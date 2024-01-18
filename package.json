@@ -1,6 +1,6 @@
 {
   "name": "discord-hono",
-  "version": "0.1.6",
+  "version": "0.1.4",
   "description": "Edge Functions module for interacting with the Discord API",
   "author": "Luis (https://github.com/LuisFun)",
   "license": "MIT",
@@ -10,7 +10,7 @@
     "patch": "npm version patch && npm run tag",
     "minor": "npm version minor && npm run tag",
     "major": "npm version major && npm run tag",
-    "tag": "powershell -Command \"git tag -a v$(node -p -e \\\"require('./package.json').version\\\") -m 'v$(node -p -e \\\"require('./package.json').version\\\")' && git push origin --tags\"",
+    "tag": "git tag -a v$(node -e \"require('./package.json').version\") -m 'v$(node -e \"require(`./package.json`).version\")' && git push origin --tags",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
