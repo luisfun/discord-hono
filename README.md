@@ -16,7 +16,7 @@ npm i discord-hono
 
 ### 2. Coding
 
-Sample Code
+[Sample Code](https://github.com/LuisFun/sample-discord-hono)
 
 ## Imports
 
