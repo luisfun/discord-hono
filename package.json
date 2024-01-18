@@ -10,7 +10,7 @@
     "patch": "npm version patch && npm run tag",
     "minor": "npm version minor && npm run tag",
     "major": "npm version major && npm run tag",
-    "tag": "git tag -a v$npm_package_version -m 'v$npm_package_version' && git push origin v$npm_package_version",
+    "tag": "VERSION=$( node -e `console.log(require('./package.json').version)` ) && git tag -a v$VERSION -m 'v$VERSION' && git push origin v$VERSION",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
