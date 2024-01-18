@@ -11,7 +11,7 @@
     "minor": "npm version minor && npm run tag && npm run push",
     "major": "npm version major && npm run tag && npm run push",
     "tag": "for /f \"tokens=*\" %i in ('node -p \"require('./package.json').version\"') do git tag v%i",
-    "push": "git push origin --tags && git push origin main",
+    "push": "git push --follow-tags",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
