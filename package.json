@@ -7,9 +7,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "patch": "tsc && npm version patch && npm run push",
-    "minor": "tsc && npm version minor && npm run push",
-    "major": "tsc && npm version major && npm run push",
+    "patch": "npm version patch && npm run push",
+    "minor": "npm version minor && npm run push",
+    "major": "npm version major && npm run push",
     "tag": "for /f \"tokens=*\" %i in ('node -p \"require('./package.json').version\"') do git tag v%i",
     "push": "git push --follow-tags",
     "build": "tsc",
