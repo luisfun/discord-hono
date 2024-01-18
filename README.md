@@ -34,6 +34,8 @@ import type {
   WaitUntilHandler,
   RegisterArg,
   Context,
+  ResObject,
+  SendObject,
 } from "discord-hono"
 ```
 
@@ -43,8 +45,8 @@ import type {
 app.setCommands(commands) // commands as Commands
 app.setScheduled("", scheduled) // scheduled as ScheduledHandler
 
-return c.res(content)
-await c.edit(content)
+return c.res(obj) // obj as ResObject
+await c.send(obj) // obj as SendObject
 
 c.waitUntil(handler) // handler as WaitUntilHandler
 return c.resDefer()

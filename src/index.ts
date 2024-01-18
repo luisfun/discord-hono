@@ -1,6 +1,11 @@
 import type { APIEmbed } from 'discord-api-types/v10'
 import { verifyKey, InteractionResponseType } from 'discord-interactions'
-import type { ExecutionContext, WaitUntilHandler } from './context'
+import type {
+  ExecutionContext,
+  WaitUntilHandler,
+  ResObject,
+  SendObject,
+} from './context'
 import { Context } from './context'
 import type {
   Env,
@@ -27,6 +32,8 @@ export type {
   WaitUntilHandler,
   RegisterArg,
   Context,
+  ResObject,
+  SendObject,
 }
 export {
   register,
