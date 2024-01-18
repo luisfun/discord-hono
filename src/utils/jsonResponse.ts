@@ -1,7 +1,7 @@
 import type { JSONValue } from './types'
 
 export class JsonResponse extends Response {
-  constructor(body: JSONValue, init?: ResponseInit) {
+  constructor(body: Object, init?: ResponseInit) {
     const jsonBody = JSON.stringify(body)
     init = init || {
       headers: {

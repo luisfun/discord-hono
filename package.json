@@ -2,6 +2,8 @@
   "name": "discord-hono",
   "version": "0.1.0",
   "description": "Edge Functions module for interacting with the Discord API",
+  "author": "Luis (https://github.com/LuisFun)",
+  "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -12,10 +14,31 @@
     "discord-bot",
     "cloudflare-workers"
   ],
-  "author": "Luis (https://github.com/LuisFun)",
-  "license": "MIT",
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/github",
+      "@semantic-release/npm"
+    ],
+    "branches": ["main"]
+  },
   "devDependencies": {
+    "@commitlint/cli": "^18.4.4",
+    "@commitlint/config-conventional": "^18.4.4",
     "discord-api-types": "^0.37.67",
+    "husky": "^8.0.3",
+    "semantic-release": "^23.0.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {

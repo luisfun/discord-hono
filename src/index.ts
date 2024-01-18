@@ -15,6 +15,8 @@ import type {
   ApplicationCommand,
 } from './types'
 import { JsonResponse } from './utils/jsonResponse'
+import type { RegisterArg } from './register'
+import { register } from './register'
 
 export type {
   APIEmbed,
@@ -23,6 +25,11 @@ export type {
   Commands,
   ScheduledHandler,
   WaitUntilHandler,
+  RegisterArg,
+  Context,
+}
+export {
+  register,
 }
 
 const defineClass = function(): {
@@ -42,7 +49,7 @@ const defineClass = function(): {
   return class {} as never
 }
 
-const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
+export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
   #commands: Commands | undefined = undefined
   #scheduled: ScheduledArray = []
 
@@ -86,7 +93,7 @@ const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
         const commandName = interaction.data?.name.toLowerCase()
         const commandIndex = this.#commands.findIndex(command => command[0].name.toLowerCase() === commandName)
         const handler = this.#commands[commandIndex][1]
-        return handler(new Context(request, env, executionCtx, interaction))
+        return await handler(new Context(request, env, executionCtx, interaction))
       }
       return new JsonResponse({ error: 'Unknown Type' }, { status: 400 })
     }
@@ -98,4 +105,3 @@ const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
     //executionCtx.waitUntil()
   }
 }
-export default DiscordHono

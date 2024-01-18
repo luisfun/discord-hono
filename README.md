@@ -1,5 +1,5 @@
 
-🔥 This project is heavily influenced by [Hono](https://github.com/honojs/hono).
+🔥 This project is heavily influenced by [Hono](https://github.com/honojs/hono).  
 Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! [Hono LICENSE](https://github.com/honojs/hono/blob/main/LICENSE)
 
 ## 🚀 Getting Started
@@ -18,15 +18,34 @@ npm i discord-hono
 
 Sample Code
 
-## 🔥 Methods
+## Imports
 
 ```js
-app.setCommands(commands as Commands)
-app.setScheduled("", scheduled as ScheduledHandler)
+import { DiscordHono } from "discord-hono"
+
+import { register } from "discord-hono"
+
+import type {
+  APIEmbed,
+  ApplicationCommand,
+  CommandHandler,
+  Commands,
+  ScheduledHandler,
+  WaitUntilHandler,
+  RegisterArg,
+  Context,
+} from "discord-hono"
+```
+
+## Methods
+
+```js
+app.setCommands(commands) // commands as Commands
+app.setScheduled("", scheduled) // scheduled as ScheduledHandler
 
 return c.res(content)
 await c.edit(content)
 
-c.waitUntil(handler as WaitUntilHandler)
+c.waitUntil(handler) // handler as WaitUntilHandler
 return c.resDefer()
 ```

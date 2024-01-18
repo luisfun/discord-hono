@@ -32,7 +32,7 @@ export type ScheduledEvent = {
 
 ////////// CommandHandler //////////
 
-export type CommandHandler<E extends Env = any> = (c: Context<E>) => Response
+export type CommandHandler<E extends Env = any> = (c: Context<E>) => Promise<Response> | Response
 /**
  * [ApplicationCommand](https://discord.com/developers/docs/interactions/application-commands)
  */
