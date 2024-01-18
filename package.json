@@ -1,0 +1,24 @@
+{
+  "name": "discord-hono",
+  "version": "0.1.0",
+  "description": "Edge Functions module for interacting with the Discord API",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "discord-bot",
+    "cloudflare-workers"
+  ],
+  "author": "Luis (https://github.com/LuisFun)",
+  "license": "MIT",
+  "devDependencies": {
+    "discord-api-types": "^0.37.67",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "discord-interactions": "^3.4.0"
+  }
+}
