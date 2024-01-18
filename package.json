@@ -7,6 +7,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "patch": "npm version patch && npm run tag",
+    "minor": "npm version minor && npm run tag",
+    "major": "npm version major && npm run tag",
+    "tag": "git tag -a v$npm_package_version -m 'v$npm_package_version' && git push origin v$npm_package_version",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
