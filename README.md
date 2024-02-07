@@ -50,10 +50,7 @@ export const commands: Commands<Env> = [
       name: "ping",
       description: "response Pong",
     },
-    async c => {
-      //const db = c.env.db
-      return c.resText("Pong")
-    },
+    c => c.resText("Pong"),
   ],
   [
     {
@@ -66,6 +63,7 @@ export const commands: Commands<Env> = [
       }],
     },
     async c => {
+      //const db = c.env.db
       c.executionCtx.waitUntil(handler(c))
       return c.resDefer()
     }
@@ -74,7 +72,6 @@ export const commands: Commands<Env> = [
 
 const handler = async (c: Context<Env>) => {
   try {
-    //const db = c.env.db
     const imageResponse = await fetch("https://luis.fun/luisfun.png")
     const arrayBuffer = await imageResponse.arrayBuffer()
     const blob = new Blob([arrayBuffer])
@@ -86,7 +83,6 @@ const handler = async (c: Context<Env>) => {
     await c.sendText("error")
   }
 }
-
 ```
 
 ### register.ts
