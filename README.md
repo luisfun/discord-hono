@@ -14,7 +14,7 @@ npm i discord-hono
 
 ## Sample Code
 
-[Repository](https://github.com/LuisFun/sample-discord-hono)
+[sample-discord-hono](https://github.com/LuisFun/sample-discord-hono)
 
 ### index.ts
 
@@ -24,12 +24,12 @@ import { DiscordHono } from "discord-hono"
 import { commands } from "./commands"
 
 type Bindings = {
-	db: D1Database
+  db: D1Database
 }
 export type Env = { Bindings: Bindings }
 
 const scheduled: ScheduledHandler<Env> = async c => {
-	console.log("Run Scheduled")
+  console.log("Run Scheduled")
 }
 
 const app = new DiscordHono<Env>()
