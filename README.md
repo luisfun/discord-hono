@@ -12,7 +12,7 @@ Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! 
 npm i discord-hono
 ```
 
-## Sample Code
+## 📑 Sample Code
 
 [sample-discord-hono](https://github.com/LuisFun/sample-discord-hono)
 
