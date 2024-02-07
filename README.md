@@ -18,7 +18,7 @@ npm i discord-hono
 
 ### index.ts
 
-```js
+```ts
 import type { ScheduledHandler } from "discord-hono"
 import { DiscordHono } from "discord-hono"
 import { commands } from "./commands"
@@ -40,7 +40,7 @@ export default app
 
 ### commands.ts
 
-```js
+```ts
 import type { Env } from "."
 import type { Commands, Context } from "discord-hono"
 
@@ -91,7 +91,7 @@ const handler = async (c: Context<Env>) => {
 
 ### register.ts
 
-```js
+```ts
 import dotenv from "dotenv"
 import process from "node:process"
 import type { RegisterArg } from "discord-hono"
