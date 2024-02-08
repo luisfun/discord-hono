@@ -16,8 +16,8 @@ export interface ExecutionContext {
 }
 
 type Command = ApplicationCommand & {
-  values?: string[]
-  valuesMap?: Record<string, string>
+  values: string[]
+  valuesMap: Record<string, string>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -55,7 +55,7 @@ export class Context<E extends Env = any> {
     this.req = req
     if(env) this.env = env
     if(executionCtx) this.#executionCtx = executionCtx
-    if(command) this.#command = command
+    if(command) this.#command = { ...command, values: [], valuesMap: {} }
     if(interaction) this.#interaction = interaction
     if(interaction?.data?.options && this.#command) {
       this.#command.valuesMap = interaction.data.options.reduce((obj: Record<string, string>, e) => {
@@ -70,7 +70,7 @@ export class Context<E extends Env = any> {
   }
 
   get event(): FetchEventLike {
-    if (this.#executionCtx && 'respondWith' in this.#executionCtx) {
+    if(this.#executionCtx && 'respondWith' in this.#executionCtx) {
       return this.#executionCtx
     } else {
       throw Error('This context has no FetchEvent')
@@ -78,7 +78,7 @@ export class Context<E extends Env = any> {
   }
 
   get executionCtx(): ExecutionContext {
-    if (this.#executionCtx) {
+    if(this.#executionCtx) {
       return this.#executionCtx as ExecutionContext
     } else {
       throw Error('This context has no ExecutionContext')
@@ -86,15 +86,19 @@ export class Context<E extends Env = any> {
   }
 
   get interaction(): Interaction {
-    if (this.#interaction) {
+    if(this.#interaction) {
       return this.#interaction as Interaction
     } else {
       throw Error('This context has no Interaction')
     }
   }
 
-  get command(): Command | undefined {
-    return this.#command
+  get command(): Command {
+    if(this.#command) {
+      return this.#command as Command
+    } else {
+      throw Error('This context has no Command')
+    }
   }
 
   set: Set<E> = (key: string, value: unknown) => {
@@ -129,8 +133,8 @@ export class Context<E extends Env = any> {
    * @returns 
    */
   followup = async (data: APIInteractionResponseCallbackData, file?: FileData | FileData[]) => {
-    if (!this.env?.DISCORD_APPLICATION_ID) throw new Error('DISCORD_APPLICATION_ID is not set.')
-    if (!this.#interaction?.token) throw new Error('interaction is not set.')
+    if(!this.env?.DISCORD_APPLICATION_ID) throw new Error('DISCORD_APPLICATION_ID is not set.')
+    if(!this.#interaction?.token) throw new Error('interaction is not set.')
     const post = await fetchMessage(`${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.#interaction.token}`, data, file)
     return new Response('Sent to Discord.', { status: post.status })
   }
@@ -150,7 +154,7 @@ export class Context<E extends Env = any> {
    */
   post = async (channelId: string, data: APIInteractionResponseCallbackData, file?: FileData | FileData[]) => {
     const id = channelId || this.#interaction?.channel?.id
-    if (!id) throw new Error('channelId is not set.')
+    if(!id) throw new Error('channelId is not set.')
     return await postMessage(id, data, file)
   }
   postText = async (channelId: string, content: string) => await this.post(channelId, { content })
