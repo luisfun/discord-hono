@@ -74,8 +74,9 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
         if(!this.#commands) throw new Error('Commands is not set.')
         const commandName = interaction.data?.name.toLowerCase()
         const commandIndex = this.#commands.findIndex(command => command[0].name.toLowerCase() === commandName)
+        const command = this.#commands[commandIndex][0]
         const handler = this.#commands[commandIndex][1]
-        return await handler(new Context(request, env, executionCtx, interaction))
+        return await handler(new Context(request, env, executionCtx, command, interaction))
       }
       return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
     }

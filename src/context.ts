@@ -5,7 +5,7 @@ import type {
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
-import type { Env, FetchEventLike, Interaction } from './types'
+import type { Env, FetchEventLike, ApplicationCommand, Interaction } from './types'
 import type { FileData } from './utils'
 import { apiUrl, ResponseJson, fetchMessage } from './utils'
 import { postMessage } from './api-wrapper/channel-message'
@@ -15,8 +15,9 @@ export interface ExecutionContext {
   passThroughOnException(): void
 }
 
-type Command = {
-  options: Record<string, string>
+type Command = ApplicationCommand & {
+  values?: string[]
+  valuesMap?: Record<string, string>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,25 +42,30 @@ export class Context<E extends Env = any> {
 
   #executionCtx: FetchEventLike | ExecutionContext | undefined
   #interaction: Interaction | undefined
-  #command: Command = { options: {} }
+  #command: Command | undefined
   #var: E['Variables'] = {}
 
   constructor(
     req: Request,
     env?: E['Bindings'],
     executionCtx?: FetchEventLike | ExecutionContext | undefined,
+    command?: ApplicationCommand,
     interaction?: Interaction,
   ) {
     this.req = req
     if(env) this.env = env
     if(executionCtx) this.#executionCtx = executionCtx
+    if(command) this.#command = command
     if(interaction) this.#interaction = interaction
-    if(interaction?.data?.options) {
-      this.#command.options = interaction.data.options.reduce((obj: Record<string, string>, e) => {
+    if(interaction?.data?.options && this.#command) {
+      this.#command.valuesMap = interaction.data.options.reduce((obj: Record<string, string>, e) => {
         // @ts-expect-error
         obj[e.name] = e.value
         return obj
       }, {})
+      const optionsName = this.#command.options?.map(e => e.name)
+      // @ts-expect-error
+      if(this.#command.valuesMap) this.#command.values = optionsName?.map(e => this.#command.valuesMap[e])
     }
   }
 
@@ -87,7 +93,7 @@ export class Context<E extends Env = any> {
     }
   }
 
-  get command(): Command {
+  get command(): Command | undefined {
     return this.#command
   }
 
