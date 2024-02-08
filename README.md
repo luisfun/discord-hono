@@ -76,7 +76,7 @@ const handler = async (c: Context<Env>) => {
     const arrayBuffer = await imageResponse.arrayBuffer()
     const blob = new Blob([arrayBuffer])
     await c.followup(
-      { content: c.command.options["content"] },
+      { content: c.command.values[0] },
       { blob, name: "image.png" },
     )
   } catch {
