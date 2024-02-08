@@ -75,12 +75,12 @@ const handler = async (c: Context<Env>) => {
     const imageResponse = await fetch("https://luis.fun/luisfun.png")
     const arrayBuffer = await imageResponse.arrayBuffer()
     const blob = new Blob([arrayBuffer])
-    await c.send({
-      content: c.command.options["content"],
-      files: [blob],
-    })
+    await c.followup(
+      { content: c.command.options["content"] },
+      { blob, name: "image.png" },
+    )
   } catch {
-    await c.sendText("error")
+    await c.followupText("error")
   }
 }
 ```
