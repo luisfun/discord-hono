@@ -4,9 +4,9 @@ import type {
   APIInteractionResponseChannelMessageWithSource,
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIInteractionResponseCallbackData,
-  RESTPostAPIChannelMessageFormDataBody,
 } from 'discord-api-types/v10'
 import type { Env, FetchEventLike, Interaction } from './types'
+import type { FileData } from './utils'
 import { apiUrl, ResponseJson, fetchMessage } from './utils'
 import { postMessage } from './api-wrapper/channel-message'
 
@@ -32,23 +32,6 @@ interface Get<E extends Env> {
 interface Set<E extends Env> {
   <Key extends keyof ContextVariableMap>(key: Key, value: ContextVariableMap[Key]): void
   <Key extends keyof E['Variables']>(key: Key, value: E['Variables'][Key]): void
-}
-
-/**
- * @deprecated
- */
-export type ResObject = {
-  content?: string
-  embeds?: APIEmbed[]
-}
-
-/**
- * @deprecated
- */
-export type SendObject = {
-  content?: string
-  embeds?: APIEmbed[]
-  files?: (File | Blob)[]
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -122,7 +105,6 @@ export class Context<E extends Env = any> {
     return { ...this.#var } as never
   }
 
-  // api response
   resBase = (json: APIInteractionResponse) => new ResponseJson(json)
   /**
    * Response to request.
@@ -134,89 +116,41 @@ export class Context<E extends Env = any> {
   resEmbed = (embed: APIEmbed) => this.res({ embeds: [embed] })
   resDefer = () => this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
 
-  // followup is after resDefer
   /**
    * Used to send messages after resDefer.
-   * @param json [json Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
-   * @param file Files, images, etc. to be attached to messages.
+   * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
+   * @param file FileData: { blob: Blob, name: string }
    * @returns 
    */
-  followup = async (json: APIInteractionResponseCallbackData, file?: Blob | Blob[]) => {
+  followup = async (data: APIInteractionResponseCallbackData, file?: FileData | FileData[]) => {
     if (!this.env?.DISCORD_APPLICATION_ID) throw new Error('DISCORD_APPLICATION_ID is not set.')
     if (!this.#interaction?.token) throw new Error('interaction is not set.')
-    const post = await fetchMessage(`${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.#interaction.token}`, json, file)
+    const post = await fetchMessage(`${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.#interaction.token}`, data, file)
     return new Response('Sent to Discord.', { status: post.status })
   }
   followupText = async (content: string) => await this.followup({ content })
   followupEmbed = async (embed: APIEmbed) => await this.followup({ embeds: [embed] })
   followupImage = async (image: ArrayBuffer | ArrayBuffer[]) => {
-    if (!Array.isArray(image)) return await this.followup({}, new Blob([image]))
-    return await this.followup({}, image.map(e => new Blob([e])))
+    if (!Array.isArray(image)) return await this.followup({}, { blob: new Blob([image]), name: 'image.png' })
+    return await this.followup({}, image.map((e,i) => ({ blob: new Blob([e]), name: `image${i}.png` })))
   }
 
-  // api message wrapper
   /**
    * Used to send messages other than res*** and followup***.
    * @param channelId "" is request channel id.
-   * @param json [data type](https://discord-api-types.dev/api/next/discord-api-types-v10#RESTPostAPIChannelMessageFormDataBody)
+   * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
+   * @param file FileData: { blob: Blob, name: string }
    * @returns 
    */
-  post = async (channelId: string, json?: APIInteractionResponseCallbackData, file?: Blob | Blob[]) => {
+  post = async (channelId: string, data: APIInteractionResponseCallbackData, file?: FileData | FileData[]) => {
     const id = channelId || this.#interaction?.channel?.id
     if (!id) throw new Error('channelId is not set.')
-    return await postMessage(id, json, file)
+    return await postMessage(id, data, file)
   }
   postText = async (channelId: string, content: string) => await this.post(channelId, { content })
   postEmbed = async (channelId: string, embed: APIEmbed) => await this.post(channelId, { embeds: [embed] })
   postImage = async (channelId: string, image: ArrayBuffer | ArrayBuffer[]) => {
-    if (!Array.isArray(image)) return await this.post(channelId, {}, new Blob([image]))
-    return await this.post(channelId, {}, image.map(e => new Blob([e])))
+    if (!Array.isArray(image)) return await this.post(channelId, {}, { blob: new Blob([image]), name: 'image.png' })
+    return await this.post(channelId, {}, image.map((e,i) => ({ blob: new Blob([e]), name: `image${i}.png` })))
   }
-
-  /**
-   * @deprecated
-   */
-  sendBody = async (body: BodyInit) => {
-    if (!this.env?.DISCORD_APPLICATION_ID) throw new Error('DISCORD_APPLICATION_ID is not set.')
-    if (!this.#interaction?.token) throw new Error('interaction is not set.')
-    const res = await fetch(
-      `${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.#interaction.token}`,
-      { method: 'POST', body, },
-    )
-    return new Response('Sent to Discord', { status: res.status })
-  }
-  /**
-   * @deprecated
-   */
-  sendJson = async (json: APIInteractionResponse) => {
-    return await this.sendBody(JSON.stringify(json))
-  }
-  /**
-   * @deprecated
-   * @param obj content: string, embeds: embed[], files: (File | Blob)[]
-   * @returns Promise<Response>
-   */
-  send = async (obj: SendObject) => {
-    const body = new FormData()
-    if (obj.content) body.append('content', obj.content)
-    if (obj.embeds) body.append('embeds', JSON.stringify(obj.embeds)) // 未検証
-    if (obj.files) {
-      for(let i=0; i<obj.files.length; i++) {
-        body.append(`files[${i}]`, obj.files[i], `image${i}.png`)
-      }
-    }
-    return await this.sendBody(body)
-  }
-  /**
-   * @deprecated
-   */
-  sendText = async (content: string) => await this.send({ content })
-  /**
-   * @deprecated
-   */
-  sendEmbed = async (embed: APIEmbed) => await this.send({ embeds: [embed] })
-  /**
-   * @deprecated
-   */
-  sendImageBuffer = async (imageBuffer: ArrayBuffer) => await this.send({ files: [new Blob([imageBuffer])] })
 }
