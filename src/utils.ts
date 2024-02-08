@@ -1,3 +1,4 @@
+import type { APIInteractionResponseCallbackData } from 'discord-api-types/v10'
 
 export const apiUrl = 'https://discord.com/api/v10'
 
@@ -15,21 +16,16 @@ export class ResponseJson extends Response {
   }
 }
 
-export const fetchFormData = async (input: RequestInfo | URL, init?: RequestInit | undefined) => {
-  const initFormData = {
-    ...init,
-    headers: {
-      'content-type': 'multipart/form-data;charset=UTF-8',
-      ...init?.headers,
-    },
-  }
-  return await fetch(input, initFormData)
-}
-
-/*
-export const jsonToFormData = (json: Record<string, string | Blob>) => {
+/**
+ * fetch(input, { body })
+ * @param method default 'POST'
+ */
+export const fetchMessage = async (input: URL | RequestInfo, json?: APIInteractionResponseCallbackData, file?: Blob | Blob[], method?: string) => {
   const body = new FormData()
-  for (const key in json) body.append(key, json[key])
-  return body
+  body.append('payload_json', JSON.stringify(json))
+  if (file){
+    if (!Array.isArray(file)) body.append(`files[0]`, file)
+    else for (let i=0, len=file.length; i<len; i++) body.append(`files[${i}]`, file[i])
+  }
+  return await fetch(input, { method: method || 'POST', body })
 }
-*/

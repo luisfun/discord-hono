@@ -1,15 +1,13 @@
-import type {
-  RESTPostAPIChannelMessageFormDataBody,
-} from 'discord-api-types/v10'
-import { apiUrl, fetchFormData } from '../utils'
+import type { APIInteractionResponseCallbackData } from 'discord-api-types/v10'
+import { apiUrl, fetchMessage } from '../utils'
 
 /**
  * [API Create Message](https://discord.com/developers/docs/resources/channel#create-message)
  */
-export const postMessage = async (json: RESTPostAPIChannelMessageFormDataBody, channelId: string) =>
-  await fetchFormData(
+export const postMessage = async (channelId: string, data?: APIInteractionResponseCallbackData, file?: Blob | Blob[] ) =>
+  await fetchMessage(
     `${apiUrl}/channels/${channelId}/messages`,
-    { method: 'POST', body: JSON.stringify(json) },
+    data, file,
   )
 
 /**

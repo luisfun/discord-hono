@@ -3,11 +3,11 @@ import type {
   APIInteractionResponse,
   APIInteractionResponseChannelMessageWithSource,
   APIInteractionResponseDeferredChannelMessageWithSource,
-  RESTPostAPIInteractionFollowupFormDataBody,
+  APIInteractionResponseCallbackData,
   RESTPostAPIChannelMessageFormDataBody,
 } from 'discord-api-types/v10'
 import type { Env, FetchEventLike, Interaction } from './types'
-import { apiUrl, ResponseJson, fetchFormData } from './utils'
+import { apiUrl, ResponseJson, fetchMessage } from './utils'
 import { postMessage } from './api-wrapper/channel-message'
 
 export interface ExecutionContext {
@@ -129,7 +129,7 @@ export class Context<E extends Env = any> {
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @returns Response
    */
-  res = (data: APIInteractionResponseChannelMessageWithSource['data']) => this.resBase({ data, type: 4 } as APIInteractionResponseChannelMessageWithSource)
+  res = (data: APIInteractionResponseCallbackData) => this.resBase({ data, type: 4 } as APIInteractionResponseChannelMessageWithSource)
   resText = (content: string) => this.res({ content })
   resEmbed = (embed: APIEmbed) => this.res({ embeds: [embed] })
   resDefer = () => this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
@@ -137,50 +137,40 @@ export class Context<E extends Env = any> {
   // followup is after resDefer
   /**
    * Used to send messages after resDefer.
-   * @param json [data type](https://discord-api-types.dev/api/next/discord-api-types-v10#RESTPostAPIInteractionFollowupFormDataBody)
+   * @param json [json Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
+   * @param file Files, images, etc. to be attached to messages.
    * @returns 
    */
-  followup = async (json: RESTPostAPIInteractionFollowupFormDataBody) => {
+  followup = async (json: APIInteractionResponseCallbackData, file?: Blob | Blob[]) => {
     if (!this.env?.DISCORD_APPLICATION_ID) throw new Error('DISCORD_APPLICATION_ID is not set.')
     if (!this.#interaction?.token) throw new Error('interaction is not set.')
-    const post = await fetchFormData(
-      `${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.#interaction.token}`,
-      { method: 'POST', body: JSON.stringify(json) },
-    )
+    const post = await fetchMessage(`${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.#interaction.token}`, json, file)
     return new Response('Sent to Discord.', { status: post.status })
   }
   followupText = async (content: string) => await this.followup({ content })
   followupEmbed = async (embed: APIEmbed) => await this.followup({ embeds: [embed] })
-  followupImage = async (imageBuffer: ArrayBuffer | ArrayBuffer[]) => {
-    if (!Array.isArray(imageBuffer)) return await this.followup({ 'files[0]': [new Blob([imageBuffer])] })
-    const json = {} as RESTPostAPIInteractionFollowupFormDataBody
-    for (let i=0, len=imageBuffer.length; i<len; i++) {
-      json[`files[${i}]` as keyof RESTPostAPIInteractionFollowupFormDataBody] = [new Blob([imageBuffer[i]])]
-    }
-    return await this.followup(json)
+  followupImage = async (image: ArrayBuffer | ArrayBuffer[]) => {
+    if (!Array.isArray(image)) return await this.followup({}, new Blob([image]))
+    return await this.followup({}, image.map(e => new Blob([e])))
   }
 
   // api message wrapper
   /**
    * Used to send messages other than res*** and followup***.
+   * @param channelId "" is request channel id.
    * @param json [data type](https://discord-api-types.dev/api/next/discord-api-types-v10#RESTPostAPIChannelMessageFormDataBody)
-   * @param channelId If omitted, it is sent to the channel of the request.
    * @returns 
    */
-  post = async (json: RESTPostAPIChannelMessageFormDataBody, channelId?: string) => {
+  post = async (channelId: string, json?: APIInteractionResponseCallbackData, file?: Blob | Blob[]) => {
     const id = channelId || this.#interaction?.channel?.id
     if (!id) throw new Error('channelId is not set.')
-    return await postMessage(json, id)
+    return await postMessage(id, json, file)
   }
-  postText = async (content: string) => await this.post({ content })
-  postEmbed = async (embed: APIEmbed) => await this.post({ embeds: [embed] })
-  postImage = async (imageBuffer: ArrayBuffer | ArrayBuffer[]) => {
-    if (!Array.isArray(imageBuffer)) return await this.post({ 'files[0]': [new Blob([imageBuffer])] })
-    const json = {} as RESTPostAPIChannelMessageFormDataBody
-    for (let i=0, len=imageBuffer.length; i<len; i++) {
-      json[`files[${i}]` as keyof RESTPostAPIChannelMessageFormDataBody] = [new Blob([imageBuffer[i]])]
-    }
-    return await this.post(json)
+  postText = async (channelId: string, content: string) => await this.post(channelId, { content })
+  postEmbed = async (channelId: string, embed: APIEmbed) => await this.post(channelId, { embeds: [embed] })
+  postImage = async (channelId: string, image: ArrayBuffer | ArrayBuffer[]) => {
+    if (!Array.isArray(image)) return await this.post(channelId, {}, new Blob([image]))
+    return await this.post(channelId, {}, image.map(e => new Blob([e])))
   }
 
   /**
