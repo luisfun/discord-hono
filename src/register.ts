@@ -1,4 +1,5 @@
 import type { Commands } from './types.js'
+import { apiUrl } from './utils.js'
 
 export type RegisterArg = {
   commands: Commands,
@@ -14,8 +15,8 @@ export const register = async (arg: RegisterArg) => {
   if(!arg.token) throw new Error('The DISCORD_TOKEN environment variable is required.')
   if(!arg.applicationId) throw new Error('The DISCORD_APPLICATION_ID environment variable is required.')
   const url = arg.guildId
-    ? `https://discord.com/api/v10/applications/${arg.applicationId}/guilds/${arg.guildId}/commands`
-    : `https://discord.com/api/v10/applications/${arg.applicationId}/commands`
+    ? `${apiUrl}/applications/${arg.applicationId}/guilds/${arg.guildId}/commands`
+    : `${apiUrl}/applications/${arg.applicationId}/commands`
   const applicationCommands = arg.commands.map(cmd => cmd[0])
 
   const response = await fetch(url, {

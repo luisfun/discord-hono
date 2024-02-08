@@ -97,3 +97,12 @@ export abstract class FetchEventLike {
  * https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
  */
 export type Interaction = APIBaseInteraction<InteractionType, APIChatInputApplicationCommandInteractionData>
+
+
+////////// JSONValue //////////
+/*
+type JSONPrimitive = string | boolean | number | null | undefined
+type JSONArray = (JSONPrimitive | JSONObject | JSONArray)[]
+type JSONObject = { [key: string]: JSONPrimitive | JSONArray | JSONObject | object }
+export type JSONValue = JSONObject | JSONArray | JSONPrimitive
+*/
