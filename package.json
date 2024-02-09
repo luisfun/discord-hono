@@ -21,8 +21,7 @@
   "prettier": {
     "printWidth": 140,
     "semi": false,
-    "singleQuote": true,
-    "trailingComma": "es5"
+    "arrowParens": "avoid"
   },
   "devDependencies": {
     "discord-api-types": "^0.37.69",

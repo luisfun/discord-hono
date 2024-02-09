@@ -1,4 +1,3 @@
-
 🔥 This project is heavily influenced by [Hono](https://github.com/honojs/hono).  
 Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! [Hono LICENSE](https://github.com/honojs/hono/blob/main/LICENSE)
 
@@ -9,11 +8,13 @@ Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! 
 ### Install
 
 JavaScript
+
 ```shell
 npm i discord-hono
 ```
 
 TypeScript
+
 ```shell
 npm i discord-hono
 npm i -D discord-api-types
@@ -63,17 +64,19 @@ export const commands: Commands<Env> = [
     {
       name: "img",
       description: "response Image",
-      options: [{
-        type: 3,
-        name: "content",
-        description: "response text",
-      }],
+      options: [
+        {
+          type: 3,
+          name: "content",
+          description: "response text",
+        },
+      ],
     },
     async c => {
       //const db = c.env.db
       c.executionCtx.waitUntil(handler(c))
       return c.resDefer()
-    }
+    },
   ],
 ]
 
@@ -82,10 +85,7 @@ const handler = async (c: Context<Env>) => {
     const imageResponse = await fetch("https://luis.fun/luisfun.png")
     const arrayBuffer = await imageResponse.arrayBuffer()
     const blob = new Blob([arrayBuffer])
-    await c.followup(
-      { content: c.command.values[0] },
-      { blob, name: "image.png" },
-    )
+    await c.followup({ content: c.command.values[0] }, { blob, name: "image.png" })
   } catch {
     await c.followupText("error")
   }

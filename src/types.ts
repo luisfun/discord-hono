@@ -5,9 +5,8 @@ import type {
   APIChatInputApplicationCommandInteractionData,
   APIApplicationCommand,
   ApplicationCommandType,
-} from 'discord-api-types/v10'
-import type { Context } from './context'
-
+} from "discord-api-types/v10"
+import type { Context } from "./context"
 
 ////////// Values //////////
 
@@ -19,7 +18,6 @@ export type Env = {
   Variables?: Variables
 }
 
-
 ////////// ScheduledEvent //////////
 // https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled/#syntax
 
@@ -29,7 +27,6 @@ export type ScheduledEvent = {
   scheduledTime: number
 }
 
-
 ////////// CommandHandler //////////
 
 export type CommandHandler<E extends Env = any> = (c: Context<E>) => Promise<Response> | Response
@@ -38,7 +35,7 @@ export type CommandHandler<E extends Env = any> = (c: Context<E>) => Promise<Res
  */
 export type ApplicationCommand = Omit<
   APIApplicationCommand,
-  'id' | 'type' | 'application_id' | 'default_member_permissions' | 'version'
+  "id" | "type" | "application_id" | "default_member_permissions" | "version"
 > & {
   id?: string
   type?: ApplicationCommandType
@@ -49,25 +46,17 @@ export type ApplicationCommand = Omit<
 /**
  * [ApplicationCommand](https://discord.com/developers/docs/interactions/application-commands)
  */
-export type Commands<E extends Env = any> = [
-  ApplicationCommand,
-  CommandHandler<E>,
-][]
+export type Commands<E extends Env = any> = [ApplicationCommand, CommandHandler<E>][]
 
 export type SetCommandsHandler<E extends Env = any> = (commands: Commands<E>) => void
-
 
 ////////// ScheduledHandler //////////
 
 export type ScheduledHandler<E extends Env = any> = (c: Context<E>) => Promise<unknown>
 
-export type ScheduledArray<E extends Env = any> = [
-  string,
-  ScheduledHandler<E>,
-][]
+export type ScheduledArray<E extends Env = any> = [string, ScheduledHandler<E>][]
 
-export type SetScheduledHandler<E extends Env = any> = (cron: string, scheduled: ScheduledHandler<E>,) => void
-
+export type SetScheduledHandler<E extends Env = any> = (cron: string, scheduled: ScheduledHandler<E>) => void
 
 ////////// ValidationTargets //////////
 
@@ -81,7 +70,6 @@ export type ValidationTargets = {
   cookie: Record<string, string>
 }
 
-
 ////////// FetchEventLike //////////
 
 export abstract class FetchEventLike {
@@ -91,13 +79,11 @@ export abstract class FetchEventLike {
   abstract waitUntil(promise: Promise<void>): void
 }
 
-
 ////////// Interaction //////////
 /**
  * https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
  */
 export type Interaction = APIBaseInteraction<InteractionType, APIChatInputApplicationCommandInteractionData>
-
 
 ////////// JSONValue //////////
 /*
