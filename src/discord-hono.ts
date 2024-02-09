@@ -2,7 +2,15 @@ import type { APIInteractionResponsePong } from "discord-api-types/v10"
 import { verifyKey } from "discord-interactions"
 import type { ExecutionContext } from "./context"
 import { Context } from "./context"
-import type { Env, ScheduledEvent, Commands, SetCommandsHandler, ScheduledArray, SetScheduledHandler, Interaction } from "./types"
+import type {
+  Env,
+  ScheduledEvent,
+  Commands,
+  SetCommandsHandler,
+  ScheduledArray,
+  SetScheduledHandler,
+  Interaction,
+} from "./types"
 import { ResponseJson } from "./utils"
 
 const defineClass = function (): {

@@ -140,7 +140,8 @@ export class Context<E extends Env = any> {
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @returns Response
    */
-  res = (data: APIInteractionResponseCallbackData) => this.resBase({ data, type: 4 } as APIInteractionResponseChannelMessageWithSource)
+  res = (data: APIInteractionResponseCallbackData) =>
+    this.resBase({ data, type: 4 } as APIInteractionResponseChannelMessageWithSource)
   resText = (content: string) => this.res({ content })
   resEmbed = (embed: APIEmbed) => this.res({ embeds: [embed] })
   resDefer = () => this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
@@ -154,7 +155,11 @@ export class Context<E extends Env = any> {
   followup = async (data: APIInteractionResponseCallbackData, file?: FileData | FileData[]) => {
     if (!this.env?.DISCORD_APPLICATION_ID) throw new Error("DISCORD_APPLICATION_ID is not set.")
     if (!this.#interaction?.token) throw new Error("interaction is not set.")
-    const post = await fetchMessage(`${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.#interaction.token}`, data, file)
+    const post = await fetchMessage(
+      `${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.#interaction.token}`,
+      data,
+      file,
+    )
     return new Response("Sent to Discord.", { status: post.status })
   }
   followupText = async (content: string) => await this.followup({ content })
