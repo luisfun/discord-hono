@@ -19,10 +19,10 @@
     "cloudflare-workers"
   ],
   "devDependencies": {
+    "discord-api-types": "^0.37.69",
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "discord-api-types": "^0.37.69",
     "discord-interactions": "^3.4.0"
   }
 }
