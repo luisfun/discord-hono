@@ -4,11 +4,11 @@ import type {
   APIInteractionResponseChannelMessageWithSource,
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIInteractionResponseCallbackData,
-} from "discord-api-types/v10"
-import type { Env, FetchEventLike, ScheduledEvent, ApplicationCommand, Interaction } from "./types"
-import type { FileData } from "./utils"
-import { apiUrl, ResponseJson, fetchMessage } from "./utils"
-import { postMessage } from "./api-wrapper/channel-message"
+} from 'discord-api-types/v10'
+import type { Env, FetchEventLike, ScheduledEvent, ApplicationCommand, Interaction } from './types'
+import type { FileData } from './utils'
+import { apiUrl, ResponseJson, fetchMessage } from './utils'
+import { postMessage } from './api-wrapper/channel-message'
 
 export interface ExecutionContext {
   waitUntil(promise: Promise<unknown>): void
@@ -27,28 +27,28 @@ export interface ContextVariableMap {}
 
 interface Get<E extends Env> {
   <Key extends keyof ContextVariableMap>(key: Key): ContextVariableMap[Key]
-  <Key extends keyof E["Variables"]>(key: Key): E["Variables"][Key]
+  <Key extends keyof E['Variables']>(key: Key): E['Variables'][Key]
 }
 
 interface Set<E extends Env> {
   <Key extends keyof ContextVariableMap>(key: Key, value: ContextVariableMap[Key]): void
-  <Key extends keyof E["Variables"]>(key: Key, value: E["Variables"][Key]): void
+  <Key extends keyof E['Variables']>(key: Key, value: E['Variables'][Key]): void
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class Context<E extends Env = any> {
-  env: E["Bindings"] = {}
+  env: E['Bindings'] = {}
 
   #req: Request | undefined
   #executionCtx: FetchEventLike | ExecutionContext | undefined
   #interaction: Interaction | undefined
   #command: Command | undefined
   #scheduledEvent: ScheduledEvent | undefined
-  #var: E["Variables"] = {}
+  #var: E['Variables'] = {}
 
   constructor(
     req: Request | undefined,
-    env?: E["Bindings"],
+    env?: E['Bindings'],
     executionCtx?: FetchEventLike | ExecutionContext | undefined,
     command?: ApplicationCommand,
     interaction?: Interaction,
@@ -76,15 +76,15 @@ export class Context<E extends Env = any> {
     if (this.#req) {
       return this.#req
     } else {
-      throw Error("This context has no Request.")
+      throw Error('This context has no Request.')
     }
   }
 
   get event(): FetchEventLike {
-    if (this.#executionCtx && "respondWith" in this.#executionCtx) {
+    if (this.#executionCtx && 'respondWith' in this.#executionCtx) {
       return this.#executionCtx
     } else {
-      throw Error("This context has no FetchEvent.")
+      throw Error('This context has no FetchEvent.')
     }
   }
 
@@ -92,7 +92,7 @@ export class Context<E extends Env = any> {
     if (this.#executionCtx) {
       return this.#executionCtx
     } else {
-      throw Error("This context has no ExecutionContext.")
+      throw Error('This context has no ExecutionContext.')
     }
   }
 
@@ -100,7 +100,7 @@ export class Context<E extends Env = any> {
     if (this.#interaction) {
       return this.#interaction
     } else {
-      throw Error("This context has no Interaction.")
+      throw Error('This context has no Interaction.')
     }
   }
 
@@ -108,7 +108,7 @@ export class Context<E extends Env = any> {
     if (this.#command) {
       return this.#command
     } else {
-      throw Error("This context has no Command.")
+      throw Error('This context has no Command.')
     }
   }
 
@@ -116,7 +116,7 @@ export class Context<E extends Env = any> {
     if (this.#scheduledEvent) {
       return this.#scheduledEvent
     } else {
-      throw Error("This context has no ScheduledEvent.")
+      throw Error('This context has no ScheduledEvent.')
     }
   }
 
@@ -130,7 +130,7 @@ export class Context<E extends Env = any> {
   }
 
   // c.var.propName is a read-only
-  get var(): Readonly<E["Variables"] & ContextVariableMap> {
+  get var(): Readonly<E['Variables'] & ContextVariableMap> {
     return { ...this.#var } as never
   }
 
@@ -153,19 +153,19 @@ export class Context<E extends Env = any> {
    * @returns
    */
   followup = async (data: APIInteractionResponseCallbackData, file?: FileData | FileData[]) => {
-    if (!this.env?.DISCORD_APPLICATION_ID) throw new Error("DISCORD_APPLICATION_ID is not set.")
-    if (!this.#interaction?.token) throw new Error("interaction is not set.")
+    if (!this.env?.DISCORD_APPLICATION_ID) throw new Error('DISCORD_APPLICATION_ID is not set.')
+    if (!this.#interaction?.token) throw new Error('interaction is not set.')
     const post = await fetchMessage(
       `${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.#interaction.token}`,
       data,
       file,
     )
-    return new Response("Sent to Discord.", { status: post.status })
+    return new Response('Sent to Discord.', { status: post.status })
   }
   followupText = async (content: string) => await this.followup({ content })
   followupEmbed = async (embed: APIEmbed) => await this.followup({ embeds: [embed] })
   followupImage = async (image: ArrayBuffer | ArrayBuffer[]) => {
-    if (!Array.isArray(image)) return await this.followup({}, { blob: new Blob([image]), name: "image.png" })
+    if (!Array.isArray(image)) return await this.followup({}, { blob: new Blob([image]), name: 'image.png' })
     return await this.followup(
       {},
       image.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })),
@@ -181,13 +181,13 @@ export class Context<E extends Env = any> {
    */
   post = async (channelId: string, data: APIInteractionResponseCallbackData, file?: FileData | FileData[]) => {
     const id = channelId || this.#interaction?.channel?.id
-    if (!id) throw new Error("channelId is not set.")
+    if (!id) throw new Error('channelId is not set.')
     return await postMessage(id, data, file)
   }
   postText = async (channelId: string, content: string) => await this.post(channelId, { content })
   postEmbed = async (channelId: string, embed: APIEmbed) => await this.post(channelId, { embeds: [embed] })
   postImage = async (channelId: string, image: ArrayBuffer | ArrayBuffer[]) => {
-    if (!Array.isArray(image)) return await this.post(channelId, {}, { blob: new Blob([image]), name: "image.png" })
+    if (!Array.isArray(image)) return await this.post(channelId, {}, { blob: new Blob([image]), name: 'image.png' })
     return await this.post(
       channelId,
       {},

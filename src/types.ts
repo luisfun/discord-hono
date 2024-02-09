@@ -5,8 +5,8 @@ import type {
   APIChatInputApplicationCommandInteractionData,
   APIApplicationCommand,
   ApplicationCommandType,
-} from "discord-api-types/v10"
-import type { Context } from "./context"
+} from 'discord-api-types/v10'
+import type { Context } from './context'
 
 ////////// Values //////////
 
@@ -35,7 +35,7 @@ export type CommandHandler<E extends Env = any> = (c: Context<E>) => Promise<Res
  */
 export type ApplicationCommand = Omit<
   APIApplicationCommand,
-  "id" | "type" | "application_id" | "default_member_permissions" | "version"
+  'id' | 'type' | 'application_id' | 'default_member_permissions' | 'version'
 > & {
   id?: string
   type?: ApplicationCommandType
