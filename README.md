@@ -99,7 +99,7 @@ import dotenv from "dotenv"
 import process from "node:process"
 import type { RegisterArg } from "discord-hono"
 import { register } from "discord-hono"
-import { commands } from "./commands"
+import { commands } from "./commands.js" // '.js' is necessary for 'npm run register'.
 
 dotenv.config({ path: ".dev.vars" })
 
