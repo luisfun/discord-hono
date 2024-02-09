@@ -5,6 +5,10 @@
   "author": "Luis (https://github.com/LuisFun)",
   "homepage": "https://github.com/LuisFun/discord-hono",
   "license": "MIT",
+  "keywords": [
+    "discord-bot",
+    "cloudflare-workers"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -14,12 +18,15 @@
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [
-    "discord-bot",
-    "cloudflare-workers"
-  ],
+  "prettier": {
+    "printWidth": 140,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
   "devDependencies": {
     "discord-api-types": "^0.37.69",
+    "prettier": "^3.2.5",
     "typescript": "^5.3.3"
   },
   "dependencies": {
