@@ -12,11 +12,10 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "fix": "prettier . --write",
     "patch": "prettier . --write && npm version patch && git push --follow-tags",
     "minor": "prettier . --write && npm version minor && git push --follow-tags",
     "major": "prettier . --write && npm version major && git push --follow-tags",
-    "build": "tsc",
-    "prettier": "prettier . --write",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "prettier": {
