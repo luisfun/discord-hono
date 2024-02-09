@@ -76,7 +76,7 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
         const commandIndex = this.#commands.findIndex(command => command[0].name.toLowerCase() === commandName)
         const command = this.#commands[commandIndex][0]
         const handler = this.#commands[commandIndex][1]
-        return await handler(new Context(request, env, executionCtx, command, interaction))
+        return await handler( new Context( request, env, executionCtx, command, interaction ) )
       }
       return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
     }
@@ -84,7 +84,8 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
   }
 
   scheduled = async (event: ScheduledEvent, env: E['Bindings'] | {}, executionCtx: ExecutionContext) => {
-    //const c = new Context(new HonoRequest(request), { env, executionCtx, })
-    //executionCtx.waitUntil()
+    const scheduledIndex = this.#scheduled.findIndex(e => e[0] === event.cron)
+    const handler = this.#scheduled[scheduledIndex][1]
+    await handler( new Context( undefined, env, executionCtx, undefined, undefined, event ) )
   }
 }

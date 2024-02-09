@@ -5,7 +5,7 @@ import type {
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
-import type { Env, FetchEventLike, ApplicationCommand, Interaction } from './types'
+import type { Env, FetchEventLike, ScheduledEvent, ApplicationCommand, Interaction } from './types'
 import type { FileData } from './utils'
 import { apiUrl, ResponseJson, fetchMessage } from './utils'
 import { postMessage } from './api-wrapper/channel-message'
@@ -37,22 +37,24 @@ interface Set<E extends Env> {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export class Context<E extends Env = any> {
-  req: Request
   env: E['Bindings'] = {}
 
+  #req: Request | undefined
   #executionCtx: FetchEventLike | ExecutionContext | undefined
   #interaction: Interaction | undefined
   #command: Command | undefined
+  #scheduledEvent: ScheduledEvent | undefined
   #var: E['Variables'] = {}
 
   constructor(
-    req: Request,
+    req: Request | undefined,
     env?: E['Bindings'],
     executionCtx?: FetchEventLike | ExecutionContext | undefined,
     command?: ApplicationCommand,
     interaction?: Interaction,
+    scheduledEvent?: ScheduledEvent | undefined,
   ) {
-    this.req = req
+    if(req) this.#req = req
     if(env) this.env = env
     if(executionCtx) this.#executionCtx = executionCtx
     if(command) this.#command = { ...command, values: [], valuesMap: {} }
@@ -67,37 +69,54 @@ export class Context<E extends Env = any> {
       // @ts-expect-error
       if(this.#command.valuesMap) this.#command.values = optionsName?.map(e => this.#command.valuesMap[e])
     }
+    if(scheduledEvent) this.#scheduledEvent = scheduledEvent
+  }
+
+  get req(): Request {
+    if(this.#req) {
+      return this.#req
+    } else {
+      throw Error('This context has no Request.')
+    }
   }
 
   get event(): FetchEventLike {
     if(this.#executionCtx && 'respondWith' in this.#executionCtx) {
       return this.#executionCtx
     } else {
-      throw Error('This context has no FetchEvent')
+      throw Error('This context has no FetchEvent.')
     }
   }
 
   get executionCtx(): ExecutionContext {
     if(this.#executionCtx) {
-      return this.#executionCtx as ExecutionContext
+      return this.#executionCtx
     } else {
-      throw Error('This context has no ExecutionContext')
+      throw Error('This context has no ExecutionContext.')
     }
   }
 
   get interaction(): Interaction {
     if(this.#interaction) {
-      return this.#interaction as Interaction
+      return this.#interaction
     } else {
-      throw Error('This context has no Interaction')
+      throw Error('This context has no Interaction.')
     }
   }
 
   get command(): Command {
     if(this.#command) {
-      return this.#command as Command
+      return this.#command
     } else {
-      throw Error('This context has no Command')
+      throw Error('This context has no Command.')
+    }
+  }
+
+  get scheduledEvent(): ScheduledEvent {
+    if(this.#scheduledEvent) {
+      return this.#scheduledEvent
+    } else {
+      throw Error('This context has no ScheduledEvent.')
     }
   }
 
