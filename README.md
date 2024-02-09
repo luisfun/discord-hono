@@ -8,8 +8,15 @@ Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! 
 
 ### Install
 
+JavaScript
 ```shell
 npm i discord-hono
+```
+
+TypeScript
+```shell
+npm i discord-hono
+npm i -D discord-api-types
 ```
 
 ## 📑 Sample Code
