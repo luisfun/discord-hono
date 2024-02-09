@@ -1,4 +1,3 @@
-export type { APIEmbed, APIMessageComponent } from 'discord-api-types/v10'
 export type { ApplicationCommand, CommandHandler, Commands, ScheduledHandler } from './types'
 export type { Context, WaitUntilHandler } from './context'
 export type { RegisterArg } from './register'
