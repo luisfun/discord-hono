@@ -163,14 +163,12 @@ export class Context<E extends Env = any> {
     return new Response('Sent to Discord.', { status: post.status })
   }
   followupText = async (content: string) => await this.followup({ content })
-  followupEmbed = async (embed: APIEmbed) => await this.followup({ embeds: [embed] })
-  followupImage = async (image: ArrayBuffer | ArrayBuffer[]) => {
-    if (!Array.isArray(image)) return await this.followup({}, { blob: new Blob([image]), name: 'image.png' })
-    return await this.followup(
+  followupEmbeds = async (...embeds: APIEmbed[]) => await this.followup({ embeds })
+  followupImages = async (...images: ArrayBuffer[]) =>
+    await this.followup(
       {},
-      image.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })),
+      images.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })),
     )
-  }
 
   /**
    * Used to send messages other than res*** and followup***.
@@ -185,13 +183,11 @@ export class Context<E extends Env = any> {
     return await postMessage(id, data, file)
   }
   postText = async (channelId: string, content: string) => await this.post(channelId, { content })
-  postEmbed = async (channelId: string, embed: APIEmbed) => await this.post(channelId, { embeds: [embed] })
-  postImage = async (channelId: string, image: ArrayBuffer | ArrayBuffer[]) => {
-    if (!Array.isArray(image)) return await this.post(channelId, {}, { blob: new Blob([image]), name: 'image.png' })
-    return await this.post(
+  postEmbeds = async (channelId: string, ...embeds: APIEmbed[]) => await this.post(channelId, { embeds })
+  postImages = async (channelId: string, ...images: ArrayBuffer[]) =>
+    await this.post(
       channelId,
       {},
-      image.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })),
+      images.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })),
     )
-  }
 }
