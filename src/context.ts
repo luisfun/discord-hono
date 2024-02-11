@@ -15,7 +15,7 @@ export interface ExecutionContext {
   passThroughOnException(): void
 }
 
-type Command = ApplicationCommand & {
+export type ContextCommand = ApplicationCommand & {
   values: string[]
   valuesMap: Record<string, string>
 }
@@ -42,7 +42,7 @@ export class Context<E extends Env = any> {
   #req: Request | undefined
   #executionCtx: FetchEventLike | ExecutionContext | undefined
   #interaction: Interaction | undefined
-  #command: Command | undefined
+  #command: ContextCommand | undefined
   #scheduledEvent: ScheduledEvent | undefined
   #var: E['Variables'] = {}
 
@@ -104,7 +104,7 @@ export class Context<E extends Env = any> {
     }
   }
 
-  get command(): Command {
+  get command(): ContextCommand {
     if (this.#command) {
       return this.#command
     } else {
@@ -143,7 +143,7 @@ export class Context<E extends Env = any> {
   res = (data: APIInteractionResponseCallbackData) =>
     this.resBase({ data, type: 4 } as APIInteractionResponseChannelMessageWithSource)
   resText = (content: string) => this.res({ content })
-  resEmbed = (embed: APIEmbed) => this.res({ embeds: [embed] })
+  resEmbeds = (...embeds: APIEmbed[]) => this.res({ embeds })
   resDefer = () => this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
 
   /**

@@ -5,6 +5,19 @@ import type {
   APIChatInputApplicationCommandInteractionData,
   APIApplicationCommand,
   ApplicationCommandType,
+  APIApplicationCommandOption,
+  APIApplicationCommandSubcommandOption, // 1
+  APIApplicationCommandSubcommandGroupOption, // 2
+  APIApplicationCommandStringOption, // 3
+  APIApplicationCommandIntegerOption, // 4
+  APIApplicationCommandBooleanOption, // 5
+  APIApplicationCommandUserOption, // 6
+  APIApplicationCommandChannelOption, // 7
+  APIApplicationCommandRoleOption, // 8
+  APIApplicationCommandMentionableOption, // 9
+  APIApplicationCommandNumberOption, // 10
+  APIApplicationCommandAttachmentOption, // 11
+  ApplicationCommandOptionType,
 } from 'discord-api-types/v10'
 import type { Context } from './context'
 
@@ -92,3 +105,19 @@ type JSONArray = (JSONPrimitive | JSONObject | JSONArray)[]
 type JSONObject = { [key: string]: JSONPrimitive | JSONArray | JSONObject | object }
 export type JSONValue = JSONObject | JSONArray | JSONPrimitive
 */
+
+////////// ApplicationCommandOption //////////
+// prettier-ignore
+export type ApplicationCommandOption<T extends ApplicationCommandOptionType> =
+  T extends 1 ? APIApplicationCommandSubcommandOption :
+  T extends 2 ? APIApplicationCommandSubcommandGroupOption :
+  T extends 3 ? APIApplicationCommandStringOption :
+  T extends 4 ? APIApplicationCommandIntegerOption :
+  T extends 5 ? APIApplicationCommandBooleanOption :
+  T extends 6 ? APIApplicationCommandUserOption :
+  T extends 7 ? APIApplicationCommandChannelOption :
+  T extends 8 ? APIApplicationCommandRoleOption :
+  T extends 9 ? APIApplicationCommandMentionableOption :
+  T extends 10 ? APIApplicationCommandNumberOption :
+  T extends 11 ? APIApplicationCommandAttachmentOption :
+  APIApplicationCommandOption
