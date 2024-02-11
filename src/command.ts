@@ -52,14 +52,15 @@ export class Command<E extends Env = any> {
   res = (e: APIInteractionResponseCallbackData) => [this.#command, (c: Context) => c.res(e)] as const
   resText = (e: string) => [this.#command, (c: Context) => c.resText(e)] as const
   resEmbeds = (...e: APIEmbed[]) => [this.#command, (c: Context) => c.resEmbeds(...e)] as const
-  resDefer = <T>(handler: <T1>(c: Context<E>, ...args1: T1[]) => Promise<unknown>, ...args: T[]) => [
-    this.#command,
-    (c: Context<E>) => {
-      if (!c.executionCtx.waitUntil) throw Error('This command handler context has no waitUntil.')
-      c.executionCtx.waitUntil(handler(c, ...args))
-      return c.resDefer()
-    },
-  ] as const
+  resDefer = <T>(handler: <T1>(c: Context<E>, ...args1: T1[]) => Promise<unknown>, ...args: T[]) =>
+    [
+      this.#command,
+      (c: Context<E>) => {
+        if (!c.executionCtx.waitUntil) throw Error('This command handler context has no waitUntil.')
+        c.executionCtx.waitUntil(handler(c, ...args))
+        return c.resDefer()
+      },
+    ] as const
   handler = (handler: (...args: unknown[]) => unknown) => [this.#command, handler] as const
 }
 
