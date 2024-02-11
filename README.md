@@ -68,9 +68,8 @@ const img_handler = async (c: Context<Env>) => {
 
 export const commands: Commands<Env> = [
   new Command('ping', 'response Pong').resText('Pong'),
-  // prettier-ignore
   new Command('img', 'response Image')
-    .option(new CommandOption('content', 'response text'))
+    .option(new CommandOption('content', 'response text').required())
     .resDefer(img_handler),
 ]
 ```
