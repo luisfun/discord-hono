@@ -59,7 +59,7 @@ export class Command<E extends Env = any> {
       return c.resDefer()
     },
   ]
-  handler = (handler: (...args: unknown[]) => Promise<Response> | Response): Commands[0] => [this.#command, handler]
+  handler = (handler: (c: Context<E>) => Promise<Response> | Response): Commands[0] => [this.#command, handler]
 }
 
 /**
