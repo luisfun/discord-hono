@@ -45,6 +45,7 @@ export class Command<E extends Env = any> {
     const opt = e instanceof CommandOption ? e.build() : e
     if (!this.#command.options) this.#command.options = []
     this.#command.options.push(opt)
+    return this
   }
 
   // build()
