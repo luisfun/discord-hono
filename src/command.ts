@@ -3,8 +3,8 @@ import type {
   APIInteractionResponseCallbackData,
   APIInteractionResponse,
   APIEmbed,
+  ApplicationCommandOptionType,
 } from 'discord-api-types/v10'
-import { ApplicationCommandOptionType } from 'discord-api-types/v10'
 import type { Env, Commands, CommandHandler, ApplicationCommand as Cmd, ApplicationCommandOption as Opt } from './types'
 import type { Context } from './context'
 
@@ -65,7 +65,7 @@ export class Command<E extends Env = any> {
 /**
  * [Command Option Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure)
  */
-export class CommandOption<T extends ApplicationCommandOptionType = ApplicationCommandOptionType.String> {
+export class CommandOption<T extends ApplicationCommandOptionType = 3> {
   #option: Opt<T>
 
   /**
@@ -76,7 +76,7 @@ export class CommandOption<T extends ApplicationCommandOptionType = ApplicationC
    */
   constructor(name: Opt<T>['name'], description: Opt<T>['description'] = '', type?: T) {
     // @ts-expect-error
-    this.#option = { name, description, type: type || ApplicationCommandOptionType.String }
+    this.#option = { name, description, type: type || 3 }
   }
 
   // options builder
