@@ -5,7 +5,7 @@ import type {
   APIEmbed,
 } from 'discord-api-types/v10'
 import { ApplicationCommandOptionType } from 'discord-api-types/v10'
-import type { Env, Commands, ApplicationCommand as Cmd, ApplicationCommandOption as Opt } from './types'
+import type { Env, Commands, CommandHandler, ApplicationCommand as Cmd, ApplicationCommandOption as Opt } from './types'
 import type { Context } from './context'
 
 /**
@@ -47,11 +47,11 @@ export class Command<E extends Env = any> {
   }
 
   // build()
-  resBase = (e: APIInteractionResponse): Commands[0] => [this.#command, (c: Context) => c.resBase(e)]
-  res = (e: APIInteractionResponseCallbackData): Commands[0] => [this.#command, (c: Context) => c.res(e)]
-  resText = (e: string): Commands[0] => [this.#command, (c: Context) => c.resText(e)]
-  resEmbeds = (...e: APIEmbed[]): Commands[0] => [this.#command, (c: Context) => c.resEmbeds(...e)]
-  resDefer = <T>(handler: (c: Context<E>, ...args1: T[]) => Promise<unknown>, ...args: T[]): Commands[0] => [
+  resBase = (e: APIInteractionResponse): Commands<E>[0] => [this.#command, (c: Context) => c.resBase(e)]
+  res = (e: APIInteractionResponseCallbackData): Commands<E>[0] => [this.#command, (c: Context) => c.res(e)]
+  resText = (e: string): Commands<E>[0] => [this.#command, (c: Context) => c.resText(e)]
+  resEmbeds = (...e: APIEmbed[]): Commands<E>[0] => [this.#command, (c: Context) => c.resEmbeds(...e)]
+  resDefer = <T>(handler: (c: Context<E>, ...args1: T[]) => Promise<unknown>, ...args: T[]): Commands<E>[0] => [
     this.#command,
     (c: Context<E>) => {
       if (!c.executionCtx.waitUntil) throw Error('This command handler context has no waitUntil.')
@@ -59,7 +59,7 @@ export class Command<E extends Env = any> {
       return c.resDefer()
     },
   ]
-  handler = (handler: (c: Context<E>) => Promise<Response> | Response): Commands[0] => [this.#command, handler]
+  handler = (handler: CommandHandler<E>): Commands<E>[0] => [this.#command, handler]
 }
 
 /**
