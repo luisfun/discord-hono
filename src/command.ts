@@ -15,11 +15,9 @@ export class Command<E extends Env = any> {
   #command: Cmd
 
   /**
-   *
-   * @param name
-   * 1-32 character name; CHAT_INPUT command names must be all lowercase matching ^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$
-   * @param description
-   * 1-100 character description for CHAT_INPUT commands, empty string for USER and MESSAGE commands
+   * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure)
+   * @param name 1-32 character name
+   * @param description 1-100 character description for CHAT_INPUT commands, empty string for USER and MESSAGE commands
    */
   constructor(name: Cmd['name'], description: Cmd['description'] = '') {
     this.#command = { name, description }
@@ -70,6 +68,12 @@ export class Command<E extends Env = any> {
 export class CommandOption<T extends ApplicationCommandOptionType = ApplicationCommandOptionType.String> {
   #option: Opt<T>
 
+  /**
+   * [Command Option Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure)
+   * @param name 1-32 character name
+   * @param description 1-100 character description
+   * @param type [Command Option Type](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type)
+   */
   constructor(name: Opt<T>['name'], description: Opt<T>['description'] = '', type?: T) {
     // @ts-expect-error
     this.#option = { name, description, type: type || ApplicationCommandOptionType.String }
