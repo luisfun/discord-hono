@@ -5,8 +5,8 @@ import type {
   APIEmbed,
 } from 'discord-api-types/v10'
 import { ApplicationCommandOptionType } from 'discord-api-types/v10'
-import type { Env, ApplicationCommand, ApplicationCommandOption as Opt } from './types'
-import type { ContextCommand as Cmd, Context } from './context'
+import type { Env, Commands, ApplicationCommand as Cmd, ApplicationCommandOption as Opt } from './types'
+import type { Context } from './context'
 
 /**
  * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure)
@@ -22,11 +22,11 @@ export class Command<E extends Env = any> {
    * 1-100 character description for CHAT_INPUT commands, empty string for USER and MESSAGE commands
    */
   constructor(name: Cmd['name'], description: Cmd['description'] = '') {
-    this.#command = { name, description, values: [], valuesMap: {} }
+    this.#command = { name, description }
   }
 
   // builder
-  private assign = (command: Omit<ApplicationCommand, 'name' | 'description'>) => {
+  private assign = (command: Omit<Cmd, 'name' | 'description'>) => {
     Object.assign(this.#command, command)
     return this
   }
@@ -48,20 +48,19 @@ export class Command<E extends Env = any> {
   }
 
   // build()
-  resBase = (e: APIInteractionResponse) => [this.#command, (c: Context) => c.resBase(e)] as const
-  res = (e: APIInteractionResponseCallbackData) => [this.#command, (c: Context) => c.res(e)] as const
-  resText = (e: string) => [this.#command, (c: Context) => c.resText(e)] as const
-  resEmbeds = (...e: APIEmbed[]) => [this.#command, (c: Context) => c.resEmbeds(...e)] as const
-  resDefer = <T>(handler: <T1>(c: Context<E>, ...args1: T1[]) => Promise<unknown>, ...args: T[]) =>
-    [
-      this.#command,
-      (c: Context<E>) => {
-        if (!c.executionCtx.waitUntil) throw Error('This command handler context has no waitUntil.')
-        c.executionCtx.waitUntil(handler(c, ...args))
-        return c.resDefer()
-      },
-    ] as const
-  handler = (handler: (...args: unknown[]) => unknown) => [this.#command, handler] as const
+  resBase = (e: APIInteractionResponse): Commands[0] => [this.#command, (c: Context) => c.resBase(e)]
+  res = (e: APIInteractionResponseCallbackData): Commands[0] => [this.#command, (c: Context) => c.res(e)]
+  resText = (e: string): Commands[0] => [this.#command, (c: Context) => c.resText(e)]
+  resEmbeds = (...e: APIEmbed[]): Commands[0] => [this.#command, (c: Context) => c.resEmbeds(...e)]
+  resDefer = <T>(handler: <T1>(c: Context<E>, ...args1: T1[]) => Promise<unknown>, ...args: T[]): Commands[0] => [
+    this.#command,
+    (c: Context<E>) => {
+      if (!c.executionCtx.waitUntil) throw Error('This command handler context has no waitUntil.')
+      c.executionCtx.waitUntil(handler(c, ...args))
+      return c.resDefer()
+    },
+  ]
+  handler = (handler: (...args: unknown[]) => Promise<Response> | Response): Commands[0] => [this.#command, handler]
 }
 
 /**

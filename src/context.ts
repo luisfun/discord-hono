@@ -15,7 +15,7 @@ export interface ExecutionContext {
   passThroughOnException(): void
 }
 
-export type ContextCommand = ApplicationCommand & {
+type Command = ApplicationCommand & {
   values: string[]
   valuesMap: Record<string, string>
 }
@@ -42,7 +42,7 @@ export class Context<E extends Env = any> {
   #req: Request | undefined
   #executionCtx: FetchEventLike | ExecutionContext | undefined
   #interaction: Interaction | undefined
-  #command: ContextCommand | undefined
+  #command: Command | undefined
   #scheduledEvent: ScheduledEvent | undefined
   #var: E['Variables'] = {}
 
@@ -104,7 +104,7 @@ export class Context<E extends Env = any> {
     }
   }
 
-  get command(): ContextCommand {
+  get command(): Command {
     if (this.#command) {
       return this.#command
     } else {
