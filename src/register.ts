@@ -27,11 +27,10 @@ export const register = async (
   })
 
   if (response.ok) {
-    console.log('Registered all commands')
     const data = await response.json()
     console.log(JSON.stringify(data, null, 2))
+    console.log('Registered all commands')
   } else {
-    console.error('Error registering commands')
     let errorText = `Error registering commands \n ${response.url}: ${response.status} ${response.statusText}`
     try {
       const error = await response.text()
@@ -42,5 +41,6 @@ export const register = async (
       console.error('Error reading body from request:', err)
     }
     console.error(errorText)
+    console.error('Error registering commands')
   }
 }
