@@ -114,5 +114,3 @@ export class CommandOption<T extends ApplicationCommandOptionType = ApplicationC
 
   build = () => this.#option
 }
-
-const o = new CommandOption('aaa', 'de', 3).min_length(1)
