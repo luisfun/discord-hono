@@ -48,10 +48,10 @@ export class Command<E extends Env = any> {
   }
 
   // build()
-  resBase = (e: APIInteractionResponse) => [this.#command, (c: Context) => c.resBase(e)]
-  res = (e: APIInteractionResponseCallbackData) => [this.#command, (c: Context) => c.res(e)]
-  resText = (e: string) => [this.#command, (c: Context) => c.resText(e)]
-  resEmbeds = (...e: APIEmbed[]) => [this.#command, (c: Context) => c.resEmbeds(...e)]
+  resBase = (e: APIInteractionResponse) => [this.#command, (c: Context) => c.resBase(e)] as const
+  res = (e: APIInteractionResponseCallbackData) => [this.#command, (c: Context) => c.res(e)] as const
+  resText = (e: string) => [this.#command, (c: Context) => c.resText(e)] as const
+  resEmbeds = (...e: APIEmbed[]) => [this.#command, (c: Context) => c.resEmbeds(...e)] as const
   resDefer = <T>(handler: <T1>(c: Context<E>, ...args1: T1[]) => Promise<unknown>, ...args: T[]) => [
     this.#command,
     (c: Context<E>) => {
@@ -59,8 +59,8 @@ export class Command<E extends Env = any> {
       c.executionCtx.waitUntil(handler(c, ...args))
       return c.resDefer()
     },
-  ]
-  handler = (handler: unknown) => [this.#command, handler]
+  ] as const
+  handler = (handler: (...args: unknown[]) => unknown) => [this.#command, handler] as const
 }
 
 /**
