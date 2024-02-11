@@ -1,28 +1,26 @@
 import type { Commands } from './types.js'
 import { apiUrl } from './utils.js'
 
-export type RegisterArg = {
-  commands: Commands
-  applicationId: string | undefined
-  token: string | undefined
-  guildId?: string | undefined
-}
-
 // cloudflare-sample-app
 // Copyright (c) 2022 Justin Beckwith
 // https://github.com/discord/cloudflare-sample-app/blob/main/LICENSE
-export const register = async (arg: RegisterArg) => {
-  if (!arg.token) throw new Error('The DISCORD_TOKEN environment variable is required.')
-  if (!arg.applicationId) throw new Error('The DISCORD_APPLICATION_ID environment variable is required.')
-  const url = arg.guildId
-    ? `${apiUrl}/applications/${arg.applicationId}/guilds/${arg.guildId}/commands`
-    : `${apiUrl}/applications/${arg.applicationId}/commands`
-  const applicationCommands = arg.commands.map(cmd => cmd[0])
+export const register = async (
+  commands: Commands,
+  applicationId: string | undefined,
+  token: string | undefined,
+  guildId?: string | undefined,
+) => {
+  if (!token) throw new Error('The DISCORD_TOKEN environment variable is required.')
+  if (!applicationId) throw new Error('The DISCORD_APPLICATION_ID environment variable is required.')
+  const url = guildId
+    ? `${apiUrl}/applications/${applicationId}/guilds/${guildId}/commands`
+    : `${apiUrl}/applications/${applicationId}/commands`
+  const applicationCommands = commands.map(cmd => cmd[0])
 
   const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bot ${arg.token}`,
+      Authorization: `Bot ${token}`,
     },
     method: 'PUT',
     body: JSON.stringify(applicationCommands),
