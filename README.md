@@ -56,6 +56,7 @@ import { Command, CommandOption } from 'discord-hono'
 
 const img_handler = async (c: Context<Env>) => {
   try {
+    //const db = c.env.db
     const imageResponse = await fetch('https://luis.fun/luisfun.png')
     const arrayBuffer = await imageResponse.arrayBuffer()
     const blob = new Blob([arrayBuffer])
