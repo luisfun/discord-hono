@@ -51,7 +51,7 @@ export class Command<E extends Env = any> {
   res = (e: APIInteractionResponseCallbackData): Commands[0] => [this.#command, (c: Context) => c.res(e)]
   resText = (e: string): Commands[0] => [this.#command, (c: Context) => c.resText(e)]
   resEmbeds = (...e: APIEmbed[]): Commands[0] => [this.#command, (c: Context) => c.resEmbeds(...e)]
-  resDefer = <T>(handler: <T1>(c: Context<E>, ...args1: T1[]) => Promise<unknown>, ...args: T[]): Commands[0] => [
+  resDefer = <T>(handler: (c: Context<E>, ...args1: T[]) => Promise<unknown>, ...args: T[]): Commands[0] => [
     this.#command,
     (c: Context<E>) => {
       if (!c.executionCtx.waitUntil) throw Error('This command handler context has no waitUntil.')
@@ -89,7 +89,7 @@ export class CommandOption<T extends ApplicationCommandOptionType = ApplicationC
   // @ts-expect-error
   description_localizations = (e: Opt<T>['description_localizations']) => this.assign({ description_localizations: e })
   // @ts-expect-error
-  required = (e: Opt<T>['required']) => this.assign({ required: e })
+  required = (e: Opt<T>['required'] = true) => this.assign({ required: e })
   // @ts-expect-error
   choices = (e: Opt<T>['choices']) => this.assign({ choices: e })
   // @ts-expect-error
