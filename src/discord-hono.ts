@@ -32,19 +32,19 @@ const defineClass = function (): {
   return class {} as never
 }
 
+/**
+ * @sample
+ * ```ts
+ * const app = new DiscordHono()
+ * app.commands(commands)
+ * export default app
+ * ```
+ */
 export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
   #commands: Commands | undefined = undefined
   #cronjobs: [string, CronHandler<E>][] = []
   #DISCORD_PUBLIC_KEY: string | undefined = undefined
 
-  /**
-   * @sample
-   * ```ts
-   * const app = new DiscordHono()
-   * app.commands(commands)
-   * export default app
-   * ```
-   */
   constructor() {
     super()
     this.commands = commands => {
