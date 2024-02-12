@@ -20,67 +20,39 @@ npm i discord-hono
 npm i -D discord-api-types
 ```
 
-## 📑 Sample Code
+## 📑 [Example](https://github.com/LuisFun/sample-discord-hono)
 
-[sample-discord-hono](https://github.com/LuisFun/sample-discord-hono)
-
-### index.ts
+index.ts
 
 ```ts
-import type { ScheduledHandler } from 'discord-hono'
-import { DiscordHono } from 'discord-hono'
-import { commands } from './commands'
+import type { Context } from 'discord-hono'
+import { DiscordHono, Command, CommandOption } from 'discord-hono'
 
-export type Env = {
-  Bindings: {
-    db: D1Database
-  }
+const imageHandler = async (c: Context) => {
+  const image = await fetch('https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Fire/3D/fire_3d.png')
+  const blob = new Blob([await image.arrayBuffer()])
+  await c.followup({ content: c.command.values[0] }, { blob, name: 'image.png' })
 }
 
-const scheduled: ScheduledHandler<Env> = async c => {
-  console.log('Run Scheduled')
-}
+export const commands = [
+  new Command('ping', 'response pong').resText('Pong!!'),
+  new Command('image', 'response image file with text')
+    .option(new CommandOption('content', 'response text').required())
+    .resDefer(imageHandler),
+]
 
-const app = new DiscordHono<Env>()
-app.setCommands(commands)
-app.setScheduled('', scheduled)
+const app = new DiscordHono()
+app.commands(commands)
 export default app
 ```
 
-### commands.ts
-
-```ts
-import type { Env } from '.'
-import type { Commands, Context } from 'discord-hono'
-import { Command, CommandOption } from 'discord-hono'
-
-const img_handler = async (c: Context<Env>) => {
-  try {
-    //const db = c.env.db
-    const imageResponse = await fetch('https://luis.fun/luisfun.png')
-    const arrayBuffer = await imageResponse.arrayBuffer()
-    const blob = new Blob([arrayBuffer])
-    await c.followup({ content: c.command.values[0] }, { blob, name: 'image.png' })
-  } catch {
-    await c.followupText('error')
-  }
-}
-
-export const commands: Commands<Env> = [
-  new Command('ping', 'response Pong').resText('Pong'),
-  new Command('img', 'response Image')
-    .option(new CommandOption('content', 'response text').required())
-    .resDefer(img_handler),
-]
-```
-
-### register.ts
+register.ts
 
 ```ts
 import dotenv from 'dotenv'
 import process from 'node:process'
 import { register } from 'discord-hono'
-import { commands } from './commands.js' // '.js' is necessary for 'npm run register'.
+import { commands } from './index.js' // '.js' is necessary for 'npm run register'.
 
 dotenv.config({ path: '.dev.vars' })
 
