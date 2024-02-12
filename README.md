@@ -1,16 +1,15 @@
 🔥 This project is heavily influenced by [Hono](https://github.com/honojs/hono).  
 Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! [Hono LICENSE](https://github.com/honojs/hono/blob/main/LICENSE)
 
-## 🚀 Getting Started
+## 🚀 Install
 
 [<img alt="Node.js" src="https://img.shields.io/badge/Node.js-20.x-%23339933?logo=Node.js" />](https://nodejs.org)
-
-### Install
 
 JavaScript
 
 ```shell
 npm i discord-hono
+npm i -D dotenv # Used when 'npm run register'.
 ```
 
 TypeScript
@@ -18,6 +17,7 @@ TypeScript
 ```shell
 npm i discord-hono
 npm i -D discord-api-types
+npm i -D dotenv # Used when 'npm run register'.
 ```
 
 ## 📑 [Example](https://github.com/LuisFun/sample-discord-hono)
@@ -29,9 +29,9 @@ import type { Context } from 'discord-hono'
 import { DiscordHono, Command, CommandOption } from 'discord-hono'
 
 const imageHandler = async (c: Context) => {
-  const image = await fetch('https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Fire/3D/fire_3d.png')
+  const image = await fetch('https://luis.fun/images/hono.webp')
   const blob = new Blob([await image.arrayBuffer()])
-  await c.followup({ content: c.command.values[0] }, { blob, name: 'image.png' })
+  await c.followup({ content: c.command.values[0] }, { blob, name: 'image.webp' })
 }
 
 export const commands = [
