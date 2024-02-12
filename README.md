@@ -11,7 +11,7 @@ npm i -D discord-api-types # When using TypeScript
 npm i -D dotenv # When using 'npm run register'
 ```
 
-## 📑 [Example](https://github.com/LuisFun/sample-discord-hono)
+## 📑 [Example](https://github.com/LuisFun/discord-hono-example)
 
 index.ts
 
