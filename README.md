@@ -5,19 +5,10 @@ Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! 
 
 [<img alt="Node.js" src="https://img.shields.io/badge/Node.js-20.x-%23339933?logo=Node.js" />](https://nodejs.org)
 
-JavaScript
-
 ```shell
 npm i discord-hono
-npm i -D dotenv # Used when 'npm run register'.
-```
-
-TypeScript
-
-```shell
-npm i discord-hono
-npm i -D discord-api-types
-npm i -D dotenv # Used when 'npm run register'.
+npm i -D discord-api-types # When using TypeScript
+npm i -D dotenv # When using 'npm run register'
 ```
 
 ## 📑 [Example](https://github.com/LuisFun/sample-discord-hono)
