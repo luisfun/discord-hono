@@ -64,9 +64,9 @@ export class Context<E extends Env = any> {
         obj[e.name] = e.value
         return obj
       }, {})
-      const optionsName = this.#command.options?.map(e => e.name)
+      const names = this.#command.options?.map(e => e.name)
       // @ts-expect-error
-      if (this.#command.valuesMap) this.#command.values = optionsName?.map(e => this.#command.valuesMap[e])
+      if (this.#command.valuesMap && names) this.#command.values = names.map(e => this.#command.valuesMap[e])
     }
   }
 
