@@ -54,3 +54,14 @@ await register(
   //process.env.DISCORD_TEST_GUILD_ID,
 )
 ```
+
+### Other Examples
+
+- [Using Cloudflare AI](https://github.com/LuisFun/discord-bot-cloudflare-ai)
+
+## References
+
+The following repositories were referenced in the making of this project:
+
+- [Official Example](https://github.com/discord/cloudflare-sample-app)
+- [Hono](https://github.com/honojs/hono)
