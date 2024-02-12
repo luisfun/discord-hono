@@ -1,4 +1,5 @@
 import type { APIInteractionResponseCallbackData } from 'discord-api-types/v10'
+import type { FileData } from './types'
 
 export const apiUrl = 'https://discord.com/api/v10'
 
@@ -14,11 +15,6 @@ export class ResponseJson extends Response {
     }
     super(body, initJson)
   }
-}
-
-export type FileData = {
-  blob: Blob
-  name: string
 }
 
 /**

@@ -5,25 +5,24 @@ import type {
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
-import type { Env, FetchEventLike, ScheduledEvent, ApplicationCommand, Interaction } from './types'
-import type { FileData } from './utils'
+import type {
+  Env,
+  ExecutionContext,
+  FetchEventLike,
+  CronEvent,
+  ApplicationCommand,
+  Interaction,
+  FileData,
+} from './types'
 import { apiUrl, ResponseJson, fetchMessage } from './utils'
 import { postMessage } from './api-wrapper/channel-message'
-
-export interface ExecutionContext {
-  waitUntil(promise: Promise<unknown>): void
-  passThroughOnException(): void
-}
 
 type Command = ApplicationCommand & {
   values: string[]
   valuesMap: Record<string, string>
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type WaitUntilHandler<E extends Env = any> = (c: Context<E>) => Promise<unknown>
-
-export interface ContextVariableMap {}
+interface ContextVariableMap {}
 
 interface Get<E extends Env> {
   <Key extends keyof ContextVariableMap>(key: Key): ContextVariableMap[Key]
@@ -43,18 +42,18 @@ export class Context<E extends Env = any> {
   #executionCtx: FetchEventLike | ExecutionContext | undefined
   #interaction: Interaction | undefined
   #command: Command | undefined
-  #scheduledEvent: ScheduledEvent | undefined
+  #cronEvent: CronEvent | undefined
   #var: E['Variables'] = {}
 
   constructor(
-    req: Request | undefined,
+    req: Request | CronEvent,
     env?: E['Bindings'],
     executionCtx?: FetchEventLike | ExecutionContext | undefined,
     command?: ApplicationCommand,
     interaction?: Interaction,
-    scheduledEvent?: ScheduledEvent | undefined,
   ) {
-    if (req) this.#req = req
+    if (req instanceof Request) this.#req = req
+    else this.#cronEvent = req
     if (env) this.env = env
     if (executionCtx) this.#executionCtx = executionCtx
     if (command) this.#command = { ...command, values: [], valuesMap: {} }
@@ -69,67 +68,46 @@ export class Context<E extends Env = any> {
       // @ts-expect-error
       if (this.#command.valuesMap) this.#command.values = optionsName?.map(e => this.#command.valuesMap[e])
     }
-    if (scheduledEvent) this.#scheduledEvent = scheduledEvent
   }
 
   get req(): Request {
-    if (this.#req) {
-      return this.#req
-    } else {
-      throw Error('This context has no Request.')
-    }
+    if (!this.#req) throw new Error('This context has no Request.')
+    return this.#req
   }
 
   get event(): FetchEventLike {
-    if (this.#executionCtx && 'respondWith' in this.#executionCtx) {
-      return this.#executionCtx
-    } else {
-      throw Error('This context has no FetchEvent.')
-    }
+    if (!(this.#executionCtx && 'respondWith' in this.#executionCtx)) throw new Error('This context has no FetchEvent.')
+    return this.#executionCtx
   }
 
   get executionCtx(): ExecutionContext {
-    if (this.#executionCtx) {
-      return this.#executionCtx
-    } else {
-      throw Error('This context has no ExecutionContext.')
-    }
+    if (!this.#executionCtx) throw new Error('This context has no ExecutionContext.')
+    return this.#executionCtx
   }
 
   get interaction(): Interaction {
-    if (this.#interaction) {
-      return this.#interaction
-    } else {
-      throw Error('This context has no Interaction.')
-    }
+    if (!this.#interaction) throw new Error('This context has no Interaction.')
+    return this.#interaction
   }
 
   get command(): Command {
-    if (this.#command) {
-      return this.#command
-    } else {
-      throw Error('This context has no Command.')
-    }
+    if (!this.#command) throw new Error('This context has no Command.')
+    return this.#command
   }
 
-  get scheduledEvent(): ScheduledEvent {
-    if (this.#scheduledEvent) {
-      return this.#scheduledEvent
-    } else {
-      throw Error('This context has no ScheduledEvent.')
-    }
+  get cronEvent(): CronEvent {
+    if (!this.#cronEvent) throw new Error('This context has no ScheduledEvent.')
+    return this.#cronEvent
   }
 
+  // c.set, c.get, c.var.propName is Variables
   set: Set<E> = (key: string, value: unknown) => {
     this.#var ??= {}
     this.#var[key as string] = value
   }
-
   get: Get<E> = (key: string) => {
     return this.#var ? this.#var[key] : undefined
   }
-
-  // c.var.propName is a read-only
   get var(): Readonly<E['Variables'] & ContextVariableMap> {
     return { ...this.#var } as never
   }

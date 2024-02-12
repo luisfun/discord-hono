@@ -1,5 +1,5 @@
 import type { APIInteractionResponseCallbackData } from 'discord-api-types/v10'
-import type { FileData } from '../utils'
+import type { FileData } from '../types'
 import { apiUrl, fetchMessage } from '../utils'
 
 /**

@@ -4,9 +4,35 @@ import type {
   APIInteractionResponse,
   APIEmbed,
   ApplicationCommandOptionType,
+  APIApplicationCommandSubcommandOption, // 1
+  APIApplicationCommandSubcommandGroupOption, // 2
+  APIApplicationCommandStringOption, // 3
+  APIApplicationCommandIntegerOption, // 4
+  APIApplicationCommandBooleanOption, // 5
+  APIApplicationCommandUserOption, // 6
+  APIApplicationCommandChannelOption, // 7
+  APIApplicationCommandRoleOption, // 8
+  APIApplicationCommandMentionableOption, // 9
+  APIApplicationCommandNumberOption, // 10
+  APIApplicationCommandAttachmentOption, // 11
 } from 'discord-api-types/v10'
-import type { Env, Commands, CommandHandler, ApplicationCommand as Cmd, ApplicationCommandOption as Opt } from './types'
+import type { Env, Commands, CommandHandler, ApplicationCommand as Cmd } from './types'
 import type { Context } from './context'
+
+// prettier-ignore
+type Opt<T extends ApplicationCommandOptionType> =
+  T extends 1 ? APIApplicationCommandSubcommandOption :
+  T extends 2 ? APIApplicationCommandSubcommandGroupOption :
+  T extends 3 ? APIApplicationCommandStringOption :
+  T extends 4 ? APIApplicationCommandIntegerOption :
+  T extends 5 ? APIApplicationCommandBooleanOption :
+  T extends 6 ? APIApplicationCommandUserOption :
+  T extends 7 ? APIApplicationCommandChannelOption :
+  T extends 8 ? APIApplicationCommandRoleOption :
+  T extends 9 ? APIApplicationCommandMentionableOption :
+  T extends 10 ? APIApplicationCommandNumberOption :
+  T extends 11 ? APIApplicationCommandAttachmentOption :
+  APIApplicationCommandOption
 
 /**
  * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure)
@@ -41,7 +67,7 @@ export class Command<E extends Env = any> {
   // options
   option = (e: CommandOption | APIApplicationCommandOption) => {
     const opt = e instanceof CommandOption ? e.build() : e
-    if (!this.#command.options) this.#command.options = []
+    this.#command.options ??= []
     this.#command.options.push(opt)
     return this
   }
@@ -54,8 +80,11 @@ export class Command<E extends Env = any> {
   resDefer = <T>(handler: (c: Context<E>, ...args1: T[]) => Promise<unknown>, ...args: T[]): Commands<E>[0] => [
     this.#command,
     (c: Context<E>) => {
-      if (!c.executionCtx.waitUntil) throw Error('This command handler context has no waitUntil.')
-      c.executionCtx.waitUntil(handler(c, ...args))
+      if (!c.executionCtx.waitUntil && !c.event.waitUntil)
+        throw new Error('This command handler context has no waitUntil. You can use .handler(command_handler).')
+      if (c.executionCtx.waitUntil) c.executionCtx.waitUntil(handler(c, ...args))
+      // @ts-expect-error
+      else c.event.waitUntil(handler(c, ...args))
       return c.resDefer()
     },
   ]
@@ -106,10 +135,13 @@ export class CommandOption<T extends ApplicationCommandOptionType = 3> {
   autocomplete = (e: Opt<T>['autocomplete']) => this.assign({ autocomplete: e })
 
   // @ts-expect-error
-  options = (e: CommandOption | Opt<T>['options']) => {
+  option = (e: CommandOption | Opt<T>['options'][0]) => {
     const opt = e instanceof CommandOption ? e.build() : e
     // @ts-expect-error
-    this.assign({ options: e })
+    this.#option.options ??= []
+    // @ts-expect-error
+    this.#option.options.push(opt)
+    return this
   }
 
   build = () => this.#option

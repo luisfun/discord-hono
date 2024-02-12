@@ -5,46 +5,21 @@ import type {
   APIChatInputApplicationCommandInteractionData,
   APIApplicationCommand,
   ApplicationCommandType,
-  APIApplicationCommandOption,
-  APIApplicationCommandSubcommandOption, // 1
-  APIApplicationCommandSubcommandGroupOption, // 2
-  APIApplicationCommandStringOption, // 3
-  APIApplicationCommandIntegerOption, // 4
-  APIApplicationCommandBooleanOption, // 5
-  APIApplicationCommandUserOption, // 6
-  APIApplicationCommandChannelOption, // 7
-  APIApplicationCommandRoleOption, // 8
-  APIApplicationCommandMentionableOption, // 9
-  APIApplicationCommandNumberOption, // 10
-  APIApplicationCommandAttachmentOption, // 11
-  ApplicationCommandOptionType,
 } from 'discord-api-types/v10'
 import type { Context } from './context'
 
-////////// Values //////////
-
-type Bindings = Record<string, unknown>
-type Variables = Record<string, unknown>
+////////// Env //////////
 
 export type Env = {
-  Bindings?: Bindings
-  Variables?: Variables
+  Bindings?: Record<string, unknown>
+  Variables?: Record<string, unknown>
 }
 
-////////// ScheduledEvent //////////
-// https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled/#syntax
-
-export type ScheduledEvent = {
-  cron: string
-  type: string
-  scheduledTime: number
-}
-
-////////// CommandHandler //////////
+////////// Command //////////
 
 export type CommandHandler<E extends Env = any> = (c: Context<E>) => Promise<Response> | Response
 /**
- * [ApplicationCommand](https://discord.com/developers/docs/interactions/application-commands)
+ * [Application Command](https://discord.com/developers/docs/interactions/application-commands)
  */
 export type ApplicationCommand = Omit<
   APIApplicationCommand,
@@ -57,30 +32,28 @@ export type ApplicationCommand = Omit<
   version?: string
 }
 /**
- * [ApplicationCommand](https://discord.com/developers/docs/interactions/application-commands)
+ * [Application Command](https://discord.com/developers/docs/interactions/application-commands)
  */
 export type Commands<E extends Env = any> = [ApplicationCommand, CommandHandler<E>][]
 
-export type SetCommandsHandler<E extends Env = any> = (commands: Commands<E>) => void
+////////// CronHandler //////////
 
-////////// ScheduledHandler //////////
+export type CronHandler<E extends Env = any> = (c: Context<E>) => Promise<unknown>
 
-export type ScheduledHandler<E extends Env = any> = (c: Context<E>) => Promise<unknown>
+////////// CronEvent //////////
+// https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled/#syntax
 
-export type ScheduledArray<E extends Env = any> = [string, ScheduledHandler<E>][]
+export type CronEvent = {
+  cron: string
+  type: string
+  scheduledTime: number
+}
 
-export type SetScheduledHandler<E extends Env = any> = (cron: string, scheduled: ScheduledHandler<E>) => void
+////////// ExecutionContext //////////
 
-////////// ValidationTargets //////////
-
-export type ValidationTargets = {
-  json: any
-  form: Record<string, string | File>
-  query: Record<string, string | string[]>
-  queries: Record<string, string[]> // Deprecated. Will be obsolete in v4.
-  param: Record<string, string>
-  header: Record<string, string>
-  cookie: Record<string, string>
+export interface ExecutionContext {
+  waitUntil(promise: Promise<unknown>): void
+  passThroughOnException(): void
 }
 
 ////////// FetchEventLike //////////
@@ -98,26 +71,9 @@ export abstract class FetchEventLike {
  */
 export type Interaction = APIBaseInteraction<InteractionType, APIChatInputApplicationCommandInteractionData>
 
-////////// JSONValue //////////
-/*
-type JSONPrimitive = string | boolean | number | null | undefined
-type JSONArray = (JSONPrimitive | JSONObject | JSONArray)[]
-type JSONObject = { [key: string]: JSONPrimitive | JSONArray | JSONObject | object }
-export type JSONValue = JSONObject | JSONArray | JSONPrimitive
-*/
+////////// FileData //////////
 
-////////// ApplicationCommandOption //////////
-// prettier-ignore
-export type ApplicationCommandOption<T extends ApplicationCommandOptionType> =
-  T extends 1 ? APIApplicationCommandSubcommandOption :
-  T extends 2 ? APIApplicationCommandSubcommandGroupOption :
-  T extends 3 ? APIApplicationCommandStringOption :
-  T extends 4 ? APIApplicationCommandIntegerOption :
-  T extends 5 ? APIApplicationCommandBooleanOption :
-  T extends 6 ? APIApplicationCommandUserOption :
-  T extends 7 ? APIApplicationCommandChannelOption :
-  T extends 8 ? APIApplicationCommandRoleOption :
-  T extends 9 ? APIApplicationCommandMentionableOption :
-  T extends 10 ? APIApplicationCommandNumberOption :
-  T extends 11 ? APIApplicationCommandAttachmentOption :
-  APIApplicationCommandOption
+export type FileData = {
+  blob: Blob
+  name: string
+}
