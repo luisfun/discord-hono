@@ -1,9 +1,11 @@
-🔥 This project is heavily influenced by [Hono](https://github.com/honojs/hono).  
+# 🔥 Discord Hono [![license](https://img.shields.io/github/license/luisfun/discord-hono)](https://github.com/LuisFun/discord-hono/blob/main/LICENSE) [![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono)
+
+This project is heavily influenced by [Hono](https://github.com/honojs/hono).  
 Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! [Hono LICENSE](https://github.com/honojs/hono/blob/main/LICENSE)
 
 ## 🚀 Install
 
-[<img alt="Node.js" src="https://img.shields.io/badge/Node.js-20.x-%23339933?logo=Node.js" />](https://nodejs.org)
+[![Node.js 20.x](https://img.shields.io/badge/Node.js-20.x-%23339933?logo=Node.js)](https://nodejs.org)
 
 ```shell
 npm i discord-hono
