@@ -1,7 +1,7 @@
 import type { APIInteractionResponsePong } from 'discord-api-types/v10'
 import { verifyKey } from 'discord-interactions'
 import { Context } from './context'
-import type { Env, ExecutionContext, CronEvent, Commands, CronHandler, Interaction } from './types'
+import type { Env, ExecutionContext, CronEvent, Commands, CronHandler, PublicKeyHandler, Interaction } from './types'
 import { ResponseJson } from './utils'
 
 const defineClass = function (): {
@@ -26,7 +26,7 @@ const defineClass = function (): {
     /**
      * Used when DISCORD_PUBLIC_KEY error occurs.
      */
-    discordPublicKey: (key: string) => void
+    publicKey: (handler: PublicKeyHandler<E>) => void //(key: string) => void
   }
 } {
   return class {} as never
@@ -43,7 +43,7 @@ const defineClass = function (): {
 export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
   #commands: Commands | undefined = undefined
   #cronjobs: [string, CronHandler<E>][] = []
-  #DISCORD_PUBLIC_KEY: string | undefined = undefined
+  #publicKey: PublicKeyHandler<E> | undefined = undefined
 
   constructor() {
     super()
@@ -55,8 +55,8 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
       this.#cronjobs.push([cron, handler])
       return this
     }
-    this.discordPublicKey = key => {
-      this.#DISCORD_PUBLIC_KEY = key
+    this.publicKey = handler => {
+      this.#publicKey = handler
       return this
     }
   }
@@ -70,9 +70,9 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
       return new Response('powered by Discord Hono🔥')
     } else if (request.method === 'POST') {
       if (!env) throw new Error('There is no env.')
-      const DISCORD_PUBLIC_KEY = this.#DISCORD_PUBLIC_KEY || (env.DISCORD_PUBLIC_KEY as string | undefined)
+      const DISCORD_PUBLIC_KEY = this.#publicKey ? this.#publicKey(env) : (env.DISCORD_PUBLIC_KEY as string | undefined)
       if (!DISCORD_PUBLIC_KEY)
-        throw new Error('There is no DISCORD_PUBLIC_KEY. You can set the key in app.discordPublicKey(KEY).')
+        throw new Error('There is no DISCORD_PUBLIC_KEY. You can set the key in app.publicKey(env => env.KEY).')
       // verify
       const signature = request.headers.get('x-signature-ed25519')
       const timestamp = request.headers.get('x-signature-timestamp')

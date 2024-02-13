@@ -40,6 +40,10 @@ export type Commands<E extends Env = any> = [ApplicationCommand, CommandHandler<
 
 export type CronHandler<E extends Env = any> = (c: Context<E>) => Promise<unknown>
 
+////////// PublicKeyHandler //////////
+
+export type PublicKeyHandler<E extends Env = any> = (env: E['Bindings']) => string
+
 ////////// CronEvent //////////
 // https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled/#syntax
 
