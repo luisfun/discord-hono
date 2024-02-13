@@ -1,4 +1,4 @@
-# 🔥Discord Hono [![license](https://img.shields.io/github/license/luisfun/discord-hono)](https://github.com/LuisFun/discord-hono/blob/main/LICENSE) [![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono)
+# 🔥Discord Hono [![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono) [![license](https://img.shields.io/github/license/luisfun/discord-hono)](https://github.com/LuisFun/discord-hono/blob/main/LICENSE)
 
 This project is heavily influenced by [Hono](https://github.com/honojs/hono).  
 Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! [Hono LICENSE](https://github.com/honojs/hono/blob/main/LICENSE)
