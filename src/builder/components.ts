@@ -1,8 +1,6 @@
 import type {
   APIActionRowComponent,
   APIActionRowComponentTypes,
-  APIMessageComponent,
-  APIModalComponent,
   APIButtonComponent,
   APISelectMenuComponent,
   APIButtonComponentWithCustomId,

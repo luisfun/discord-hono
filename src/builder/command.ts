@@ -3,7 +3,6 @@ import type {
   APIInteractionResponseCallbackData,
   APIInteractionResponse,
   APIEmbed,
-  ApplicationCommandOptionType,
   APIApplicationCommandSubcommandOption, // 1
   APIApplicationCommandSubcommandGroupOption, // 2
   APIApplicationCommandStringOption, // 3

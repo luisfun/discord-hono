@@ -82,8 +82,7 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
     } else if (request.method === 'POST') {
       if (!env) throw new Error('There is no env.')
       const DISCORD_PUBLIC_KEY = this.#publicKey ? this.#publicKey(env) : (env.DISCORD_PUBLIC_KEY as string | undefined)
-      if (!DISCORD_PUBLIC_KEY)
-        throw new Error('There is no DISCORD_PUBLIC_KEY. You can set the key in app.publicKey(env => env.KEY).')
+      if (!DISCORD_PUBLIC_KEY) throw new Error('There is no DISCORD_PUBLIC_KEY. Set by app.publicKey(env => env.KEY).')
       // verify
       const signature = request.headers.get('x-signature-ed25519')
       const timestamp = request.headers.get('x-signature-timestamp')
@@ -97,29 +96,42 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
       const interaction: APIBaseInteraction<InteractionType, any> = JSON.parse(body)
       // interaction type https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
       switch (interaction.type) {
-        case 1:
+        case 1: {
           return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
-        case 2:
-          if (!this.#commands) throw new Error('Commands is not set.')
-          const commandName = interaction.data?.name.toLowerCase()
-          const commandIndex = this.#commands.findIndex(command => command[0].name.toLowerCase() === commandName)
-          const command = this.#commands[commandIndex][0]
-          const commandHandler = this.#commands[commandIndex][1]
-          const commandInteraction = interaction as APIBaseInteraction<2, any>
-          return await commandHandler(new Context(request, env, executionCtx, commandInteraction, command))
-        case 3:
-          if (!this.#components[0])
-            throw new Error('Component is not set. You can set the Component Handler in app.component(id, handler).')
-          const reqCustomId = interaction.data?.custom_id as string
-          const uniqueId = reqCustomId.split(';')[0]
-          const custom_id = reqCustomId.slice(uniqueId.length + 1, reqCustomId.length)
-          const componentIndex = this.#components.findIndex(e => e[0] === uniqueId || e[0] === '')
-          const componentHandler = this.#components[componentIndex][1]
-          const componentInteraction = interaction as APIBaseInteraction<3, any>
-          componentInteraction.data.custom_id = custom_id
-          return await componentHandler(new Context(request, env, executionCtx, componentInteraction))
-        default:
+        }
+        case 2: {
+          if (!this.#commands) throw new Error('Commands is not set. Set by app.commands(Commands).')
+          const name = interaction.data?.name.toLowerCase()
+          const index = this.#commands.findIndex(command => command[0].name.toLowerCase() === name)
+          const command = this.#commands[index][0]
+          const handler = this.#commands[index][1]
+          const interaction2 = interaction as APIBaseInteraction<2, any>
+          return await handler(new Context(request, env, executionCtx, interaction2, command))
+        }
+        case 3: {
+          if (!this.#components[0]) throw new Error('Component Handler is not set. Set by app.component(id, Handler).')
+          const customId = interaction.data?.custom_id as string
+          const uniqueId = customId.split(';')[0]
+          const custom_id = customId.slice(uniqueId.length + 1, customId.length)
+          const index = this.#components.findIndex(e => e[0] === uniqueId || e[0] === '')
+          const handler = this.#components[index][1]
+          const interaction3 = interaction as APIBaseInteraction<3, any>
+          interaction3.data.custom_id = custom_id
+          return await handler(new Context(request, env, executionCtx, interaction3))
+        }
+        case 5: {
+          /*
+          if (!this.#components[0]) throw new Error('Component Handler is not set. Set by app.component(id, Handler).')
+          const modalId = interaction.data?.custom_id as string
+          const customId = interaction.data?.components[0].components[0].custom_id as string
+          const uniqueId = customId.split(';')[0]
+          const custom_id = customId.slice(uniqueId.length + 1, customId.length)
+          */
+        }
+        default: {
+          console.warn('interaction.type: ', interaction.type)
           return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
+        }
       }
     }
     return new Response('Not Found.', { status: 404 })
