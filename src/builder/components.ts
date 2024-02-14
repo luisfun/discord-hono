@@ -1,7 +1,8 @@
 import type {
+  APIActionRowComponent,
+  APIActionRowComponentTypes,
   APIMessageComponent,
   APIModalComponent,
-  APIActionRowComponent,
   APIButtonComponent,
   APISelectMenuComponent,
   APIButtonComponentWithCustomId,
@@ -14,7 +15,7 @@ import type {
   APITextInputComponent,
 } from 'discord-api-types/v10'
 
-type ButtonSelectClass =
+type ComponentClass =
   | ComponentButton
   | ComponentButtonLink
   | ComponentSelect
@@ -22,62 +23,55 @@ type ButtonSelectClass =
   | ComponentRoleSelect
   | ComponentMentionableSelect
   | ComponentChannelSelect
+  | ComponentTextInput
 
-type RowComponent = APIButtonComponent | APISelectMenuComponent | APITextInputComponent
-
-export const componentsBuilder = (
-  ...components: (ButtonSelectClass | ComponentRow)[]
-): (APIMessageComponent | APIModalComponent)[] => components.map(e => e.build())
-
-export class ComponentRow {
-  #component: APIActionRowComponent<any> = { type: 1, components: [] }
-  /**
-   * [Action Rows](https://discord.com/developers/docs/interactions/message-components#action-rows)
-   */
-  constructor(...components: RowComponent[] | (ButtonSelectClass | ComponentTextInput)[]) {
-    this.#component.components = components.map(component => {
+export class Components {
+  #components: APIActionRowComponent<APIActionRowComponentTypes>[] = []
+  components = (...e: (ComponentClass | APIActionRowComponentTypes)[]) => {
+    if (e.length >= 5) console.warn('You can have up to 5 Action Rows per message')
+    const components = e.map(comp => {
       if (
-        component instanceof ComponentButton ||
-        component instanceof ComponentButtonLink ||
-        component instanceof ComponentSelect ||
-        component instanceof ComponentUserSelect ||
-        component instanceof ComponentRoleSelect ||
-        component instanceof ComponentMentionableSelect ||
-        component instanceof ComponentChannelSelect ||
-        component instanceof ComponentTextInput
+        comp instanceof ComponentButton ||
+        comp instanceof ComponentButtonLink ||
+        comp instanceof ComponentSelect ||
+        comp instanceof ComponentUserSelect ||
+        comp instanceof ComponentRoleSelect ||
+        comp instanceof ComponentMentionableSelect ||
+        comp instanceof ComponentChannelSelect ||
+        comp instanceof ComponentTextInput
       )
-        return component.build()
-      return component
+        return comp.build()
+      return comp
     })
+    this.#components.push({ type: 1, components })
+    return this
   }
-  build = () => this.#component
+  build = () => this.#components
 }
 
-type But<T extends 1 | 2 | 3 | 4 | 5> = T extends 5 ? APIButtonComponentWithURL : APIButtonComponentWithCustomId
-type ButOmit<T> = Omit<T, 'type' | 'style' | 'url'>
-
-class ButtonBase<T extends 1 | 2 | 3 | 4 | 5> {
+type OmitButton =
+  | Omit<APIButtonComponentWithCustomId, 'type' | 'style'>
+  | Omit<APIButtonComponentWithURL, 'type' | 'style' | 'url'>
+class ButtonBase {
   protected uniqueStr: string
-  protected component: But<T>
-  constructor(str: string, style: T) {
+  protected component: APIButtonComponent
+  constructor(str: string, style: 1 | 2 | 3 | 4 | 5) {
     this.uniqueStr = str + ';'
-    this.component = (
-      style === 5 ? { type: 2, style, url: str } : { type: 2, style, custom_id: this.uniqueStr }
-    ) as But<T>
+    this.component = style === 5 ? { type: 2, style, url: str } : { type: 2, style, custom_id: this.uniqueStr }
   }
-  protected assign = (component: ButOmit<But<T>>) => {
+  protected assign = (component: OmitButton) => {
     Object.assign(this.component, component)
     return this
   }
-  label = (e: But<T>['label']) => this.assign({ label: e } as ButOmit<But<T>>)
-  emoji = (e: But<T>['emoji']) => this.assign({ emoji: e } as ButOmit<But<T>>)
-  disabled = (e: But<T>['disabled']) => this.assign({ disabled: e } as ButOmit<But<T>>)
+  label = (e: APIButtonComponent['label']) => this.assign({ label: e })
+  emoji = (e: APIButtonComponent['emoji']) => this.assign({ emoji: e })
+  disabled = (e: APIButtonComponent['disabled']) => this.assign({ disabled: e })
   build = () => this.component
 }
 
 type ButtonStyle = 'Primary' | 'Secondary' | 'Success' | 'Danger' | 'Link'
 
-export class ComponentButton extends ButtonBase<1 | 2 | 3 | 4> {
+export class ComponentButton extends ButtonBase {
   /**
    * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
    * @param buttonStyle default 'Primary'
@@ -94,7 +88,7 @@ export class ComponentButton extends ButtonBase<1 | 2 | 3 | 4> {
   }
   custom_id = (e: APIButtonComponentWithCustomId['custom_id']) => this.assign({ custom_id: this.uniqueStr + e })
 }
-export class ComponentButtonLink extends ButtonBase<5> {
+export class ComponentButtonLink extends ButtonBase {
   /**
    * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
    */
@@ -103,37 +97,32 @@ export class ComponentButtonLink extends ButtonBase<5> {
   }
 }
 
-// prettier-ignore
-type Sel<T extends 3 | 5 | 6 | 7 | 8> =
-  T extends 3 ? APIStringSelectComponent :
-  T extends 5 ? APIUserSelectComponent :
-  T extends 6 ? APIRoleSelectComponent :
-  T extends 7 ? APIMentionableSelectComponent :
-  T extends 8 ? APIChannelSelectComponent :
-  APIStringSelectComponent
-
-type SelOmit<T> = Omit<T, 'type' | 'custom_id'>
-
-class SelectBase<T extends 3 | 5 | 6 | 7 | 8> {
+type OmitSelect =
+  | Omit<APIStringSelectComponent, 'type' | 'custom_id'>
+  | Omit<APIUserSelectComponent, 'type' | 'custom_id'>
+  | Omit<APIRoleSelectComponent, 'type' | 'custom_id'>
+  | Omit<APIMentionableSelectComponent, 'type' | 'custom_id'>
+  | Omit<APIChannelSelectComponent, 'type' | 'custom_id'>
+class SelectBase {
   protected uniqueStr: string
   protected component: APISelectMenuComponent
   constructor(uniqueId: string, type: 3 | 5 | 6 | 7 | 8) {
     this.uniqueStr = uniqueId + ';'
     this.component = type === 3 ? { type, custom_id: this.uniqueStr, options: [] } : { type, custom_id: this.uniqueStr }
   }
-  protected assign = (component: SelOmit<Sel<T>> | { custom_id?: string }) => {
+  protected assign = (component: OmitSelect | { custom_id?: string }) => {
     Object.assign(this.component, component)
     return this
   }
-  custom_id = (e: Sel<T>['custom_id']) => this.assign({ custom_id: this.uniqueStr + e })
-  placeholder = (e: Sel<T>['placeholder']) => this.assign({ placeholder: e } as SelOmit<Sel<T>>)
-  min_values = (e: Sel<T>['min_values']) => this.assign({ min_values: e } as SelOmit<Sel<T>>)
-  max_values = (e: Sel<T>['max_values']) => this.assign({ max_values: e } as SelOmit<Sel<T>>)
-  disabled = (e: Sel<T>['disabled']) => this.assign({ disabled: e } as SelOmit<Sel<T>>)
+  custom_id = (e: APISelectMenuComponent['custom_id']) => this.assign({ custom_id: this.uniqueStr + e })
+  placeholder = (e: APISelectMenuComponent['placeholder']) => this.assign({ placeholder: e })
+  min_values = (e: APISelectMenuComponent['min_values']) => this.assign({ min_values: e })
+  max_values = (e: APISelectMenuComponent['max_values']) => this.assign({ max_values: e })
+  disabled = (e: APISelectMenuComponent['disabled']) => this.assign({ disabled: e })
   build = () => this.component
 }
 
-export class ComponentSelect extends SelectBase<3> {
+export class ComponentSelect extends SelectBase {
   /**
    * [Select Structure](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure)
    * .options() require
@@ -141,35 +130,33 @@ export class ComponentSelect extends SelectBase<3> {
   constructor(uniqueId: string) {
     super(uniqueId, 3)
   }
-  options = (e: Sel<3>['options']) => this.assign({ options: e })
+  options = (e: APIStringSelectComponent['options']) => this.assign({ options: e })
 }
-export class ComponentUserSelect extends SelectBase<5> {
+export class ComponentUserSelect extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 5)
   }
-  default_values = (e: Sel<5>['default_values']) => this.assign({ default_values: e })
+  default_values = (e: APIUserSelectComponent['default_values']) => this.assign({ default_values: e })
 }
-export class ComponentRoleSelect extends SelectBase<6> {
+export class ComponentRoleSelect extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 6)
   }
-  default_values = (e: Sel<6>['default_values']) => this.assign({ default_values: e })
+  default_values = (e: APIRoleSelectComponent['default_values']) => this.assign({ default_values: e })
 }
-export class ComponentMentionableSelect extends SelectBase<7> {
+export class ComponentMentionableSelect extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 7)
   }
-  default_values = (e: Sel<7>['default_values']) => this.assign({ default_values: e })
+  default_values = (e: APIMentionableSelectComponent['default_values']) => this.assign({ default_values: e })
 }
-export class ComponentChannelSelect extends SelectBase<8> {
+export class ComponentChannelSelect extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 8)
   }
-  channel_types = (e: Sel<8>['channel_types']) => this.assign({ channel_types: e })
-  default_values = (e: Sel<8>['default_values']) => this.assign({ default_values: e })
+  channel_types = (e: APIChannelSelectComponent['channel_types']) => this.assign({ channel_types: e })
+  default_values = (e: APIChannelSelectComponent['default_values']) => this.assign({ default_values: e })
 }
-
-type inputStyle = 'Single' | 'Multi'
 
 export class ComponentTextInput {
   #uniqueStr: string
@@ -178,9 +165,9 @@ export class ComponentTextInput {
    * [Text Input Structure](https://discord.com/developers/docs/interactions/message-components#text-input-object-text-input-structure)
    * @param inputStyle default 'Single'
    */
-  constructor(uniqueId: string, label: string, inputStyle: inputStyle = 'Single') {
+  constructor(uniqueId: string, label: string, inputStyle?: 'Single' | 'Multi') {
     this.#uniqueStr = uniqueId + ';'
-    this.#component = { type: 4, custom_id: this.#uniqueStr, label, style: inputStyle === 'Single' ? 1 : 2 }
+    this.#component = { type: 4, custom_id: this.#uniqueStr, label, style: inputStyle === 'Multi' ? 2 : 1 }
   }
   #assign = (component: Omit<APITextInputComponent, 'type' | 'custom_id' | 'label' | 'style'>) => {
     Object.assign(this.#component, component)
