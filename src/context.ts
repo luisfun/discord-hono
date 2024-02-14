@@ -98,8 +98,8 @@ export class Context<E extends Env = any> {
     return this.#command
   }
 
-  get component(): Interaction["data"] {
-    if (!this.#component) throw new Error("This context has no Component.")
+  get component(): Interaction['data'] {
+    if (!this.#component) throw new Error('This context has no Component.')
     return this.#component
   }
 
