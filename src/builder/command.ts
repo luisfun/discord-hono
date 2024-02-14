@@ -77,42 +77,36 @@ export class Command<E extends Env = any> {
   handler = (handler: CommandHandler<E>): Commands<E>[0] => [this.#command, handler]
 }
 
-// prettier-ignore
-type Opt<T extends ApplicationCommandOptionType> =
-  T extends 1 ? APIApplicationCommandSubcommandOption :
-  T extends 2 ? APIApplicationCommandSubcommandGroupOption :
-  T extends 3 ? APIApplicationCommandStringOption :
-  T extends 4 ? APIApplicationCommandIntegerOption :
-  T extends 5 ? APIApplicationCommandBooleanOption :
-  T extends 6 ? APIApplicationCommandUserOption :
-  T extends 7 ? APIApplicationCommandChannelOption :
-  T extends 8 ? APIApplicationCommandRoleOption :
-  T extends 9 ? APIApplicationCommandMentionableOption :
-  T extends 10 ? APIApplicationCommandNumberOption :
-  T extends 11 ? APIApplicationCommandAttachmentOption :
-  APIApplicationCommandOption
-
-type OptOmit<T> = Omit<T, 'name' | 'description' | 'type'>
-
-class OptionBase<T extends ApplicationCommandOptionType> {
-  protected option: Opt<T>
-  constructor(name: string, description: string, type: T) {
-    this.option = { name, description, type } as Opt<T>
+type OmitOption =
+  | Omit<APIApplicationCommandSubcommandOption, 'name' | 'description' | 'type'>
+  | Omit<APIApplicationCommandSubcommandGroupOption, 'name' | 'description' | 'type'>
+  | Omit<APIApplicationCommandStringOption, 'name' | 'description' | 'type'>
+  | Omit<APIApplicationCommandIntegerOption, 'name' | 'description' | 'type'>
+  | Omit<APIApplicationCommandBooleanOption, 'name' | 'description' | 'type'>
+  | Omit<APIApplicationCommandUserOption, 'name' | 'description' | 'type'>
+  | Omit<APIApplicationCommandChannelOption, 'name' | 'description' | 'type'>
+  | Omit<APIApplicationCommandRoleOption, 'name' | 'description' | 'type'>
+  | Omit<APIApplicationCommandMentionableOption, 'name' | 'description' | 'type'>
+  | Omit<APIApplicationCommandNumberOption, 'name' | 'description' | 'type'>
+  | Omit<APIApplicationCommandAttachmentOption, 'name' | 'description' | 'type'>
+class OptionBase {
+  protected option: APIApplicationCommandOption
+  constructor(name: string, description: string, type: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11) {
+    this.option = { name, description, type } as APIApplicationCommandOption
   }
-  protected assign = (option: OptOmit<Opt<T>>) => {
+  protected assign = (option: OmitOption) => {
     Object.assign(this.option, option)
     return this
   }
-  name_localizations = (e: Opt<T>['name_localizations']) => this.assign({ name_localizations: e } as OptOmit<Opt<T>>)
-  description_localizations = (e: Opt<T>['description_localizations']) =>
-    this.assign({ description_localizations: e } as OptOmit<Opt<T>>)
-  required = (e: Opt<T>['required'] = true) => this.assign({ required: e } as OptOmit<Opt<T>>)
+  name_localizations = (e: APIApplicationCommandOption['name_localizations']) => this.assign({ name_localizations: e })
+  description_localizations = (e: APIApplicationCommandOption['description_localizations']) =>
+    this.assign({ description_localizations: e })
+  required = (e: APIApplicationCommandOption['required'] = true) => this.assign({ required: e })
   build = () => this.option
 }
 
-type CommandClass = CommandOption | CommandNumberOption | CommandOtherOption | CommandChannelOption
-
-export class CommandSubOption extends OptionBase<1> {
+type CommandClass = CommandOption | CommandNumberOption | CommandBooleanOption | CommandUserOption | CommandChannelOption | CommandRoleOption | CommandMentionableOption | CommandAttachmentOption
+export class CommandSubOption extends OptionBase {
   constructor(name: string, description: string) {
     super(name, description, 1)
   }
@@ -121,27 +115,33 @@ export class CommandSubOption extends OptionBase<1> {
       if (
         opt instanceof CommandOption ||
         opt instanceof CommandNumberOption ||
-        opt instanceof CommandOtherOption ||
-        opt instanceof CommandChannelOption
+        opt instanceof CommandBooleanOption ||
+        opt instanceof CommandUserOption ||
+        opt instanceof CommandChannelOption ||
+        opt instanceof CommandRoleOption ||
+        opt instanceof CommandMentionableOption ||
+        opt instanceof CommandAttachmentOption
       )
-        return opt.build()
+        return opt.build() as APIApplicationCommandBasicOption
       return opt
     })
     return this.assign({ options })
   }
 }
 
-export class CommandSubGroupOption extends OptionBase<2> {
+export class CommandSubGroupOption extends OptionBase {
   constructor(name: string, description: string) {
     super(name, description, 2)
   }
   options = (...e: (CommandSubOption | APIApplicationCommandSubcommandOption)[]) => {
-    const options = e.map(opt => (opt instanceof CommandSubOption ? opt.build() : opt))
+    const options = e.map(opt =>
+      opt instanceof CommandSubOption ? (opt.build() as APIApplicationCommandSubcommandOption) : opt,
+    )
     return this.assign({ options })
   }
 }
 
-export class CommandOption extends OptionBase<3> {
+export class CommandOption extends OptionBase {
   /**
    * [Command Option Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure)
    * @param name 1-32 character name
@@ -151,38 +151,58 @@ export class CommandOption extends OptionBase<3> {
     super(name, description, 3)
   }
   choices = (...e: APIApplicationCommandOptionChoice<string>[]) => this.assign({ choices: e })
-  min_length = (e: Opt<3>['min_length']) => this.assign({ min_length: e })
-  max_length = (e: Opt<3>['max_length']) => this.assign({ max_length: e })
-  autocomplete = (e: Opt<3>['autocomplete']) => this.assign({ autocomplete: e })
+  min_length = (e: APIApplicationCommandStringOption['min_length']) => this.assign({ min_length: e })
+  max_length = (e: APIApplicationCommandStringOption['max_length']) => this.assign({ max_length: e })
+  autocomplete = (e: APIApplicationCommandStringOption['autocomplete']) => this.assign({ autocomplete: e })
 }
 
-export class CommandNumberOption extends OptionBase<4 | 10> {
-  constructor(name: string, description: string, type?: 'integer') {
+type NumberOption = APIApplicationCommandIntegerOption | APIApplicationCommandNumberOption
+export class CommandNumberOption extends OptionBase {
+  /**
+   * @param type default 'number'
+   */
+  constructor(name: string, description: string, type?: 'integer' | "number") {
     super(name, description, type === 'integer' ? 4 : 10)
   }
   choices = (...e: APIApplicationCommandOptionChoice<number>[]) => this.assign({ choices: e })
-  min_value = (e: Opt<4 | 10>['min_value']) => this.assign({ min_value: e })
-  max_value = (e: Opt<4 | 10>['max_value']) => this.assign({ max_value: e })
-  autocomplete = (e: Opt<4 | 10>['autocomplete']) => this.assign({ autocomplete: e })
+  min_value = (e: NumberOption['min_value']) => this.assign({ min_value: e })
+  max_value = (e: NumberOption['max_value']) => this.assign({ max_value: e })
+  autocomplete = (e: NumberOption['autocomplete']) => this.assign({ autocomplete: e })
 }
 
-export class CommandOtherOption extends OptionBase<5 | 6 | 8 | 9 | 11> {
-  constructor(name: string, description: string, type: 'boolean' | 'user' | 'role' | 'mentionable' | 'attachment') {
-    // prettier-ignore
-    const num =
-      type === 'boolean' ? 5 :
-      type === 'user' ? 6 :
-      type === 'role' ? 8 :
-      type === 'mentionable' ? 9 :
-      type === 'attachment' ? 11 :
-      5
-    super(name, description, num)
+export class CommandBooleanOption extends OptionBase {
+  constructor(name: string, description: string) {
+    super(name, description, 5)
   }
 }
 
-export class CommandChannelOption extends OptionBase<7> {
+export class CommandUserOption extends OptionBase {
+  constructor(name: string, description: string) {
+    super(name, description, 6)
+  }
+}
+
+export class CommandChannelOption extends OptionBase {
   constructor(name: string, description: string) {
     super(name, description, 7)
   }
-  channel_types = (e: Opt<7>['channel_types']) => this.assign({ channel_types: e })
+  channel_types = (e: APIApplicationCommandChannelOption['channel_types']) => this.assign({ channel_types: e })
+}
+
+export class CommandRoleOption extends OptionBase {
+  constructor(name: string, description: string) {
+    super(name, description, 8)
+  }
+}
+
+export class CommandMentionableOption extends OptionBase {
+  constructor(name: string, description: string) {
+    super(name, description, 9)
+  }
+}
+
+export class CommandAttachmentOption extends OptionBase {
+  constructor(name: string, description: string) {
+    super(name, description, 11)
+  }
 }
