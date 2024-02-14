@@ -105,7 +105,15 @@ class OptionBase {
   build = () => this.option
 }
 
-type CommandClass = CommandOption | CommandNumberOption | CommandBooleanOption | CommandUserOption | CommandChannelOption | CommandRoleOption | CommandMentionableOption | CommandAttachmentOption
+type CommandClass =
+  | CommandOption
+  | CommandNumberOption
+  | CommandBooleanOption
+  | CommandUserOption
+  | CommandChannelOption
+  | CommandRoleOption
+  | CommandMentionableOption
+  | CommandAttachmentOption
 export class CommandSubOption extends OptionBase {
   constructor(name: string, description: string) {
     super(name, description, 1)
@@ -161,7 +169,7 @@ export class CommandNumberOption extends OptionBase {
   /**
    * @param type default 'number'
    */
-  constructor(name: string, description: string, type?: 'integer' | "number") {
+  constructor(name: string, description: string, type?: 'integer' | 'number') {
     super(name, description, type === 'integer' ? 4 : 10)
   }
   choices = (...e: APIApplicationCommandOptionChoice<number>[]) => this.assign({ choices: e })
