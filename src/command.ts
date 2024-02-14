@@ -39,7 +39,6 @@ type Opt<T extends ApplicationCommandOptionType> =
  */
 export class Command<E extends Env = any> {
   #command: Cmd
-
   /**
    * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure)
    * @param name 1-32 character name
@@ -83,7 +82,7 @@ export class Command<E extends Env = any> {
       if (!c.executionCtx.waitUntil && !c.event.waitUntil)
         throw new Error('This command handler context has no waitUntil. You can use .handler(command_handler).')
       if (c.executionCtx.waitUntil) c.executionCtx.waitUntil(handler(c, ...args))
-      // @ts-expect-error
+      // @ts-expect-error ****************** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
       else c.event.waitUntil(handler(c, ...args))
       return c.resDefer()
     },
@@ -96,7 +95,6 @@ export class Command<E extends Env = any> {
  */
 export class CommandOption<T extends ApplicationCommandOptionType = 3> {
   #option: Opt<T>
-
   /**
    * [Command Option Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure)
    * @param name 1-32 character name
