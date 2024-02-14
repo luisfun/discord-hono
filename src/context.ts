@@ -1,21 +1,19 @@
 import type {
+  APIBaseInteraction,
+  InteractionType,
   APIEmbed,
   APIInteractionResponse,
   APIInteractionResponseChannelMessageWithSource,
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIInteractionResponseCallbackData,
+  APIChatInputApplicationCommandInteractionData,
 } from 'discord-api-types/v10'
-import type {
-  Env,
-  ExecutionContext,
-  FetchEventLike,
-  CronEvent,
-  ApplicationCommand,
-  Interaction,
-  FileData,
-} from './types'
+import type { Env, ExecutionContext, FetchEventLike, CronEvent, ApplicationCommand, FileData } from './types'
 import { apiUrl, ResponseJson, fetchMessage } from './utils'
 import { postMessage } from './api-wrapper/channel-message'
+
+// ************* any 何とかしたい
+type Interaction = APIBaseInteraction<InteractionType, any>
 
 type Command = ApplicationCommand & {
   values: string[]
@@ -42,6 +40,7 @@ export class Context<E extends Env = any> {
   #executionCtx: FetchEventLike | ExecutionContext | undefined
   #interaction: Interaction | undefined
   #command: Command | undefined
+  #component: Interaction['data'] | undefined
   #cronEvent: CronEvent | undefined
   #var: E['Variables'] = {}
 
@@ -49,18 +48,22 @@ export class Context<E extends Env = any> {
     req: Request | CronEvent,
     env?: E['Bindings'],
     executionCtx?: FetchEventLike | ExecutionContext | undefined,
-    command?: ApplicationCommand,
     interaction?: Interaction,
+    command?: ApplicationCommand,
   ) {
     if (req instanceof Request) this.#req = req
     else this.#cronEvent = req
     if (env) this.env = env
     if (executionCtx) this.#executionCtx = executionCtx
-    if (command) this.#command = { ...command, values: [], valuesMap: {} }
     if (interaction) this.#interaction = interaction
+    if (command) {
+      this.#command = { ...command, values: [], valuesMap: {} }
+    } else {
+      if (interaction) this.#component = interaction.data
+    }
     if (interaction?.data?.options && this.#command) {
+      // @ts-expect-error ************** any 何とかしたい
       this.#command.valuesMap = interaction.data.options.reduce((obj: Record<string, string>, e) => {
-        // @ts-expect-error
         obj[e.name] = e.value
         return obj
       }, {})
@@ -93,6 +96,11 @@ export class Context<E extends Env = any> {
   get command(): Command {
     if (!this.#command) throw new Error('This context has no Command.')
     return this.#command
+  }
+
+  get component(): Interaction["data"] {
+    if (!this.#component) throw new Error("This context has no Component.")
+    return this.#component
   }
 
   get cronEvent(): CronEvent {

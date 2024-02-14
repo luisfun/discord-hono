@@ -1,7 +1,7 @@
-import type { APIInteractionResponsePong } from 'discord-api-types/v10'
+import type { APIBaseInteraction, InteractionType, APIInteractionResponsePong } from 'discord-api-types/v10'
 import { verifyKey } from 'discord-interactions'
 import { Context } from './context'
-import type { Env, ExecutionContext, CronEvent, Commands, CronHandler, PublicKeyHandler, Interaction } from './types'
+import type { Env, ExecutionContext, CronEvent, Commands, Handler, PublicKeyHandler } from './types'
 import { ResponseJson } from './utils'
 
 const defineClass = function (): {
@@ -12,16 +12,22 @@ const defineClass = function (): {
     commands: (commands: Commands<E>) => void
   } & {
     /**
+     * @param uniqueId uniqueId set in Component builder
+     * @param handler type Handler
+     */
+    component: (uniqueId: string, handler: Handler<E>) => void
+  } & {
+    /**
      * Just setting up cron here does not execute it. Please set up a cron trigger in wrangler.toml.
      * @param schedule cron schedule - '': trigger all crons
-     * @param handler type CronHandler
+     * @param handler type Handler
      * @sample
      * ```ts
      * app.cron('0 0 * * *', daily_handler)
      * app.cron('', all_other_schedule_handler)
      * ```
      */
-    cron: (schedule: string, handler: CronHandler<E>) => void
+    cron: (schedule: string, handler: Handler<E>) => void
   } & {
     /**
      * Used when DISCORD_PUBLIC_KEY error occurs.
@@ -42,13 +48,18 @@ const defineClass = function (): {
  */
 export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
   #commands: Commands | undefined = undefined
-  #cronjobs: [string, CronHandler<E>][] = []
+  #components: [string, Handler<E>][] = []
+  #cronjobs: [string, Handler<E>][] = []
   #publicKey: PublicKeyHandler<E> | undefined = undefined
 
   constructor() {
     super()
     this.commands = commands => {
       this.#commands = commands
+      return this
+    }
+    this.component = (uniqueId, handler) => {
+      this.#components.push([uniqueId, handler])
       return this
     }
     this.cron = (cron, handler) => {
@@ -82,21 +93,34 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
         return new Response('Bad request signature.', { status: 401 })
       }
       // verify end
-      const interaction: Interaction = JSON.parse(body)
+      // ************ any 何とかしたい
+      const interaction: APIBaseInteraction<InteractionType, any> = JSON.parse(body)
       // interaction type https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
-      if (interaction.type === 1) {
-        // verify
-        return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
+      switch (interaction.type) {
+        case 1:
+          return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
+        case 2:
+          if (!this.#commands) throw new Error('Commands is not set.')
+          const commandName = interaction.data?.name.toLowerCase()
+          const commandIndex = this.#commands.findIndex(command => command[0].name.toLowerCase() === commandName)
+          const command = this.#commands[commandIndex][0]
+          const commandHandler = this.#commands[commandIndex][1]
+          const commandInteraction = interaction as APIBaseInteraction<2, any>
+          return await commandHandler(new Context(request, env, executionCtx, commandInteraction, command))
+        case 3:
+          if (!this.#components[0])
+            throw new Error('Component is not set. You can set the Component Handler in app.component(id, handler).')
+          const reqCustomId = interaction.data?.custom_id as string
+          const uniqueId = reqCustomId.split(';')[0]
+          const custom_id = reqCustomId.slice(uniqueId.length + 1, reqCustomId.length)
+          const componentIndex = this.#components.findIndex(e => e[0] === uniqueId || e[0] === '')
+          const componentHandler = this.#components[componentIndex][1]
+          const componentInteraction = interaction as APIBaseInteraction<3, any>
+          componentInteraction.data.custom_id = custom_id
+          return await componentHandler(new Context(request, env, executionCtx, componentInteraction))
+        default:
+          return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
       }
-      if (interaction.type === 2) {
-        if (!this.#commands) throw new Error('Commands is not set.')
-        const commandName = interaction.data?.name.toLowerCase()
-        const commandIndex = this.#commands.findIndex(command => command[0].name.toLowerCase() === commandName)
-        const command = this.#commands[commandIndex][0]
-        const handler = this.#commands[commandIndex][1]
-        return await handler(new Context(request, env, executionCtx, command, interaction))
-      }
-      return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
     }
     return new Response('Not Found.', { status: 404 })
   }

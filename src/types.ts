@@ -2,7 +2,7 @@
 import type {
   APIBaseInteraction,
   InteractionType,
-  APIChatInputApplicationCommandInteractionData,
+  APIApplicationCommandInteractionData,
   APIApplicationCommand,
   ApplicationCommandType,
 } from 'discord-api-types/v10'
@@ -36,9 +36,9 @@ export type ApplicationCommand = Omit<
  */
 export type Commands<E extends Env = any> = [ApplicationCommand, CommandHandler<E>][]
 
-////////// CronHandler //////////
+////////// Handler //////////
 
-export type CronHandler<E extends Env = any> = (c: Context<E>) => Promise<unknown>
+export type Handler<E extends Env = any> = (c: Context<E>) => Promise<unknown>
 
 ////////// PublicKeyHandler //////////
 
@@ -68,12 +68,6 @@ export abstract class FetchEventLike {
   abstract passThroughOnException(): void
   abstract waitUntil(promise: Promise<void>): void
 }
-
-////////// Interaction //////////
-/**
- * https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object
- */
-export type Interaction = APIBaseInteraction<InteractionType, APIChatInputApplicationCommandInteractionData>
 
 ////////// FileData //////////
 
