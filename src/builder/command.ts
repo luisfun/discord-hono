@@ -20,6 +20,16 @@ import type {
 import type { Env, Commands, CommandHandler, ApplicationCommand as Cmd } from '../types'
 import type { Context } from '../context'
 
+type OptionClass =
+  | CommandOption
+  | CommandNumberOption
+  | CommandBooleanOption
+  | CommandUserOption
+  | CommandChannelOption
+  | CommandRoleOption
+  | CommandMentionableOption
+  | CommandAttachmentOption
+type OptionAllClass = OptionClass | CommandSubOption | CommandSubGroupOption
 /**
  * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure)
  */
@@ -34,7 +44,6 @@ export class Command<E extends Env = any> {
     this.#command = { name, description }
   }
 
-  // builder
   private assign = (command: Omit<Cmd, 'name' | 'description'>) => {
     Object.assign(this.#command, command)
     return this
@@ -50,11 +59,24 @@ export class Command<E extends Env = any> {
   nsfw = (e: Cmd['nsfw']) => this.assign({ nsfw: e })
   version = (e: Cmd['version']) => this.assign({ version: e })
   // options
-  option = (e: CommandOption | APIApplicationCommandOption) => {
-    const opt = e instanceof CommandOption ? e.build() : e
-    this.#command.options ??= []
-    this.#command.options.push(opt)
-    return this
+  options = (...e: (OptionAllClass | APIApplicationCommandOption)[]) => {
+    const options = e.map(opt => {
+      if (
+        opt instanceof CommandSubOption ||
+        opt instanceof CommandSubGroupOption ||
+        opt instanceof CommandOption ||
+        opt instanceof CommandNumberOption ||
+        opt instanceof CommandBooleanOption ||
+        opt instanceof CommandUserOption ||
+        opt instanceof CommandChannelOption ||
+        opt instanceof CommandRoleOption ||
+        opt instanceof CommandMentionableOption ||
+        opt instanceof CommandAttachmentOption
+      )
+        return opt.build()
+      return opt
+    })
+    return this.assign({ options })
   }
 
   // build()
@@ -104,20 +126,11 @@ class OptionBase {
   build = () => this.option
 }
 
-type CommandClass =
-  | CommandOption
-  | CommandNumberOption
-  | CommandBooleanOption
-  | CommandUserOption
-  | CommandChannelOption
-  | CommandRoleOption
-  | CommandMentionableOption
-  | CommandAttachmentOption
 export class CommandSubOption extends OptionBase {
   constructor(name: string, description: string) {
     super(name, description, 1)
   }
-  options = (e: (CommandClass | APIApplicationCommandBasicOption)[]) => {
+  options = (...e: (OptionClass | APIApplicationCommandBasicOption)[]) => {
     const options = e.map(opt => {
       if (
         opt instanceof CommandOption ||

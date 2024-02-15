@@ -26,7 +26,7 @@ type ComponentClass =
 export class Components {
   #components: APIActionRowComponent<APIActionRowComponentTypes>[] = []
   components = (...e: (ComponentClass | APIActionRowComponentTypes)[]) => {
-    if (e.length >= 5) console.warn('You can have up to 5 Action Rows per message')
+    if (this.#components.length >= 5) console.warn('You can have up to 5 Action Rows per message')
     const components = e.map(comp => {
       if (
         comp instanceof ComponentButton ||
