@@ -4,8 +4,10 @@ import type {
   APIInteractionResponseChannelMessageWithSource,
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIInteractionResponseDeferredMessageUpdate,
+  APIInteractionResponseUpdateMessage,
   APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
+  APIMessageActionRowComponent,
   APIEmbed,
 } from 'discord-api-types/v10'
 import type {
@@ -17,32 +19,25 @@ import type {
   InteractionCommandData,
   InteractionComponentData,
   InteractionModalData,
+  InteractionComponentButtonData,
+  InteractionComponentSelectData,
   FileData,
 } from './types'
 import { apiUrl, ResponseJson, fetchMessage } from './utils'
 import { postMessage } from './api-wrapper/channel-message'
 import { Modal } from './builder/modal'
 
-type CommandValue = string | number | boolean
-type CommandValuesMap = Record<string, CommandValue>
-type Command = ApplicationCommand & {
-  values: CommandValue[]
-  valuesMap: CommandValuesMap
-}
+type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
 interface ContextVariableMap {}
-
 interface Get<E extends Env> {
   <Key extends keyof ContextVariableMap>(key: Key): ContextVariableMap[Key]
   <Key extends keyof E['Variables']>(key: Key): E['Variables'][Key]
 }
-
 interface Set<E extends Env> {
   <Key extends keyof ContextVariableMap>(key: Key, value: ContextVariableMap[Key]): void
   <Key extends keyof E['Variables']>(key: Key, value: E['Variables'][Key]): void
 }
-
-type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
 class ContextBase<E extends Env> {
   #env: E['Bindings'] = {}
@@ -159,8 +154,12 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   postEmbeds = async (channelId: string, ...embeds: APIEmbed[]) => await this.post(channelId, { embeds })
 }
 
+type CommandValue = string | number | boolean
+type CommandValuesMap = Record<string, CommandValue>
 export class CommandContext<E extends Env = any> extends RequestContext<E, InteractionData<2>> {
-  #command: Command
+  #command: ApplicationCommand
+  #values: CommandValue[] = []
+  #valuesMap: CommandValuesMap = {}
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -169,20 +168,26 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
     command: ApplicationCommand,
   ) {
     super(req, env, executionCtx, interaction)
-    this.#command = { ...command, values: [], valuesMap: {} }
+    this.#command = command
     if (interaction?.data && 'options' in interaction?.data && interaction.data.options && this.#command) {
-      this.#command.valuesMap = interaction.data.options.reduce((obj: CommandValuesMap, e) => {
+      this.#valuesMap = interaction.data.options.reduce((obj: CommandValuesMap, e) => {
         if (e.type === 1 || e.type === 2) return obj // sub command
         obj[e.name] = e.value
         return obj
       }, {})
       const names = this.#command.options?.map(e => e.name)
-      if (this.#command.valuesMap && names) this.#command.values = names.map(e => this.#command.valuesMap[e])
+      if (this.#valuesMap && names) this.#values = names.map(e => this.#valuesMap[e])
     }
   }
 
-  get command(): Command {
+  get command(): ApplicationCommand {
     return this.#command
+  }
+  get values(): CommandValue[] {
+    return this.#values
+  }
+  get valuesMap(): CommandValuesMap {
+    return this.#valuesMap
   }
 
   resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
@@ -192,11 +197,33 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
 }
 
 export class ComponentContext<E extends Env = any> extends RequestContext<E, InteractionData<3>> {
-  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, interaction: InteractionData<3>) {
+  #interaction: InteractionData<3>
+  #component: APIMessageActionRowComponent
+  constructor(
+    req: Request,
+    env: E['Bindings'],
+    executionCtx: ExecutionCtx,
+    interaction: InteractionData<3>,
+    component: APIMessageActionRowComponent,
+  ) {
     super(req, env, executionCtx, interaction)
+    this.#interaction = interaction
+    this.#component = component
   }
 
-  resDeferComponent = () => this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
+  get interaction() {
+    if (this.#interaction.data?.component_type === 2) return this.#interaction as InteractionComponentButtonData
+    return this.#interaction as InteractionComponentSelectData
+  }
+  get component(): APIMessageActionRowComponent {
+    return this.#component
+  }
+
+  resUpdate = (data: APIInteractionResponseCallbackData) =>
+    this.resBase({ type: 7, data } as APIInteractionResponseUpdateMessage)
+  resUpdateText = (content: string) => this.resUpdate({ content })
+  resUpdateEmbeds = (...embeds: APIEmbed[]) => this.resUpdate({ embeds })
+  resUpdateDefer = () => this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
   resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
     const data = e instanceof Modal ? e.build() : e
     return this.resBase({ type: 9, data } as APIModalInteractionResponse)
@@ -204,8 +231,20 @@ export class ComponentContext<E extends Env = any> extends RequestContext<E, Int
 }
 
 export class ModalContext<E extends Env = any> extends RequestContext<E, InteractionData<5>> {
-  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, interaction: InteractionData<5>) {
+  #modal: APIModalInteractionResponseCallbackData
+  constructor(
+    req: Request,
+    env: E['Bindings'],
+    executionCtx: ExecutionCtx,
+    interaction: InteractionData<5>,
+    modal: APIModalInteractionResponseCallbackData,
+  ) {
     super(req, env, executionCtx, interaction)
+    this.#modal = modal
+  }
+
+  get modal(): APIModalInteractionResponseCallbackData {
+    return this.#modal
   }
 }
 

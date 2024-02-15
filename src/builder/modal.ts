@@ -1,8 +1,10 @@
 import type { APIModalInteractionResponseCallbackData, APITextInputComponent } from 'discord-api-types/v10'
+import type { Env, ModalHandler } from '../types'
 
-export class Modal {
+export class Modal<E extends Env = any> {
   #uniqueStr: string
   #data: APIModalInteractionResponseCallbackData
+  #handler: ModalHandler<E> | undefined
   constructor(uniqueId: string, title: string) {
     this.#uniqueStr = uniqueId + ';'
     this.#data = { title, custom_id: this.#uniqueStr, components: [] }
@@ -16,7 +18,12 @@ export class Modal {
     this.#data.components.push({ type: 1, components })
     return this
   }
+  handler = (handler: ModalHandler<E>) => (this.#handler = handler)
   build = () => this.#data
+  getHandler = (): [APIModalInteractionResponseCallbackData, string, ModalHandler<E>] => {
+    if (!this.#handler) throw new Error('This is no handler.')
+    return [this.#data, this.#uniqueStr.replace(';', ''), this.#handler]
+  }
 }
 
 export class ComponentTextInput {

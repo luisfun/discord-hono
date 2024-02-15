@@ -7,6 +7,8 @@ import type {
   APIModalSubmission,
   APIApplicationCommand,
   ApplicationCommandType,
+  APIMessageButtonInteractionData,
+  APIMessageSelectMenuInteractionData,
 } from 'discord-api-types/v10'
 import type { CommandContext, ComponentContext, ModalContext, CronContext } from './context'
 
@@ -38,9 +40,13 @@ export type ApplicationCommand = Omit<
  */
 export type Commands<E extends Env = any> = [ApplicationCommand, CommandHandler<E>][]
 
+////////// ComponentsHandler //////////
+
+export type ComponentsHandler<E extends Env = any> = [string, ComponentHandler<E>][]
+
 ////////// ComponentHandler //////////
 
-export type ComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<unknown>
+export type ComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<Response> | Response
 
 ////////// ModalHandler //////////
 
@@ -90,6 +96,15 @@ export type InteractionComponentData = APIBaseInteraction<
   APIMessageComponentInteractionData
 >
 export type InteractionModalData = APIBaseInteraction<InteractionType.ModalSubmit, APIModalSubmission>
+
+export type InteractionComponentButtonData = APIBaseInteraction<
+  InteractionType.MessageComponent,
+  APIMessageButtonInteractionData
+>
+export type InteractionComponentSelectData = APIBaseInteraction<
+  InteractionType.MessageComponent,
+  APIMessageSelectMenuInteractionData
+>
 
 ////////// FileData //////////
 

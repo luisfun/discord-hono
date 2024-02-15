@@ -11,6 +11,7 @@ import type {
   APIMentionableSelectComponent,
   APIChannelSelectComponent,
 } from 'discord-api-types/v10'
+import type { Env, ComponentHandler } from '../types'
 
 type ComponentClass =
   | ComponentButton
@@ -21,11 +22,22 @@ type ComponentClass =
   | ComponentMentionableSelect
   | ComponentChannelSelect
 
-export class Components {
+export class Components<E extends Env = any> {
   #components: APIActionRowComponent<APIMessageActionRowComponent>[] = []
-  components = (...e: (ComponentClass | APIMessageActionRowComponent)[]) => {
+  #handlers: [APIMessageActionRowComponent, string, ComponentHandler<E>][] = []
+  components = (
+    ...e: (
+      | ComponentClass
+      | APIMessageActionRowComponent
+      | [APIMessageActionRowComponent, string, ComponentHandler<E>]
+    )[]
+  ) => {
     if (this.#components.length >= 5) console.warn('You can have up to 5 Action Rows per message')
     const components = e.map(comp => {
+      if (Array.isArray(comp)) {
+        this.#handlers.push(comp)
+        return comp[0]
+      }
       if (
         comp instanceof ComponentButton ||
         comp instanceof ComponentButtonLink ||
@@ -42,12 +54,13 @@ export class Components {
     return this
   }
   build = () => this.#components
+  handlers = () => this.#handlers
 }
 
 type OmitButton =
   | Omit<APIButtonComponentWithCustomId, 'type' | 'style'>
   | Omit<APIButtonComponentWithURL, 'type' | 'style' | 'url'>
-class ButtonBase {
+class ButtonBase<E extends Env> {
   protected uniqueStr: string
   protected component: APIButtonComponent
   // ***************************** label or emoji でいけるのか検証したい
@@ -63,11 +76,12 @@ class ButtonBase {
   emoji = (e: APIButtonComponent['emoji']) => this.assign({ emoji: e })
   disabled = (e: APIButtonComponent['disabled']) => this.assign({ disabled: e })
   build = () => this.component
+  handler = (handler: ComponentHandler<E>) => [this.component, this.uniqueStr.replace(';', ''), handler]
 }
 
 type ButtonStyle = 'Primary' | 'Secondary' | 'Success' | 'Danger'
 
-export class ComponentButton extends ButtonBase {
+export class ComponentButton<E extends Env = any> extends ButtonBase<E> {
   /**
    * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
    * @param buttonStyle default 'Primary'
@@ -84,7 +98,7 @@ export class ComponentButton extends ButtonBase {
   }
   custom_id = (e: APIButtonComponentWithCustomId['custom_id']) => this.assign({ custom_id: this.uniqueStr + e })
 }
-export class ComponentButtonLink extends ButtonBase {
+export class ComponentButtonLink<E extends Env = any> extends ButtonBase<E> {
   /**
    * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
    */
@@ -99,7 +113,7 @@ type OmitSelect =
   | Omit<APIRoleSelectComponent, 'type' | 'custom_id'>
   | Omit<APIMentionableSelectComponent, 'type' | 'custom_id'>
   | Omit<APIChannelSelectComponent, 'type' | 'custom_id'>
-class SelectBase {
+class SelectBase<E extends Env> {
   protected uniqueStr: string
   protected component: APISelectMenuComponent
   constructor(uniqueId: string, type: 3 | 5 | 6 | 7 | 8) {
@@ -116,9 +130,10 @@ class SelectBase {
   max_values = (e: APISelectMenuComponent['max_values']) => this.assign({ max_values: e })
   disabled = (e: APISelectMenuComponent['disabled']) => this.assign({ disabled: e })
   build = () => this.component
+  handler = (handler: ComponentHandler<E>) => [this.component, this.uniqueStr.replace(';', ''), handler]
 }
 
-export class ComponentSelect extends SelectBase {
+export class ComponentSelect<E extends Env = any> extends SelectBase<E> {
   /**
    * [Select Structure](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure)
    * .options() require
@@ -128,25 +143,25 @@ export class ComponentSelect extends SelectBase {
   }
   options = (e: APIStringSelectComponent['options']) => this.assign({ options: e })
 }
-export class ComponentUserSelect extends SelectBase {
+export class ComponentUserSelect<E extends Env = any> extends SelectBase<E> {
   constructor(uniqueId: string) {
     super(uniqueId, 5)
   }
   default_values = (e: APIUserSelectComponent['default_values']) => this.assign({ default_values: e })
 }
-export class ComponentRoleSelect extends SelectBase {
+export class ComponentRoleSelect<E extends Env = any> extends SelectBase<E> {
   constructor(uniqueId: string) {
     super(uniqueId, 6)
   }
   default_values = (e: APIRoleSelectComponent['default_values']) => this.assign({ default_values: e })
 }
-export class ComponentMentionableSelect extends SelectBase {
+export class ComponentMentionableSelect<E extends Env = any> extends SelectBase<E> {
   constructor(uniqueId: string) {
     super(uniqueId, 7)
   }
   default_values = (e: APIMentionableSelectComponent['default_values']) => this.assign({ default_values: e })
 }
-export class ComponentChannelSelect extends SelectBase {
+export class ComponentChannelSelect<E extends Env = any> extends SelectBase<E> {
   constructor(uniqueId: string) {
     super(uniqueId, 8)
   }

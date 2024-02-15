@@ -97,7 +97,7 @@ export class Command<E extends Env = any> {
       return c.resDefer()
     },
   ]
-  resModal = (e: Modal | APIModalInteractionResponseCallbackData) => [
+  resModal = (e: Modal<E> | APIModalInteractionResponseCallbackData) => [
     this.#command,
     (c: CommandContext) => c.resModal(e),
   ]
