@@ -1,6 +1,6 @@
 import type {
   APIActionRowComponent,
-  APIActionRowComponentTypes,
+  APIMessageActionRowComponent,
   APIButtonComponent,
   APISelectMenuComponent,
   APIButtonComponentWithCustomId,
@@ -10,7 +10,6 @@ import type {
   APIRoleSelectComponent,
   APIMentionableSelectComponent,
   APIChannelSelectComponent,
-  APITextInputComponent,
 } from 'discord-api-types/v10'
 
 type ComponentClass =
@@ -21,11 +20,10 @@ type ComponentClass =
   | ComponentRoleSelect
   | ComponentMentionableSelect
   | ComponentChannelSelect
-  | ComponentTextInput
 
 export class Components {
-  #components: APIActionRowComponent<APIActionRowComponentTypes>[] = []
-  components = (...e: (ComponentClass | APIActionRowComponentTypes)[]) => {
+  #components: APIActionRowComponent<APIMessageActionRowComponent>[] = []
+  components = (...e: (ComponentClass | APIMessageActionRowComponent)[]) => {
     if (this.#components.length >= 5) console.warn('You can have up to 5 Action Rows per message')
     const components = e.map(comp => {
       if (
@@ -35,8 +33,7 @@ export class Components {
         comp instanceof ComponentUserSelect ||
         comp instanceof ComponentRoleSelect ||
         comp instanceof ComponentMentionableSelect ||
-        comp instanceof ComponentChannelSelect ||
-        comp instanceof ComponentTextInput
+        comp instanceof ComponentChannelSelect
       )
         return comp.build()
       return comp
@@ -154,28 +151,4 @@ export class ComponentChannelSelect extends SelectBase {
   }
   channel_types = (e: APIChannelSelectComponent['channel_types']) => this.assign({ channel_types: e })
   default_values = (e: APIChannelSelectComponent['default_values']) => this.assign({ default_values: e })
-}
-
-export class ComponentTextInput {
-  #uniqueStr: string
-  #component: APITextInputComponent
-  /**
-   * [Text Input Structure](https://discord.com/developers/docs/interactions/message-components#text-input-object-text-input-structure)
-   * @param inputStyle default 'Single'
-   */
-  constructor(uniqueId: string, label: string, inputStyle?: 'Single' | 'Multi') {
-    this.#uniqueStr = uniqueId + ';'
-    this.#component = { type: 4, custom_id: this.#uniqueStr, label, style: inputStyle === 'Multi' ? 2 : 1 }
-  }
-  #assign = (component: Omit<APITextInputComponent, 'type' | 'custom_id' | 'label' | 'style'>) => {
-    Object.assign(this.#component, component)
-    return this
-  }
-  // https://discord.com/developers/docs/interactions/message-components#text-input-object
-  min_length = (e: APITextInputComponent['min_length']) => this.#assign({ min_length: e })
-  max_length = (e: APITextInputComponent['max_length']) => this.#assign({ max_length: e })
-  required = (e: APITextInputComponent['required']) => this.#assign({ required: e })
-  value = (e: APITextInputComponent['value']) => this.#assign({ value: e })
-  placeholder = (e: APITextInputComponent['placeholder']) => this.#assign({ placeholder: e })
-  build = () => this.#component
 }

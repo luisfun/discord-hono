@@ -1,22 +1,32 @@
 import type {
-  APIBaseInteraction,
-  InteractionType,
   APIInteractionResponseCallbackData,
   APIInteractionResponse,
   APIInteractionResponseChannelMessageWithSource,
   APIInteractionResponseDeferredChannelMessageWithSource,
+  APIInteractionResponseUpdateMessage,
+  APIInteractionResponseDeferredMessageUpdate,
+  APIModalInteractionResponse,
+  APIModalInteractionResponseCallbackData,
   APIEmbed,
 } from 'discord-api-types/v10'
-import type { Env, ExecutionContext, FetchEventLike, CronEvent, ApplicationCommand, FileData } from './types'
+import type {
+  Env,
+  ExecutionContext,
+  FetchEventLike,
+  CronEvent,
+  ApplicationCommand,
+  InteractionData,
+  FileData,
+} from './types'
 import { apiUrl, ResponseJson, fetchMessage } from './utils'
 import { postMessage } from './api-wrapper/channel-message'
+import { Modal } from './builder/modal'
 
-// ************* any 何とかしたい
-type Interaction = APIBaseInteraction<InteractionType, any>
-
+type CommandValue = string | number | boolean
+type CommandValuesMap = Record<string, CommandValue>
 type Command = ApplicationCommand & {
-  values: string[]
-  valuesMap: Record<string, string>
+  values: CommandValue[]
+  valuesMap: CommandValuesMap
 }
 
 interface ContextVariableMap {}
@@ -32,14 +42,14 @@ interface Set<E extends Env> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class Context<E extends Env = any> {
+export class Context<E extends Env = any, D extends InteractionData = InteractionData> {
   env: E['Bindings'] = {}
 
   #req: Request | undefined
   #executionCtx: FetchEventLike | ExecutionContext | undefined
-  #interaction: Interaction | undefined
+  #interaction: D | undefined
   #command: Command | undefined
-  #component: Interaction['data'] | undefined
+  #component: D['data'] | undefined
   #cronEvent: CronEvent | undefined
   #var: E['Variables'] = {}
 
@@ -47,7 +57,7 @@ export class Context<E extends Env = any> {
     req: Request | CronEvent,
     env?: E['Bindings'],
     executionCtx?: FetchEventLike | ExecutionContext | undefined,
-    interaction?: Interaction,
+    interaction?: D,
     command?: ApplicationCommand,
   ) {
     if (req instanceof Request) this.#req = req
@@ -60,9 +70,9 @@ export class Context<E extends Env = any> {
     } else {
       if (interaction) this.#component = interaction.data
     }
-    if (interaction?.data?.options && this.#command) {
-      // @ts-expect-error ************** any 何とかしたい
-      this.#command.valuesMap = interaction.data.options.reduce((obj: Record<string, string>, e) => {
+    if (interaction?.data && 'options' in interaction?.data && interaction.data.options && this.#command) {
+      this.#command.valuesMap = interaction.data.options.reduce((obj: CommandValuesMap, e) => {
+        if (e.type === 1 || e.type === 2) return obj
         obj[e.name] = e.value
         return obj
       }, {})
@@ -87,7 +97,7 @@ export class Context<E extends Env = any> {
     return this.#executionCtx
   }
 
-  get interaction(): Interaction {
+  get interaction(): D {
     if (!this.#interaction) throw new Error('This context has no Interaction.')
     return this.#interaction
   }
@@ -97,7 +107,7 @@ export class Context<E extends Env = any> {
     return this.#command
   }
 
-  get component(): Interaction['data'] {
+  get component(): D['data'] {
     if (!this.#component) throw new Error('This context has no Component.')
     return this.#component
   }
@@ -125,11 +135,21 @@ export class Context<E extends Env = any> {
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @returns Response
    */
-  res = (data: APIInteractionResponseCallbackData) =>
-    this.resBase({ data, type: 4 } as APIInteractionResponseChannelMessageWithSource)
+  res = (data: APIInteractionResponseCallbackData) => {
+    if (this.#command) return this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
+    else return this.resBase({ type: 7, data } as APIInteractionResponseUpdateMessage)
+  }
   resText = (content: string) => this.res({ content })
   resEmbeds = (...embeds: APIEmbed[]) => this.res({ embeds })
-  resDefer = () => this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
+  resDefer = () => {
+    if (this.#command) return this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
+    else return this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
+  }
+  resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
+    const data = e instanceof Modal ? e.build() : e
+    return this.resBase({ type: 9, data } as APIModalInteractionResponse)
+  }
+  //resDeferComponents = () => this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
 
   /**
    * Used to send messages after resDefer.
@@ -150,10 +170,7 @@ export class Context<E extends Env = any> {
   followupText = async (content: string) => await this.followup({ content })
   followupEmbeds = async (...embeds: APIEmbed[]) => await this.followup({ embeds })
   followupImages = async (...images: ArrayBuffer[]) =>
-    await this.followup(
-      {},
-      ...images.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })),
-    )
+    await this.followup({}, ...images.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })))
 
   /**
    * Used to send messages other than res*** and followup***.
@@ -170,9 +187,5 @@ export class Context<E extends Env = any> {
   postText = async (channelId: string, content: string) => await this.post(channelId, { content })
   postEmbeds = async (channelId: string, ...embeds: APIEmbed[]) => await this.post(channelId, { embeds })
   postImages = async (channelId: string, ...images: ArrayBuffer[]) =>
-    await this.post(
-      channelId,
-      {},
-      ...images.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })),
-    )
+    await this.post(channelId, {}, ...images.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })))
 }

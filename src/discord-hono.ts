@@ -1,7 +1,23 @@
-import type { APIBaseInteraction, InteractionType, APIInteractionResponsePong } from 'discord-api-types/v10'
+import type {
+  APIBaseInteraction,
+  InteractionType,
+  APIInteraction,
+  APIApplicationCommandInteractionData,
+  APIInteractionResponsePong,
+} from 'discord-api-types/v10'
 import { verifyKey } from 'discord-interactions'
 import { Context } from './context'
-import type { Env, ExecutionContext, CronEvent, Commands, Handler, PublicKeyHandler } from './types'
+import type {
+  Env,
+  ExecutionContext,
+  CronEvent,
+  Commands,
+  Handler,
+  PublicKeyHandler,
+  InteractionCommandData,
+  InteractionComponentData,
+  InteractionModalData,
+} from './types'
 import { ResponseJson } from './utils'
 
 const defineClass = function (): {
@@ -93,43 +109,48 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
       }
       // verify end
       // ************ any 何とかしたい
-      const interaction: APIBaseInteraction<InteractionType, any> = JSON.parse(body)
+      const data: APIBaseInteraction<InteractionType, any> = JSON.parse(body)
       // interaction type https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
-      switch (interaction.type) {
+      switch (data.type) {
         case 1: {
           return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
         }
         case 2: {
           if (!this.#commands) throw new Error('Commands is not set. Set by app.commands(Commands).')
-          const name = interaction.data?.name.toLowerCase()
+          const interaction = data as InteractionCommandData
+          if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
+          const name = interaction.data.name.toLowerCase()
           const index = this.#commands.findIndex(command => command[0].name.toLowerCase() === name)
           const command = this.#commands[index][0]
           const handler = this.#commands[index][1]
-          const interaction2 = interaction as APIBaseInteraction<2, any>
-          return await handler(new Context(request, env, executionCtx, interaction2, command))
+          return await handler(new Context(request, env, executionCtx, interaction, command))
         }
         case 3: {
           if (!this.#components[0]) throw new Error('Component Handler is not set. Set by app.component(id, Handler).')
-          const customId = interaction.data?.custom_id as string
+          const interaction = data as InteractionComponentData
+          if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
+          const customId = interaction.data.custom_id
           const uniqueId = customId.split(';')[0]
           const custom_id = customId.slice(uniqueId.length + 1, customId.length)
           const index = this.#components.findIndex(e => e[0] === uniqueId || e[0] === '')
           const handler = this.#components[index][1]
-          const interaction3 = interaction as APIBaseInteraction<3, any>
-          interaction3.data.custom_id = custom_id
-          return await handler(new Context(request, env, executionCtx, interaction3))
+          interaction.data.custom_id = custom_id
+          return await handler(new Context(request, env, executionCtx, interaction))
         }
         case 5: {
-          /*
           if (!this.#components[0]) throw new Error('Component Handler is not set. Set by app.component(id, Handler).')
-          const modalId = interaction.data?.custom_id as string
-          const customId = interaction.data?.components[0].components[0].custom_id as string
-          const uniqueId = customId.split(';')[0]
-          const custom_id = customId.slice(uniqueId.length + 1, customId.length)
-          */
+          const interaction = data as InteractionModalData
+          if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
+          const modalId = interaction.data.custom_id
+          //const customId = interaction.data.components[0].components[0].custom_id
+          const uniqueId = modalId.split(';')[0]
+          //const custom_id = customId.slice(uniqueId.length + 1, customId.length)
+          const index = this.#components.findIndex(e => e[0] === uniqueId || e[0] === '')
+          const handler = this.#components[index][1]
+          return await handler(new Context(request, env, executionCtx, interaction))
         }
         default: {
-          console.warn('interaction.type: ', interaction.type)
+          console.warn('interaction.type: ', data.type)
           return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
         }
       }

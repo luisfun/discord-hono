@@ -3,6 +3,8 @@ import type {
   APIBaseInteraction,
   InteractionType,
   APIApplicationCommandInteractionData,
+  APIMessageComponentInteractionData,
+  APIModalSubmission,
   APIApplicationCommand,
   ApplicationCommandType,
 } from 'discord-api-types/v10'
@@ -68,6 +70,19 @@ export abstract class FetchEventLike {
   abstract passThroughOnException(): void
   abstract waitUntil(promise: Promise<void>): void
 }
+
+////////// InteractionData //////////
+
+export type InteractionCommandData = APIBaseInteraction<
+  InteractionType.ApplicationCommand,
+  APIApplicationCommandInteractionData
+>
+export type InteractionComponentData = APIBaseInteraction<
+  InteractionType.ApplicationCommand,
+  APIMessageComponentInteractionData
+>
+export type InteractionModalData = APIBaseInteraction<InteractionType.ApplicationCommand, APIModalSubmission>
+export type InteractionData = InteractionCommandData | InteractionComponentData | InteractionModalData
 
 ////////// FileData //////////
 

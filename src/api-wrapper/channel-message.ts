@@ -5,11 +5,8 @@ import { apiUrl, fetchMessage } from '../utils'
 /**
  * [API Create Message](https://discord.com/developers/docs/resources/channel#create-message)
  */
-export const postMessage = async (
-  channelId: string,
-  data?: APIInteractionResponseCallbackData,
-  ...files: FileData[]
-) => await fetchMessage(`${apiUrl}/channels/${channelId}/messages`, data, files)
+export const postMessage = async (channelId: string, data?: APIInteractionResponseCallbackData, ...files: FileData[]) =>
+  await fetchMessage(`${apiUrl}/channels/${channelId}/messages`, data, files)
 
 /**
  * [API Delete Message](https://discord.com/developers/docs/resources/channel#delete-message)

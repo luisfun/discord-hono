@@ -16,9 +16,11 @@ import type {
   APIApplicationCommandAttachmentOption, // 11
   APIApplicationCommandBasicOption,
   APIApplicationCommandOptionChoice,
+  APIModalInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
 import type { Env, Commands, CommandHandler, ApplicationCommand as Cmd } from '../types'
 import type { Context } from '../context'
+import type { Modal } from './modal'
 
 type OptionClass =
   | CommandOption
@@ -95,6 +97,7 @@ export class Command<E extends Env = any> {
       return c.resDefer()
     },
   ]
+  resModal = (e: Modal | APIModalInteractionResponseCallbackData) => [this.#command, (c: Context) => c.resModal(e)]
   handler = (handler: CommandHandler<E>): Commands<E>[0] => [this.#command, handler]
 }
 
