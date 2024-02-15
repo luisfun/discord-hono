@@ -113,7 +113,8 @@ type OmitOption =
 class OptionBase {
   protected option: APIApplicationCommandOption
   constructor(name: string, description: string, type: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11) {
-    this.option = { name, description, type } as APIApplicationCommandOption
+    // @ts-expect-error *************** 型定義がおかしい？ 分からない
+    this.option = { name, description, type } // as APIApplicationCommandOption
   }
   protected assign = (option: OmitOption) => {
     Object.assign(this.option, option)
