@@ -8,7 +8,7 @@ import type {
   APIApplicationCommand,
   ApplicationCommandType,
 } from 'discord-api-types/v10'
-import type { Context } from './context'
+import type { CommandContext, ComponentContext, ModalContext, CronContext } from './context'
 
 ////////// Env //////////
 
@@ -19,7 +19,7 @@ export type Env = {
 
 ////////// Command //////////
 
-export type CommandHandler<E extends Env = any> = (c: Context<E>) => Promise<Response> | Response
+export type CommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
 /**
  * [Application Command](https://discord.com/developers/docs/interactions/application-commands)
  */
@@ -38,9 +38,17 @@ export type ApplicationCommand = Omit<
  */
 export type Commands<E extends Env = any> = [ApplicationCommand, CommandHandler<E>][]
 
-////////// Handler //////////
+////////// ComponentHandler //////////
 
-export type Handler<E extends Env = any> = (c: Context<E>) => Promise<unknown>
+export type ComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<unknown>
+
+////////// ModalHandler //////////
+
+export type ModalHandler<E extends Env = any> = (c: ModalContext<E>) => Promise<unknown>
+
+////////// CronHandler //////////
+
+export type CronHandler<E extends Env = any> = (c: CronContext<E>) => Promise<unknown>
 
 ////////// PublicKeyHandler //////////
 
@@ -78,11 +86,10 @@ export type InteractionCommandData = APIBaseInteraction<
   APIApplicationCommandInteractionData
 >
 export type InteractionComponentData = APIBaseInteraction<
-  InteractionType.ApplicationCommand,
+  InteractionType.MessageComponent,
   APIMessageComponentInteractionData
 >
-export type InteractionModalData = APIBaseInteraction<InteractionType.ApplicationCommand, APIModalSubmission>
-export type InteractionData = InteractionCommandData | InteractionComponentData | InteractionModalData
+export type InteractionModalData = APIBaseInteraction<InteractionType.ModalSubmit, APIModalSubmission>
 
 ////////// FileData //////////
 

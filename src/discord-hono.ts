@@ -1,18 +1,14 @@
-import type {
-  APIBaseInteraction,
-  InteractionType,
-  APIInteraction,
-  APIApplicationCommandInteractionData,
-  APIInteractionResponsePong,
-} from 'discord-api-types/v10'
+import type { APIBaseInteraction, InteractionType, APIInteractionResponsePong } from 'discord-api-types/v10'
 import { verifyKey } from 'discord-interactions'
-import { Context } from './context'
+import { CommandContext, ComponentContext, ModalContext, CronContext } from './context'
 import type {
   Env,
   ExecutionContext,
   CronEvent,
   Commands,
-  Handler,
+  ComponentHandler,
+  ModalHandler,
+  CronHandler,
   PublicKeyHandler,
   InteractionCommandData,
   InteractionComponentData,
@@ -31,7 +27,13 @@ const defineClass = function (): {
      * @param uniqueId uniqueId set in Component builder
      * @param handler type Handler
      */
-    component: (uniqueId: string, handler: Handler<E>) => void
+    component: (uniqueId: string, handler: ComponentHandler<E>) => void
+  } & {
+    /**
+     * @param uniqueId uniqueId set in Component builder
+     * @param handler type Handler
+     */
+    modal: (uniqueId: string, handler: ModalHandler<E>) => void
   } & {
     /**
      * Just setting up cron here does not execute it. Please set up a cron trigger in wrangler.toml.
@@ -43,7 +45,7 @@ const defineClass = function (): {
      * app.cron('', all_other_schedule_handler)
      * ```
      */
-    cron: (schedule: string, handler: Handler<E>) => void
+    cron: (schedule: string, handler: CronHandler<E>) => void
   } & {
     /**
      * Used when DISCORD_PUBLIC_KEY error occurs.
@@ -64,8 +66,9 @@ const defineClass = function (): {
  */
 export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
   #commands: Commands | undefined = undefined
-  #components: [string, Handler<E>][] = []
-  #cronjobs: [string, Handler<E>][] = []
+  #components: [string, ComponentHandler<E>][] = []
+  #modals: [string, ModalHandler<E>][] = []
+  #cronjobs: [string, CronHandler<E>][] = []
   #publicKey: PublicKeyHandler<E> | undefined = undefined
 
   constructor() {
@@ -76,6 +79,10 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
     }
     this.component = (uniqueId, handler) => {
       this.#components.push([uniqueId, handler])
+      return this
+    }
+    this.modal = (uniqueId, handler) => {
+      this.#modals.push([uniqueId, handler])
       return this
     }
     this.cron = (cron, handler) => {
@@ -123,7 +130,7 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
           const index = this.#commands.findIndex(command => command[0].name.toLowerCase() === name)
           const command = this.#commands[index][0]
           const handler = this.#commands[index][1]
-          return await handler(new Context(request, env, executionCtx, interaction, command))
+          return await handler(new CommandContext(request, env, executionCtx, interaction, command))
         }
         case 3: {
           if (!this.#components[0]) throw new Error('Component Handler is not set. Set by app.component(id, Handler).')
@@ -135,19 +142,19 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
           const index = this.#components.findIndex(e => e[0] === uniqueId || e[0] === '')
           const handler = this.#components[index][1]
           interaction.data.custom_id = custom_id
-          return await handler(new Context(request, env, executionCtx, interaction))
+          return await handler(new ComponentContext(request, env, executionCtx, interaction))
         }
         case 5: {
-          if (!this.#components[0]) throw new Error('Component Handler is not set. Set by app.component(id, Handler).')
+          if (!this.#modals[0]) throw new Error('Component Handler is not set. Set by app.component(id, Handler).')
           const interaction = data as InteractionModalData
           if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
-          const modalId = interaction.data.custom_id
-          //const customId = interaction.data.components[0].components[0].custom_id
-          const uniqueId = modalId.split(';')[0]
-          //const custom_id = customId.slice(uniqueId.length + 1, customId.length)
-          const index = this.#components.findIndex(e => e[0] === uniqueId || e[0] === '')
-          const handler = this.#components[index][1]
-          return await handler(new Context(request, env, executionCtx, interaction))
+          const customId = interaction.data.custom_id
+          const uniqueId = customId.split(';')[0]
+          const custom_id = customId.slice(uniqueId.length + 1, customId.length)
+          const index = this.#modals.findIndex(e => e[0] === uniqueId || e[0] === '')
+          const handler = this.#modals[index][1]
+          interaction.data.custom_id = custom_id
+          return await handler(new ModalContext(request, env, executionCtx, interaction))
         }
         default: {
           console.warn('interaction.type: ', data.type)
@@ -161,6 +168,6 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
   scheduled = async (event: CronEvent, env: E['Bindings'] | {}, executionCtx: ExecutionContext) => {
     const cronIndex = this.#cronjobs.findIndex(e => e[0] === event.cron || e[0] === '')
     const handler = this.#cronjobs[cronIndex][1]
-    await handler(new Context(event, env, executionCtx))
+    await handler(new CronContext(event, env, executionCtx))
   }
 }

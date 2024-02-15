@@ -19,7 +19,7 @@ import type {
   APIModalInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
 import type { Env, Commands, CommandHandler, ApplicationCommand as Cmd } from '../types'
-import type { Context } from '../context'
+import type { CommandContext } from '../context'
 import type { Modal } from './modal'
 
 type OptionClass =
@@ -82,13 +82,13 @@ export class Command<E extends Env = any> {
   }
 
   // build()
-  resBase = (e: APIInteractionResponse): Commands<E>[0] => [this.#command, (c: Context) => c.resBase(e)]
-  res = (e: APIInteractionResponseCallbackData): Commands<E>[0] => [this.#command, (c: Context) => c.res(e)]
-  resText = (e: string): Commands<E>[0] => [this.#command, (c: Context) => c.resText(e)]
-  resEmbeds = (...e: APIEmbed[]): Commands<E>[0] => [this.#command, (c: Context) => c.resEmbeds(...e)]
-  resDefer = <T>(handler: (c: Context<E>, ...args1: T[]) => Promise<unknown>, ...args: T[]): Commands<E>[0] => [
+  resBase = (e: APIInteractionResponse): Commands<E>[0] => [this.#command, (c: CommandContext) => c.resBase(e)]
+  res = (e: APIInteractionResponseCallbackData): Commands<E>[0] => [this.#command, (c: CommandContext) => c.res(e)]
+  resText = (e: string): Commands<E>[0] => [this.#command, (c: CommandContext) => c.resText(e)]
+  resEmbeds = (...e: APIEmbed[]): Commands<E>[0] => [this.#command, (c: CommandContext) => c.resEmbeds(...e)]
+  resDefer = <T>(handler: (c: CommandContext<E>, ...args1: T[]) => Promise<unknown>, ...args: T[]): Commands<E>[0] => [
     this.#command,
-    (c: Context<E>) => {
+    (c: CommandContext<E>) => {
       if (!c.executionCtx.waitUntil && !c.event.waitUntil)
         throw new Error('This command handler context has no waitUntil. You can use .handler(command_handler).')
       if (c.executionCtx.waitUntil) c.executionCtx.waitUntil(handler(c, ...args))
@@ -97,7 +97,10 @@ export class Command<E extends Env = any> {
       return c.resDefer()
     },
   ]
-  resModal = (e: Modal | APIModalInteractionResponseCallbackData) => [this.#command, (c: Context) => c.resModal(e)]
+  resModal = (e: Modal | APIModalInteractionResponseCallbackData) => [
+    this.#command,
+    (c: CommandContext) => c.resModal(e),
+  ]
   handler = (handler: CommandHandler<E>): Commands<E>[0] => [this.#command, handler]
 }
 

@@ -50,28 +50,29 @@ type OmitButton =
 class ButtonBase {
   protected uniqueStr: string
   protected component: APIButtonComponent
-  constructor(str: string, style: 1 | 2 | 3 | 4 | 5) {
+  // ***************************** label or emoji でいけるのか検証したい
+  constructor(str: string, label: string, style: 1 | 2 | 3 | 4 | 5) {
     this.uniqueStr = str + ';'
-    this.component = style === 5 ? { type: 2, style, url: str } : { type: 2, style, custom_id: this.uniqueStr }
+    this.component =
+      style === 5 ? { type: 2, label, style, url: str } : { type: 2, label, style, custom_id: this.uniqueStr }
   }
   protected assign = (component: OmitButton) => {
     Object.assign(this.component, component)
     return this
   }
-  label = (e: APIButtonComponent['label']) => this.assign({ label: e })
   emoji = (e: APIButtonComponent['emoji']) => this.assign({ emoji: e })
   disabled = (e: APIButtonComponent['disabled']) => this.assign({ disabled: e })
   build = () => this.component
 }
 
-type ButtonStyle = 'Primary' | 'Secondary' | 'Success' | 'Danger' | 'Link'
+type ButtonStyle = 'Primary' | 'Secondary' | 'Success' | 'Danger'
 
 export class ComponentButton extends ButtonBase {
   /**
    * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
    * @param buttonStyle default 'Primary'
    */
-  constructor(uniqueId: string, buttonStyle: ButtonStyle = 'Primary') {
+  constructor(uniqueId: string, label: string, buttonStyle: ButtonStyle = 'Primary') {
     // prettier-ignore
     const style =
       buttonStyle === 'Primary' ? 1 :
@@ -79,7 +80,7 @@ export class ComponentButton extends ButtonBase {
       buttonStyle === 'Success' ? 3 :
       buttonStyle === 'Danger' ? 4 :
       1
-    super(uniqueId, style)
+    super(uniqueId, label, style)
   }
   custom_id = (e: APIButtonComponentWithCustomId['custom_id']) => this.assign({ custom_id: this.uniqueStr + e })
 }
@@ -87,8 +88,8 @@ export class ComponentButtonLink extends ButtonBase {
   /**
    * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
    */
-  constructor(url: string) {
-    super(url, 5)
+  constructor(url: string, label: string) {
+    super(url, label, 5)
   }
 }
 

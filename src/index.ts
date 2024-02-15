@@ -1,5 +1,5 @@
-export type { ApplicationCommand, Commands, CommandHandler, Handler } from './types'
-export type { Context } from './context'
+export type { ApplicationCommand, Commands, CommandHandler, ComponentHandler, ModalHandler, CronHandler } from './types'
+export type * from './context'
 export { DiscordHono } from './discord-hono'
 export { register } from './register'
 export * from './api-wrapper/channel-message'

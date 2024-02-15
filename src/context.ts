@@ -3,7 +3,6 @@ import type {
   APIInteractionResponse,
   APIInteractionResponseChannelMessageWithSource,
   APIInteractionResponseDeferredChannelMessageWithSource,
-  APIInteractionResponseUpdateMessage,
   APIInteractionResponseDeferredMessageUpdate,
   APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
@@ -15,7 +14,9 @@ import type {
   FetchEventLike,
   CronEvent,
   ApplicationCommand,
-  InteractionData,
+  InteractionCommandData,
+  InteractionComponentData,
+  InteractionModalData,
   FileData,
 } from './types'
 import { apiUrl, ResponseJson, fetchMessage } from './utils'
@@ -41,82 +42,28 @@ interface Set<E extends Env> {
   <Key extends keyof E['Variables']>(key: Key, value: E['Variables'][Key]): void
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class Context<E extends Env = any, D extends InteractionData = InteractionData> {
-  env: E['Bindings'] = {}
+type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
-  #req: Request | undefined
-  #executionCtx: FetchEventLike | ExecutionContext | undefined
-  #interaction: D | undefined
-  #command: Command | undefined
-  #component: D['data'] | undefined
-  #cronEvent: CronEvent | undefined
+class ContextBase<E extends Env> {
+  #env: E['Bindings'] = {}
+  #executionCtx: ExecutionCtx
   #var: E['Variables'] = {}
-
-  constructor(
-    req: Request | CronEvent,
-    env?: E['Bindings'],
-    executionCtx?: FetchEventLike | ExecutionContext | undefined,
-    interaction?: D,
-    command?: ApplicationCommand,
-  ) {
-    if (req instanceof Request) this.#req = req
-    else this.#cronEvent = req
-    if (env) this.env = env
-    if (executionCtx) this.#executionCtx = executionCtx
-    if (interaction) this.#interaction = interaction
-    if (command) {
-      this.#command = { ...command, values: [], valuesMap: {} }
-    } else {
-      if (interaction) this.#component = interaction.data
-    }
-    if (interaction?.data && 'options' in interaction?.data && interaction.data.options && this.#command) {
-      this.#command.valuesMap = interaction.data.options.reduce((obj: CommandValuesMap, e) => {
-        if (e.type === 1 || e.type === 2) return obj
-        obj[e.name] = e.value
-        return obj
-      }, {})
-      const names = this.#command.options?.map(e => e.name)
-      // @ts-expect-error
-      if (this.#command.valuesMap && names) this.#command.values = names.map(e => this.#command.valuesMap[e])
-    }
+  constructor(env: E['Bindings'], executionCtx: ExecutionCtx) {
+    this.#env = env
+    this.#executionCtx = executionCtx
   }
 
-  get req(): Request {
-    if (!this.#req) throw new Error('This context has no Request.')
-    return this.#req
+  get env(): E['Bindings'] {
+    return this.#env
   }
-
   get event(): FetchEventLike {
     if (!(this.#executionCtx && 'respondWith' in this.#executionCtx)) throw new Error('This context has no FetchEvent.')
     return this.#executionCtx
   }
-
   get executionCtx(): ExecutionContext {
     if (!this.#executionCtx) throw new Error('This context has no ExecutionContext.')
     return this.#executionCtx
   }
-
-  get interaction(): D {
-    if (!this.#interaction) throw new Error('This context has no Interaction.')
-    return this.#interaction
-  }
-
-  get command(): Command {
-    if (!this.#command) throw new Error('This context has no Command.')
-    return this.#command
-  }
-
-  get component(): D['data'] {
-    if (!this.#component) throw new Error('This context has no Component.')
-    return this.#component
-  }
-
-  get cronEvent(): CronEvent {
-    if (!this.#cronEvent) throw new Error('This context has no ScheduledEvent.')
-    return this.#cronEvent
-  }
-
   // c.set, c.get, c.var.propName is Variables
   set: Set<E> = (key: string, value: unknown) => {
     this.#var ??= {}
@@ -129,27 +76,54 @@ export class Context<E extends Env = any, D extends InteractionData = Interactio
     return { ...this.#var } as never
   }
 
+  /**
+   * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
+   * @param files FileData: { blob: Blob, name: string }
+   */
+  post = async (channelId: string, data: APIInteractionResponseCallbackData, ...files: FileData[]) => {
+    if (!channelId) throw new Error('channelId is not set.')
+    return await postMessage(channelId, data, ...files)
+  }
+  postText = async (channelId: string, content: string) => await this.post(channelId, { content })
+  postEmbeds = async (channelId: string, ...embeds: APIEmbed[]) => await this.post(channelId, { embeds })
+}
+
+// prettier-ignore
+type InteractionData<T extends 2 | 3 | 4 | 5> =
+  T extends 2 ? InteractionCommandData :
+  T extends 3 ? InteractionComponentData :
+  T extends 5 ? InteractionModalData :
+  InteractionCommandData
+class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> extends ContextBase<E> {
+  #req: Request
+  #interaction: D
+  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, interaction: D) {
+    super(env, executionCtx)
+    this.#req = req
+    this.#interaction = interaction
+  }
+
+  get req(): Request {
+    return this.#req
+  }
+  get interaction(): D {
+    return this.#interaction
+  }
+
+  /**
+   * [Check Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type)
+   */
   resBase = (json: APIInteractionResponse) => new ResponseJson(json)
   /**
    * Response to request.
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @returns Response
    */
-  res = (data: APIInteractionResponseCallbackData) => {
-    if (this.#command) return this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
-    else return this.resBase({ type: 7, data } as APIInteractionResponseUpdateMessage)
-  }
+  res = (data: APIInteractionResponseCallbackData) =>
+    this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
   resText = (content: string) => this.res({ content })
   resEmbeds = (...embeds: APIEmbed[]) => this.res({ embeds })
-  resDefer = () => {
-    if (this.#command) return this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
-    else return this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
-  }
-  resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
-    const data = e instanceof Modal ? e.build() : e
-    return this.resBase({ type: 9, data } as APIModalInteractionResponse)
-  }
-  //resDeferComponents = () => this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
+  resDefer = () => this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
 
   /**
    * Used to send messages after resDefer.
@@ -159,9 +133,8 @@ export class Context<E extends Env = any, D extends InteractionData = Interactio
    */
   followup = async (data: APIInteractionResponseCallbackData, ...files: FileData[]) => {
     if (!this.env?.DISCORD_APPLICATION_ID) throw new Error('DISCORD_APPLICATION_ID is not set.')
-    if (!this.#interaction?.token) throw new Error('interaction is not set.')
     const post = await fetchMessage(
-      `${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.#interaction.token}`,
+      `${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.interaction.token}`,
       data,
       files,
     )
@@ -169,8 +142,6 @@ export class Context<E extends Env = any, D extends InteractionData = Interactio
   }
   followupText = async (content: string) => await this.followup({ content })
   followupEmbeds = async (...embeds: APIEmbed[]) => await this.followup({ embeds })
-  followupImages = async (...images: ArrayBuffer[]) =>
-    await this.followup({}, ...images.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })))
 
   /**
    * Used to send messages other than res*** and followup***.
@@ -186,6 +157,66 @@ export class Context<E extends Env = any, D extends InteractionData = Interactio
   }
   postText = async (channelId: string, content: string) => await this.post(channelId, { content })
   postEmbeds = async (channelId: string, ...embeds: APIEmbed[]) => await this.post(channelId, { embeds })
-  postImages = async (channelId: string, ...images: ArrayBuffer[]) =>
-    await this.post(channelId, {}, ...images.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })))
+}
+
+export class CommandContext<E extends Env = any> extends RequestContext<E, InteractionData<2>> {
+  #command: Command
+  constructor(
+    req: Request,
+    env: E['Bindings'],
+    executionCtx: ExecutionCtx,
+    interaction: InteractionData<2>,
+    command: ApplicationCommand,
+  ) {
+    super(req, env, executionCtx, interaction)
+    this.#command = { ...command, values: [], valuesMap: {} }
+    if (interaction?.data && 'options' in interaction?.data && interaction.data.options && this.#command) {
+      this.#command.valuesMap = interaction.data.options.reduce((obj: CommandValuesMap, e) => {
+        if (e.type === 1 || e.type === 2) return obj // sub command
+        obj[e.name] = e.value
+        return obj
+      }, {})
+      const names = this.#command.options?.map(e => e.name)
+      if (this.#command.valuesMap && names) this.#command.values = names.map(e => this.#command.valuesMap[e])
+    }
+  }
+
+  get command(): Command {
+    return this.#command
+  }
+
+  resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
+    const data = e instanceof Modal ? e.build() : e
+    return this.resBase({ type: 9, data } as APIModalInteractionResponse)
+  }
+}
+
+export class ComponentContext<E extends Env = any> extends RequestContext<E, InteractionData<3>> {
+  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, interaction: InteractionData<3>) {
+    super(req, env, executionCtx, interaction)
+  }
+
+  resDeferComponent = () => this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
+  resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
+    const data = e instanceof Modal ? e.build() : e
+    return this.resBase({ type: 9, data } as APIModalInteractionResponse)
+  }
+}
+
+export class ModalContext<E extends Env = any> extends RequestContext<E, InteractionData<5>> {
+  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, interaction: InteractionData<5>) {
+    super(req, env, executionCtx, interaction)
+  }
+}
+
+export class CronContext<E extends Env = any> extends ContextBase<E> {
+  #cronEvent: CronEvent
+  constructor(event: CronEvent, env: E['Bindings'], executionCtx: ExecutionCtx) {
+    super(env, executionCtx)
+    this.#cronEvent = event
+  }
+
+  get cronEvent(): CronEvent {
+    return this.#cronEvent
+  }
 }
