@@ -22,16 +22,12 @@ type ComponentClass =
   | ComponentMentionableSelect
   | ComponentChannelSelect
 
+type HandlerArray<E extends Env> = [APIMessageActionRowComponent, string, ComponentHandler<E>]
+
 export class Components<E extends Env = any> {
   #components: APIActionRowComponent<APIMessageActionRowComponent>[] = []
-  #handlers: [APIMessageActionRowComponent, string, ComponentHandler<E>][] = []
-  components = (
-    ...e: (
-      | ComponentClass
-      | APIMessageActionRowComponent
-      | [APIMessageActionRowComponent, string, ComponentHandler<E>]
-    )[]
-  ) => {
+  #handlers: HandlerArray<E>[] = []
+  components = (...e: (ComponentClass | APIMessageActionRowComponent | HandlerArray<E>)[]) => {
     if (this.#components.length >= 5) console.warn('You can have up to 5 Action Rows per message')
     const components = e.map(comp => {
       if (Array.isArray(comp)) {
@@ -76,7 +72,11 @@ class ButtonBase<E extends Env> {
   emoji = (e: APIButtonComponent['emoji']) => this.assign({ emoji: e })
   disabled = (e: APIButtonComponent['disabled']) => this.assign({ disabled: e })
   build = () => this.component
-  handler = (handler: ComponentHandler<E>) => [this.component, this.uniqueStr.replace(';', ''), handler]
+  handler = (handler: ComponentHandler<E>): HandlerArray<E> => [
+    this.component,
+    this.uniqueStr.replace(';', ''),
+    handler,
+  ]
 }
 
 type ButtonStyle = 'Primary' | 'Secondary' | 'Success' | 'Danger'
@@ -130,7 +130,11 @@ class SelectBase<E extends Env> {
   max_values = (e: APISelectMenuComponent['max_values']) => this.assign({ max_values: e })
   disabled = (e: APISelectMenuComponent['disabled']) => this.assign({ disabled: e })
   build = () => this.component
-  handler = (handler: ComponentHandler<E>) => [this.component, this.uniqueStr.replace(';', ''), handler]
+  handler = (handler: ComponentHandler<E>): HandlerArray<E> => [
+    this.component,
+    this.uniqueStr.replace(';', ''),
+    handler,
+  ]
 }
 
 export class ComponentSelect<E extends Env = any> extends SelectBase<E> {

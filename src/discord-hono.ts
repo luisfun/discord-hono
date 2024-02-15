@@ -147,7 +147,7 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
           const index = this.#components.findIndex(e => e[1] === uniqueId || e[1] === '')
           const component = this.#components[index][0]
           const handler = this.#components[index][2]
-          interaction.data.custom_id = customId.slice(uniqueId.length + 1, 0)
+          interaction.data.custom_id = customId.slice(uniqueId.length + 1)
           return await handler(new ComponentContext(request, env, executionCtx, interaction, component))
         }
         case 5: {
@@ -159,7 +159,7 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
           const index = this.#modals.findIndex(e => e[1] === uniqueId || e[1] === '')
           const modal = this.#modals[index][0]
           const handler = this.#modals[index][2]
-          interaction.data.custom_id = customId.slice(uniqueId.length + 1, 0)
+          interaction.data.custom_id = customId.slice(uniqueId.length + 1)
           return await handler(new ModalContext(request, env, executionCtx, interaction, modal))
         }
         default: {

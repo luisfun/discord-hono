@@ -97,15 +97,6 @@ export type InteractionComponentData = APIBaseInteraction<
 >
 export type InteractionModalData = APIBaseInteraction<InteractionType.ModalSubmit, APIModalSubmission>
 
-export type InteractionComponentButtonData = APIBaseInteraction<
-  InteractionType.MessageComponent,
-  APIMessageButtonInteractionData
->
-export type InteractionComponentSelectData = APIBaseInteraction<
-  InteractionType.MessageComponent,
-  APIMessageSelectMenuInteractionData
->
-
 ////////// FileData //////////
 
 export type FileData = {

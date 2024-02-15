@@ -9,6 +9,14 @@ import type {
   APIModalInteractionResponseCallbackData,
   APIMessageActionRowComponent,
   APIEmbed,
+  APIBaseInteraction,
+  InteractionType,
+  APIMessageButtonInteractionData,
+  APIMessageStringSelectInteractionData,
+  APIMessageUserSelectInteractionData,
+  APIMessageRoleSelectInteractionData,
+  APIMessageMentionableSelectInteractionData,
+  APIMessageChannelSelectInteractionData,
 } from 'discord-api-types/v10'
 import type {
   Env,
@@ -19,8 +27,6 @@ import type {
   InteractionCommandData,
   InteractionComponentData,
   InteractionModalData,
-  InteractionComponentButtonData,
-  InteractionComponentSelectData,
   FileData,
 } from './types'
 import { apiUrl, ResponseJson, fetchMessage } from './utils'
@@ -196,7 +202,22 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
   }
 }
 
-export class ComponentContext<E extends Env = any> extends RequestContext<E, InteractionData<3>> {
+type ComponentType = 'Button' | 'Select' | 'Other Select'
+// prettier-ignore
+type ComponentInteractionData<T extends ComponentType> =
+  T extends 'Button' ? APIBaseInteraction<InteractionType.MessageComponent, APIMessageButtonInteractionData> :
+  T extends 'Select' ? APIBaseInteraction<InteractionType.MessageComponent, APIMessageStringSelectInteractionData> :
+  APIBaseInteraction<
+    InteractionType.MessageComponent,
+    | APIMessageUserSelectInteractionData
+    | APIMessageRoleSelectInteractionData
+    | APIMessageMentionableSelectInteractionData
+    | APIMessageChannelSelectInteractionData
+  >
+export class ComponentContext<E extends Env = any, T extends ComponentType = any> extends RequestContext<
+  E,
+  InteractionData<3>
+> {
   #interaction: InteractionData<3>
   #component: APIMessageActionRowComponent
   constructor(
@@ -212,8 +233,7 @@ export class ComponentContext<E extends Env = any> extends RequestContext<E, Int
   }
 
   get interaction() {
-    if (this.#interaction.data?.component_type === 2) return this.#interaction as InteractionComponentButtonData
-    return this.#interaction as InteractionComponentSelectData
+    return this.#interaction as ComponentInteractionData<T>
   }
   get component(): APIMessageActionRowComponent {
     return this.#component
