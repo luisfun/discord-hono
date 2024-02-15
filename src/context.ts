@@ -1,12 +1,11 @@
 import type {
   APIBaseInteraction,
   InteractionType,
-  APIEmbed,
+  APIInteractionResponseCallbackData,
   APIInteractionResponse,
   APIInteractionResponseChannelMessageWithSource,
   APIInteractionResponseDeferredChannelMessageWithSource,
-  APIInteractionResponseCallbackData,
-  APIChatInputApplicationCommandInteractionData,
+  APIEmbed,
 } from 'discord-api-types/v10'
 import type { Env, ExecutionContext, FetchEventLike, CronEvent, ApplicationCommand, FileData } from './types'
 import { apiUrl, ResponseJson, fetchMessage } from './utils'
@@ -138,13 +137,13 @@ export class Context<E extends Env = any> {
    * @param file FileData: { blob: Blob, name: string }
    * @returns
    */
-  followup = async (data: APIInteractionResponseCallbackData, file?: FileData | FileData[]) => {
+  followup = async (data: APIInteractionResponseCallbackData, ...files: FileData[]) => {
     if (!this.env?.DISCORD_APPLICATION_ID) throw new Error('DISCORD_APPLICATION_ID is not set.')
     if (!this.#interaction?.token) throw new Error('interaction is not set.')
     const post = await fetchMessage(
       `${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.#interaction.token}`,
       data,
-      file,
+      files,
     )
     return new Response('Sent to Discord.', { status: post.status })
   }
@@ -153,7 +152,7 @@ export class Context<E extends Env = any> {
   followupImages = async (...images: ArrayBuffer[]) =>
     await this.followup(
       {},
-      images.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })),
+      ...images.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })),
     )
 
   /**
@@ -163,10 +162,10 @@ export class Context<E extends Env = any> {
    * @param file FileData: { blob: Blob, name: string }
    * @returns
    */
-  post = async (channelId: string, data: APIInteractionResponseCallbackData, file?: FileData | FileData[]) => {
+  post = async (channelId: string, data: APIInteractionResponseCallbackData, ...files: FileData[]) => {
     const id = channelId || this.#interaction?.channel?.id
     if (!id) throw new Error('channelId is not set.')
-    return await postMessage(id, data, file)
+    return await postMessage(id, data, ...files)
   }
   postText = async (channelId: string, content: string) => await this.post(channelId, { content })
   postEmbeds = async (channelId: string, ...embeds: APIEmbed[]) => await this.post(channelId, { embeds })
@@ -174,6 +173,6 @@ export class Context<E extends Env = any> {
     await this.post(
       channelId,
       {},
-      images.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })),
+      ...images.map((e, i) => ({ blob: new Blob([e]), name: `image${i}.png` })),
     )
 }

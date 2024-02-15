@@ -24,14 +24,12 @@ export class ResponseJson extends Response {
 export const fetchMessage = async (
   input: URL | RequestInfo,
   data?: APIInteractionResponseCallbackData,
-  file?: FileData | FileData[],
+  files?: FileData[],
   method?: string,
 ) => {
   const body = new FormData()
   body.append('payload_json', JSON.stringify(data))
-  if (file) {
-    if (!Array.isArray(file)) body.append(`files[0]`, file.blob, file.name)
-    else for (let i = 0, len = file.length; i < len; i++) body.append(`files[${i}]`, file[i].blob, file[i].name)
-  }
+  if (files?.[0])
+    for (let i = 0, len = files.length; i < len; i++) body.append(`files[${i}]`, files[i].blob, files[i].name)
   return await fetch(input, { method: method || 'POST', body })
 }
