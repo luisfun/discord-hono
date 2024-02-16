@@ -5,8 +5,6 @@ Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! 
 
 ## 🚀 Install
 
-[![Node.js 20.x](https://img.shields.io/badge/Node.js-20.x-%23339933?logo=Node.js)](https://nodejs.org)
-
 ```shell
 npm i discord-hono
 npm i -D discord-api-types # When using TypeScript
