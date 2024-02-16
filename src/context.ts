@@ -123,8 +123,16 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
   resText = (content: string) => this.res({ content })
   resEmbeds = (...embeds: APIEmbed[]) => this.res({ embeds })
-  resDefer = () => this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
-
+  resDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
+    if (handler) {
+      if (!this.executionCtx.waitUntil && !this.event.waitUntil)
+        throw new Error('This command handler context has no waitUntil.')
+      if (this.executionCtx.waitUntil) this.executionCtx.waitUntil(handler(this, ...args))
+      // @ts-expect-error ****************** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
+      else this.event.waitUntil(handler(this, ...args))
+    }
+    return this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
+  }
   /**
    * Used to send messages after resDefer.
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
@@ -231,7 +239,16 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
     this.resBase({ type: 7, data } as APIInteractionResponseUpdateMessage)
   resUpdateText = (content: string) => this.resUpdate({ content })
   resUpdateEmbeds = (...embeds: APIEmbed[]) => this.resUpdate({ embeds })
-  resUpdateDefer = () => this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
+  resUpdateDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
+    if (handler) {
+      if (!this.executionCtx.waitUntil && !this.event.waitUntil)
+        throw new Error('This command handler context has no waitUntil. You can use .handler(command_handler).')
+      if (this.executionCtx.waitUntil) this.executionCtx.waitUntil(handler(this, ...args))
+      // @ts-expect-error ****************** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
+      else this.event.waitUntil(handler(this, ...args))
+    }
+    return this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
+  }
   resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
     const data = e instanceof Modal ? e.build() : e
     return this.resBase({ type: 9, data } as APIModalInteractionResponse)
