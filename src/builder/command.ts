@@ -18,7 +18,7 @@ import type {
   APIApplicationCommandOptionChoice,
   APIModalInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
-import type { Env, Commands, CommandHandler, ApplicationCommand as Cmd } from '../types'
+import type { Env, Commands, TypeCommandHandler, ApplicationCommand as Cmd } from '../types'
 import type { CommandContext } from '../context'
 import type { Modal } from './modal'
 
@@ -31,7 +31,9 @@ type OptionClass =
   | CommandRoleOption
   | CommandMentionableOption
   | CommandAttachmentOption
+
 type OptionAllClass = OptionClass | CommandSubOption | CommandSubGroupOption
+type Output<E extends Env> = Commands<E>[0]
 /**
  * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure)
  */
@@ -82,11 +84,11 @@ export class Command<E extends Env = any> {
   }
 
   // build()
-  resBase = (e: APIInteractionResponse): Commands<E>[0] => [this.#command, (c: CommandContext) => c.resBase(e)]
-  res = (e: APIInteractionResponseCallbackData): Commands<E>[0] => [this.#command, (c: CommandContext) => c.res(e)]
-  resText = (e: string): Commands<E>[0] => [this.#command, (c: CommandContext) => c.resText(e)]
-  resEmbeds = (...e: APIEmbed[]): Commands<E>[0] => [this.#command, (c: CommandContext) => c.resEmbeds(...e)]
-  resDefer = <T>(handler: (c: CommandContext<E>, ...args1: T[]) => Promise<unknown>, ...args: T[]): Commands<E>[0] => [
+  resBase = (e: APIInteractionResponse): Output<E> => [this.#command, (c: CommandContext) => c.resBase(e)]
+  res = (e: APIInteractionResponseCallbackData): Output<E> => [this.#command, (c: CommandContext) => c.res(e)]
+  resText = (content: string) => this.res({ content })
+  resEmbeds = (...embeds: APIEmbed[]) => this.res({ embeds })
+  resDefer = <T>(handler: (c: CommandContext<E>, ...args1: T[]) => Promise<unknown>, ...args: T[]): Output<E> => [
     this.#command,
     (c: CommandContext<E>) => {
       if (!c.executionCtx.waitUntil && !c.event.waitUntil)
@@ -97,11 +99,11 @@ export class Command<E extends Env = any> {
       return c.resDefer()
     },
   ]
-  resModal = (e: Modal<E> | APIModalInteractionResponseCallbackData) => [
+  resModal = (e: Modal | APIModalInteractionResponseCallbackData): Output<E> => [
     this.#command,
     (c: CommandContext) => c.resModal(e),
   ]
-  handler = (handler: CommandHandler<E>): Commands<E>[0] => [this.#command, handler]
+  handler = (handler: TypeCommandHandler<E>): Output<E> => [this.#command, handler]
 }
 
 type OmitOption =

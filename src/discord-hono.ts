@@ -1,10 +1,4 @@
-import type {
-  APIBaseInteraction,
-  InteractionType,
-  APIMessageActionRowComponent,
-  APIModalInteractionResponseCallbackData,
-  APIInteractionResponsePong,
-} from 'discord-api-types/v10'
+import type { APIBaseInteraction, InteractionType, APIInteractionResponsePong } from 'discord-api-types/v10'
 import { verifyKey } from 'discord-interactions'
 import { CommandContext, ComponentContext, ModalContext, CronContext } from './context'
 import type {
@@ -12,8 +6,8 @@ import type {
   ExecutionContext,
   CronEvent,
   Commands,
-  ComponentHandler,
-  ModalHandler,
+  Handlers,
+  ModalHandlers,
   CronHandler,
   PublicKeyHandler,
   InteractionCommandData,
@@ -21,8 +15,6 @@ import type {
   InteractionModalData,
 } from './types'
 import { ResponseJson } from './utils'
-import type { Components } from './builder/components'
-import type { Modal } from './builder/modal'
 
 const defineClass = function (): {
   new <E extends Env = Env>(): {
@@ -32,14 +24,14 @@ const defineClass = function (): {
     commands: (commands: Commands<E>) => void
   } & {
     /**
-     * @param components type Commands
+     * @param handlers type Commands
      */
-    components: (components: Components<E>) => void
+    handlers: (handlers: Handlers<E>) => void
   } & {
     /**
-     * @param commands type Commands
+     * @param modalHandlers type Commands
      */
-    modal: (commands: Modal<E>) => void
+    modalHandlers: (modalHandlers: ModalHandlers<E>) => void
   } & {
     /**
      * Just setting up cron here does not execute it. Please set up a cron trigger in wrangler.toml.
@@ -71,9 +63,9 @@ const defineClass = function (): {
  * ```
  */
 export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
-  #commands: Commands | undefined = undefined
-  #components: [APIMessageActionRowComponent, string, ComponentHandler<E>][] = []
-  #modals: [APIModalInteractionResponseCallbackData, string, ModalHandler<E>][] = []
+  #commands: Commands<E> | undefined = undefined
+  #handlers: Handlers<E> | undefined = undefined
+  #modalHandlers: ModalHandlers<E> | undefined = undefined
   #cronjobs: [string, CronHandler<E>][] = []
   #publicKey: PublicKeyHandler<E> | undefined = undefined
 
@@ -83,12 +75,12 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
       this.#commands = commands
       return this
     }
-    this.components = components => {
-      this.#components.push(...components.handlers())
+    this.handlers = handlers => {
+      this.#handlers = handlers
       return this
     }
-    this.modal = modal => {
-      this.#modals.push(modal.getHandler())
+    this.modalHandlers = modalHandlers => {
+      this.#modalHandlers = modalHandlers
       return this
     }
     this.cron = (cron, handler) => {
@@ -139,28 +131,26 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
           return await handler(new CommandContext(request, env, executionCtx, interaction, command))
         }
         case 3: {
-          if (!this.#components[0]) throw new Error('Components is not set. Set by app.components(Components).')
+          if (!this.#handlers) throw new Error('Component Handlers is not set. Set by app.handlers(Handlers).')
           const interaction = data as InteractionComponentData
           if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
           const customId = interaction.data.custom_id
           const uniqueId = customId.split(';')[0]
-          const index = this.#components.findIndex(e => e[1] === uniqueId || e[1] === '')
-          const component = this.#components[index][0]
-          const handler = this.#components[index][2]
+          const index = this.#handlers.findIndex(e => e[0] === uniqueId || e[0] === '')
+          const handler = this.#handlers[index][1]
           interaction.data.custom_id = customId.slice(uniqueId.length + 1)
-          return await handler(new ComponentContext(request, env, executionCtx, interaction, component))
+          return await handler(new ComponentContext(request, env, executionCtx, interaction))
         }
         case 5: {
-          if (!this.#modals[0]) throw new Error('Modal is not set. Set by app.modal(Modal).')
+          if (!this.#modalHandlers) throw new Error('Modal is not set. Set by app.modal(Modal).')
           const interaction = data as InteractionModalData
           if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
           const customId = interaction.data.custom_id
           const uniqueId = customId.split(';')[0]
-          const index = this.#modals.findIndex(e => e[1] === uniqueId || e[1] === '')
-          const modal = this.#modals[index][0]
-          const handler = this.#modals[index][2]
+          const index = this.#modalHandlers.findIndex(e => e[0] === uniqueId || e[0] === '')
+          const handler = this.#modalHandlers[index][1]
           interaction.data.custom_id = customId.slice(uniqueId.length + 1)
-          return await handler(new ModalContext(request, env, executionCtx, interaction, modal))
+          return await handler(new ModalContext(request, env, executionCtx, interaction))
         }
         default: {
           console.warn('interaction.type: ', data.type)

@@ -7,7 +7,6 @@ import type {
   APIInteractionResponseUpdateMessage,
   APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
-  APIMessageActionRowComponent,
   APIEmbed,
   APIBaseInteraction,
   InteractionType,
@@ -214,29 +213,18 @@ type ComponentInteractionData<T extends ComponentType> =
     | APIMessageMentionableSelectInteractionData
     | APIMessageChannelSelectInteractionData
   >
-export class ComponentContext<E extends Env = any, T extends ComponentType = any> extends RequestContext<
+export class ComponentContext<E extends Env = any, T extends ComponentType = 'Other Select'> extends RequestContext<
   E,
   InteractionData<3>
 > {
   #interaction: InteractionData<3>
-  #component: APIMessageActionRowComponent
-  constructor(
-    req: Request,
-    env: E['Bindings'],
-    executionCtx: ExecutionCtx,
-    interaction: InteractionData<3>,
-    component: APIMessageActionRowComponent,
-  ) {
+  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, interaction: InteractionData<3>) {
     super(req, env, executionCtx, interaction)
     this.#interaction = interaction
-    this.#component = component
   }
 
   get interaction() {
     return this.#interaction as ComponentInteractionData<T>
-  }
-  get component(): APIMessageActionRowComponent {
-    return this.#component
   }
 
   resUpdate = (data: APIInteractionResponseCallbackData) =>
@@ -251,20 +239,8 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = any
 }
 
 export class ModalContext<E extends Env = any> extends RequestContext<E, InteractionData<5>> {
-  #modal: APIModalInteractionResponseCallbackData
-  constructor(
-    req: Request,
-    env: E['Bindings'],
-    executionCtx: ExecutionCtx,
-    interaction: InteractionData<5>,
-    modal: APIModalInteractionResponseCallbackData,
-  ) {
+  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, interaction: InteractionData<5>) {
     super(req, env, executionCtx, interaction)
-    this.#modal = modal
-  }
-
-  get modal(): APIModalInteractionResponseCallbackData {
-    return this.#modal
   }
 }
 

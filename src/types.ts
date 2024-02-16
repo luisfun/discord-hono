@@ -7,8 +7,6 @@ import type {
   APIModalSubmission,
   APIApplicationCommand,
   ApplicationCommandType,
-  APIMessageButtonInteractionData,
-  APIMessageSelectMenuInteractionData,
 } from 'discord-api-types/v10'
 import type { CommandContext, ComponentContext, ModalContext, CronContext } from './context'
 
@@ -21,7 +19,6 @@ export type Env = {
 
 ////////// Command //////////
 
-export type CommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
 /**
  * [Application Command](https://discord.com/developers/docs/interactions/application-commands)
  */
@@ -35,22 +32,21 @@ export type ApplicationCommand = Omit<
   default_member_permissions?: string | null
   version?: string
 }
+export type TypeCommandHandler<E extends Env> = (c: CommandContext<E>) => Promise<Response> | Response
 /**
  * [Application Command](https://discord.com/developers/docs/interactions/application-commands)
  */
-export type Commands<E extends Env = any> = [ApplicationCommand, CommandHandler<E>][]
+export type Commands<E extends Env = any> = [ApplicationCommand, TypeCommandHandler<E>][]
 
-////////// ComponentsHandler //////////
+////////// ComponentHandlers //////////
 
-export type ComponentsHandler<E extends Env = any> = [string, ComponentHandler<E>][]
+type TypeComponentHandler<E extends Env> = (c: ComponentContext<E>) => Promise<Response> | Response
+export type Handlers<E extends Env = any> = [string, TypeComponentHandler<E>][]
 
-////////// ComponentHandler //////////
+////////// ModalHandlers //////////
 
-export type ComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<Response> | Response
-
-////////// ModalHandler //////////
-
-export type ModalHandler<E extends Env = any> = (c: ModalContext<E>) => Promise<unknown>
+type TypeModalHandler<E extends Env> = (c: ModalContext<E>) => Promise<unknown>
+export type ModalHandlers<E extends Env = any> = [string, TypeModalHandler<E>][]
 
 ////////// CronHandler //////////
 
@@ -58,7 +54,7 @@ export type CronHandler<E extends Env = any> = (c: CronContext<E>) => Promise<un
 
 ////////// PublicKeyHandler //////////
 
-export type PublicKeyHandler<E extends Env = any> = (env: E['Bindings']) => string
+export type PublicKeyHandler<E extends Env> = (env: E['Bindings']) => string
 
 ////////// CronEvent //////////
 // https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled/#syntax
