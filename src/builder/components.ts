@@ -12,14 +12,7 @@ import type {
   APIChannelSelectComponent,
 } from 'discord-api-types/v10'
 
-type ComponentClass =
-  | Button
-  | LinkButton
-  | Select
-  | UserSelect
-  | RoleSelect
-  | MentionableSelect
-  | ChannelSelect
+type ComponentClass = Button | LinkButton | Select | UserSelect | RoleSelect | MentionableSelect | ChannelSelect
 
 export class Components {
   #components: APIActionRowComponent<APIMessageActionRowComponent>[] = []
