@@ -1,11 +1,12 @@
-import type { Commands } from './types.js'
-import { apiUrl } from './utils.js'
+import type { ApplicationCommand } from './types'
+import { apiUrl } from './utils'
+import { Command } from './builder/command'
 
 // cloudflare-sample-app
 // Copyright (c) 2022 Justin Beckwith
 // https://github.com/discord/cloudflare-sample-app/blob/main/LICENSE
 export const register = async (
-  commands: Commands,
+  commands: (Command | ApplicationCommand)[],
   applicationId: string | undefined,
   token: string | undefined,
   guildId?: string | undefined,
@@ -15,7 +16,10 @@ export const register = async (
   const url = guildId
     ? `${apiUrl}/applications/${applicationId}/guilds/${guildId}/commands`
     : `${apiUrl}/applications/${applicationId}/commands`
-  const applicationCommands = commands.map(cmd => cmd[0])
+  const applicationCommands = commands.map(cmd => {
+    if (cmd instanceof Command) return cmd.build()
+    return cmd
+  })
 
   const response = await fetch(url, {
     headers: {

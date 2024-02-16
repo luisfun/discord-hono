@@ -5,50 +5,45 @@ import type {
   Env,
   ExecutionContext,
   CronEvent,
-  Commands,
+  ApplicationCommand,
+  TypeCommandHandler,
+  TypeComponentHandler,
+  TypeModalHandler,
+  TypeCronHandler,
   Handlers,
-  ModalHandlers,
-  CronHandler,
   PublicKeyHandler,
   InteractionCommandData,
   InteractionComponentData,
   InteractionModalData,
 } from './types'
 import { ResponseJson } from './utils'
+import { Command } from './builder/command'
+import { CommandHandlers, ComponentHandlers, ModalHandlers, CronHandlers } from './builder/handler'
 
 const defineClass = function (): {
   new <E extends Env = Env>(): {
-    /**
-     * @param commands type Commands
-     */
-    commands: (commands: Commands<E>) => void
+    commands: (commands: (Command | ApplicationCommand)[]) => void
   } & {
     /**
-     * @param handlers type Commands
+     * If the class is not used, specify the type as the second argument.
      */
-    handlers: (handlers: Handlers<E>) => void
-  } & {
-    /**
-     * @param modalHandlers type Commands
-     */
-    modalHandlers: (modalHandlers: ModalHandlers<E>) => void
-  } & {
-    /**
-     * Just setting up cron here does not execute it. Please set up a cron trigger in wrangler.toml.
-     * @param schedule cron schedule - '': trigger all crons
-     * @param handler type Handler
-     * @sample
-     * ```ts
-     * app.cron('0 0 * * *', daily_handler)
-     * app.cron('', all_other_schedule_handler)
-     * ```
-     */
-    cron: (schedule: string, handler: CronHandler<E>) => void
+    handlers: (
+      handlers:
+        | CommandHandlers
+        | ComponentHandlers
+        | ModalHandlers
+        | CronHandlers
+        | Handlers<TypeCommandHandler>
+        | Handlers<TypeComponentHandler>
+        | Handlers<TypeModalHandler>
+        | Handlers<TypeCronHandler>,
+      type?: 'command' | 'component' | 'modal' | 'cron',
+    ) => void
   } & {
     /**
      * Used when DISCORD_PUBLIC_KEY error occurs.
      */
-    publicKey: (handler: PublicKeyHandler<E>) => void //(key: string) => void
+    publicKey: (handler: PublicKeyHandler<E>) => void
   }
 } {
   return class {} as never
@@ -63,32 +58,36 @@ const defineClass = function (): {
  * ```
  */
 export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
-  #commands: Commands<E> | undefined = undefined
-  #handlers: Handlers<E> | undefined = undefined
-  #modalHandlers: ModalHandlers<E> | undefined = undefined
-  #cronjobs: [string, CronHandler<E>][] = []
+  #commands: ApplicationCommand[] | undefined = undefined
+  #commandHandlers: Handlers<TypeCommandHandler<E>> | undefined = undefined
+  #componentHandlers: Handlers<TypeComponentHandler<E>> | undefined = undefined
+  #modalHandlers: Handlers<TypeModalHandler<E>> | undefined = undefined
+  #cronHandlers: Handlers<TypeCronHandler<E>> | undefined = undefined
   #publicKey: PublicKeyHandler<E> | undefined = undefined
 
   constructor() {
     super()
-    this.commands = commands => {
+    this.commands = e => {
+      const commands = e.map(cmd => {
+        if (cmd instanceof Command) return cmd.build()
+        return cmd
+      })
       this.#commands = commands
       return this
     }
-    this.handlers = handlers => {
-      this.#handlers = handlers
+    this.handlers = (handlers, type) => {
+      if (handlers instanceof CommandHandlers) this.#commandHandlers = handlers.build()
+      if (handlers instanceof ComponentHandlers) this.#componentHandlers = handlers.build()
+      if (handlers instanceof ModalHandlers) this.#modalHandlers = handlers.build()
+      if (handlers instanceof CronHandlers) this.#cronHandlers = handlers.build()
+      if (type === 'command') this.#commandHandlers = handlers as Handlers<TypeCommandHandler<E>>
+      if (type === 'component') this.#componentHandlers = handlers as Handlers<TypeComponentHandler<E>>
+      if (type === 'modal') this.#modalHandlers = handlers as Handlers<TypeModalHandler<E>>
+      if (type === 'cron') this.#cronHandlers = handlers as Handlers<TypeCronHandler<E>>
       return this
     }
-    this.modalHandlers = modalHandlers => {
-      this.#modalHandlers = modalHandlers
-      return this
-    }
-    this.cron = (cron, handler) => {
-      this.#cronjobs.push([cron, handler])
-      return this
-    }
-    this.publicKey = handler => {
-      this.#publicKey = handler
+    this.publicKey = e => {
+      this.#publicKey = e
       return this
     }
   }
@@ -121,28 +120,30 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
           return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
         }
         case 2: {
-          if (!this.#commands) throw new Error('Commands is not set. Set by app.commands(Commands).')
+          if (!this.#commands) throw new Error('Commands is not set. Set by app.commands')
+          if (!this.#commandHandlers) throw new Error('Handlers is not set. Set by app.commandHandlers')
           const interaction = data as InteractionCommandData
           if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
           const name = interaction.data.name.toLowerCase()
-          const index = this.#commands.findIndex(command => command[0].name.toLowerCase() === name)
-          const command = this.#commands[index][0]
-          const handler = this.#commands[index][1]
+          const index = this.#commandHandlers.findIndex(e => e[0].toLowerCase() === name)
+          const handler = this.#commandHandlers[index][1]
+          const commandIndex = this.#commands.findIndex(e => e.name.toLowerCase() === name)
+          const command = this.#commands[commandIndex]
           return await handler(new CommandContext(request, env, executionCtx, interaction, command))
         }
         case 3: {
-          if (!this.#handlers) throw new Error('Component Handlers is not set. Set by app.handlers(Handlers).')
+          if (!this.#componentHandlers) throw new Error('Handlers is not set. Set by app.componentHandlers')
           const interaction = data as InteractionComponentData
           if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
           const customId = interaction.data.custom_id
           const uniqueId = customId.split(';')[0]
-          const index = this.#handlers.findIndex(e => e[0] === uniqueId || e[0] === '')
-          const handler = this.#handlers[index][1]
+          const index = this.#componentHandlers.findIndex(e => e[0] === uniqueId || e[0] === '')
+          const handler = this.#componentHandlers[index][1]
           interaction.data.custom_id = customId.slice(uniqueId.length + 1)
           return await handler(new ComponentContext(request, env, executionCtx, interaction))
         }
         case 5: {
-          if (!this.#modalHandlers) throw new Error('Modal is not set. Set by app.modal(Modal).')
+          if (!this.#modalHandlers) throw new Error('Handlers is not set. Set by app.modalHandlers')
           const interaction = data as InteractionModalData
           if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
           const customId = interaction.data.custom_id
@@ -162,8 +163,9 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
   }
 
   scheduled = async (event: CronEvent, env: E['Bindings'] | {}, executionCtx: ExecutionContext) => {
-    const cronIndex = this.#cronjobs.findIndex(e => e[0] === event.cron || e[0] === '')
-    const handler = this.#cronjobs[cronIndex][1]
+    if (!this.#cronHandlers) throw new Error('Handlers is not set. Set by app.cronHandlers')
+    const index = this.#cronHandlers.findIndex(e => e[0] === event.cron || e[0] === '')
+    const handler = this.#cronHandlers[index][1]
     await handler(new CronContext(event, env, executionCtx))
   }
 }

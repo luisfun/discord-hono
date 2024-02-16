@@ -25,7 +25,7 @@
     "arrowParens": "avoid"
   },
   "devDependencies": {
-    "discord-api-types": "^0.37.69",
+    "discord-api-types": "^0.37.70",
     "prettier": "^3.2.5",
     "typescript": "^5.3.3"
   },

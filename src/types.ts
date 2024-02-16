@@ -32,25 +32,17 @@ export type ApplicationCommand = Omit<
   default_member_permissions?: string | null
   version?: string
 }
-export type TypeCommandHandler<E extends Env> = (c: CommandContext<E>) => Promise<Response> | Response
-/**
- * [Application Command](https://discord.com/developers/docs/interactions/application-commands)
- */
-export type Commands<E extends Env = any> = [ApplicationCommand, TypeCommandHandler<E>][]
 
-////////// ComponentHandlers //////////
+////////// Handlers //////////
 
-type TypeComponentHandler<E extends Env> = (c: ComponentContext<E>) => Promise<Response> | Response
-export type Handlers<E extends Env = any> = [string, TypeComponentHandler<E>][]
-
-////////// ModalHandlers //////////
-
-type TypeModalHandler<E extends Env> = (c: ModalContext<E>) => Promise<unknown>
-export type ModalHandlers<E extends Env = any> = [string, TypeModalHandler<E>][]
-
-////////// CronHandler //////////
-
-export type CronHandler<E extends Env = any> = (c: CronContext<E>) => Promise<unknown>
+export type TypeCommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
+export type TypeComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<Response> | Response
+export type TypeModalHandler<E extends Env = any> = (c: ModalContext<E>) => Promise<Response> | Response
+export type TypeCronHandler<E extends Env = any> = (c: CronContext<E>) => Promise<unknown>
+export type Handlers<H extends TypeCommandHandler | TypeComponentHandler | TypeModalHandler | TypeCronHandler> = [
+  string,
+  H,
+][]
 
 ////////// PublicKeyHandler //////////
 

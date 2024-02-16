@@ -1,8 +1,5 @@
 import type {
   APIApplicationCommandOption,
-  APIInteractionResponseCallbackData,
-  APIInteractionResponse,
-  APIEmbed,
   APIApplicationCommandSubcommandOption, // 1
   APIApplicationCommandSubcommandGroupOption, // 2
   APIApplicationCommandStringOption, // 3
@@ -16,11 +13,8 @@ import type {
   APIApplicationCommandAttachmentOption, // 11
   APIApplicationCommandBasicOption,
   APIApplicationCommandOptionChoice,
-  APIModalInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
-import type { Env, Commands, TypeCommandHandler, ApplicationCommand as Cmd } from '../types'
-import type { CommandContext } from '../context'
-import type { Modal } from './modal'
+import type { ApplicationCommand as Cmd } from '../types'
 
 type OptionClass =
   | CommandOption
@@ -33,11 +27,10 @@ type OptionClass =
   | CommandAttachmentOption
 
 type OptionAllClass = OptionClass | CommandSubOption | CommandSubGroupOption
-type Output<E extends Env> = Commands<E>[0]
 /**
  * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure)
  */
-export class Command<E extends Env = any> {
+export class Command {
   #command: Cmd
   /**
    * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure)
@@ -82,28 +75,7 @@ export class Command<E extends Env = any> {
     })
     return this.assign({ options })
   }
-
-  // build()
-  resBase = (e: APIInteractionResponse): Output<E> => [this.#command, (c: CommandContext) => c.resBase(e)]
-  res = (e: APIInteractionResponseCallbackData): Output<E> => [this.#command, (c: CommandContext) => c.res(e)]
-  resText = (content: string) => this.res({ content })
-  resEmbeds = (...embeds: APIEmbed[]) => this.res({ embeds })
-  resDefer = <T>(handler: (c: CommandContext<E>, ...args1: T[]) => Promise<unknown>, ...args: T[]): Output<E> => [
-    this.#command,
-    (c: CommandContext<E>) => {
-      if (!c.executionCtx.waitUntil && !c.event.waitUntil)
-        throw new Error('This command handler context has no waitUntil. You can use .handler(command_handler).')
-      if (c.executionCtx.waitUntil) c.executionCtx.waitUntil(handler(c, ...args))
-      // @ts-expect-error ****************** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
-      else c.event.waitUntil(handler(c, ...args))
-      return c.resDefer()
-    },
-  ]
-  resModal = (e: Modal | APIModalInteractionResponseCallbackData): Output<E> => [
-    this.#command,
-    (c: CommandContext) => c.resModal(e),
-  ]
-  handler = (handler: TypeCommandHandler<E>): Output<E> => [this.#command, handler]
+  build = () => this.#command
 }
 
 type OmitOption =
@@ -122,7 +94,7 @@ class OptionBase {
   protected option: APIApplicationCommandOption
   constructor(name: string, description: string, type: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11) {
     // @ts-expect-error *************** 型定義がおかしい？ 分からない
-    this.option = { name, description, type } // as APIApplicationCommandOption
+    this.option = { name, description, type }
   }
   protected assign = (option: OmitOption) => {
     Object.assign(this.option, option)
