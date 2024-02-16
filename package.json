@@ -1,6 +1,6 @@
 {
   "name": "discord-hono",
-  "version": "0.3.8",
+  "version": "0.4.0",
   "description": "Edge Functions module for interacting with the Discord API",
   "author": "Luis (https://github.com/LuisFun)",
   "homepage": "https://github.com/LuisFun/discord-hono",
