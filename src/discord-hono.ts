@@ -19,6 +19,7 @@ import type {
 import { ResponseJson } from './utils'
 import { Command } from './builder/command'
 import { CommandHandlers, ComponentHandlers, ModalHandlers, CronHandlers } from './builder/handler'
+import { register } from './register'
 
 const defineClass = function (): {
   new <E extends Env = Env>(): {
@@ -44,6 +45,12 @@ const defineClass = function (): {
      * Used when DISCORD_PUBLIC_KEY error occurs.
      */
     publicKey: (handler: PublicKeyHandler<E>) => void
+  } & {
+    register: (
+      applicationId: string | undefined,
+      token: string | undefined,
+      guildId?: string | undefined,
+    ) => Promise<void>
   }
 } {
   return class {} as never
@@ -89,6 +96,10 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
     this.publicKey = e => {
       this.#publicKey = e
       return this
+    }
+    this.register = async (applicationId, token, guildId) => {
+      if (!this.#commands) throw new Error('Commands is not set. Set by app.commands')
+      await register(this.#commands, applicationId, token, guildId)
     }
   }
 
@@ -152,6 +163,11 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
           const handler = this.#modalHandlers[index][1]
           interaction.data.custom_id = customId.slice(uniqueId.length + 1)
           return await handler(new ModalContext(request, env, executionCtx, interaction))
+        }
+        case 4: {
+          console.warn('interaction.type: ', data.type)
+          console.warn('Not yet implemented. Please tell the developer of discord-hono how to get this reply.')
+          return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
         }
         default: {
           console.warn('interaction.type: ', data.type)

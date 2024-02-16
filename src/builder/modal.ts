@@ -11,15 +11,15 @@ export class Modal {
     this.#data.custom_id = this.#uniqueStr + e
     return this
   }
-  components = (...e: (ComponentTextInput | APITextInputComponent)[]) => {
-    const components = e.map(comp => (comp instanceof ComponentTextInput ? comp.build() : comp))
+  row = (...e: (TextInput | APITextInputComponent)[]) => {
+    const components = e.map(comp => (comp instanceof TextInput ? comp.build() : comp))
     this.#data.components.push({ type: 1, components })
     return this
   }
   build = () => this.#data
 }
 
-export class ComponentTextInput {
+export class TextInput {
   #uniqueStr: string
   #component: APITextInputComponent
   /**
@@ -37,7 +37,7 @@ export class ComponentTextInput {
   // https://discord.com/developers/docs/interactions/message-components#text-input-object
   min_length = (e: APITextInputComponent['min_length']) => this.#assign({ min_length: e })
   max_length = (e: APITextInputComponent['max_length']) => this.#assign({ max_length: e })
-  required = (e: APITextInputComponent['required']) => this.#assign({ required: e })
+  required = (e: APITextInputComponent['required'] = true) => this.#assign({ required: e })
   value = (e: APITextInputComponent['value']) => this.#assign({ value: e })
   placeholder = (e: APITextInputComponent['placeholder']) => this.#assign({ placeholder: e })
   build = () => this.#component

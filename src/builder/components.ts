@@ -13,27 +13,27 @@ import type {
 } from 'discord-api-types/v10'
 
 type ComponentClass =
-  | ComponentButton
-  | ComponentButtonLink
-  | ComponentSelect
-  | ComponentUserSelect
-  | ComponentRoleSelect
-  | ComponentMentionableSelect
-  | ComponentChannelSelect
+  | Button
+  | LinkButton
+  | Select
+  | UserSelect
+  | RoleSelect
+  | MentionableSelect
+  | ChannelSelect
 
 export class Components {
   #components: APIActionRowComponent<APIMessageActionRowComponent>[] = []
-  components = (...e: (ComponentClass | APIMessageActionRowComponent)[]) => {
+  row = (...e: (ComponentClass | APIMessageActionRowComponent)[]) => {
     if (this.#components.length >= 5) console.warn('You can have up to 5 Action Rows per message')
     const components = e.map(comp => {
       if (
-        comp instanceof ComponentButton ||
-        comp instanceof ComponentButtonLink ||
-        comp instanceof ComponentSelect ||
-        comp instanceof ComponentUserSelect ||
-        comp instanceof ComponentRoleSelect ||
-        comp instanceof ComponentMentionableSelect ||
-        comp instanceof ComponentChannelSelect
+        comp instanceof Button ||
+        comp instanceof LinkButton ||
+        comp instanceof Select ||
+        comp instanceof UserSelect ||
+        comp instanceof RoleSelect ||
+        comp instanceof MentionableSelect ||
+        comp instanceof ChannelSelect
       )
         return comp.build()
       return comp
@@ -67,7 +67,7 @@ class ButtonBase {
 
 type ButtonStyle = 'Primary' | 'Secondary' | 'Success' | 'Danger'
 
-export class ComponentButton extends ButtonBase {
+export class Button extends ButtonBase {
   /**
    * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
    * @param buttonStyle default 'Primary'
@@ -85,7 +85,7 @@ export class ComponentButton extends ButtonBase {
   custom_id = //(handler: (c: ComponentContext<E>) => Promise<string> | string) => this.assign({ custom_id: this.uniqueStr + (await handler()) })
     (e: APIButtonComponentWithCustomId['custom_id']) => this.assign({ custom_id: this.uniqueStr + e })
 }
-export class ComponentButtonLink extends ButtonBase {
+export class LinkButton extends ButtonBase {
   /**
    * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
    */
@@ -119,7 +119,7 @@ class SelectBase {
   build = () => this.component
 }
 
-export class ComponentSelect extends SelectBase {
+export class Select extends SelectBase {
   /**
    * [Select Structure](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure)
    * .options() require
@@ -129,25 +129,25 @@ export class ComponentSelect extends SelectBase {
   }
   options = (e: APIStringSelectComponent['options']) => this.assign({ options: e })
 }
-export class ComponentUserSelect extends SelectBase {
+export class UserSelect extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 5)
   }
   default_values = (e: APIUserSelectComponent['default_values']) => this.assign({ default_values: e })
 }
-export class ComponentRoleSelect extends SelectBase {
+export class RoleSelect extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 6)
   }
   default_values = (e: APIRoleSelectComponent['default_values']) => this.assign({ default_values: e })
 }
-export class ComponentMentionableSelect extends SelectBase {
+export class MentionableSelect extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 7)
   }
   default_values = (e: APIMentionableSelectComponent['default_values']) => this.assign({ default_values: e })
 }
-export class ComponentChannelSelect extends SelectBase {
+export class ChannelSelect extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 8)
   }
