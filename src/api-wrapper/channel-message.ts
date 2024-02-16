@@ -1,11 +1,10 @@
-import type { APIInteractionResponseCallbackData } from 'discord-api-types/v10'
-import type { FileData } from '../types'
+import type { CustomResponseCallbackData, FileData } from '../types'
 import { apiUrl, fetchMessage } from '../utils'
 
 /**
  * [API Create Message](https://discord.com/developers/docs/resources/channel#create-message)
  */
-export const postMessage = async (channelId: string, data?: APIInteractionResponseCallbackData, ...files: FileData[]) =>
+export const postMessage = async (channelId: string, data?: CustomResponseCallbackData, ...files: FileData[]) =>
   await fetchMessage(`${apiUrl}/channels/${channelId}/messages`, data, files)
 
 /**

@@ -7,8 +7,10 @@ import type {
   APIModalSubmission,
   APIApplicationCommand,
   ApplicationCommandType,
+  APIInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
 import type { CommandContext, ComponentContext, ModalContext, CronContext } from './context'
+import type { Components } from './builder/components'
 
 ////////// Env //////////
 
@@ -84,6 +86,10 @@ export type InteractionComponentData = APIBaseInteraction<
   APIMessageComponentInteractionData
 >
 export type InteractionModalData = APIBaseInteraction<InteractionType.ModalSubmit, APIModalSubmission>
+
+export type CustomResponseCallbackData = Omit<APIInteractionResponseCallbackData, 'components'> & {
+  components?: Components | APIInteractionResponseCallbackData['components']
+}
 
 ////////// FileData //////////
 

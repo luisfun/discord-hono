@@ -1,5 +1,4 @@
 import type {
-  APIInteractionResponseCallbackData,
   APIInteractionResponse,
   APIInteractionResponseChannelMessageWithSource,
   APIInteractionResponseDeferredChannelMessageWithSource,
@@ -26,11 +25,13 @@ import type {
   InteractionCommandData,
   InteractionComponentData,
   InteractionModalData,
+  CustomResponseCallbackData,
   FileData,
 } from './types'
 import { apiUrl, ResponseJson, fetchMessage } from './utils'
 import { postMessage } from './api-wrapper/channel-message'
 import { Modal } from './builder/modal'
+import { Components } from './builder/components'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -80,7 +81,7 @@ class ContextBase<E extends Env> {
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param files FileData: { blob: Blob, name: string }
    */
-  post = async (channelId: string, data: APIInteractionResponseCallbackData, ...files: FileData[]) => {
+  post = async (channelId: string, data: CustomResponseCallbackData, ...files: FileData[]) => {
     if (!channelId) throw new Error('channelId is not set.')
     return await postMessage(channelId, data, ...files)
   }
@@ -113,13 +114,19 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   /**
    * [Check Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type)
    */
-  resBase = (json: APIInteractionResponse) => new ResponseJson(json)
+  resBase = (json: APIInteractionResponse) => {
+    if ('data' in json && json.data && 'components' in json.data) {
+      const components = json.data.components
+      json.data.components = components instanceof Components ? components.build() : components
+    }
+    return new ResponseJson(json)
+  }
   /**
    * Response to request.
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @returns Response
    */
-  res = (data: APIInteractionResponseCallbackData) =>
+  res = (data: CustomResponseCallbackData) =>
     this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
   resText = (content: string) => this.res({ content })
   resEmbeds = (...embeds: APIEmbed[]) => this.res({ embeds })
@@ -139,7 +146,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param file FileData: { blob: Blob, name: string }
    * @returns
    */
-  followup = async (data: APIInteractionResponseCallbackData, ...files: FileData[]) => {
+  followup = async (data: CustomResponseCallbackData, ...files: FileData[]) => {
     if (!this.env?.DISCORD_APPLICATION_ID) throw new Error('DISCORD_APPLICATION_ID is not set.')
     const post = await fetchMessage(
       `${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.interaction.token}`,
@@ -158,13 +165,11 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param file FileData: { blob: Blob, name: string }
    * @returns
    */
-  post = async (channelId: string, data: APIInteractionResponseCallbackData, ...files: FileData[]) => {
+  post = async (channelId: string, data: CustomResponseCallbackData, ...files: FileData[]) => {
     const id = channelId || this.#interaction?.channel?.id
     if (!id) throw new Error('channelId is not set.')
     return await postMessage(id, data, ...files)
   }
-  postText = async (channelId: string, content: string) => await this.post(channelId, { content })
-  postEmbeds = async (channelId: string, ...embeds: APIEmbed[]) => await this.post(channelId, { embeds })
 }
 
 type CommandValue = string | number | boolean
@@ -235,7 +240,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
     return this.#interaction as ComponentInteractionData<T>
   }
 
-  resUpdate = (data: APIInteractionResponseCallbackData) =>
+  resUpdate = (data: CustomResponseCallbackData) =>
     this.resBase({ type: 7, data } as APIInteractionResponseUpdateMessage)
   resUpdateText = (content: string) => this.resUpdate({ content })
   resUpdateEmbeds = (...embeds: APIEmbed[]) => this.resUpdate({ embeds })

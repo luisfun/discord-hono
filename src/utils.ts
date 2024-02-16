@@ -1,5 +1,5 @@
-import type { APIInteractionResponseCallbackData } from 'discord-api-types/v10'
-import type { FileData } from './types'
+import type { CustomResponseCallbackData, FileData } from './types'
+import { Components } from './builder/components'
 
 export const apiUrl = 'https://discord.com/api/v10'
 
@@ -23,11 +23,13 @@ export class ResponseJson extends Response {
  */
 export const fetchMessage = async (
   input: URL | RequestInfo,
-  data?: APIInteractionResponseCallbackData,
+  data?: CustomResponseCallbackData,
   files?: FileData[],
   method?: string,
 ) => {
   const body = new FormData()
+  if (data?.components)
+    data.components = data.components instanceof Components ? data.components.build() : data.components
   body.append('payload_json', JSON.stringify(data))
   if (files?.[0])
     for (let i = 0, len = files.length; i < len; i++) body.append(`files[${i}]`, files[i].blob, files[i].name)
