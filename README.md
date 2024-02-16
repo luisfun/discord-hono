@@ -18,24 +18,26 @@ npm i -D dotenv # When using 'npm run register'
 index.ts
 
 ```ts
-import type { Context } from 'discord-hono'
-import { DiscordHono, Command, CommandOption } from 'discord-hono'
-
-const imageHandler = async (c: Context) => {
-  const image = await fetch('https://luis.fun/images/hono.webp')
-  const blob = new Blob([await image.arrayBuffer()])
-  await c.followup({ content: c.command.values[0] }, { blob, name: 'image.webp' })
-}
+import { DiscordHono, Command, Option, CommandHandlers } from 'discord-hono'
 
 export const commands = [
-  new Command('ping', 'response pong').resText('Pong!!'),
-  new Command('image', 'response image file with text')
-    .options(new CommandOption('content', 'response text').required())
-    .resDefer(imageHandler),
+  new Command('ping', 'response pong'),
+  new Command('image', 'response image file with text').options(new Option('content', 'response text').required()),
 ]
+
+const handlers = new CommandHandlers()
+  .on('ping', c => c.resText('Pong!!'))
+  .on('image', c =>
+    c.resDefer(async () => {
+      const image = await fetch('https://luis.fun/images/hono.webp')
+      const blob = new Blob([await image.arrayBuffer()])
+      await c.followup({ content: c.values[0].toString() }, { blob, name: 'image.webp' })
+    }),
+  )
 
 const app = new DiscordHono()
 app.commands(commands)
+app.handlers(handlers)
 export default app
 ```
 
@@ -44,13 +46,11 @@ register.ts
 ```ts
 import dotenv from 'dotenv'
 import process from 'node:process'
-import { register } from 'discord-hono'
-import { commands } from './index.js' // '.js' is necessary for 'npm run register'.
+import app from './index.js' // '.js' is necessary for 'npm run register'.
 
 dotenv.config({ path: '.dev.vars' })
 
-await register(
-  commands,
+await app.register(
   process.env.DISCORD_APPLICATION_ID,
   process.env.DISCORD_TOKEN,
   //process.env.DISCORD_TEST_GUILD_ID,
