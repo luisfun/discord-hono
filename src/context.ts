@@ -107,6 +107,9 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   get req(): Request {
     return this.#req
   }
+  /**
+   * [Interaction Object](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
+   */
   get interaction(): D {
     return this.#interaction
   }
