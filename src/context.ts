@@ -18,6 +18,7 @@ import type {
 } from 'discord-api-types/v10'
 import type {
   Env,
+  DiscordKey,
   ExecutionContext,
   FetchEventLike,
   CronEvent,
@@ -29,7 +30,7 @@ import type {
   FileData,
 } from './types'
 import { apiUrl, ResponseJson, fetchMessage } from './utils'
-import { postMessage } from './api-wrapper/channel-message'
+import { postMessage, deleteMessage } from './api-wrapper/channel-message'
 import { Modal } from './builder/modal'
 import { Components } from './builder/components'
 
@@ -48,10 +49,12 @@ interface Set<E extends Env> {
 class ContextBase<E extends Env> {
   #env: E['Bindings'] = {}
   #executionCtx: ExecutionCtx
+  protected discord: DiscordKey
   #var: E['Variables'] = {}
-  constructor(env: E['Bindings'], executionCtx: ExecutionCtx) {
+  constructor(env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordKey) {
     this.#env = env
     this.#executionCtx = executionCtx
+    this.discord = discord
   }
 
   get env(): E['Bindings'] {
@@ -81,12 +84,12 @@ class ContextBase<E extends Env> {
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param files FileData: { blob: Blob, name: string }
    */
-  post = async (channelId: string, data: CustomResponseCallbackData, ...files: FileData[]) => {
-    if (!channelId) throw new Error('channelId is not set.')
-    return await postMessage(channelId, data, ...files)
-  }
+  post = async (channelId: string, data: CustomResponseCallbackData, ...files: FileData[]) =>
+    await postMessage(channelId, data, ...files)
   postText = async (channelId: string, content: string) => await this.post(channelId, { content })
   postEmbeds = async (channelId: string, ...embeds: APIEmbed[]) => await this.post(channelId, { embeds })
+
+  delete = async (channelId: string, messageId: string) => await deleteMessage(this.discord.TOKEN, channelId, messageId)
 }
 
 // prettier-ignore
@@ -98,8 +101,8 @@ type InteractionData<T extends 2 | 3 | 4 | 5> =
 class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> extends ContextBase<E> {
   #req: Request
   #interaction: D
-  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, interaction: D) {
-    super(env, executionCtx)
+  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordKey, interaction: D) {
+    super(env, executionCtx, discord)
     this.#req = req
     this.#interaction = interaction
   }
@@ -131,6 +134,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    */
   res = (data: CustomResponseCallbackData) =>
     this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
+  resEphemeral = (data: CustomResponseCallbackData) => this.res({ flags: 1 << 6, ...data })
   resText = (content: string) => this.res({ content })
   resEmbeds = (...embeds: APIEmbed[]) => this.res({ embeds })
   resDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
@@ -158,6 +162,8 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     )
     return new Response('Sent to Discord.', { status: post.status })
   }
+  followupEphemeral = async (data: CustomResponseCallbackData, ...files: FileData[]) =>
+    await this.followup({ flags: 1 << 6, ...data }, ...files)
   followupText = async (content: string) => await this.followup({ content })
   followupEmbeds = async (...embeds: APIEmbed[]) => await this.followup({ embeds })
 
@@ -173,6 +179,14 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     if (!id) throw new Error('channelId is not set.')
     return await postMessage(id, data, ...files)
   }
+
+  delete = async (channelId?: string, messageId?: string) => {
+    const cId = channelId || this.#interaction?.channel?.id
+    const mId = messageId || this.#interaction?.message?.id
+    if (!cId) throw new Error('channelId is not set.')
+    if (!mId) throw new Error('messageId is not set.')
+    return await deleteMessage(this.discord.TOKEN, cId, mId)
+  }
 }
 
 type CommandValue = string | number | boolean
@@ -185,10 +199,11 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
     req: Request,
     env: E['Bindings'],
     executionCtx: ExecutionCtx,
+    discord: DiscordKey,
     interaction: InteractionData<2>,
     command: ApplicationCommand,
   ) {
-    super(req, env, executionCtx, interaction)
+    super(req, env, executionCtx, discord, interaction)
     this.#command = command
     if (interaction?.data && 'options' in interaction?.data && interaction.data.options && this.#command) {
       this.#valuesMap = interaction.data.options.reduce((obj: CommandValuesMap, e) => {
@@ -234,8 +249,14 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
   InteractionData<3>
 > {
   #interaction: InteractionData<3>
-  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, interaction: InteractionData<3>) {
-    super(req, env, executionCtx, interaction)
+  constructor(
+    req: Request,
+    env: E['Bindings'],
+    executionCtx: ExecutionCtx,
+    discord: DiscordKey,
+    interaction: InteractionData<3>,
+  ) {
+    super(req, env, executionCtx, discord, interaction)
     this.#interaction = interaction
   }
 
@@ -264,15 +285,21 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
 }
 
 export class ModalContext<E extends Env = any> extends RequestContext<E, InteractionData<5>> {
-  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, interaction: InteractionData<5>) {
-    super(req, env, executionCtx, interaction)
+  constructor(
+    req: Request,
+    env: E['Bindings'],
+    executionCtx: ExecutionCtx,
+    discord: DiscordKey,
+    interaction: InteractionData<5>,
+  ) {
+    super(req, env, executionCtx, discord, interaction)
   }
 }
 
 export class CronContext<E extends Env = any> extends ContextBase<E> {
   #cronEvent: CronEvent
-  constructor(event: CronEvent, env: E['Bindings'], executionCtx: ExecutionCtx) {
-    super(env, executionCtx)
+  constructor(event: CronEvent, env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordKey) {
+    super(env, executionCtx, discord)
     this.#cronEvent = event
   }
 

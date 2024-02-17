@@ -17,6 +17,15 @@ export class ResponseJson extends Response {
   }
 }
 
+export const fetchAuth = async (token: string, input: URL | RequestInfo, init?: RequestInit | undefined) =>
+  await fetch(input, {
+    ...init,
+    headers: {
+      Authorization: `Bot ${token}`,
+      ...init?.headers,
+    },
+  })
+
 /**
  * fetch(input, { body })
  * @param method default 'POST'

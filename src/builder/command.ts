@@ -52,8 +52,8 @@ export class Command {
   name_localizations = (e: Cmd['name_localizations']) => this.assign({ name_localizations: e })
   description_localizations = (e: Cmd['description_localizations']) => this.assign({ description_localizations: e })
   default_member_permissions = (e: Cmd['default_member_permissions']) => this.assign({ default_member_permissions: e })
-  dm_permission = (e: Cmd['dm_permission']) => this.assign({ dm_permission: e })
-  nsfw = (e: Cmd['nsfw']) => this.assign({ nsfw: e })
+  dm_permission = (e: Cmd['dm_permission'] = true) => this.assign({ dm_permission: e })
+  nsfw = (e: Cmd['nsfw'] = true) => this.assign({ nsfw: e })
   version = (e: Cmd['version']) => this.assign({ version: e })
   // options
   options = (...e: (OptionAllClass | APIApplicationCommandOption)[]) => {

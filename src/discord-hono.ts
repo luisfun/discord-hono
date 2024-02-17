@@ -3,6 +3,7 @@ import { verifyKey } from 'discord-interactions'
 import { CommandContext, ComponentContext, ModalContext, CronContext } from './context'
 import type {
   Env,
+  EnvDiscordKey,
   ExecutionContext,
   CronEvent,
   ApplicationCommand,
@@ -11,7 +12,7 @@ import type {
   TypeModalHandler,
   TypeCronHandler,
   Handlers,
-  PublicKeyHandler,
+  EnvHandler,
   InteractionCommandData,
   InteractionComponentData,
   InteractionModalData,
@@ -44,7 +45,12 @@ const defineClass = function (): {
     /**
      * Used when DISCORD_PUBLIC_KEY error occurs.
      */
-    publicKey: (handler: PublicKeyHandler<E>) => void
+    token: (handler: EnvHandler<E>) => void
+  } & {
+    /**
+     * Used when DISCORD_PUBLIC_KEY error occurs.
+     */
+    publicKey: (handler: EnvHandler<E>) => void
   } & {
     register: (
       applicationId: string | undefined,
@@ -70,7 +76,8 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
   #componentHandlers: Handlers<TypeComponentHandler<E>> | undefined = undefined
   #modalHandlers: Handlers<TypeModalHandler<E>> | undefined = undefined
   #cronHandlers: Handlers<TypeCronHandler<E>> | undefined = undefined
-  #publicKey: PublicKeyHandler<E> | undefined = undefined
+  #token: EnvHandler<E> | undefined = undefined
+  #publicKey: EnvHandler<E> | undefined = undefined
 
   constructor() {
     super()
@@ -93,6 +100,9 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
       if (type === 'cron') this.#cronHandlers = handlers as Handlers<TypeCronHandler<E>>
       return this
     }
+    this.token = e => {
+      this.#token = e
+    }
     this.publicKey = e => {
       this.#publicKey = e
       return this
@@ -103,22 +113,21 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
     }
   }
 
-  fetch = async (
-    request: Request,
-    env?: E['Bindings'] | { DISCORD_PUBLIC_KEY?: string },
-    executionCtx?: ExecutionContext,
-  ) => {
+  fetch = async (request: Request, env?: E['Bindings'] | EnvDiscordKey, executionCtx?: ExecutionContext) => {
     if (request.method === 'GET') {
       return new Response('powered by Discord Hono🔥')
     } else if (request.method === 'POST') {
       if (!env) throw new Error('There is no env.')
-      const DISCORD_PUBLIC_KEY = this.#publicKey ? this.#publicKey(env) : (env.DISCORD_PUBLIC_KEY as string | undefined)
-      if (!DISCORD_PUBLIC_KEY) throw new Error('There is no DISCORD_PUBLIC_KEY. Set by app.publicKey(env => env.KEY).')
+      const discord = {
+        TOKEN: this.#token ? this.#token(env) : (env.DISCORD_TOKEN as string | undefined),
+        PUBLIC_KEY: this.#publicKey ? this.#publicKey(env) : (env.DISCORD_PUBLIC_KEY as string | undefined),
+      }
+      if (!discord.PUBLIC_KEY) throw new Error('There is no DISCORD_PUBLIC_KEY. Set by app.publicKey(env => env.KEY).')
       // verify
       const signature = request.headers.get('x-signature-ed25519')
       const timestamp = request.headers.get('x-signature-timestamp')
       const body = await request.text()
-      const isValidRequest = signature && timestamp && verifyKey(body, signature, timestamp, DISCORD_PUBLIC_KEY)
+      const isValidRequest = signature && timestamp && verifyKey(body, signature, timestamp, discord.PUBLIC_KEY)
       if (!isValidRequest || !body) {
         return new Response('Bad request signature.', { status: 401 })
       }
@@ -140,7 +149,7 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
           const handler = this.#commandHandlers[index][1]
           const commandIndex = this.#commands.findIndex(e => e.name.toLowerCase() === name)
           const command = this.#commands[commandIndex]
-          return await handler(new CommandContext(request, env, executionCtx, interaction, command))
+          return await handler(new CommandContext(request, env, executionCtx, discord, interaction, command))
         }
         case 3: {
           if (!this.#componentHandlers) throw new Error('Handlers is not set. Set by app.componentHandlers')
@@ -151,7 +160,7 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
           const index = this.#componentHandlers.findIndex(e => e[0] === uniqueId || e[0] === '')
           const handler = this.#componentHandlers[index][1]
           interaction.data.custom_id = customId.slice(uniqueId.length + 1)
-          return await handler(new ComponentContext(request, env, executionCtx, interaction))
+          return await handler(new ComponentContext(request, env, executionCtx, discord, interaction))
         }
         case 5: {
           if (!this.#modalHandlers) throw new Error('Handlers is not set. Set by app.modalHandlers')
@@ -162,7 +171,7 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
           const index = this.#modalHandlers.findIndex(e => e[0] === uniqueId || e[0] === '')
           const handler = this.#modalHandlers[index][1]
           interaction.data.custom_id = customId.slice(uniqueId.length + 1)
-          return await handler(new ModalContext(request, env, executionCtx, interaction))
+          return await handler(new ModalContext(request, env, executionCtx, discord, interaction))
         }
         case 4: {
           console.warn('interaction.type: ', data.type)
@@ -178,10 +187,14 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
     return new Response('Not Found.', { status: 404 })
   }
 
-  scheduled = async (event: CronEvent, env: E['Bindings'] | {}, executionCtx: ExecutionContext) => {
+  scheduled = async (event: CronEvent, env: E['Bindings'] | EnvDiscordKey, executionCtx: ExecutionContext) => {
     if (!this.#cronHandlers) throw new Error('Handlers is not set. Set by app.cronHandlers')
+    const discord = {
+      TOKEN: this.#token ? this.#token(env) : (env?.DISCORD_TOKEN as string | undefined),
+      PUBLIC_KEY: this.#publicKey ? this.#publicKey(env) : (env?.DISCORD_PUBLIC_KEY as string | undefined),
+    }
     const index = this.#cronHandlers.findIndex(e => e[0] === event.cron || e[0] === '')
     const handler = this.#cronHandlers[index][1]
-    await handler(new CronContext(event, env, executionCtx))
+    await handler(new CronContext(event, env, executionCtx, discord))
   }
 }

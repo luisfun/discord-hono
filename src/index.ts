@@ -1,6 +1,7 @@
-export type { ApplicationCommand, PublicKeyHandler } from './types'
+export type { ApplicationCommand, EnvHandler } from './types'
 export type * from './context'
 export * from './discord-hono'
+export * from './register'
 export * from './api-wrapper/channel-message'
 export * from './builder/command'
 export * from './builder/components'
