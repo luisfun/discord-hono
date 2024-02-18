@@ -74,7 +74,11 @@ class DiscordHonoBase<E extends Env = Env> {
       if (!env) throw new Error('There is no env.')
       const discord = this.#discordKeyHandler
         ? this.#discordKeyHandler(env)
-        : ({ TOKEN: env.DISCORD_TOKEN, PUBLIC_KEY: env.DISCORD_PUBLIC_KEY } as DiscordKey)
+        : ({
+            APPLICATION_ID: env.DISCORD_APPLICATION_ID,
+            TOKEN: env.DISCORD_TOKEN,
+            PUBLIC_KEY: env.DISCORD_PUBLIC_KEY,
+          } as DiscordKey)
       if (!discord.PUBLIC_KEY) throw new Error('There is no DISCORD_PUBLIC_KEY. Set by app.publicKey(env => env.KEY).')
       // verify
       const signature = request.headers.get('x-signature-ed25519')
@@ -144,7 +148,11 @@ class DiscordHonoBase<E extends Env = Env> {
     if (!this.#cronHandlers) throw new Error('Handlers is not set. Set by app.cronHandlers')
     const discord = this.#discordKeyHandler
       ? this.#discordKeyHandler(env)
-      : ({ TOKEN: env?.DISCORD_TOKEN, PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY } as DiscordKey)
+      : ({
+          APPLICATION_ID: env?.DISCORD_APPLICATION_ID,
+          TOKEN: env?.DISCORD_TOKEN,
+          PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY,
+        } as DiscordKey)
     const index = this.#cronHandlers.findIndex(e => e[0] === event.cron || e[0] === '')
     const handler = this.#cronHandlers[index][1]
     await handler(new CronContext(event, env, executionCtx, discord))

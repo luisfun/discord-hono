@@ -24,10 +24,12 @@ export type Env = {
 export type EnvDiscordKey = {
   DISCORD_TOKEN?: string
   DISCORD_PUBLIC_KEY?: string
+  DISCORD_APPLICATION_ID?: string
 }
 export type DiscordKey = {
   TOKEN?: string
   PUBLIC_KEY?: string
+  APPLICATION_ID?: string
 }
 
 ////////// Command //////////

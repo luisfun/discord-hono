@@ -17,30 +17,20 @@ export class ResponseJson extends Response {
   }
 }
 
-export const fetchAuth = async (token: string, input: URL | RequestInfo, init?: RequestInit | undefined) =>
-  await fetch(input, {
-    ...init,
-    headers: {
-      Authorization: `Bot ${token}`,
-      ...init?.headers,
-    },
-  })
+export const addToken = (token: string, init?: RequestInit): RequestInit => ({
+  ...init,
+  headers: {
+    ...init?.headers,
+    Authorization: `Bot ${token}`,
+  },
+})
 
-/**
- * fetch(input, { body })
- * @param method default 'POST'
- */
-export const fetchMessage = async (
-  input: URL | RequestInfo,
-  data?: CustomResponseCallbackData,
-  files?: FileData[],
-  method?: string,
-) => {
+export const formData = (data?: CustomResponseCallbackData, files?: FileData[]) => {
   const body = new FormData()
   if (data?.components)
     data.components = data.components instanceof Components ? data.components.build() : data.components
   body.append('payload_json', JSON.stringify(data))
   if (files?.[0])
     for (let i = 0, len = files.length; i < len; i++) body.append(`files[${i}]`, files[i].blob, files[i].name)
-  return await fetch(input, { method: method || 'POST', body })
+  return body
 }

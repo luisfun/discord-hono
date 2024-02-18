@@ -1,16 +1,49 @@
 import type { CustomResponseCallbackData, FileData } from '../types'
-import { apiUrl, fetchMessage, fetchAuth } from '../utils'
+import { apiUrl, addToken, formData } from '../utils'
 
 /**
  * [API Create Message](https://discord.com/developers/docs/resources/channel#create-message)
+ * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
+ * @param file FileData: { blob: Blob, name: string }
  */
-export const postMessage = async (channelId: string, data?: CustomResponseCallbackData, ...files: FileData[]) =>
-  await fetchMessage(`${apiUrl}/channels/${channelId}/messages`, data, files)
+export const postMessage = async (
+  token: string | undefined,
+  channelId: string,
+  data: CustomResponseCallbackData,
+  ...files: FileData[]
+) => {
+  if (!token) throw new Error('DISCORD_TOKEN is not set. Set up in app.discordKey or use postMessage.')
+  return await fetch(
+    `${apiUrl}/channels/${channelId}/messages`,
+    addToken(token, { method: 'POST', body: formData(data, files) }),
+  )
+}
 
 /**
  * [API Delete Message](https://discord.com/developers/docs/resources/channel#delete-message)
  */
 export const deleteMessage = async (token: string | undefined, channelId: string, messageId: string) => {
-  if (!token) throw new Error('DISCORD_TOKEN is not set. Set up in app.token() or use deleteMessage.')
-  return await fetchAuth(token, `${apiUrl}/channels/${channelId}/messages/${messageId}`, { method: 'DELETE' })
+  if (!token) throw new Error('DISCORD_TOKEN is not set. Set up in app.discordKey or use deleteMessage.')
+  return await fetch(`${apiUrl}/channels/${channelId}/messages/${messageId}`, addToken(token, { method: 'DELETE' }))
+}
+
+/**
+ * [API Followup Message](https://discord.com/developers/docs/interactions/receiving-and-responding#followup-messages)
+ * Used to send messages after resDefer.
+ * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
+ * @param file FileData: { blob: Blob, name: string }
+ */
+export const followupMessage = async (
+  applicationId: string | undefined,
+  interactionToken: string | undefined,
+  data: CustomResponseCallbackData,
+  ...files: FileData[]
+) => {
+  if (!applicationId)
+    throw new Error('DISCORD_APPLICATION_ID is not set. Set up in app.discordKey or use followupMessage.')
+  if (!interactionToken) throw new Error('Interaction Token is not set. You can use followupMessage.')
+  return await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}`, {
+    method: 'POST',
+    body: formData(data, files),
+  })
 }

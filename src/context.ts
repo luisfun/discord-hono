@@ -29,8 +29,8 @@ import type {
   CustomResponseCallbackData,
   FileData,
 } from './types'
-import { apiUrl, ResponseJson, fetchMessage } from './utils'
-import { postMessage, deleteMessage } from './api-wrapper/channel-message'
+import { ResponseJson } from './utils'
+import { postMessage, deleteMessage, followupMessage } from './api-wrapper/channel-message'
 import { Modal } from './builder/modal'
 import { Components } from './builder/components'
 
@@ -85,7 +85,7 @@ class ContextBase<E extends Env> {
    * @param files FileData: { blob: Blob, name: string }
    */
   post = async (channelId: string, data: CustomResponseCallbackData, ...files: FileData[]) =>
-    await postMessage(channelId, data, ...files)
+    await postMessage(this.discord.TOKEN, channelId, data, ...files)
   postText = async (channelId: string, content: string) => await this.post(channelId, { content })
   postEmbeds = async (channelId: string, ...embeds: APIEmbed[]) => await this.post(channelId, { embeds })
 
@@ -151,17 +151,9 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * Used to send messages after resDefer.
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file FileData: { blob: Blob, name: string }
-   * @returns
    */
-  followup = async (data: CustomResponseCallbackData, ...files: FileData[]) => {
-    if (!this.env?.DISCORD_APPLICATION_ID) throw new Error('DISCORD_APPLICATION_ID is not set.')
-    const post = await fetchMessage(
-      `${apiUrl}/webhooks/${this.env.DISCORD_APPLICATION_ID}/${this.interaction.token}`,
-      data,
-      files,
-    )
-    return new Response('Sent to Discord.', { status: post.status })
-  }
+  followup = async (data: CustomResponseCallbackData, ...files: FileData[]) =>
+    await followupMessage(this.discord.APPLICATION_ID, this.interaction.token, data, ...files)
   followupEphemeral = async (data: CustomResponseCallbackData, ...files: FileData[]) =>
     await this.followup({ flags: 1 << 6, ...data }, ...files)
   followupText = async (content: string) => await this.followup({ content })
@@ -177,7 +169,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   post = async (channelId: string, data: CustomResponseCallbackData, ...files: FileData[]) => {
     const id = channelId || this.#interaction?.channel?.id
     if (!id) throw new Error('channelId is not set.')
-    return await postMessage(id, data, ...files)
+    return await postMessage(this.discord.TOKEN, id, data, ...files)
   }
 
   delete = async (channelId?: string, messageId?: string) => {
