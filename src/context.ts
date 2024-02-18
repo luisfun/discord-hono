@@ -270,6 +270,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
     }
     return this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
   }
+  resUpdateDelete = () => this.resUpdateDefer(async () => await this.delete())
   resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
     const data = e instanceof Modal ? e.build() : e
     return this.resBase({ type: 9, data } as APIModalInteractionResponse)

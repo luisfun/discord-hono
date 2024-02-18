@@ -37,6 +37,7 @@ export const formData = (data?: CustomResponseCallbackData, files?: FileData[]) 
 
 export const apiResponse = (res: Response) => {
   const xRateLimit = {
+    RetryAfter: res.headers.get('Retry-After'),
     Limit: res.headers.get('X-RateLimit-Limit'),
     Remaining: res.headers.get('X-RateLimit-Limit'),
     Reset: res.headers.get('X-RateLimit-Reset'),
