@@ -59,7 +59,7 @@ export type Handlers<H extends TypeCommandHandler | TypeComponentHandler | TypeM
 
 ////////// EnvHandler //////////
 
-export type EnvHandler<E extends Env> = (env: E['Bindings']) => string
+export type DiscordKeyHandler<E extends Env> = (env: E['Bindings']) => DiscordKey
 
 ////////// CronEvent //////////
 // https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled/#syntax

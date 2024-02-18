@@ -12,105 +12,59 @@ import type {
   TypeModalHandler,
   TypeCronHandler,
   Handlers,
-  EnvHandler,
+  DiscordKeyHandler,
   InteractionCommandData,
   InteractionComponentData,
   InteractionModalData,
+  DiscordKey,
 } from './types'
 import { ResponseJson } from './utils'
 import { Command } from './builder/command'
 import { CommandHandlers, ComponentHandlers, ModalHandlers, CronHandlers } from './builder/handler'
-import { register } from './register'
 
-const defineClass = function (): {
-  new <E extends Env = Env>(): {
-    commands: (commands: (Command | ApplicationCommand)[]) => void
-  } & {
-    /**
-     * If the class is not used, specify the type as the second argument.
-     */
-    handlers: (
-      handlers:
-        | CommandHandlers
-        | ComponentHandlers
-        | ModalHandlers
-        | CronHandlers
-        | Handlers<TypeCommandHandler>
-        | Handlers<TypeComponentHandler>
-        | Handlers<TypeModalHandler>
-        | Handlers<TypeCronHandler>,
-      type?: 'command' | 'component' | 'modal' | 'cron',
-    ) => void
-  } & {
-    /**
-     * Used when DISCORD_PUBLIC_KEY error occurs.
-     */
-    token: (handler: EnvHandler<E>) => void
-  } & {
-    /**
-     * Used when DISCORD_PUBLIC_KEY error occurs.
-     */
-    publicKey: (handler: EnvHandler<E>) => void
-  } & {
-    register: (
-      applicationId: string | undefined,
-      token: string | undefined,
-      guildId?: string | undefined,
-    ) => Promise<void>
-  }
-} {
-  return class {} as never
-}
-
-/**
- * @sample
- * ```ts
- * const app = new DiscordHono()
- * app.commands(commands)
- * export default app
- * ```
- */
-export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
+class DiscordHonoBase<E extends Env = Env> {
   #commands: ApplicationCommand[] | undefined = undefined
   #commandHandlers: Handlers<TypeCommandHandler<E>> | undefined = undefined
   #componentHandlers: Handlers<TypeComponentHandler<E>> | undefined = undefined
   #modalHandlers: Handlers<TypeModalHandler<E>> | undefined = undefined
   #cronHandlers: Handlers<TypeCronHandler<E>> | undefined = undefined
-  #token: EnvHandler<E> | undefined = undefined
-  #publicKey: EnvHandler<E> | undefined = undefined
+  #discordKeyHandler: DiscordKeyHandler<E> | undefined = undefined
 
-  constructor() {
-    super()
-    this.commands = e => {
-      const commands = e.map(cmd => {
-        if (cmd instanceof Command) return cmd.build()
-        return cmd
-      })
-      this.#commands = commands
-      return this
-    }
-    this.handlers = (handlers, type) => {
-      if (handlers instanceof CommandHandlers) this.#commandHandlers = handlers.build()
-      if (handlers instanceof ComponentHandlers) this.#componentHandlers = handlers.build()
-      if (handlers instanceof ModalHandlers) this.#modalHandlers = handlers.build()
-      if (handlers instanceof CronHandlers) this.#cronHandlers = handlers.build()
-      if (type === 'command') this.#commandHandlers = handlers as Handlers<TypeCommandHandler<E>>
-      if (type === 'component') this.#componentHandlers = handlers as Handlers<TypeComponentHandler<E>>
-      if (type === 'modal') this.#modalHandlers = handlers as Handlers<TypeModalHandler<E>>
-      if (type === 'cron') this.#cronHandlers = handlers as Handlers<TypeCronHandler<E>>
-      return this
-    }
-    this.token = e => {
-      this.#token = e
-    }
-    this.publicKey = e => {
-      this.#publicKey = e
-      return this
-    }
-    this.register = async (applicationId, token, guildId) => {
-      if (!this.#commands) throw new Error('Commands is not set. Set by app.commands')
-      await register(this.#commands, applicationId, token, guildId)
-    }
+  commands = (e: (Command | ApplicationCommand)[]) => {
+    const commands = e.map(cmd => {
+      if (cmd instanceof Command) return cmd.build()
+      return cmd
+    })
+    this.#commands = commands
+    return this
+  }
+
+  handlers = (
+    handlers:
+      | CommandHandlers
+      | ComponentHandlers
+      | ModalHandlers
+      | CronHandlers
+      | Handlers<TypeCommandHandler>
+      | Handlers<TypeComponentHandler>
+      | Handlers<TypeModalHandler>
+      | Handlers<TypeCronHandler>,
+    type?: 'command' | 'component' | 'modal' | 'cron',
+  ) => {
+    if (handlers instanceof CommandHandlers) this.#commandHandlers = handlers.build()
+    if (handlers instanceof ComponentHandlers) this.#componentHandlers = handlers.build()
+    if (handlers instanceof ModalHandlers) this.#modalHandlers = handlers.build()
+    if (handlers instanceof CronHandlers) this.#cronHandlers = handlers.build()
+    if (type === 'command') this.#commandHandlers = handlers as Handlers<TypeCommandHandler<E>>
+    if (type === 'component') this.#componentHandlers = handlers as Handlers<TypeComponentHandler<E>>
+    if (type === 'modal') this.#modalHandlers = handlers as Handlers<TypeModalHandler<E>>
+    if (type === 'cron') this.#cronHandlers = handlers as Handlers<TypeCronHandler<E>>
+    return this
+  }
+
+  discordKey = (handler: DiscordKeyHandler<E>) => {
+    this.#discordKeyHandler = handler
+    return this
   }
 
   fetch = async (request: Request, env?: E['Bindings'] | EnvDiscordKey, executionCtx?: ExecutionContext) => {
@@ -118,10 +72,9 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
       return new Response('powered by Discord Hono🔥')
     } else if (request.method === 'POST') {
       if (!env) throw new Error('There is no env.')
-      const discord = {
-        TOKEN: this.#token ? this.#token(env) : (env.DISCORD_TOKEN as string | undefined),
-        PUBLIC_KEY: this.#publicKey ? this.#publicKey(env) : (env.DISCORD_PUBLIC_KEY as string | undefined),
-      }
+      const discord = this.#discordKeyHandler
+        ? this.#discordKeyHandler(env)
+        : ({ TOKEN: env.DISCORD_TOKEN, PUBLIC_KEY: env.DISCORD_PUBLIC_KEY } as DiscordKey)
       if (!discord.PUBLIC_KEY) throw new Error('There is no DISCORD_PUBLIC_KEY. Set by app.publicKey(env => env.KEY).')
       // verify
       const signature = request.headers.get('x-signature-ed25519')
@@ -189,12 +142,21 @@ export const DiscordHono = class<E extends Env = Env> extends defineClass()<E> {
 
   scheduled = async (event: CronEvent, env: E['Bindings'] | EnvDiscordKey, executionCtx: ExecutionContext) => {
     if (!this.#cronHandlers) throw new Error('Handlers is not set. Set by app.cronHandlers')
-    const discord = {
-      TOKEN: this.#token ? this.#token(env) : (env?.DISCORD_TOKEN as string | undefined),
-      PUBLIC_KEY: this.#publicKey ? this.#publicKey(env) : (env?.DISCORD_PUBLIC_KEY as string | undefined),
-    }
+    const discord = this.#discordKeyHandler
+      ? this.#discordKeyHandler(env)
+      : ({ TOKEN: env?.DISCORD_TOKEN, PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY } as DiscordKey)
     const index = this.#cronHandlers.findIndex(e => e[0] === event.cron || e[0] === '')
     const handler = this.#cronHandlers[index][1]
     await handler(new CronContext(event, env, executionCtx, discord))
   }
 }
+
+/**
+ * @sample
+ * ```ts
+ * const app = new DiscordHono()
+ * app.commands(commands)
+ * export default app
+ * ```
+ */
+export class DiscordHono<E extends Env = Env> extends DiscordHonoBase<E> {}
