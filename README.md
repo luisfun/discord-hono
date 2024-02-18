@@ -16,12 +16,8 @@ npm i -D dotenv # When using 'npm run register'
 index.ts
 
 ```ts
-import { DiscordHono, Command, Option, CommandHandlers } from 'discord-hono'
-
-export const commands = [
-  new Command('ping', 'response pong'),
-  new Command('image', 'response image file with text').options(new Option('content', 'response text').required()),
-]
+import { DiscordHono, CommandHandlers } from 'discord-hono'
+import { commands } from './commands'
 
 const handlers = new CommandHandlers()
   .on('ping', c => c.resText('Pong!!'))
@@ -39,16 +35,29 @@ app.handlers(handlers)
 export default app
 ```
 
+commands.ts
+
+```ts
+import { Command, Option } from 'discord-hono'
+
+export const commands = [
+  new Command('ping', 'response pong'),
+  new Command('image', 'response image file').options(new Option('text', 'response text').required()),
+]
+```
+
 register.ts
 
 ```ts
 import dotenv from 'dotenv'
 import process from 'node:process'
-import app from './index.js' // '.js' is necessary for 'npm run register'.
+import { register } from 'discord-hono'
+import { commands } from './commands.js' // '.js' is necessary for 'npm run register'
 
 dotenv.config({ path: '.dev.vars' })
 
-await app.register(
+await register(
+  commands,
   process.env.DISCORD_APPLICATION_ID,
   process.env.DISCORD_TOKEN,
   //process.env.DISCORD_TEST_GUILD_ID,
