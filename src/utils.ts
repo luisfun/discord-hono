@@ -34,3 +34,16 @@ export const formData = (data?: CustomResponseCallbackData, files?: FileData[]) 
     for (let i = 0, len = files.length; i < len; i++) body.append(`files[${i}]`, files[i].blob, files[i].name)
   return body
 }
+
+export const apiResponse = (res: Response) => {
+  const xRateLimit = {
+    Limit: res.headers.get('X-RateLimit-Limit'),
+    Remaining: res.headers.get('X-RateLimit-Limit'),
+    Reset: res.headers.get('X-RateLimit-Reset'),
+    ResetAfter: res.headers.get('X-RateLimit-Reset-After'),
+    Bucket: res.headers.get('X-RateLimit-Bucket'),
+    Scope: res.headers.get('X-RateLimit-Scope'),
+    Global: res.headers.get('X-RateLimit-Global'),
+  }
+  return { res, xRateLimit }
+}

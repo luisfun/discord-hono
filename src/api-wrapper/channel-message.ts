@@ -1,5 +1,5 @@
 import type { CustomResponseCallbackData, FileData } from '../types'
-import { apiUrl, addToken, formData } from '../utils'
+import { apiUrl, addToken, formData, apiResponse } from '../utils'
 
 /**
  * [API Create Message](https://discord.com/developers/docs/resources/channel#create-message)
@@ -13,9 +13,11 @@ export const postMessage = async (
   ...files: FileData[]
 ) => {
   if (!token) throw new Error('DISCORD_TOKEN is not set. Set up in app.discordKey or use postMessage.')
-  return await fetch(
-    `${apiUrl}/channels/${channelId}/messages`,
-    addToken(token, { method: 'POST', body: formData(data, files) }),
+  return apiResponse(
+    await fetch(
+      `${apiUrl}/channels/${channelId}/messages`,
+      addToken(token, { method: 'POST', body: formData(data, files) }),
+    ),
   )
 }
 
@@ -24,7 +26,9 @@ export const postMessage = async (
  */
 export const deleteMessage = async (token: string | undefined, channelId: string, messageId: string) => {
   if (!token) throw new Error('DISCORD_TOKEN is not set. Set up in app.discordKey or use deleteMessage.')
-  return await fetch(`${apiUrl}/channels/${channelId}/messages/${messageId}`, addToken(token, { method: 'DELETE' }))
+  return apiResponse(
+    await fetch(`${apiUrl}/channels/${channelId}/messages/${messageId}`, addToken(token, { method: 'DELETE' })),
+  )
 }
 
 /**
@@ -42,8 +46,10 @@ export const followupMessage = async (
   if (!applicationId)
     throw new Error('DISCORD_APPLICATION_ID is not set. Set up in app.discordKey or use followupMessage.')
   if (!interactionToken) throw new Error('Interaction Token is not set. You can use followupMessage.')
-  return await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}`, {
-    method: 'POST',
-    body: formData(data, files),
-  })
+  return apiResponse(
+    await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}`, {
+      method: 'POST',
+      body: formData(data, files),
+    }),
+  )
 }
