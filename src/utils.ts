@@ -1,4 +1,4 @@
-import type { CustomResponseCallbackData, FileData } from './types'
+import type { CustomResponseCallbackData, FileData, ApiResponse } from './types'
 import { Components } from './builder/components'
 
 export const apiUrl = 'https://discord.com/api/v10'
@@ -35,7 +35,7 @@ export const formData = (data?: CustomResponseCallbackData, files?: FileData[]) 
   return body
 }
 
-export const apiResponse = (res: Response) => {
+export const apiResponse = (res: Response): ApiResponse => {
   const xRateLimit = {
     RetryAfter: res.headers.get('Retry-After'),
     Limit: res.headers.get('X-RateLimit-Limit'),
@@ -48,3 +48,5 @@ export const apiResponse = (res: Response) => {
   }
   return { res, xRateLimit }
 }
+
+export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, Math.max(ms, 0)))

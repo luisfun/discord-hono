@@ -144,7 +144,7 @@ class DiscordHonoBase<E extends Env = Env> {
     return new Response('Not Found.', { status: 404 })
   }
 
-  scheduled = async (event: CronEvent, env: E['Bindings'] | EnvDiscordKey, executionCtx: ExecutionContext) => {
+  scheduled = async (event: CronEvent, env: E['Bindings'] | EnvDiscordKey, executionCtx?: ExecutionContext) => {
     if (!this.#cronHandlers) throw new Error('Handlers is not set. Set by app.cronHandlers')
     const discord = this.#discordKeyHandler
       ? this.#discordKeyHandler(env)
@@ -155,7 +155,13 @@ class DiscordHonoBase<E extends Env = Env> {
         } as DiscordKey)
     const index = this.#cronHandlers.findIndex(e => e[0] === event.cron || e[0] === '')
     const handler = this.#cronHandlers[index][1]
-    await handler(new CronContext(event, env, executionCtx, discord))
+    if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(new CronContext(event, env, executionCtx, discord)))
+    else {
+      console.log(
+        'The process does not apply waitUntil. it would be helpful if you could contact the developer of discord-hono.',
+      )
+      await handler(new CronContext(event, env, executionCtx, discord))
+    }
   }
 }
 

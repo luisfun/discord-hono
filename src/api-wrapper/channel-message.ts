@@ -13,12 +13,17 @@ export const postMessage = async (
   ...files: FileData[]
 ) => {
   if (!token) throw new Error('DISCORD_TOKEN is not set. Set up in app.discordKey or use postMessage.')
-  return apiResponse(
-    await fetch(
-      `${apiUrl}/channels/${channelId}/messages`,
-      addToken(token, { method: 'POST', body: formData(data, files) }),
-    ),
-  )
+  try {
+    return apiResponse(
+      await fetch(
+        `${apiUrl}/channels/${channelId}/messages`,
+        addToken(token, { method: 'POST', body: formData(data, files) }),
+      ),
+    )
+  } catch (e) {
+    console.warn('API fetch() Error: POST message\n', e)
+    return undefined
+  }
 }
 
 /**
@@ -26,9 +31,14 @@ export const postMessage = async (
  */
 export const deleteMessage = async (token: string | undefined, channelId: string, messageId: string) => {
   if (!token) throw new Error('DISCORD_TOKEN is not set. Set up in app.discordKey or use deleteMessage.')
-  return apiResponse(
-    await fetch(`${apiUrl}/channels/${channelId}/messages/${messageId}`, addToken(token, { method: 'DELETE' })),
-  )
+  try {
+    return apiResponse(
+      await fetch(`${apiUrl}/channels/${channelId}/messages/${messageId}`, addToken(token, { method: 'DELETE' })),
+    )
+  } catch (e) {
+    console.warn('API fetch() Error: DELETE message\n', e)
+    return undefined
+  }
 }
 
 /**
@@ -46,10 +56,15 @@ export const followupMessage = async (
   if (!applicationId)
     throw new Error('DISCORD_APPLICATION_ID is not set. Set up in app.discordKey or use followupMessage.')
   if (!interactionToken) throw new Error('Interaction Token is not set. You can use followupMessage.')
-  return apiResponse(
-    await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}`, {
-      method: 'POST',
-      body: formData(data, files),
-    }),
-  )
+  try {
+    return apiResponse(
+      await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}`, {
+        method: 'POST',
+        body: formData(data, files),
+      }),
+    )
+  } catch (e) {
+    console.warn('API fetch() Error: POST followup\n', e)
+    return undefined
+  }
 }

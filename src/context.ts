@@ -28,8 +28,9 @@ import type {
   InteractionModalData,
   CustomResponseCallbackData,
   FileData,
+  ApiResponse,
 } from './types'
-import { ResponseJson } from './utils'
+import { ResponseJson, sleep } from './utils'
 import { postMessage, deleteMessage, followupMessage } from './api-wrapper/channel-message'
 import { Modal } from './builder/modal'
 import { Components } from './builder/components'
@@ -51,6 +52,8 @@ class ContextBase<E extends Env> {
   #executionCtx: ExecutionCtx
   protected discord: DiscordKey
   #var: E['Variables'] = {}
+  #rateLimitControl: boolean = true
+  protected apiRes: ApiResponse | undefined = undefined
   constructor(env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordKey) {
     this.#env = env
     this.#executionCtx = executionCtx
@@ -79,17 +82,40 @@ class ContextBase<E extends Env> {
   get var(): Readonly<E['Variables'] & ContextVariableMap> {
     return { ...this.#var } as never
   }
+  rateLimitControl = (flag: boolean) => (this.#rateLimitControl = flag)
+  protected apiWait = async () => {
+    if (!this.#rateLimitControl || !this.apiRes) return null
+    if (this.apiRes.res.status === 429) {
+      const ms = Number(this.apiRes.xRateLimit.RetryAfter || 60) * 1000
+      console.log('===== API Rate Limit =====\nsleep: ', ms, '\n', this.apiRes.xRateLimit, '\n')
+      await sleep(ms)
+    } else {
+      const ms = Math.max((3 - Number(this.apiRes.xRateLimit.Remaining || 5)) * 500, 0)
+      if (ms === 0) return null
+      await sleep(ms)
+    }
+    return null
+  }
 
   /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param files FileData: { blob: Blob, name: string }
    */
-  post = async (channelId: string, data: CustomResponseCallbackData, ...files: FileData[]) =>
-    await postMessage(this.discord.TOKEN, channelId, data, ...files)
+  post = async (channelId: string, data: CustomResponseCallbackData, ...files: FileData[]) => {
+    await this.apiWait()
+    const res = await postMessage(this.discord.TOKEN, channelId, data, ...files)
+    if (res) this.apiRes = res
+    return res
+  }
   postText = async (channelId: string, content: string) => await this.post(channelId, { content })
   postEmbeds = async (channelId: string, ...embeds: APIEmbed[]) => await this.post(channelId, { embeds })
 
-  delete = async (channelId: string, messageId: string) => await deleteMessage(this.discord.TOKEN, channelId, messageId)
+  delete = async (channelId: string, messageId: string) => {
+    await this.apiWait()
+    const res = await deleteMessage(this.discord.TOKEN, channelId, messageId)
+    if (res) this.apiRes = res
+    return res
+  }
 }
 
 // prettier-ignore
@@ -152,8 +178,12 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file FileData: { blob: Blob, name: string }
    */
-  followup = async (data: CustomResponseCallbackData, ...files: FileData[]) =>
-    await followupMessage(this.discord.APPLICATION_ID, this.interaction.token, data, ...files)
+  followup = async (data: CustomResponseCallbackData, ...files: FileData[]) => {
+    await this.apiWait()
+    const res = await followupMessage(this.discord.APPLICATION_ID, this.interaction.token, data, ...files)
+    if (res) this.apiRes = res
+    return res
+  }
   followupEphemeral = async (data: CustomResponseCallbackData, ...files: FileData[]) =>
     await this.followup({ flags: 1 << 6, ...data }, ...files)
   followupText = async (content: string) => await this.followup({ content })
@@ -169,7 +199,10 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   post = async (channelId: string, data: CustomResponseCallbackData, ...files: FileData[]) => {
     const id = channelId || this.#interaction?.channel?.id
     if (!id) throw new Error('channelId is not set.')
-    return await postMessage(this.discord.TOKEN, id, data, ...files)
+    await this.apiWait()
+    const res = await postMessage(this.discord.TOKEN, id, data, ...files)
+    if (res) this.apiRes = res
+    return res
   }
 
   delete = async (channelId?: string, messageId?: string) => {
@@ -177,7 +210,10 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     const mId = messageId || this.#interaction?.message?.id
     if (!cId) throw new Error('channelId is not set.')
     if (!mId) throw new Error('messageId is not set.')
-    return await deleteMessage(this.discord.TOKEN, cId, mId)
+    await this.apiWait()
+    const res = await deleteMessage(this.discord.TOKEN, cId, mId)
+    if (res) this.apiRes = res
+    return res
   }
 }
 

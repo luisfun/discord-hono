@@ -110,3 +110,19 @@ export type FileData = {
   blob: Blob
   name: string
 }
+
+////////// ApiResponse //////////
+
+export type ApiResponse = {
+  res: Response
+  xRateLimit: {
+    RetryAfter: string | null
+    Limit: string | null
+    Remaining: string | null
+    Reset: string | null
+    ResetAfter: string | null
+    Bucket: string | null
+    Scope: string | null
+    Global: string | null
+  }
+}
