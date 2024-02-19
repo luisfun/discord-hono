@@ -66,7 +66,8 @@ await register(
 
 ### Other Examples
 
-- [Using Cloudflare AI](https://github.com/LuisFun/discord-bot-cloudflare-ai)
+- [Using Cloudflare AI](https://github.com/LuisFun/discord-bot-cloudflare-ai) - AI bot
+- [Using Cloudflare D1, Cron](https://github.com/LuisFun/discord-bot-hoyo-news) - news bot
 
 ## References
 
