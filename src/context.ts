@@ -233,14 +233,16 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
   ) {
     super(req, env, executionCtx, discord, interaction)
     this.#command = command
-    if (interaction?.data && 'options' in interaction?.data && interaction.data.options && this.#command) {
+    if (interaction?.data && 'options' in interaction?.data && interaction.data.options) {
       this.#valuesMap = interaction.data.options.reduce((obj: CommandValuesMap, e) => {
         if (e.type === 1 || e.type === 2) return obj // sub command
         obj[e.name] = e.value
         return obj
       }, {})
-      const names = this.#command.options?.map(e => e.name)
-      if (this.#valuesMap && names) this.#values = names.map(e => this.#valuesMap[e])
+      if (this.#command) {
+        const names = this.#command.options?.map(e => e.name)
+        if (this.#valuesMap && names) this.#values = names.map(e => this.#valuesMap[e])
+      }
     }
   }
 
