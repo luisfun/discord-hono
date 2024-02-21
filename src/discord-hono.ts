@@ -6,7 +6,6 @@ import type {
   EnvDiscordKey,
   ExecutionContext,
   CronEvent,
-  ApplicationCommand,
   TypeCommandHandler,
   TypeComponentHandler,
   TypeModalHandler,
@@ -19,25 +18,14 @@ import type {
   DiscordKey,
 } from './types'
 import { ResponseJson } from './utils'
-import { Command } from './builder/command'
 import { CommandHandlers, ComponentHandlers, ModalHandlers, CronHandlers } from './builder/handler'
 
 class DiscordHonoBase<E extends Env = Env> {
-  #commands: ApplicationCommand[] | undefined = undefined
   #commandHandlers: Handlers<TypeCommandHandler<E>> | undefined = undefined
   #componentHandlers: Handlers<TypeComponentHandler<E>> | undefined = undefined
   #modalHandlers: Handlers<TypeModalHandler<E>> | undefined = undefined
   #cronHandlers: Handlers<TypeCronHandler<E>> | undefined = undefined
   #discordKeyHandler: DiscordKeyHandler<E> | undefined = undefined
-
-  commands = (e: (Command | ApplicationCommand)[]) => {
-    const commands = e.map(cmd => {
-      if (cmd instanceof Command) return cmd.build()
-      return cmd
-    })
-    this.#commands = commands
-    return this
-  }
 
   handlers = (
     handlers:
@@ -97,16 +85,13 @@ class DiscordHonoBase<E extends Env = Env> {
           return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
         }
         case 2: {
-          if (!this.#commands) throw new Error('Commands is not set. Set by app.commands')
           if (!this.#commandHandlers) throw new Error('Handlers is not set. Set by app.commandHandlers')
           const interaction = data as InteractionCommandData
           if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
           const name = interaction.data.name.toLowerCase()
           const index = this.#commandHandlers.findIndex(e => e[0].toLowerCase() === name)
           const handler = this.#commandHandlers[index][1]
-          const commandIndex = this.#commands.findIndex(e => e.name.toLowerCase() === name)
-          const command = this.#commands[commandIndex]
-          return await handler(new CommandContext(request, env, executionCtx, discord, interaction, command))
+          return await handler(new CommandContext(request, env, executionCtx, discord, interaction))
         }
         case 3: {
           if (!this.#componentHandlers) throw new Error('Handlers is not set. Set by app.componentHandlers')

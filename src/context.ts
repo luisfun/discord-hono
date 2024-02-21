@@ -22,7 +22,6 @@ import type {
   ExecutionContext,
   FetchEventLike,
   CronEvent,
-  ApplicationCommand,
   InteractionCommandData,
   InteractionComponentData,
   InteractionModalData,
@@ -217,43 +216,28 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   }
 }
 
-type CommandValue = string | number | boolean
-type CommandValuesMap = Record<string, CommandValue>
+type CommandValues = Record<string, string | number | boolean>
 export class CommandContext<E extends Env = any> extends RequestContext<E, InteractionData<2>> {
-  #command: ApplicationCommand
-  #values: CommandValue[] = []
-  #valuesMap: CommandValuesMap = {}
+  #values: CommandValues = {}
   constructor(
     req: Request,
     env: E['Bindings'],
     executionCtx: ExecutionCtx,
     discord: DiscordKey,
     interaction: InteractionData<2>,
-    command: ApplicationCommand,
   ) {
     super(req, env, executionCtx, discord, interaction)
-    this.#command = command
     if (interaction?.data && 'options' in interaction?.data && interaction.data.options) {
-      this.#valuesMap = interaction.data.options.reduce((obj: CommandValuesMap, e) => {
+      this.#values = interaction.data.options.reduce((obj: CommandValues, e) => {
         if (e.type === 1 || e.type === 2) return obj // sub command
         obj[e.name] = e.value
         return obj
       }, {})
-      if (this.#command) {
-        const names = this.#command.options?.map(e => e.name)
-        if (this.#valuesMap && names) this.#values = names.map(e => this.#valuesMap[e])
-      }
     }
   }
 
-  get command(): ApplicationCommand {
-    return this.#command
-  }
-  get values(): CommandValue[] {
+  get values(): CommandValues {
     return this.#values
-  }
-  get valuesMap(): CommandValuesMap {
-    return this.#valuesMap
   }
 
   resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
