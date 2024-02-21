@@ -17,7 +17,6 @@ index.ts
 
 ```ts
 import { DiscordHono, CommandHandlers } from 'discord-hono'
-import { commands } from './commands'
 
 const handlers = new CommandHandlers()
   .on('ping', c => c.resText('Pong!!'))
@@ -25,25 +24,13 @@ const handlers = new CommandHandlers()
     c.resDefer(async () => {
       const image = await fetch('https://luis.fun/images/hono.webp')
       const blob = new Blob([await image.arrayBuffer()])
-      await c.followup({ content: c.values[0].toString() }, { blob, name: 'image.webp' })
+      await c.followup({ content: c.values.text.toString() }, { blob, name: 'image.webp' })
     }),
   )
 
 const app = new DiscordHono()
-app.commands(commands)
 app.handlers(handlers)
 export default app
-```
-
-commands.ts
-
-```ts
-import { Command, Option } from 'discord-hono'
-
-export const commands = [
-  new Command('ping', 'response pong'),
-  new Command('image', 'response image file').options(new Option('text', 'response text').required()),
-]
 ```
 
 register.ts
@@ -51,10 +38,14 @@ register.ts
 ```ts
 import dotenv from 'dotenv'
 import process from 'node:process'
-import { register } from 'discord-hono'
-import { commands } from './commands.js' // '.js' is necessary for 'npm run register'
+import { Command, Option, register } from 'discord-hono'
 
 dotenv.config({ path: '.dev.vars' })
+
+const commands = [
+  new Command('ping', 'response pong'),
+  new Command('image', 'response image file').options(new Option('text', 'with text').required()),
+]
 
 await register(
   commands,
