@@ -9,10 +9,11 @@ import { apiUrl, addToken, formData, apiResponse } from '../utils'
 export const postMessage = async (
   token: string | undefined,
   channelId: string,
-  data: CustomResponseCallbackData,
+  data: CustomResponseCallbackData | string,
   ...files: FileData[]
 ) => {
   if (!token) throw new Error('DISCORD_TOKEN is not set. Set up in app.discordKey or use postMessage.')
+  if (typeof data === 'string') data = { content: data }
   try {
     return apiResponse(
       await fetch(
@@ -50,12 +51,13 @@ export const deleteMessage = async (token: string | undefined, channelId: string
 export const followupMessage = async (
   applicationId: string | undefined,
   interactionToken: string | undefined,
-  data: CustomResponseCallbackData,
+  data: CustomResponseCallbackData | string,
   ...files: FileData[]
 ) => {
   if (!applicationId)
     throw new Error('DISCORD_APPLICATION_ID is not set. Set up in app.discordKey or use followupMessage.')
   if (!interactionToken) throw new Error('Interaction Token is not set. You can use followupMessage.')
+  if (typeof data === 'string') data = { content: data }
   try {
     return apiResponse(
       await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}`, {
