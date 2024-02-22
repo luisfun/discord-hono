@@ -68,3 +68,24 @@ export const followupMessage = async (
     return undefined
   }
 }
+
+export const followupDeleteMessage = async (
+  applicationId: string | undefined,
+  interactionToken: string | undefined,
+  messageId: string | undefined,
+) => {
+  if (!applicationId)
+    throw new Error('DISCORD_APPLICATION_ID is not set. Set up in app.discordKey or use followupDeleteMessage.')
+  if (!interactionToken) throw new Error('Interaction Token is not set. You can use followupDeleteMessage.')
+  if (!messageId) throw new Error('Message Id is not set. You can use followupDeleteMessage.')
+  try {
+    return apiResponse(
+      await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}/messages/${messageId}`, {
+        method: 'DELETE',
+      }),
+    )
+  } catch (e) {
+    console.warn('API fetch() Error: DELETE followup\n', e)
+    return undefined
+  }
+}

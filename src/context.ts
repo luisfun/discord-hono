@@ -6,7 +6,6 @@ import type {
   APIInteractionResponseUpdateMessage,
   APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
-  APIEmbed,
   APIBaseInteraction,
   InteractionType,
   APIMessageButtonInteractionData,
@@ -30,7 +29,7 @@ import type {
   ApiResponse,
 } from './types'
 import { ResponseJson, sleep } from './utils'
-import { postMessage, deleteMessage, followupMessage } from './api-wrapper/channel-message'
+import { postMessage, deleteMessage, followupMessage, followupDeleteMessage } from './api-wrapper/channel-message'
 import { Modal } from './builder/modal'
 import { Components } from './builder/components'
 
@@ -100,20 +99,17 @@ class ContextBase<E extends Env> {
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param files FileData: { blob: Blob, name: string }
    */
-  post = async (channelId: string, data: CustomResponseCallbackData, ...files: FileData[]) => {
+  post = async (channelId: string, data: CustomResponseCallbackData | string, ...files: FileData[]) => {
     await this.apiWait()
-    const res = await postMessage(this.discord.TOKEN, channelId, data, ...files)
-    if (res) this.apiRes = res
-    return res
+    if (typeof data === 'string') data = { content: data }
+    this.apiRes = await postMessage(this.discord.TOKEN, channelId, data, ...files)
+    return this.apiRes
   }
-  postText = async (channelId: string, content: string) => await this.post(channelId, { content })
-  postEmbeds = async (channelId: string, ...embeds: APIEmbed[]) => await this.post(channelId, { embeds })
 
   delete = async (channelId: string, messageId: string) => {
     await this.apiWait()
-    const res = await deleteMessage(this.discord.TOKEN, channelId, messageId)
-    if (res) this.apiRes = res
-    return res
+    this.apiRes = await deleteMessage(this.discord.TOKEN, channelId, messageId)
+    return this.apiRes
   }
 }
 
@@ -157,15 +153,17 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @returns Response
    */
-  res = (data: CustomResponseCallbackData) =>
-    this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
-  resEphemeral = (data: CustomResponseCallbackData) => this.res({ flags: 1 << 6, ...data })
-  resText = (content: string) => this.res({ content })
-  resEmbeds = (...embeds: APIEmbed[]) => this.res({ embeds })
+  res = (data: CustomResponseCallbackData | string) => {
+    if (typeof data === 'string') data = { content: data }
+    return this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
+  }
+  resEphemeral = (data: CustomResponseCallbackData | string) => {
+    if (typeof data === 'string') data = { content: data }
+    return this.res({ flags: 1 << 6, ...data })
+  }
   resDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
     if (handler) {
-      if (!this.executionCtx.waitUntil && !this.event.waitUntil)
-        throw new Error('This command handler context has no waitUntil.')
+      if (!this.executionCtx.waitUntil && !this.event.waitUntil) throw new Error('This Context has no waitUntil.')
       if (this.executionCtx.waitUntil) this.executionCtx.waitUntil(handler(this, ...args))
       // @ts-expect-error ****************** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
       else this.event.waitUntil(handler(this, ...args))
@@ -177,16 +175,25 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file FileData: { blob: Blob, name: string }
    */
-  followup = async (data: CustomResponseCallbackData, ...files: FileData[]) => {
+  followup = async (data: CustomResponseCallbackData | string, ...files: FileData[]) => {
     await this.apiWait()
-    const res = await followupMessage(this.discord.APPLICATION_ID, this.interaction.token, data, ...files)
-    if (res) this.apiRes = res
-    return res
+    if (typeof data === 'string') data = { content: data }
+    this.apiRes = await followupMessage(this.discord.APPLICATION_ID, this.interaction.token, data, ...files)
+    return this.apiRes
   }
-  followupEphemeral = async (data: CustomResponseCallbackData, ...files: FileData[]) =>
-    await this.followup({ flags: 1 << 6, ...data }, ...files)
-  followupText = async (content: string) => await this.followup({ content })
-  followupEmbeds = async (...embeds: APIEmbed[]) => await this.followup({ embeds })
+  followupEphemeral = async (data: CustomResponseCallbackData | string, ...files: FileData[]) => {
+    if (typeof data === 'string') data = { content: data }
+    return await this.followup({ flags: 1 << 6, ...data }, ...files)
+  }
+
+  followupDelete = async (applicationId?: string, interactionToken?: string, messageId?: string) => {
+    const appId = applicationId || this.discord.APPLICATION_ID
+    const token = interactionToken || this.#interaction.token
+    const mId = messageId || this.#interaction?.message?.id
+    await this.apiWait()
+    this.apiRes = await followupDeleteMessage(appId, token, mId)
+    return this.apiRes
+  }
 
   /**
    * Used to send messages other than res*** and followup***.
@@ -195,13 +202,13 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param file FileData: { blob: Blob, name: string }
    * @returns
    */
-  post = async (channelId: string, data: CustomResponseCallbackData, ...files: FileData[]) => {
+  post = async (channelId: string, data: CustomResponseCallbackData | string, ...files: FileData[]) => {
     const id = channelId || this.#interaction?.channel?.id
     if (!id) throw new Error('channelId is not set.')
     await this.apiWait()
-    const res = await postMessage(this.discord.TOKEN, id, data, ...files)
-    if (res) this.apiRes = res
-    return res
+    if (typeof data === 'string') data = { content: data }
+    this.apiRes = await postMessage(this.discord.TOKEN, id, data, ...files)
+    return this.apiRes
   }
 
   delete = async (channelId?: string, messageId?: string) => {
@@ -210,9 +217,8 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     if (!cId) throw new Error('channelId is not set.')
     if (!mId) throw new Error('messageId is not set.')
     await this.apiWait()
-    const res = await deleteMessage(this.discord.TOKEN, cId, mId)
-    if (res) this.apiRes = res
-    return res
+    this.apiRes = await deleteMessage(this.discord.TOKEN, cId, mId)
+    return this.apiRes
   }
 }
 
@@ -278,21 +284,34 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
     return this.#interaction as ComponentInteractionData<T>
   }
 
-  resUpdate = (data: CustomResponseCallbackData) =>
-    this.resBase({ type: 7, data } as APIInteractionResponseUpdateMessage)
-  resUpdateText = (content: string) => this.resUpdate({ content })
-  resUpdateEmbeds = (...embeds: APIEmbed[]) => this.resUpdate({ embeds })
+  resUpdate = (data: CustomResponseCallbackData | string) => {
+    if (typeof data === 'string') data = { content: data }
+    return this.resBase({ type: 7, data } as APIInteractionResponseUpdateMessage)
+  }
   resUpdateDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
     if (handler) {
-      if (!this.executionCtx.waitUntil && !this.event.waitUntil)
-        throw new Error('This command handler context has no waitUntil. You can use .handler(command_handler).')
+      if (!this.executionCtx.waitUntil && !this.event.waitUntil) throw new Error('This Context has no waitUntil.')
       if (this.executionCtx.waitUntil) this.executionCtx.waitUntil(handler(this, ...args))
       // @ts-expect-error ****************** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
       else this.event.waitUntil(handler(this, ...args))
     }
     return this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
   }
-  resUpdateDelete = () => this.resUpdateDefer(async () => await this.delete())
+  /**
+   * Delete the previous message and post a new one.
+   * If the argument is empty, only message deletion is performed.
+   * Internally, it hits the API endpoint of followup.
+   */
+  resRepost = (data?: CustomResponseCallbackData | string) => {
+    if (!data) return this.resUpdateDefer(async () => await this.followupDelete())
+    if (!this.executionCtx.waitUntil && !this.event.waitUntil)
+      throw new Error('This Context has no waitUntil. You can use .res() and .followupDelete().')
+    if (this.executionCtx.waitUntil)
+      this.executionCtx.waitUntil(this.followupDelete(undefined, undefined, this.#interaction.message?.id))
+    // @ts-expect-error ****************** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
+    else this.event.waitUntil(this.followupDelete(undefined, undefined, this.#interaction.message?.id))
+    return this.res(data)
+  }
   resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
     const data = e instanceof Modal ? e.build() : e
     return this.resBase({ type: 9, data } as APIModalInteractionResponse)
