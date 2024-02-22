@@ -19,7 +19,7 @@ index.ts
 import { DiscordHono, CommandHandlers } from 'discord-hono'
 
 const handlers = new CommandHandlers()
-  .on('ping', c => c.resText('Pong!!'))
+  .on('ping', c => c.res('Pong!!'))
   .on('image', c =>
     c.resDefer(async () => {
       const image = await fetch('https://luis.fun/images/hono.webp')
