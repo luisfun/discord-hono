@@ -26,7 +26,6 @@ import type {
   InteractionModalData,
   CustomResponseCallbackData,
   FileData,
-  ApiResponse,
 } from './types'
 import { ResponseJson } from './utils'
 import { followupMessage, followupDeleteMessage } from './api-wrapper/channel-message'
@@ -50,7 +49,6 @@ class ContextBase<E extends Env> {
   #executionCtx: ExecutionCtx
   protected discord: DiscordKey
   #var: E['Variables'] = {}
-  protected apiRes: ApiResponse | undefined = undefined
   constructor(env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordKey) {
     this.#env = env
     this.#executionCtx = executionCtx

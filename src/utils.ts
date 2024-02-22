@@ -1,4 +1,4 @@
-import type { CustomResponseCallbackData, FileData, ApiResponse } from './types'
+import type { CustomResponseCallbackData, FileData } from './types'
 import { Components } from './builder/components'
 
 export const apiUrl = 'https://discord.com/api/v10'
