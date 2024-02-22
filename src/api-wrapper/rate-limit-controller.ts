@@ -12,9 +12,9 @@ type XRateLimit = {
 export class ApiRateLimitController {
   protected response: Response | undefined = undefined
   protected xRateLimit: XRateLimit | undefined = undefined
-  set res(res: Response) {
+  set res(res: Response | undefined) {
     this.response = res
-    this.xRateLimit = getXRateLimit(res)
+    if (res) this.xRateLimit = getXRateLimit(res)
   }
   get headers() {
     return this.xRateLimit
