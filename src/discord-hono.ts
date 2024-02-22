@@ -18,38 +18,30 @@ import type {
   DiscordKey,
 } from './types'
 import { ResponseJson } from './utils'
-import { CommandHandlers, ComponentHandlers, ModalHandlers, CronHandlers } from './builder/handler'
 
-class DiscordHonoBase<E extends Env = Env> {
-  #commandHandlers: Handlers<TypeCommandHandler<E>> | undefined = undefined
-  #componentHandlers: Handlers<TypeComponentHandler<E>> | undefined = undefined
-  #modalHandlers: Handlers<TypeModalHandler<E>> | undefined = undefined
-  #cronHandlers: Handlers<TypeCronHandler<E>> | undefined = undefined
+class DiscordHonoBase<E extends Env> {
+  #commandHandlers: Handlers<TypeCommandHandler<E>> = []
+  #componentHandlers: Handlers<TypeComponentHandler<E>> = []
+  #modalHandlers: Handlers<TypeModalHandler<E>> = []
+  #cronHandlers: Handlers<TypeCronHandler<E>> = []
   #discordKeyHandler: DiscordKeyHandler<E> | undefined = undefined
 
-  handlers = (
-    handlers:
-      | CommandHandlers
-      | ComponentHandlers
-      | ModalHandlers
-      | CronHandlers
-      | Handlers<TypeCommandHandler>
-      | Handlers<TypeComponentHandler>
-      | Handlers<TypeModalHandler>
-      | Handlers<TypeCronHandler>,
-    type?: 'command' | 'component' | 'modal' | 'cron',
-  ) => {
-    if (handlers instanceof CommandHandlers) this.#commandHandlers = handlers.build()
-    if (handlers instanceof ComponentHandlers) this.#componentHandlers = handlers.build()
-    if (handlers instanceof ModalHandlers) this.#modalHandlers = handlers.build()
-    if (handlers instanceof CronHandlers) this.#cronHandlers = handlers.build()
-    if (type === 'command') this.#commandHandlers = handlers as Handlers<TypeCommandHandler<E>>
-    if (type === 'component') this.#componentHandlers = handlers as Handlers<TypeComponentHandler<E>>
-    if (type === 'modal') this.#modalHandlers = handlers as Handlers<TypeModalHandler<E>>
-    if (type === 'cron') this.#cronHandlers = handlers as Handlers<TypeCronHandler<E>>
+  command = (command: string, handler: TypeCommandHandler<E>) => {
+    this.#commandHandlers.push([command, handler])
     return this
   }
-
+  component = (componentId: string, handler: TypeComponentHandler<E>) => {
+    this.#componentHandlers.push([componentId, handler])
+    return this
+  }
+  modal = (modalId: string, handler: TypeModalHandler<E>) => {
+    this.#modalHandlers.push([modalId, handler])
+    return this
+  }
+  cron = (cronId: string, handler: TypeCronHandler<E>) => {
+    this.#cronHandlers.push([cronId, handler])
+    return this
+  }
   discordKey = (handler: DiscordKeyHandler<E>) => {
     this.#discordKeyHandler = handler
     return this
@@ -85,7 +77,7 @@ class DiscordHonoBase<E extends Env = Env> {
           return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
         }
         case 2: {
-          if (!this.#commandHandlers) throw new Error('Handlers is not set. Set by app.commandHandlers')
+          if (!this.#commandHandlers[0]) throw new Error('Handler is not set. Set by .command()')
           const interaction = data as InteractionCommandData
           if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
           const name = interaction.data.name.toLowerCase()
@@ -94,7 +86,7 @@ class DiscordHonoBase<E extends Env = Env> {
           return await handler(new CommandContext(request, env, executionCtx, discord, interaction))
         }
         case 3: {
-          if (!this.#componentHandlers) throw new Error('Handlers is not set. Set by app.componentHandlers')
+          if (!this.#componentHandlers[0]) throw new Error('Handler is not set. Set by .component()')
           const interaction = data as InteractionComponentData
           if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
           const customId = interaction.data.custom_id
@@ -105,7 +97,7 @@ class DiscordHonoBase<E extends Env = Env> {
           return await handler(new ComponentContext(request, env, executionCtx, discord, interaction))
         }
         case 5: {
-          if (!this.#modalHandlers) throw new Error('Handlers is not set. Set by app.modalHandlers')
+          if (!this.#modalHandlers[0]) throw new Error('Handler is not set. Set by .modal()')
           const interaction = data as InteractionModalData
           if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
           const customId = interaction.data.custom_id
@@ -130,7 +122,7 @@ class DiscordHonoBase<E extends Env = Env> {
   }
 
   scheduled = async (event: CronEvent, env: E['Bindings'] | EnvDiscordKey, executionCtx?: ExecutionContext) => {
-    if (!this.#cronHandlers) throw new Error('Handlers is not set. Set by app.cronHandlers')
+    if (!this.#cronHandlers[0]) throw new Error('Handler is not set. Set by .cron()')
     const discord = this.#discordKeyHandler
       ? this.#discordKeyHandler(env)
       : ({
