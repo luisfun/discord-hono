@@ -127,7 +127,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   }
   resEphemeral = (data: CustomResponseCallbackData | string) => {
     if (typeof data === 'string') data = { content: data }
-    return this.res({ flags: 1 << 6, ...data })
+    return this.res({ ...data, flags: 1 << 6 })
   }
   resDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
     if (handler) {
@@ -147,7 +147,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     await followupMessage(this.discord.APPLICATION_ID, this.interaction.token, data, ...files)
   followupEphemeral = async (data: CustomResponseCallbackData | string, ...files: FileData[]) => {
     if (typeof data === 'string') data = { content: data }
-    return await this.followup({ flags: 1 << 6, ...data }, ...files)
+    return await this.followup({ ...data, flags: 1 << 6 }, ...files)
   }
 
   followupDelete = async (applicationId?: string, interactionToken?: string, messageId?: string) => {
@@ -247,6 +247,10 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
     // @ts-expect-error ****************** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
     else this.event.waitUntil(this.followupDelete(undefined, undefined, this.#interaction.message?.id))
     return this.res(data)
+  }
+  resRepostEphemeral = (data: CustomResponseCallbackData | string) => {
+    if (typeof data === 'string') data = { content: data }
+    return this.resRepost({ ...data, flags: 1 << 6 })
   }
   resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
     const data = e instanceof Modal ? e.build() : e

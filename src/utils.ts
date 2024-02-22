@@ -9,8 +9,8 @@ export class ResponseJson extends Response {
     const initJson = {
       ...init,
       headers: {
-        'content-type': 'application/json;charset=UTF-8',
         ...init?.headers,
+        'content-type': 'application/json;charset=UTF-8',
       },
     }
     super(body, initJson)
