@@ -2,12 +2,11 @@
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
     /* Language and Environment */
-    "target": "es2017",
+    "target": "ES2020",
     /* Modules */
     "module": "commonjs",
     /* Emit */
     "declaration": true,
-    "sourceMap": true,
     "outDir": "./dist",
     /* Interop Constraints */
     "esModuleInterop": true,
