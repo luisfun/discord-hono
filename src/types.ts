@@ -9,7 +9,6 @@ import type {
   ApplicationCommandType,
   APIInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
-import type { CommandContext, ComponentContext, ModalContext, CronContext } from './context'
 import type { Components } from './builder/components'
 
 ////////// Env //////////
@@ -47,17 +46,6 @@ export type ApplicationCommand = Omit<
   default_member_permissions?: string | null
   version?: string
 }
-
-////////// Handlers //////////
-
-export type TypeCommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
-export type TypeComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<Response> | Response
-export type TypeModalHandler<E extends Env = any> = (c: ModalContext<E>) => Promise<Response> | Response
-export type TypeCronHandler<E extends Env = any> = (c: CronContext<E>) => Promise<unknown>
-export type Handlers<H extends TypeCommandHandler | TypeComponentHandler | TypeModalHandler | TypeCronHandler> = [
-  string,
-  H,
-][]
 
 ////////// EnvHandler //////////
 

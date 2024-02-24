@@ -13,6 +13,11 @@
     "forceConsistentCasingInFileNames": true,
     /* Type Checking */
     "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    //"noUncheckedIndexedAccess": true,
     /* Completeness */
     "skipLibCheck": true
   },

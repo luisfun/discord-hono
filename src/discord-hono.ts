@@ -6,11 +6,6 @@ import type {
   EnvDiscordKey,
   ExecutionContext,
   CronEvent,
-  TypeCommandHandler,
-  TypeComponentHandler,
-  TypeModalHandler,
-  TypeCronHandler,
-  Handlers,
   DiscordKeyHandler,
   InteractionCommandData,
   InteractionComponentData,
@@ -19,26 +14,33 @@ import type {
 } from './types'
 import { ResponseJson } from './utils'
 
+type CommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
+type ComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<Response> | Response
+type ModalHandler<E extends Env = any> = (c: ModalContext<E>) => Promise<Response> | Response
+type CronHandler<E extends Env = any> = (c: CronContext<E>) => Promise<unknown>
+type Handler = CommandHandler | ComponentHandler | ModalHandler | CronHandler
+type Handlers<H extends Handler> = [string, H][]
+
 class DiscordHonoBase<E extends Env> {
-  #commandHandlers: Handlers<TypeCommandHandler<E>> = []
-  #componentHandlers: Handlers<TypeComponentHandler<E>> = []
-  #modalHandlers: Handlers<TypeModalHandler<E>> = []
-  #cronHandlers: Handlers<TypeCronHandler<E>> = []
+  #commandHandlers: Handlers<CommandHandler<E>> = []
+  #componentHandlers: Handlers<ComponentHandler<E>> = []
+  #modalHandlers: Handlers<ModalHandler<E>> = []
+  #cronHandlers: Handlers<CronHandler<E>> = []
   #discordKeyHandler: DiscordKeyHandler<E> | undefined = undefined
 
-  command = (command: string, handler: TypeCommandHandler<E>) => {
+  command = (command: string, handler: CommandHandler<E>) => {
     this.#commandHandlers.push([command, handler])
     return this
   }
-  component = (componentId: string, handler: TypeComponentHandler<E>) => {
+  component = (componentId: string, handler: ComponentHandler<E>) => {
     this.#componentHandlers.push([componentId, handler])
     return this
   }
-  modal = (modalId: string, handler: TypeModalHandler<E>) => {
+  modal = (modalId: string, handler: ModalHandler<E>) => {
     this.#modalHandlers.push([modalId, handler])
     return this
   }
-  cron = (cronId: string, handler: TypeCronHandler<E>) => {
+  cron = (cronId: string, handler: CronHandler<E>) => {
     this.#cronHandlers.push([cronId, handler])
     return this
   }
@@ -77,35 +79,21 @@ class DiscordHonoBase<E extends Env> {
           return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
         }
         case 2: {
-          if (!this.#commandHandlers[0]) throw new Error('Handler is not set. Set by .command()')
           const interaction = data as InteractionCommandData
           if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
-          const name = interaction.data.name.toLowerCase()
-          const index = this.#commandHandlers.findIndex(e => e[0].toLowerCase() === name)
-          const handler = this.#commandHandlers[index][1]
+          const { handler } = getHandler<CommandHandler>(this.#commandHandlers, interaction.data.name.toLowerCase())
           return await handler(new CommandContext(request, env, executionCtx, discord, interaction))
         }
         case 3: {
-          if (!this.#componentHandlers[0]) throw new Error('Handler is not set. Set by .component()')
-          const interaction = data as InteractionComponentData
-          if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
-          const customId = interaction.data.custom_id
-          const uniqueId = customId.split(';')[0]
-          const index = this.#componentHandlers.findIndex(e => e[0] === uniqueId || e[0] === '')
-          const handler = this.#componentHandlers[index][1]
-          interaction.data.custom_id = customId.slice(uniqueId.length + 1)
-          return await handler(new ComponentContext(request, env, executionCtx, discord, interaction))
+          const { handler, interact } = getHandler<ComponentHandler>(
+            this.#componentHandlers,
+            data as InteractionComponentData,
+          )
+          return await handler(new ComponentContext(request, env, executionCtx, discord, interact))
         }
         case 5: {
-          if (!this.#modalHandlers[0]) throw new Error('Handler is not set. Set by .modal()')
-          const interaction = data as InteractionModalData
-          if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
-          const customId = interaction.data.custom_id
-          const uniqueId = customId.split(';')[0]
-          const index = this.#modalHandlers.findIndex(e => e[0] === uniqueId || e[0] === '')
-          const handler = this.#modalHandlers[index][1]
-          interaction.data.custom_id = customId.slice(uniqueId.length + 1)
-          return await handler(new ModalContext(request, env, executionCtx, discord, interaction))
+          const { handler, interact } = getHandler<ModalHandler>(this.#modalHandlers, data as InteractionModalData)
+          return await handler(new ModalContext(request, env, executionCtx, discord, interact))
         }
         case 4: {
           console.warn('interaction.type: ', data.type)
@@ -122,7 +110,6 @@ class DiscordHonoBase<E extends Env> {
   }
 
   scheduled = async (event: CronEvent, env: E['Bindings'] | EnvDiscordKey, executionCtx?: ExecutionContext) => {
-    if (!this.#cronHandlers[0]) throw new Error('Handler is not set. Set by .cron()')
     const discord = this.#discordKeyHandler
       ? this.#discordKeyHandler(env)
       : ({
@@ -130,8 +117,7 @@ class DiscordHonoBase<E extends Env> {
           TOKEN: env?.DISCORD_TOKEN,
           PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY,
         } as DiscordKey)
-    const index = this.#cronHandlers.findIndex(e => e[0] === event.cron || e[0] === '')
-    const handler = this.#cronHandlers[index][1]
+    const { handler } = getHandler<CronHandler>(this.#cronHandlers, event.cron)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(new CronContext(event, env, executionCtx, discord)))
     else {
       console.log(
@@ -140,6 +126,28 @@ class DiscordHonoBase<E extends Env> {
       await handler(new CronContext(event, env, executionCtx, discord))
     }
   }
+}
+
+const getHandler = <
+  H extends Handler,
+  Hs extends Handlers<H> = any,
+  I extends string | InteractionComponentData | InteractionModalData = any,
+>(
+  handlers: Hs,
+  interact: I,
+) => {
+  if (!handlers[0]) throw new Error('Handlers is not set.')
+  let str = ''
+  if (typeof interact === 'string') str = interact
+  else {
+    if (!interact.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
+    const id = interact.data.custom_id
+    str = id.split(';')[0]
+    interact.data.custom_id = id.slice(str.length + 1)
+  }
+  const index = handlers.findIndex(e => e[0] === str || e[0] === '')
+  const handler = handlers[index][1]
+  return { handler, interact }
 }
 
 /**
