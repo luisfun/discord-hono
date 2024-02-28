@@ -24,10 +24,10 @@ import type {
   InteractionCommandData,
   InteractionComponentData,
   InteractionModalData,
-  CustomResponseCallbackData,
-  FileData,
+  CustomResponseData,
+  ArgFileData,
 } from './types'
-import { ResponseJson } from './utils'
+import { ResponseJson, ephemeralData } from './utils'
 import { followupMessage, followupDeleteMessage } from './api-wrapper/channel-message'
 import { Modal } from './builder/modal'
 import { Components } from './builder/components'
@@ -113,9 +113,12 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * [Check Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type)
    */
   resBase = (json: APIInteractionResponse) => {
-    if ('data' in json && json.data && 'components' in json.data) {
-      const components = json.data.components
-      json.data.components = components instanceof Components ? components.build() : components
+    if ('data' in json && json.data) {
+      if (typeof json.data === 'string') json.data = { content: json.data }
+      else if ('components' in json.data) {
+        const components = json.data.components
+        json.data.components = components instanceof Components ? components.build() : components
+      }
     }
     return new ResponseJson(json)
   }
@@ -124,14 +127,9 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @returns Response
    */
-  res = (data: CustomResponseCallbackData | string) => {
-    if (typeof data === 'string') data = { content: data }
-    return this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
-  }
-  resEphemeral = (data: CustomResponseCallbackData | string) => {
-    if (typeof data === 'string') data = { content: data }
-    return this.res({ ...data, flags: 1 << 6 })
-  }
+  res = (data: CustomResponseData) =>
+    this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
+  resEphemeral = (data: CustomResponseData) => this.res(ephemeralData(data))
   resDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
     if (handler) this.waitUntil(handler(this, ...args))
     return this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
@@ -141,17 +139,14 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file FileData: { blob: Blob, name: string }
    */
-  followup = async (data: CustomResponseCallbackData | string, ...files: FileData[]) =>
-    await followupMessage(this.discord.APPLICATION_ID, this.interaction.token, data, ...files)
-  followupEphemeral = async (data: CustomResponseCallbackData | string, ...files: FileData[]) => {
-    if (typeof data === 'string') data = { content: data }
-    return await this.followup({ ...data, flags: 1 << 6 }, ...files)
-  }
-
+  followup = async (data: CustomResponseData, file: ArgFileData) =>
+    await followupMessage(this.discord.APPLICATION_ID, this.interaction.token, data, file)
+  followupEphemeral = async (data: CustomResponseData, file: ArgFileData) =>
+    await this.followup(ephemeralData(data), file)
   followupDelete = async (applicationId?: string, interactionToken?: string, messageId?: string) => {
     const appId = applicationId || this.discord.APPLICATION_ID
     const token = interactionToken || this.#interaction.token
-    const mId = messageId || this.#interaction?.message?.id
+    const mId = messageId || this.#interaction.message?.id
     return await followupDeleteMessage(appId, token, mId)
   }
 }
@@ -218,7 +213,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
     return this.#interaction as ComponentInteractionData<T>
   }
 
-  resUpdate = (data: CustomResponseCallbackData | string) => {
+  resUpdate = (data: CustomResponseData) => {
     if (typeof data === 'string') data = { content: data }
     return this.resBase({ type: 7, data } as APIInteractionResponseUpdateMessage)
   }
@@ -231,15 +226,12 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
    * If the argument is empty, only message deletion is performed.
    * Internally, it hits the API endpoint of followup.
    */
-  resRepost = (data?: CustomResponseCallbackData | string) => {
+  resRepost = (data?: CustomResponseData) => {
     if (!data) return this.resUpdateDefer(async () => await this.followupDelete())
     this.waitUntil(this.followupDelete(undefined, undefined, this.#interaction.message?.id))
     return this.res(data)
   }
-  resRepostEphemeral = (data: CustomResponseCallbackData | string) => {
-    if (typeof data === 'string') data = { content: data }
-    return this.resRepost({ ...data, flags: 1 << 6 })
-  }
+  resRepostEphemeral = (data: CustomResponseData) => this.resRepost(ephemeralData(data))
   resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
     const data = e instanceof Modal ? e.build() : e
     return this.resBase({ type: 9, data } as APIModalInteractionResponse)

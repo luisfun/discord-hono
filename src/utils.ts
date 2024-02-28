@@ -1,4 +1,4 @@
-import type { CustomResponseCallbackData, FileData } from './types'
+import type { CustomResponseData, ArgFileData } from './types'
 import { Components } from './builder/components'
 
 export const apiUrl = 'https://discord.com/api/v10'
@@ -25,12 +25,19 @@ export const addToken = (token: string, init?: RequestInit): RequestInit => ({
   },
 })
 
-export const formData = (data?: CustomResponseCallbackData, files?: FileData[]) => {
+export const formData = (data?: CustomResponseData, file?: ArgFileData) => {
   const body = new FormData()
+  if (typeof data === 'string') data = { content: data }
   if (data?.components)
     data.components = data.components instanceof Components ? data.components.build() : data.components
-  body.append('payload_json', JSON.stringify(data))
-  if (files?.[0])
-    for (let i = 0, len = files.length; i < len; i++) body.append(`files[${i}]`, files[i].blob, files[i].name)
+  if (data) body.append('payload_json', JSON.stringify(data))
+  if (Array.isArray(file))
+    for (let i = 0, len = file.length; i < len; i++) body.append(`files[${i}]`, file[i].blob, file[i].name)
+  else if (file) body.append(`files[0]`, file.blob, file.name)
   return body
+}
+
+export const ephemeralData = (data: CustomResponseData) => {
+  if (typeof data === 'string') data = { content: data }
+  return { ...data, flags: 1 << 6 }
 }
