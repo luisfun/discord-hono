@@ -32,8 +32,5 @@
     "discord-api-types": "^0.37.70",
     "prettier": "^3.2.5",
     "typescript": "^5.3.3"
-  },
-  "dependencies": {
-    "discord-interactions": "^3.4.0"
   }
 }

@@ -1,5 +1,4 @@
 import type { APIBaseInteraction, InteractionType, APIInteractionResponsePong } from 'discord-api-types/v10'
-import { verifyKey } from 'discord-interactions'
 import { CommandContext, ComponentContext, ModalContext, CronContext } from './context'
 import type {
   Env,
@@ -12,8 +11,16 @@ import type {
   InteractionModalData,
   DiscordKey,
 } from './types'
+import { verify } from './verify'
 import { ResponseJson } from './utils'
 
+type Option = { verify: Verify }
+type Verify = (
+  body: string,
+  signature: string | null,
+  timestamp: string | null,
+  publicKey: string,
+) => Promise<boolean> | boolean
 type CommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
 type ComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<Response> | Response
 type ModalHandler<E extends Env = any> = (c: ModalContext<E>) => Promise<Response> | Response
@@ -22,11 +29,15 @@ type Handler = CommandHandler | ComponentHandler | ModalHandler | CronHandler
 type Handlers<H extends Handler> = [string, H][]
 
 class DiscordHonoBase<E extends Env> {
+  #verify: Verify = verify
   #commandHandlers: Handlers<CommandHandler<E>> = []
   #componentHandlers: Handlers<ComponentHandler<E>> = []
   #modalHandlers: Handlers<ModalHandler<E>> = []
   #cronHandlers: Handlers<CronHandler<E>> = []
   #discordKeyHandler: DiscordKeyHandler<E> | undefined = undefined
+  constructor(option?: Option) {
+    if (option?.verify) this.#verify = option?.verify
+  }
 
   command = (command: string, handler: CommandHandler<E>) => {
     this.#commandHandlers.push([command, handler])
@@ -66,10 +77,8 @@ class DiscordHonoBase<E extends Env> {
       const signature = request.headers.get('x-signature-ed25519')
       const timestamp = request.headers.get('x-signature-timestamp')
       const body = await request.text()
-      const isValidRequest = signature && timestamp && verifyKey(body, signature, timestamp, discord.PUBLIC_KEY)
-      if (!isValidRequest || !body) {
-        return new Response('Bad request signature.', { status: 401 })
-      }
+      const isValid = await this.#verify(body, signature, timestamp, discord.PUBLIC_KEY)
+      if (!isValid) return new Response('Bad request signature.', { status: 401 })
       // verify end
       // ************ any 何とかしたい
       const data: APIBaseInteraction<InteractionType, any> = JSON.parse(body)
@@ -158,4 +167,8 @@ const getHandler = <
  * export default app
  * ```
  */
-export class DiscordHono<E extends Env = Env> extends DiscordHonoBase<E> {}
+export class DiscordHono<E extends Env = Env> extends DiscordHonoBase<E> {
+  constructor(option?: Option) {
+    super(option)
+  }
+}
