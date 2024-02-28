@@ -138,9 +138,9 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file FileData: { blob: Blob, name: string }
    */
-  followup = async (data: CustomResponseData, file: ArgFileData) =>
+  followup = async (data?: CustomResponseData, file?: ArgFileData) =>
     await followupMessage(this.discord.APPLICATION_ID, this.interaction.token, data, file)
-  followupEphemeral = async (data: CustomResponseData, file: ArgFileData) =>
+  followupEphemeral = async (data?: CustomResponseData, file?: ArgFileData) =>
     await this.followup(ephemeralData(data), file)
   followupDelete = async (applicationId?: string, interactionToken?: string, messageId?: string) => {
     const appId = applicationId || this.discord.APPLICATION_ID

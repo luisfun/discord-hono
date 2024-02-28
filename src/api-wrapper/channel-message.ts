@@ -9,8 +9,8 @@ import { apiUrl, addToken, formData } from '../utils'
 export const postMessage = async (
   token: string | undefined,
   channelId: string,
-  data: CustomResponseData,
-  file: ArgFileData,
+  data?: CustomResponseData,
+  file?: ArgFileData,
 ) => {
   if (!token) throw new Error('DISCORD_TOKEN is not set.')
   try {
@@ -46,8 +46,8 @@ export const deleteMessage = async (token: string | undefined, channelId: string
 export const followupMessage = async (
   applicationId: string | undefined,
   interactionToken: string | undefined,
-  data: CustomResponseData,
-  file: ArgFileData,
+  data?: CustomResponseData,
+  file?: ArgFileData,
 ) => {
   if (!applicationId) throw new Error('DISCORD_APPLICATION_ID is not set.')
   if (!interactionToken) throw new Error('Interaction Token is not set.')
