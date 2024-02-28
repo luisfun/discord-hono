@@ -64,15 +64,14 @@ class DiscordHonoBase<E extends Env> {
     if (request.method === 'GET') {
       return new Response('powered by Discord Hono🔥')
     } else if (request.method === 'POST') {
-      if (!env) throw new Error('There is no env.')
       const discord = this.#discordKeyHandler
         ? this.#discordKeyHandler(env)
         : ({
-            APPLICATION_ID: env.DISCORD_APPLICATION_ID,
-            TOKEN: env.DISCORD_TOKEN,
-            PUBLIC_KEY: env.DISCORD_PUBLIC_KEY,
+            APPLICATION_ID: env?.DISCORD_APPLICATION_ID,
+            TOKEN: env?.DISCORD_TOKEN,
+            PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY,
           } as DiscordKey)
-      if (!discord.PUBLIC_KEY) throw new Error('There is no DISCORD_PUBLIC_KEY. Set by app.publicKey(env => env.KEY).')
+      if (!discord.PUBLIC_KEY) throw new Error('There is no DISCORD_PUBLIC_KEY.')
       // verify
       const signature = request.headers.get('x-signature-ed25519')
       const timestamp = request.headers.get('x-signature-timestamp')
@@ -82,14 +81,13 @@ class DiscordHonoBase<E extends Env> {
       // verify end
       // ************ any 何とかしたい
       const data: APIBaseInteraction<InteractionType, any> = JSON.parse(body)
-      // interaction type https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
       switch (data.type) {
         case 1: {
           return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
         }
         case 2: {
           const interaction = data as InteractionCommandData
-          if (!interaction.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
+          if (!interaction.data) throw new Error('There is no interaction.data.')
           const { handler } = getHandler<CommandHandler>(this.#commandHandlers, interaction.data.name.toLowerCase())
           return await handler(new CommandContext(request, env, executionCtx, discord, interaction))
         }
@@ -104,13 +102,9 @@ class DiscordHonoBase<E extends Env> {
           const { handler, interact } = getHandler<ModalHandler>(this.#modalHandlers, data as InteractionModalData)
           return await handler(new ModalContext(request, env, executionCtx, discord, interact))
         }
-        case 4: {
-          console.warn('interaction.type: ', data.type)
-          console.warn('Not yet implemented. Please tell the developer of discord-hono how to get this reply.')
-          return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
-        }
         default: {
           console.warn('interaction.type: ', data.type)
+          console.warn('Not yet implemented.')
           return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
         }
       }
@@ -129,9 +123,7 @@ class DiscordHonoBase<E extends Env> {
     const { handler } = getHandler<CronHandler>(this.#cronHandlers, event.cron)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(new CronContext(event, env, executionCtx, discord)))
     else {
-      console.log(
-        'The process does not apply waitUntil. it would be helpful if you could contact the developer of discord-hono.',
-      )
+      console.log('The process does not apply waitUntil.')
       await handler(new CronContext(event, env, executionCtx, discord))
     }
   }
@@ -149,7 +141,7 @@ const getHandler = <
   let str = ''
   if (typeof interact === 'string') str = interact
   else {
-    if (!interact.data) throw new Error('No interaction.data, please contact the developer of discord-hono.')
+    if (!interact.data) throw new Error('There is no interaction.data.')
     const id = interact.data.custom_id
     str = id.split(';')[0]
     interact.data.custom_id = id.slice(str.length + 1)

@@ -66,6 +66,11 @@ class ContextBase<E extends Env> {
     if (!this.#executionCtx) throw new Error('This context has no ExecutionContext.')
     return this.#executionCtx
   }
+  waitUntil: ExecutionContext['waitUntil'] /*| FetchEventLike["waitUntil"]*/ = (promise: Promise<unknown>) => {
+    if (!this.#executionCtx?.waitUntil) throw new Error('This context has no waitUntil.')
+    // @ts-expect-error *********** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
+    this.#executionCtx.waitUntil(promise)
+  }
   // c.set, c.get, c.var.propName is Variables
   set: Set<E> = (key: string, value: unknown) => {
     this.#var ??= {}
@@ -128,12 +133,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     return this.res({ ...data, flags: 1 << 6 })
   }
   resDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
-    if (handler) {
-      if (!this.executionCtx.waitUntil && !this.event.waitUntil) throw new Error('This Context has no waitUntil.')
-      if (this.executionCtx.waitUntil) this.executionCtx.waitUntil(handler(this, ...args))
-      // @ts-expect-error ****************** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
-      else this.event.waitUntil(handler(this, ...args))
-    }
+    if (handler) this.waitUntil(handler(this, ...args))
     return this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
   }
   /**
@@ -223,12 +223,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
     return this.resBase({ type: 7, data } as APIInteractionResponseUpdateMessage)
   }
   resUpdateDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
-    if (handler) {
-      if (!this.executionCtx.waitUntil && !this.event.waitUntil) throw new Error('This Context has no waitUntil.')
-      if (this.executionCtx.waitUntil) this.executionCtx.waitUntil(handler(this, ...args))
-      // @ts-expect-error ****************** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
-      else this.event.waitUntil(handler(this, ...args))
-    }
+    if (handler) this.waitUntil(handler(this, ...args))
     return this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
   }
   /**
@@ -238,12 +233,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
    */
   resRepost = (data?: CustomResponseCallbackData | string) => {
     if (!data) return this.resUpdateDefer(async () => await this.followupDelete())
-    if (!this.executionCtx.waitUntil && !this.event.waitUntil)
-      throw new Error('This Context has no waitUntil. You can use .res() and .followupDelete().')
-    if (this.executionCtx.waitUntil)
-      this.executionCtx.waitUntil(this.followupDelete(undefined, undefined, this.#interaction.message?.id))
-    // @ts-expect-error ****************** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
-    else this.event.waitUntil(this.followupDelete(undefined, undefined, this.#interaction.message?.id))
+    this.waitUntil(this.followupDelete(undefined, undefined, this.#interaction.message?.id))
     return this.res(data)
   }
   resRepostEphemeral = (data: CustomResponseCallbackData | string) => {

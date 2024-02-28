@@ -5,6 +5,7 @@ import { Command } from './builder/command'
 // cloudflare-sample-app
 // Copyright (c) 2022 Justin Beckwith
 // https://github.com/discord/cloudflare-sample-app/blob/main/LICENSE
+
 export const register = async (
   commands: (Command | ApplicationCommand)[],
   applicationId: string | undefined,

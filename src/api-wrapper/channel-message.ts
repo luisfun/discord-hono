@@ -12,7 +12,7 @@ export const postMessage = async (
   data: CustomResponseCallbackData | string,
   ...files: FileData[]
 ) => {
-  if (!token) throw new Error('DISCORD_TOKEN is not set. Set up in app.discordKey or use postMessage.')
+  if (!token) throw new Error('DISCORD_TOKEN is not set.')
   if (typeof data === 'string') data = { content: data }
   try {
     return await fetch(
@@ -29,7 +29,7 @@ export const postMessage = async (
  * [API Delete Message](https://discord.com/developers/docs/resources/channel#delete-message)
  */
 export const deleteMessage = async (token: string | undefined, channelId: string, messageId: string) => {
-  if (!token) throw new Error('DISCORD_TOKEN is not set. Set up in app.discordKey or use deleteMessage.')
+  if (!token) throw new Error('DISCORD_TOKEN is not set.')
   try {
     return await fetch(`${apiUrl}/channels/${channelId}/messages/${messageId}`, addToken(token, { method: 'DELETE' }))
   } catch (e) {
@@ -50,9 +50,8 @@ export const followupMessage = async (
   data: CustomResponseCallbackData | string,
   ...files: FileData[]
 ) => {
-  if (!applicationId)
-    throw new Error('DISCORD_APPLICATION_ID is not set. Set up in app.discordKey or use followupMessage.')
-  if (!interactionToken) throw new Error('Interaction Token is not set. You can use followupMessage.')
+  if (!applicationId) throw new Error('DISCORD_APPLICATION_ID is not set.')
+  if (!interactionToken) throw new Error('Interaction Token is not set.')
   if (typeof data === 'string') data = { content: data }
   try {
     return await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}`, {
@@ -70,10 +69,9 @@ export const followupDeleteMessage = async (
   interactionToken: string | undefined,
   messageId: string | undefined,
 ) => {
-  if (!applicationId)
-    throw new Error('DISCORD_APPLICATION_ID is not set. Set up in app.discordKey or use followupDeleteMessage.')
-  if (!interactionToken) throw new Error('Interaction Token is not set. You can use followupDeleteMessage.')
-  if (!messageId) throw new Error('Message Id is not set. You can use followupDeleteMessage.')
+  if (!applicationId) throw new Error('DISCORD_APPLICATION_ID is not set.')
+  if (!interactionToken) throw new Error('Interaction Token is not set.')
+  if (!messageId) throw new Error('Message Id is not set.')
   try {
     return await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}/messages/${messageId}`, {
       method: 'DELETE',
