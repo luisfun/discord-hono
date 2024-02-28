@@ -127,8 +127,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @returns Response
    */
-  res = (data: CustomResponseData) =>
-    this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
+  res = (data: CustomResponseData) => this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
   resEphemeral = (data: CustomResponseData) => this.res(ephemeralData(data))
   resDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
     if (handler) this.waitUntil(handler(this, ...args))
@@ -228,7 +227,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
    */
   resRepost = (data?: CustomResponseData) => {
     if (!data) return this.resUpdateDefer(async () => await this.followupDelete())
-    this.waitUntil(this.followupDelete(undefined, undefined, this.#interaction.message?.id))
+    this.waitUntil(this.followupDelete())
     return this.res(data)
   }
   resRepostEphemeral = (data: CustomResponseData) => this.resRepost(ephemeralData(data))
