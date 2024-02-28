@@ -6,8 +6,12 @@
   "homepage": "https://github.com/LuisFun/discord-hono",
   "license": "MIT",
   "keywords": [
+    "discord-hono",
     "discord-bot",
     "cloudflare-workers"
+  ],
+  "files": [
+    "dist"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
