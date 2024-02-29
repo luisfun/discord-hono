@@ -13,13 +13,23 @@
   "files": [
     "dist"
   ],
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    "require": "./dist/index.cjs",
+    "import": "./dist/index.mjs",
+    "types": "./dist/index.d.ts"
+  },
   "scripts": {
     "fix": "prettier . --write",
     "patch": "prettier . --write && npm version patch && git push --follow-tags",
     "minor": "prettier . --write && npm version minor && git push --follow-tags",
     "major": "prettier . --write && npm version major && git push --follow-tags",
+    "build:ts": "tsc --emitDeclarationOnly --declaration",
+    "build:cjs": "esbuild --bundle ./src/index.ts --outfile=./dist/index.cjs --format=cjs",
+    "build:esm": "esbuild --bundle ./src/index.ts --outfile=./dist/index.mjs --format=esm",
+    "build": "rimraf dist && npm run build:ts && npm run build:cjs && npm run build:esm",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "prettier": {
@@ -30,7 +40,9 @@
   },
   "devDependencies": {
     "discord-api-types": "^0.37.71",
+    "esbuild": "^0.20.1",
     "prettier": "^3.2.5",
+    "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
   }
 }
