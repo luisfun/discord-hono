@@ -64,5 +64,6 @@ await register(
 
 The following repositories were referenced in the making of this project:
 
-- [Official Example](https://github.com/discord/cloudflare-sample-app)
 - [Hono](https://github.com/honojs/hono)
+- [Official Example](https://github.com/discord/cloudflare-sample-app)
+- [Verify for Workers](https://gist.github.com/devsnek/77275f6e3f810a9545440931ed314dc1)
