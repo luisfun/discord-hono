@@ -8,6 +8,7 @@
     "moduleResolution": "Bundler",
     /* Emit */
     "declaration": true,
+    "emitDeclarationOnly": true,
     "outDir": "./dist",
     /* Interop Constraints */
     "forceConsistentCasingInFileNames": true,
