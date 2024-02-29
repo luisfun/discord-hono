@@ -1,4 +1,4 @@
-# 🔥 Discord Hono [![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono) [![license](https://img.shields.io/github/license/luisfun/discord-hono)](https://github.com/LuisFun/discord-hono/blob/main/LICENSE)
+# 🔥 Discord Hono [![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono) [![Bundle Size](https://img.shields.io/bundlephobia/min/discord-hono)](https://bundlephobia.com/package/discord-hono)
 
 [👉 Documentation](https://discord-hono.luis.fun)
 
@@ -16,7 +16,7 @@ npm i -D dotenv # When using 'npm run register'
 ## Features
 
 - **Easy Build** - Verify included. Code for each command is easier to write.
-- **Lightweight** - We make them as light as possible. [![Bundle Size](https://img.shields.io/bundlephobia/min/discord-hono)](https://bundlephobia.com/package/discord-hono)
+- **Lightweight** - We make them as light as possible. Discord Hono has zero dependencies.
 - **TypeScript** - TypeScript support.
 
 ## [Example](https://github.com/LuisFun/discord-hono-example)
