@@ -5,7 +5,7 @@
 This project is heavily influenced by [Hono](https://github.com/honojs/hono).  
 Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! [Hono LICENSE](https://github.com/honojs/hono/blob/main/LICENSE)
 
-## 🚀 Install
+## Install
 
 ```shell
 npm i discord-hono
@@ -13,7 +13,13 @@ npm i -D discord-api-types # When using TypeScript
 npm i -D dotenv # When using 'npm run register'
 ```
 
-## 📑 [Example](https://github.com/LuisFun/discord-hono-example)
+## Features
+
+- **Easy Build** - Verify included. Code for each command is easier to write.
+- **Lightweight** - We make them as light as possible. [![Bundle Size](https://img.shields.io/bundlephobia/min/discord-hono)](https://bundlephobia.com/package/discord-hono)
+- **TypeScript** - TypeScript support.
+
+## [Example](https://github.com/LuisFun/discord-hono-example)
 
 index.ts
 
