@@ -180,7 +180,7 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
   }
 }
 
-type ComponentType = 'Button' | 'Select' | 'Other Select'
+type ComponentType = 'Button' | 'Select' | 'Other Select' | unknown
 // prettier-ignore
 type ComponentInteractionData<T extends ComponentType> =
   T extends 'Button' ? APIBaseInteraction<InteractionType.MessageComponent, APIMessageButtonInteractionData> :
@@ -192,11 +192,10 @@ type ComponentInteractionData<T extends ComponentType> =
     | APIMessageMentionableSelectInteractionData
     | APIMessageChannelSelectInteractionData
   >
-export class ComponentContext<E extends Env = any, T extends ComponentType = 'Other Select'> extends RequestContext<
+export class ComponentContext<E extends Env = any, T extends ComponentType = unknown> extends RequestContext<
   E,
-  InteractionData<3>
+  ComponentInteractionData<T>
 > {
-  #interaction: InteractionData<3>
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -204,14 +203,9 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
     discord: DiscordKey,
     interaction: InteractionData<3>,
   ) {
-    super(req, env, executionCtx, discord, interaction)
-    this.#interaction = interaction
+    super(req, env, executionCtx, discord, interaction as ComponentInteractionData<T>)
   }
-
-  get interaction() {
-    return this.#interaction as ComponentInteractionData<T>
-  }
-
+  
   resUpdate = (data: CustomResponseData) => {
     if (typeof data === 'string') data = { content: data }
     return this.resBase({ type: 7, data } as APIInteractionResponseUpdateMessage)
