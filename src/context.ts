@@ -205,7 +205,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
   ) {
     super(req, env, executionCtx, discord, interaction as ComponentInteractionData<T>)
   }
-  
+
   resUpdate = (data: CustomResponseData) => {
     if (typeof data === 'string') data = { content: data }
     return this.resBase({ type: 7, data } as APIInteractionResponseUpdateMessage)
