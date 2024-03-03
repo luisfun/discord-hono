@@ -20,15 +20,13 @@ export class Modal {
 }
 
 export class TextInput {
-  #uniqueStr: string
   #component: APITextInputComponent
   /**
    * [Text Input Structure](https://discord.com/developers/docs/interactions/message-components#text-input-object-text-input-structure)
    * @param inputStyle default 'Single'
    */
-  constructor(uniqueId: string, label: string, inputStyle?: 'Single' | 'Multi') {
-    this.#uniqueStr = uniqueId + ';'
-    this.#component = { type: 4, custom_id: this.#uniqueStr, label, style: inputStyle === 'Multi' ? 2 : 1 }
+  constructor(custom_id: string, label: string, inputStyle?: 'Single' | 'Multi') {
+    this.#component = { type: 4, custom_id, label, style: inputStyle === 'Multi' ? 2 : 1 }
   }
   #assign = (component: Omit<APITextInputComponent, 'type' | 'custom_id' | 'label' | 'style'>) => {
     Object.assign(this.#component, component)

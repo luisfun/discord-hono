@@ -139,7 +139,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param file FileData: { blob: Blob, name: string }
    */
   followup = async (data?: CustomResponseData, file?: ArgFileData) =>
-    await followupMessage(this.discord.APPLICATION_ID, this.interaction.token, data, file)
+    await followupMessage(this.discord.APPLICATION_ID, this.#interaction.token, data, file)
   followupEphemeral = async (data?: CustomResponseData, file?: ArgFileData) =>
     await this.followup(ephemeralData(data), file)
   followupDelete = async (applicationId?: string, interactionToken?: string, messageId?: string) => {
@@ -238,6 +238,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = 'Ot
 }
 
 export class ModalContext<E extends Env = any> extends RequestContext<E, InteractionData<5>> {
+  #values: Record<string, string> = {}
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -246,6 +247,18 @@ export class ModalContext<E extends Env = any> extends RequestContext<E, Interac
     interaction: InteractionData<5>,
   ) {
     super(req, env, executionCtx, discord, interaction)
+    const modalRows = interaction.data?.components
+    if (modalRows) {
+      for (const modalRow of modalRows) {
+        for (const modal of modalRow.components) {
+          this.#values[modal.custom_id] = modal.value
+        }
+      }
+    }
+  }
+
+  get values(): Record<string, string> {
+    return this.#values
   }
 }
 
