@@ -133,6 +133,12 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     if (handler) this.waitUntil(handler(this, ...args))
     return this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
   }
+  /* not working
+  resDeferEphemeral = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
+    if (handler) this.waitUntil(handler(this, ...args))
+    return this.resBase({ type: 5, flags: 1 << 6 } as APIInteractionResponseDeferredChannelMessageWithSource)
+  }
+  */
   /**
    * Used to send messages after resDefer.
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
@@ -140,8 +146,10 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    */
   followup = async (data?: CustomResponseData, file?: ArgFileData) =>
     await followupMessage(this.discord.APPLICATION_ID, this.#interaction.token, data, file)
+  /* not working
   followupEphemeral = async (data?: CustomResponseData, file?: ArgFileData) =>
     await this.followup(ephemeralData(data), file)
+  */
   followupDelete = async (applicationId?: string, interactionToken?: string, messageId?: string) => {
     const appId = applicationId || this.discord.APPLICATION_ID
     const token = interactionToken || this.#interaction.token
