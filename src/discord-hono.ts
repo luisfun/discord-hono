@@ -26,33 +26,32 @@ type ComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise
 type ModalHandler<E extends Env = any> = (c: ModalContext<E>) => Promise<Response> | Response
 type CronHandler<E extends Env = any> = (c: CronContext<E>) => Promise<unknown>
 type Handler = CommandHandler | ComponentHandler | ModalHandler | CronHandler
-type Handlers<H extends Handler> = [string, H][]
 
 class DiscordHonoBase<E extends Env> {
   #verify: Verify = verify
-  #commandHandlers: Handlers<CommandHandler<E>> = []
-  #componentHandlers: Handlers<ComponentHandler<E>> = []
-  #modalHandlers: Handlers<ModalHandler<E>> = []
-  #cronHandlers: Handlers<CronHandler<E>> = []
+  #commandHandlers = new Map<string, CommandHandler<E>>()
+  #componentHandlers = new Map<string, ComponentHandler<E>>()
+  #modalHandlers = new Map<string, ModalHandler<E>>()
+  #cronHandlers = new Map<string, CronHandler<E>>()
   #discordKeyHandler: DiscordKeyHandler<E> | undefined = undefined
   constructor(option?: Option) {
     if (option?.verify) this.#verify = option?.verify
   }
 
   command = (command: string, handler: CommandHandler<E>) => {
-    this.#commandHandlers.push([command, handler])
+    this.#commandHandlers.set(command, handler)
     return this
   }
   component = (componentId: string, handler: ComponentHandler<E>) => {
-    this.#componentHandlers.push([componentId, handler])
+    this.#componentHandlers.set(componentId, handler)
     return this
   }
   modal = (modalId: string, handler: ModalHandler<E>) => {
-    this.#modalHandlers.push([modalId, handler])
+    this.#modalHandlers.set(modalId, handler)
     return this
   }
   cron = (cronId: string, handler: CronHandler<E>) => {
-    this.#cronHandlers.push([cronId, handler])
+    this.#cronHandlers.set(cronId, handler)
     return this
   }
   discordKey = (handler: DiscordKeyHandler<E>) => {
@@ -131,13 +130,12 @@ class DiscordHonoBase<E extends Env> {
 
 const getHandler = <
   H extends Handler,
-  Hs extends Handlers<H> = any,
+  Hs extends Map<string, H> = any, //Handlers<H> = any,
   I extends string | InteractionComponentData | InteractionModalData = any,
 >(
   handlers: Hs,
   interact: I,
 ) => {
-  if (!handlers[0]) throw new Error('Handlers is not set.')
   let str = ''
   if (typeof interact === 'string') str = interact
   else {
@@ -146,8 +144,8 @@ const getHandler = <
     str = id.split(';')[0]
     interact.data.custom_id = id.slice(str.length + 1)
   }
-  const index = handlers.findIndex(e => e[0] === str || e[0] === '')
-  const handler = handlers[index][1]
+  const handler = handlers.get(str)
+  if (!handler) throw new Error('Handlers is not set.')
   return { handler, interact }
 }
 
