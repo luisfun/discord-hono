@@ -158,7 +158,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   }
 }
 
-type CommandValues = Record<string, string | number | boolean>
+type CommandValues = Record<string, string | number | boolean | undefined>
 export class CommandContext<E extends Env = any> extends RequestContext<E, InteractionData<2>> {
   #values: CommandValues = {}
   constructor(
