@@ -19,7 +19,7 @@ npm i -D dotenv # When using 'npm run register'
 - **Lightweight** - We make them as light as possible. Discord Hono has zero dependencies.
 - **TypeScript** - TypeScript support.
 
-## [Example](https://github.com/LuisFun/discord-hono-example)
+## Sample Code
 
 index.ts
 
@@ -27,14 +27,7 @@ index.ts
 import { DiscordHono } from 'discord-hono'
 
 const app = new DiscordHono()
-  .command('ping', c => c.res('Pong!!'))
-  .command('image', c =>
-    c.resDefer(async () => {
-      const image = await fetch('https://luis.fun/images/hono.webp')
-      const blob = new Blob([await image.arrayBuffer()])
-      await c.followup({ content: c.values.text.toString() }, { blob, name: 'image.webp' })
-    }),
-  )
+app.command('hello', c => c.res('world!'))
 
 export default app
 ```
@@ -45,13 +38,9 @@ register.ts
 import dotenv from 'dotenv'
 import process from 'node:process'
 import { Command, Option, register } from 'discord-hono'
-
 dotenv.config({ path: '.dev.vars' })
 
-const commands = [
-  new Command('ping', 'response pong'),
-  new Command('image', 'response image file').options(new Option('text', 'with text').required()),
-]
+const commands = [new Command('hello', 'response world')]
 
 await register(
   commands,
@@ -61,8 +50,9 @@ await register(
 )
 ```
 
-### Other Examples
+## Examples
 
+- [Simple Example](https://github.com/LuisFun/discord-hono-example)
 - [Playing with AI](https://github.com/LuisFun/discord-bot-cloudflare-ai) - Using Cloudflare AI
 - [Deliver website news](https://github.com/LuisFun/discord-bot-hoyo-news) - Using Cloudflare D1, Browser Rendering, Cron
 
