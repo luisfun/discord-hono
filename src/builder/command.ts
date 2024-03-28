@@ -55,9 +55,9 @@ export class Command {
   dm_permission = (e: Cmd['dm_permission'] = true) => this.assign({ dm_permission: e })
   nsfw = (e: Cmd['nsfw'] = true) => this.assign({ nsfw: e })
   // @ts-expect-error
-  integration_types = (e: 0 | 1 /*Cmd['integration_types']*/) => this.assign({ integration_types: e })
+  integration_types = (e: (0 | 1)[] /*Cmd['integration_types']*/) => this.assign({ integration_types: e })
   // @ts-expect-error
-  contexts = (e: 0 | 1 | 2 /*Cmd['contexts']*/) => this.assign({ contexts: e })
+  contexts = (e: (0 | 1 | 2)[] /*Cmd['contexts']*/) => this.assign({ contexts: e })
   version = (e: Cmd['version']) => this.assign({ version: e })
   // options
   options = (...e: (OptionAllClass | APIApplicationCommandOption)[]) => {
