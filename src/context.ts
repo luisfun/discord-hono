@@ -159,7 +159,13 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
 }
 
 type CommandValues = Record<string, string | number | boolean | undefined>
+type SubCommand = {
+  group: string
+  command: string
+  string: string
+}
 export class CommandContext<E extends Env = any> extends RequestContext<E, InteractionData<2>> {
+  #sub: SubCommand = { group: "", command: "", string: "" }
   #values: CommandValues = {}
   constructor(
     req: Request,
@@ -169,15 +175,31 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
     interaction: InteractionData<2>,
   ) {
     super(req, env, executionCtx, discord, interaction)
-    if (interaction?.data && 'options' in interaction?.data && interaction.data.options) {
-      this.#values = interaction.data.options.reduce((obj: CommandValues, e) => {
-        if (e.type === 1 || e.type === 2) return obj // sub command
-        obj[e.name] = e.value
-        return obj
-      }, {})
+    if (interaction?.data && 'options' in interaction?.data) {
+      let options = interaction.data.options
+      if (options?.[0].type === 2) {
+        this.#sub.group = options[0].name
+        this.#sub.string = options[0].name + " "
+        options = options[0].options
+      }
+      if (options?.[0].type === 1) {
+        this.#sub.command = options[0].name
+        this.#sub.string += options[0].name
+        options = options[0].options
+      }
+      if (options) {
+        this.#values = options?.reduce((obj: CommandValues, e) => {
+          if (e.type === 1 || e.type === 2) return obj // for ts-error
+          obj[e.name] = e.value
+          return obj
+        }, {})
+      }
     }
   }
 
+  get sub(): SubCommand {
+    return this.#sub
+  }
   get values(): CommandValues {
     return this.#values
   }

@@ -26,7 +26,7 @@ type OptionClass =
   | MentionableOption
   | AttachmentOption
 
-type OptionAllClass = OptionClass | SubOption | SubGroupOption
+type OptionAllClass = OptionClass | SubCommand | SubGroup
 /**
  * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-structure)
  */
@@ -59,8 +59,8 @@ export class Command {
   options = (...e: (OptionAllClass | APIApplicationCommandOption)[]) => {
     const options = e.map(opt => {
       if (
-        opt instanceof SubOption ||
-        opt instanceof SubGroupOption ||
+        opt instanceof SubCommand ||
+        opt instanceof SubGroup ||
         opt instanceof Option ||
         opt instanceof NumberOption ||
         opt instanceof BooleanOption ||
@@ -107,7 +107,7 @@ class OptionBase {
   build = () => this.option
 }
 
-export class SubOption extends OptionBase {
+export class SubCommand extends OptionBase {
   constructor(name: string, description: string) {
     super(name, description, 1)
   }
@@ -129,18 +129,28 @@ export class SubOption extends OptionBase {
     return this.assign({ options })
   }
 }
+/**
+ * @deprecated
+ * Use SubCommand instead.
+ */
+export class SubOption extends SubCommand {}
 
-export class SubGroupOption extends OptionBase {
+export class SubGroup extends OptionBase {
   constructor(name: string, description: string) {
     super(name, description, 2)
   }
-  options = (...e: (SubOption | APIApplicationCommandSubcommandOption)[]) => {
+  options = (...e: (SubCommand | APIApplicationCommandSubcommandOption)[]) => {
     const options = e.map(opt =>
-      opt instanceof SubOption ? (opt.build() as APIApplicationCommandSubcommandOption) : opt,
+      opt instanceof SubCommand ? (opt.build() as APIApplicationCommandSubcommandOption) : opt,
     )
     return this.assign({ options })
   }
 }
+/**
+ * @deprecated
+ * Use SubGroup instead.
+ */
+export class SubGroupOption extends SubGroup {}
 
 export class Option extends OptionBase {
   /**
