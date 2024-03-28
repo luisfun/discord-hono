@@ -38,10 +38,10 @@
     "arrowParens": "avoid"
   },
   "devDependencies": {
-    "discord-api-types": "^0.37.71",
-    "esbuild": "^0.20.1",
+    "discord-api-types": "^0.37.77",
+    "esbuild": "^0.20.2",
     "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.3"
   }
 }
