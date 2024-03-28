@@ -60,55 +60,56 @@ class DiscordHonoBase<E extends Env> {
   }
 
   fetch = async (request: Request, env?: E['Bindings'] | EnvDiscordKey, executionCtx?: ExecutionContext) => {
-    if (request.method === 'GET') {
-      return new Response('powered by Discord Hono🔥')
-    } else if (request.method === 'POST') {
-      const discord = this.#discordKeyHandler
-        ? this.#discordKeyHandler(env)
-        : ({
-            APPLICATION_ID: env?.DISCORD_APPLICATION_ID,
-            TOKEN: env?.DISCORD_TOKEN,
-            PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY,
-          } as DiscordKey)
-      if (!discord.PUBLIC_KEY) throw new Error('There is no DISCORD_PUBLIC_KEY.')
-      // verify
-      const signature = request.headers.get('x-signature-ed25519')
-      const timestamp = request.headers.get('x-signature-timestamp')
-      const body = await request.text()
-      const isValid = await this.#verify(body, signature, timestamp, discord.PUBLIC_KEY)
-      if (!isValid) return new Response('Bad request signature.', { status: 401 })
-      // verify end
-      // ************ any 何とかしたい
-      const data: APIBaseInteraction<InteractionType, any> = JSON.parse(body)
-      switch (data.type) {
-        case 1: {
-          return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
+    switch (request.method) {
+      case 'GET':
+        return new Response('powered by Discord Hono🔥')
+      case 'POST':
+        const discord = this.#discordKeyHandler
+          ? this.#discordKeyHandler(env)
+          : ({
+              APPLICATION_ID: env?.DISCORD_APPLICATION_ID,
+              TOKEN: env?.DISCORD_TOKEN,
+              PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY,
+            } as DiscordKey)
+        if (!discord.PUBLIC_KEY) throw new Error('There is no DISCORD_PUBLIC_KEY.')
+        // verify
+        const signature = request.headers.get('x-signature-ed25519')
+        const timestamp = request.headers.get('x-signature-timestamp')
+        const body = await request.text()
+        const isValid = await this.#verify(body, signature, timestamp, discord.PUBLIC_KEY)
+        if (!isValid) return new Response('Bad request signature.', { status: 401 })
+        // verify end
+        // ************ any 何とかしたい
+        const data: APIBaseInteraction<InteractionType, any> = JSON.parse(body)
+        switch (data.type) {
+          case 1: {
+            return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
+          }
+          case 2: {
+            const interaction = data as InteractionCommandData
+            const { handler } = getHandler<CommandHandler>(this.#commandHandlers, interaction.data?.name.toLowerCase())
+            return await handler(new CommandContext(request, env, executionCtx, discord, interaction))
+          }
+          case 3: {
+            const { handler, interaction } = getHandler<ComponentHandler>(
+              this.#componentHandlers,
+              data as InteractionComponentData,
+            )
+            return await handler(new ComponentContext(request, env, executionCtx, discord, interaction))
+          }
+          case 5: {
+            const { handler, interaction } = getHandler<ModalHandler>(this.#modalHandlers, data as InteractionModalData)
+            return await handler(new ModalContext(request, env, executionCtx, discord, interaction))
+          }
+          default: {
+            console.warn('interaction.type: ', data.type)
+            console.warn('Not yet implemented.')
+            return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
+          }
         }
-        case 2: {
-          const interaction = data as InteractionCommandData
-          if (!interaction.data) throw new Error('There is no interaction.data.')
-          const { handler } = getHandler<CommandHandler>(this.#commandHandlers, interaction.data.name.toLowerCase())
-          return await handler(new CommandContext(request, env, executionCtx, discord, interaction))
-        }
-        case 3: {
-          const { handler, interact } = getHandler<ComponentHandler>(
-            this.#componentHandlers,
-            data as InteractionComponentData,
-          )
-          return await handler(new ComponentContext(request, env, executionCtx, discord, interact))
-        }
-        case 5: {
-          const { handler, interact } = getHandler<ModalHandler>(this.#modalHandlers, data as InteractionModalData)
-          return await handler(new ModalContext(request, env, executionCtx, discord, interact))
-        }
-        default: {
-          console.warn('interaction.type: ', data.type)
-          console.warn('Not yet implemented.')
-          return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
-        }
-      }
+      default:
+        return new Response('Not Found.', { status: 404 })
     }
-    return new Response('Not Found.', { status: 404 })
   }
 
   scheduled = async (event: CronEvent, env: E['Bindings'] | EnvDiscordKey, executionCtx?: ExecutionContext) => {
@@ -131,22 +132,22 @@ class DiscordHonoBase<E extends Env> {
 const getHandler = <
   H extends Handler,
   Hs extends Map<string, H> = any, //Handlers<H> = any,
-  I extends string | InteractionComponentData | InteractionModalData = any,
+  I extends string | undefined | InteractionComponentData | InteractionModalData = any,
 >(
   handlers: Hs,
-  interact: I,
+  interaction: I,
 ) => {
   let str = ''
-  if (typeof interact === 'string') str = interact
+  if (typeof interaction === 'string') str = interaction
   else {
-    if (!interact.data) throw new Error('There is no interaction.data.')
-    const id = interact.data.custom_id
+    if (!interaction?.data) throw new Error('There is no interaction.data.')
+    const id = interaction.data.custom_id
     str = id.split(';')[0]
-    interact.data.custom_id = id.slice(str.length + 1)
+    interaction.data.custom_id = id.slice(str.length + 1)
   }
   const handler = handlers.get(str)
   if (!handler) throw new Error('Handlers is not set.')
-  return { handler, interact }
+  return { handler, interaction }
 }
 
 /**
