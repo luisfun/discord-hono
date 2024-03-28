@@ -165,7 +165,7 @@ type SubCommand = {
   string: string
 }
 export class CommandContext<E extends Env = any> extends RequestContext<E, InteractionData<2>> {
-  #sub: SubCommand = { group: "", command: "", string: "" }
+  #sub: SubCommand = { group: '', command: '', string: '' }
   #values: CommandValues = {}
   constructor(
     req: Request,
@@ -179,7 +179,7 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
       let options = interaction.data.options
       if (options?.[0].type === 2) {
         this.#sub.group = options[0].name
-        this.#sub.string = options[0].name + " "
+        this.#sub.string = options[0].name + ' '
         options = options[0].options
       }
       if (options?.[0].type === 1) {
