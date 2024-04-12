@@ -5,6 +5,12 @@
 This project is heavily influenced by [Hono](https://github.com/honojs/hono).  
 Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! [Hono LICENSE](https://github.com/honojs/hono/blob/main/LICENSE)
 
+## Features
+
+- **Easy Build** - Verify included. Code for each command is easier to write.
+- **Lightweight** - We make them as light as possible. Discord Hono has zero dependencies.
+- **TypeScript** - TypeScript support.
+
 ## Install
 
 ```shell
@@ -12,12 +18,6 @@ npm i discord-hono
 npm i -D discord-api-types # When using TypeScript
 npm i -D dotenv # When using 'npm run register'
 ```
-
-## Features
-
-- **Easy Build** - Verify included. Code for each command is easier to write.
-- **Lightweight** - We make them as light as possible. Discord Hono has zero dependencies.
-- **TypeScript** - TypeScript support.
 
 ## Sample Code
 
