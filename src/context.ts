@@ -66,10 +66,9 @@ class ContextBase<E extends Env> {
     if (!this.#executionCtx) throw new Error('This context has no ExecutionContext.')
     return this.#executionCtx
   }
-  waitUntil: ExecutionContext['waitUntil'] /*| FetchEventLike["waitUntil"]*/ = (promise: Promise<unknown>) => {
+  get waitUntil(): ExecutionContext['waitUntil'] /*| FetchEventLike["waitUntil"]*/ {
     if (!this.#executionCtx?.waitUntil) throw new Error('This context has no waitUntil.')
-    // @ts-expect-error *********** おそらくworkers以外のプラットフォーム、型をexecutionCtx.waitUntilと同じにしても問題ないか確認すること
-    this.#executionCtx.waitUntil(promise)
+    return this.#executionCtx.waitUntil.bind(this.#executionCtx)
   }
   // c.set, c.get, c.var.propName is Variables
   set: Set<E> = (key: string, value: unknown) => {
