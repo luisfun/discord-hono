@@ -261,7 +261,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
 }
 
 export class ModalContext<E extends Env = any> extends RequestContext<E, InteractionData<5>> {
-  #values: Record<string, string> = {}
+  #values: Record<string, string | undefined> = {}
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -280,7 +280,7 @@ export class ModalContext<E extends Env = any> extends RequestContext<E, Interac
     }
   }
 
-  get values(): Record<string, string> {
+  get values() {
     return this.#values
   }
 }
