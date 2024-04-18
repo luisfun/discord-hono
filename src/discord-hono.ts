@@ -145,7 +145,7 @@ const getHandler = <
     str = id.split(';')[0]
     interaction.data.custom_id = id.slice(str.length + 1)
   }
-  const handler = handlers.get(str)
+  const handler = handlers.get(str) || handlers.get('')
   if (!handler) throw new Error('Handlers is not set.')
   return { handler, interaction }
 }
