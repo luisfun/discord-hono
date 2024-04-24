@@ -83,7 +83,7 @@ class ContextBase<E extends Env> {
   }
 }
 
-// prettier-ignore
+// biome-ignore format: 三項演算子
 type InteractionData<T extends 2 | 3 | 4 | 5> =
   T extends 2 ? InteractionCommandData :
   T extends 3 ? InteractionComponentData :
@@ -210,7 +210,7 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
 }
 
 type ComponentType = 'Button' | 'Select' | 'Other Select' | unknown
-// prettier-ignore
+// biome-ignore format: 三項演算子
 type ComponentInteractionData<T extends ComponentType> =
   T extends 'Button' ? APIBaseInteraction<InteractionType.MessageComponent, APIMessageButtonInteractionData> :
   T extends 'Select' ? APIBaseInteraction<InteractionType.MessageComponent, APIMessageStringSelectInteractionData> :

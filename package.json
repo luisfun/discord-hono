@@ -22,26 +22,20 @@
     "types": "./dist/index.d.ts"
   },
   "scripts": {
-    "fix": "prettier . --write",
-    "patch": "prettier . --write && npm version patch && git push --follow-tags",
-    "minor": "prettier . --write && npm version minor && git push --follow-tags",
-    "major": "prettier . --write && npm version major && git push --follow-tags",
+    "fix": "npx @biomejs/biome format . --write && npx @biomejs/biome lint .",
+    "patch": "npx @biomejs/biome check . && npm version patch && git push --follow-tags",
+    "minor": "npx @biomejs/biome check . && npm version minor && git push --follow-tags",
+    "major": "npx @biomejs/biome check . && npm version major && git push --follow-tags",
     "esbuild:cjs": "esbuild --bundle ./src/index.ts --outfile=./dist/index.cjs --format=cjs",
     "esbuild:esm": "esbuild --bundle ./src/index.ts --outfile=./dist/index.mjs --format=esm",
     "build": "rimraf dist && tsc && npm run esbuild:cjs && npm run esbuild:esm",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "prettier": {
-    "printWidth": 120,
-    "semi": false,
-    "singleQuote": true,
-    "arrowParens": "avoid"
-  },
   "devDependencies": {
-    "discord-api-types": "^0.37.77",
+    "@biomejs/biome": "1.7.1",
+    "discord-api-types": "^0.37.81",
     "esbuild": "^0.20.2",
-    "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.5"
   }
 }
