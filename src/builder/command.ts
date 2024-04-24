@@ -1,3 +1,4 @@
+// biome-ignore lint:
 import type {
   APIApplicationCommandOption,
   APIApplicationCommandSubcommandOption, // 1

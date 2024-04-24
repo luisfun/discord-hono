@@ -5,14 +5,8 @@
   "author": "Luis (https://github.com/LuisFun)",
   "homepage": "https://github.com/LuisFun/discord-hono",
   "license": "MIT",
-  "keywords": [
-    "discord-hono",
-    "discord-bot",
-    "cloudflare-workers"
-  ],
-  "files": [
-    "dist"
-  ],
+  "keywords": ["discord-hono", "discord-bot", "cloudflare-workers"],
+  "files": ["dist"],
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -22,7 +16,7 @@
     "types": "./dist/index.d.ts"
   },
   "scripts": {
-    "fix": "npx @biomejs/biome format . --write && npx @biomejs/biome lint .",
+    "fix": "npx @biomejs/biome check --apply .",
     "patch": "npx @biomejs/biome check . && npm version patch && git push --follow-tags",
     "minor": "npx @biomejs/biome check . && npm version minor && git push --follow-tags",
     "major": "npx @biomejs/biome check . && npm version major && git push --follow-tags",

@@ -1,5 +1,5 @@
-import type { CustomResponseData, ArgFileData } from './types'
 import { Components } from './builder/components'
+import type { ArgFileData, CustomResponseData } from './types'
 
 export const apiUrl = 'https://discord.com/api/v10'
 

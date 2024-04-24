@@ -1,15 +1,15 @@
 import type {
   APIActionRowComponent,
-  APIMessageActionRowComponent,
   APIButtonComponent,
-  APISelectMenuComponent,
   APIButtonComponentWithCustomId,
   APIButtonComponentWithURL,
+  APIChannelSelectComponent,
+  APIMentionableSelectComponent,
+  APIMessageActionRowComponent,
+  APIRoleSelectComponent,
+  APISelectMenuComponent,
   APIStringSelectComponent,
   APIUserSelectComponent,
-  APIRoleSelectComponent,
-  APIMentionableSelectComponent,
-  APIChannelSelectComponent,
 } from 'discord-api-types/v10'
 
 type ComponentClass = Button | LinkButton | Select | UserSelect | RoleSelect | MentionableSelect | ChannelSelect

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
-  APIBaseInteraction,
-  InteractionType,
+  APIApplicationCommand,
   APIApplicationCommandInteractionData,
+  APIBaseInteraction,
+  APIInteractionResponseCallbackData,
   APIMessageComponentInteractionData,
   APIModalSubmission,
-  APIApplicationCommand,
   ApplicationCommandType,
-  APIInteractionResponseCallbackData,
+  InteractionType,
 } from 'discord-api-types/v10'
 import type { Components } from './builder/components'
 

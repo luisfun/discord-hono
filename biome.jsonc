@@ -13,5 +13,8 @@
     }
   },
   "organizeImports": { "enabled": true },
-  "linter": { "enabled": true, "rules": { "recommended": true } }
+  "linter": { "enabled": true, "rules": { "recommended": true } },
+  "files": {
+    "ignore": ["dist"]
+  }
 }

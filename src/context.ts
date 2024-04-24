@@ -1,40 +1,40 @@
 import type {
+  APIBaseInteraction,
   APIInteractionResponse,
   APIInteractionResponseChannelMessageWithSource,
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIInteractionResponseDeferredMessageUpdate,
   APIInteractionResponseUpdateMessage,
-  APIModalInteractionResponse,
-  APIModalInteractionResponseCallbackData,
-  APIBaseInteraction,
-  InteractionType,
   APIMessageButtonInteractionData,
+  APIMessageChannelSelectInteractionData,
+  APIMessageMentionableSelectInteractionData,
+  APIMessageRoleSelectInteractionData,
   APIMessageStringSelectInteractionData,
   APIMessageUserSelectInteractionData,
-  APIMessageRoleSelectInteractionData,
-  APIMessageMentionableSelectInteractionData,
-  APIMessageChannelSelectInteractionData,
+  APIModalInteractionResponse,
+  APIModalInteractionResponseCallbackData,
+  InteractionType,
 } from 'discord-api-types/v10'
+import { followupDeleteMessage, followupMessage } from './api-wrapper/channel-message'
+import { Components } from './builder/components'
+import { Modal } from './builder/modal'
 import type {
-  Env,
+  ArgFileData,
+  CronEvent,
+  CustomResponseData,
   DiscordKey,
+  Env,
   ExecutionContext,
   FetchEventLike,
-  CronEvent,
   InteractionCommandData,
   InteractionComponentData,
   InteractionModalData,
-  CustomResponseData,
-  ArgFileData,
 } from './types'
 import { ResponseJson, ephemeralData } from './utils'
-import { followupMessage, followupDeleteMessage } from './api-wrapper/channel-message'
-import { Modal } from './builder/modal'
-import { Components } from './builder/components'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
-interface ContextVariableMap {}
+type ContextVariableMap = {}
 interface Get<E extends Env> {
   <Key extends keyof ContextVariableMap>(key: Key): ContextVariableMap[Key]
   <Key extends keyof E['Variables']>(key: Key): E['Variables'][Key]

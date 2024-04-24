@@ -1,6 +1,6 @@
+import { Command } from './builder/command'
 import type { ApplicationCommand } from './types'
 import { apiUrl } from './utils'
-import { Command } from './builder/command'
 
 // cloudflare-sample-app
 // Copyright (c) 2022 Justin Beckwith
