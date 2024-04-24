@@ -4,7 +4,7 @@ export class Modal {
   #uniqueStr: string
   #data: APIModalInteractionResponseCallbackData
   constructor(uniqueId: string, title: string) {
-    this.#uniqueStr = uniqueId + ';'
+    this.#uniqueStr = `${uniqueId};`
     this.#data = { title, custom_id: this.#uniqueStr, components: [] }
   }
   custom_id = (e: APITextInputComponent['custom_id']) => {

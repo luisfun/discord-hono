@@ -63,7 +63,7 @@ class DiscordHonoBase<E extends Env> {
     switch (request.method) {
       case 'GET':
         return new Response('powered by Discord Hono🔥')
-      case 'POST':
+      case 'POST': {
         const discord = this.#discordKeyHandler
           ? this.#discordKeyHandler(env)
           : ({
@@ -107,6 +107,7 @@ class DiscordHonoBase<E extends Env> {
             return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
           }
         }
+      }
       default:
         return new Response('Not Found.', { status: 404 })
     }
@@ -158,8 +159,4 @@ const getHandler = <
  * export default app
  * ```
  */
-export class DiscordHono<E extends Env = Env> extends DiscordHonoBase<E> {
-  constructor(option?: Option) {
-    super(option)
-  }
-}
+export class DiscordHono<E extends Env = Env> extends DiscordHonoBase<E> {}

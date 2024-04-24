@@ -45,7 +45,7 @@ class ButtonBase {
   protected component: APIButtonComponent
   // ***************************** label or emoji でいけるのか検証したい
   constructor(str: string, label: string, style: 1 | 2 | 3 | 4 | 5) {
-    this.uniqueStr = str + ';'
+    this.uniqueStr = `${str};`
     this.component =
       style === 5 ? { type: 2, label, style, url: str } : { type: 2, label, style, custom_id: this.uniqueStr }
   }
@@ -97,7 +97,7 @@ class SelectBase {
   protected uniqueStr: string
   protected component: APISelectMenuComponent
   constructor(uniqueId: string, type: 3 | 5 | 6 | 7 | 8) {
-    this.uniqueStr = uniqueId + ';'
+    this.uniqueStr = `${uniqueId};`
     this.component = type === 3 ? { type, custom_id: this.uniqueStr, options: [] } : { type, custom_id: this.uniqueStr }
   }
   protected assign = (component: OmitSelect | { custom_id?: string }) => {

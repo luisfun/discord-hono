@@ -33,7 +33,7 @@ export const formData = (data?: CustomResponseData, file?: ArgFileData) => {
   if (data) body.append('payload_json', JSON.stringify(data))
   if (Array.isArray(file))
     for (let i = 0, len = file.length; i < len; i++) body.append(`files[${i}]`, file[i].blob, file[i].name)
-  else if (file) body.append(`files[0]`, file.blob, file.name)
+  else if (file) body.append('files[0]', file.blob, file.name)
   return body
 }
 
