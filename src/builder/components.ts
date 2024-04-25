@@ -66,7 +66,7 @@ export class Button extends ButtonBase {
    * @param buttonStyle default 'Primary'
    */
   constructor(uniqueId: string, label: string, buttonStyle: ButtonStyle = 'Primary') {
-    // biome-ignore format: 三項演算子
+    // biome-ignore format: ternary operator
     const style =
       buttonStyle === 'Primary' ? 1 :
       buttonStyle === 'Secondary' ? 2 :
