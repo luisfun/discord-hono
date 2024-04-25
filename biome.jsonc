@@ -18,7 +18,7 @@
     "rules": {
       "recommended": true,
       "style": {
-        "noParameterAssign": "off" // 引数に代入（混乱の可能性） 推奨 "warn"
+        "noParameterAssign": "off" // 引数に代入を許容（混乱の可能性） 推奨 "warn"
       },
       "suspicious": {
         "noExplicitAny": "off" // anyを許容 推奨 "warn"

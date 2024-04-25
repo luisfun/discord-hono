@@ -4,8 +4,7 @@
 const hex2bin = (hex: string) => {
   const bin = new Uint8Array(Math.ceil(hex.length / 2))
   for (let i = 0, len = bin.length; i < len; i++) {
-    // biome-ignore lint: Nomber. の方がいい？
-    bin[i] = parseInt(hex.substr(i * 2, 2), 16)
+    bin[i] = Number.parseInt(hex.substr(i * 2, 2), 16)
   }
   return bin
 }

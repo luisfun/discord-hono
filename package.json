@@ -18,9 +18,9 @@
   "scripts": {
     "fix": "npx @biomejs/biome check --apply .",
     "fix:unsafe": "npx @biomejs/biome check --apply-unsafe .",
-    "patch": "npx @biomejs/biome check . && npm version patch && git push --follow-tags",
-    "minor": "npx @biomejs/biome check . && npm version minor && git push --follow-tags",
-    "major": "npx @biomejs/biome check . && npm version major && git push --follow-tags",
+    "patch": "npm run fix && npm version patch && git push --follow-tags",
+    "minor": "npm run fix && npm version minor && git push --follow-tags",
+    "major": "npm run fix && npm version major && git push --follow-tags",
     "esbuild:cjs": "esbuild --bundle ./src/index.ts --outfile=./dist/index.cjs --format=cjs",
     "esbuild:esm": "esbuild --bundle ./src/index.ts --outfile=./dist/index.mjs --format=esm",
     "build": "rimraf dist && tsc && npm run esbuild:cjs && npm run esbuild:esm",
