@@ -1,4 +1,4 @@
-// biome-ignore lint:
+// biome-ignore lint: parameter order
 import type {
   APIApplicationCommandOption,
   APIApplicationCommandSubcommandOption, // 1

@@ -13,7 +13,18 @@
     }
   },
   "organizeImports": { "enabled": true },
-  "linter": { "enabled": true, "rules": { "recommended": true } },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "style": {
+        "noParameterAssign": "off" // 引数に代入（混乱の可能性） 推奨 "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "off" // anyを許容 推奨 "warn"
+      }
+    }
+  },
   "files": {
     "ignore": ["dist"]
   }

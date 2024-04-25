@@ -34,6 +34,7 @@ import { ResponseJson, ephemeralData } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
+// biome-ignore lint: Same definition as Hono
 type ContextVariableMap = {}
 interface Get<E extends Env> {
   <Key extends keyof ContextVariableMap>(key: Key): ContextVariableMap[Key]
@@ -174,7 +175,7 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
     interaction: InteractionData<2>,
   ) {
     super(req, env, executionCtx, discord, interaction)
-    if (interaction?.data && 'options' in interaction?.data) {
+    if (interaction?.data && 'options' in interaction.data) {
       let options = interaction.data.options
       if (options?.[0].type === 2) {
         this.#sub.group = options[0].name

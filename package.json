@@ -16,7 +16,8 @@
     "types": "./dist/index.d.ts"
   },
   "scripts": {
-    "fix": "npx @biomejs/biome check --apply-unsafe .",
+    "fix": "npx @biomejs/biome check --apply .",
+    "fix:unsafe": "npx @biomejs/biome check --apply-unsafe .",
     "patch": "npx @biomejs/biome check . && npm version patch && git push --follow-tags",
     "minor": "npx @biomejs/biome check . && npm version minor && git push --follow-tags",
     "major": "npx @biomejs/biome check . && npm version major && git push --follow-tags",
