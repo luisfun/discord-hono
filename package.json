@@ -7,13 +7,16 @@
   "license": "MIT",
   "keywords": ["discord-hono", "discord-bot", "cloudflare-workers"],
   "files": ["dist"],
+  "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
-    "require": "./dist/index.cjs",
-    "import": "./dist/index.mjs",
-    "types": "./dist/index.d.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
   },
   "scripts": {
     "fix": "npx @biomejs/biome check --apply .",
