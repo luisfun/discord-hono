@@ -1,12 +1,18 @@
 {
   "name": "discord-hono",
-  "version": "0.5.4",
+  "version": "0.6.0",
   "description": "This module enables you to easily build a Discord Bot that runs on Cloudflare workers",
   "author": "Luis (https://github.com/LuisFun)",
   "homepage": "https://github.com/LuisFun/discord-hono",
   "license": "MIT",
-  "keywords": ["discord-hono", "discord-bot", "cloudflare-workers"],
-  "files": ["dist"],
+  "keywords": [
+    "discord-hono",
+    "discord-bot",
+    "cloudflare-workers"
+  ],
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "exports": "./dist/index.js",
   "types": "./dist/index.d.ts",
