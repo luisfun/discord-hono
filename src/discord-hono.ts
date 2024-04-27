@@ -14,7 +14,7 @@ import type {
 import { ResponseJson } from './utils'
 import { verify } from './verify'
 
-type Option = { verify: Verify }
+type Options = { verify: Verify }
 type Verify = (
   body: string,
   signature: string | null,
@@ -34,8 +34,8 @@ class DiscordHonoBase<E extends Env> {
   #modalHandlers = new Map<string, ModalHandler<E>>()
   #cronHandlers = new Map<string, CronHandler<E>>()
   #discordKeyHandler: DiscordKeyHandler<E> | undefined = undefined
-  constructor(option?: Option) {
-    if (option?.verify) this.#verify = option?.verify
+  constructor(options?: Options) {
+    if (options?.verify) this.#verify = options?.verify
   }
 
   command = (command: string, handler: CommandHandler<E>) => {

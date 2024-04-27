@@ -36,11 +36,11 @@ type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
 // biome-ignore lint: Same definition as Hono
 type ContextVariableMap = {}
-interface Get<E extends Env> {
+interface GetVar<E extends Env> {
   <Key extends keyof ContextVariableMap>(key: Key): ContextVariableMap[Key]
   <Key extends keyof E['Variables']>(key: Key): E['Variables'][Key]
 }
-interface Set<E extends Env> {
+interface SetVar<E extends Env> {
   <Key extends keyof ContextVariableMap>(key: Key, value: ContextVariableMap[Key]): void
   <Key extends keyof E['Variables']>(key: Key, value: E['Variables'][Key]): void
 }
@@ -72,11 +72,11 @@ class ContextBase<E extends Env> {
     return this.#executionCtx.waitUntil.bind(this.#executionCtx)
   }
   // c.set, c.get, c.var.propName is Variables
-  set: Set<E> = (key: string, value: unknown) => {
+  set: SetVar<E> = (key: string, value: unknown) => {
     this.#var ??= {}
     this.#var[key as string] = value
   }
-  get: Get<E> = (key: string) => {
+  get: GetVar<E> = (key: string) => {
     return this.#var ? this.#var[key] : undefined
   }
   get var(): Readonly<E['Variables'] & ContextVariableMap> {
@@ -159,13 +159,13 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
 }
 
 type CommandValues = Record<string, string | number | boolean | undefined>
-type SubCommand = {
+type SubCommands = {
   group: string
   command: string
   string: string
 }
 export class CommandContext<E extends Env = any> extends RequestContext<E, InteractionData<2>> {
-  #sub: SubCommand = { group: '', command: '', string: '' }
+  #sub: SubCommands = { group: '', command: '', string: '' }
   #values: CommandValues = {}
   constructor(
     req: Request,
@@ -197,7 +197,7 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
     }
   }
 
-  get sub(): SubCommand {
+  get sub(): SubCommands {
     return this.#sub
   }
   get values(): CommandValues {
