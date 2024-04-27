@@ -134,11 +134,6 @@ export class SubCommand extends OptionBase {
     return this.assign({ options })
   }
 }
-/**
- * @deprecated
- * Use SubCommand instead.
- */
-export class SubOption extends SubCommand {}
 
 export class SubGroup extends OptionBase {
   constructor(name: string, description: string) {
@@ -151,11 +146,6 @@ export class SubGroup extends OptionBase {
     return this.assign({ options })
   }
 }
-/**
- * @deprecated
- * Use SubGroup instead.
- */
-export class SubGroupOption extends SubGroup {}
 
 export class Option extends OptionBase {
   /**
