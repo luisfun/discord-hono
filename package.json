@@ -19,9 +19,9 @@
   "scripts": {
     "fix": "npx @biomejs/biome check --apply .",
     "fix:unsafe": "npx @biomejs/biome check --apply-unsafe .",
-    "patch": "npm run fix && npm version patch && git push --follow-tags",
-    "minor": "npm run fix && npm version minor && git push --follow-tags",
-    "major": "npm run fix && npm version major && git push --follow-tags",
+    "patch": "npm run fix && npm run build && npm version patch && git push --follow-tags",
+    "minor": "npm run fix && npm run build && npm version minor && git push --follow-tags",
+    "major": "npm run fix && npm run build && npm version major && git push --follow-tags",
     "build:dts": "tsc && dts-bundle-generator dist/types/index.d.ts -o dist/index.d.ts && rimraf dist/types",
     "build:esm": "esbuild src/index.ts --outdir=dist --bundle --format=esm",
     "build": "rimraf dist && npm run build:dts && npm run build:esm",
