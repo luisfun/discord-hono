@@ -25,7 +25,6 @@ type CommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Res
 type ComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<Response> | Response
 type ModalHandler<E extends Env = any> = (c: ModalContext<E>) => Promise<Response> | Response
 type CronHandler<E extends Env = any> = (c: CronContext<E>) => Promise<unknown>
-type Handler = CommandHandler | ComponentHandler | ModalHandler | CronHandler
 
 class DiscordHonoBase<E extends Env> {
   #verify: Verify = verify
@@ -35,7 +34,7 @@ class DiscordHonoBase<E extends Env> {
   #cronHandlers = new Map<string, CronHandler<E>>()
   #discordKeyHandler: DiscordKeyHandler<E> | undefined = undefined
   constructor(options?: Options) {
-    if (options?.verify) this.#verify = options?.verify
+    if (options?.verify) this.#verify = options.verify
   }
 
   command = (command: string, handler: CommandHandler<E>) => {
@@ -59,18 +58,18 @@ class DiscordHonoBase<E extends Env> {
     return this
   }
 
-  fetch = async (request: Request, env?: E['Bindings'] | EnvDiscordKey, executionCtx?: ExecutionContext) => {
+  fetch = async (request: Request, env?: E['Bindings'] & EnvDiscordKey, executionCtx?: ExecutionContext) => {
     switch (request.method) {
       case 'GET':
         return new Response('powered by Discord Hono🔥')
       case 'POST': {
         const discord = this.#discordKeyHandler
           ? this.#discordKeyHandler(env)
-          : ({
+          : {
               APPLICATION_ID: env?.DISCORD_APPLICATION_ID,
               TOKEN: env?.DISCORD_TOKEN,
               PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY,
-            } as DiscordKey)
+            }
         if (!discord.PUBLIC_KEY) throw new Error('There is no DISCORD_PUBLIC_KEY.')
         // verify
         const signature = request.headers.get('x-signature-ed25519')
@@ -131,8 +130,8 @@ class DiscordHonoBase<E extends Env> {
 }
 
 const getHandler = <
-  H extends Handler,
-  Hs extends Map<string, H> = any, //Handlers<H> = any,
+  H extends CommandHandler | ComponentHandler | ModalHandler | CronHandler,
+  Hs extends Map<string, H> = any,
   I extends string | undefined | InteractionComponentData | InteractionModalData = any,
 >(
   handlers: Hs,
