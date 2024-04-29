@@ -3,7 +3,7 @@
 [👉 Documentation](https://discord-hono.luis.fun)
 
 This project is heavily influenced by [Hono](https://github.com/honojs/hono).  
-Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors! [Hono LICENSE](https://github.com/honojs/hono/blob/main/LICENSE)
+Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors!
 
 ## Features
 
@@ -58,8 +58,6 @@ await register(
 
 ## References
 
-The following repositories were referenced in the making of this project:
-
-- [Hono](https://github.com/honojs/hono)
-- [Official Example](https://github.com/discord/cloudflare-sample-app)
+- [Hono](https://github.com/honojs/hono) - [MIT License](https://github.com/honojs/hono/blob/main/LICENSE)
+- [Official Example](https://github.com/discord/cloudflare-sample-app) - [MIT License](https://github.com/discord/cloudflare-sample-app/blob/main/LICENSE)
 - [Verify for Workers](https://gist.github.com/devsnek/77275f6e3f810a9545440931ed314dc1)

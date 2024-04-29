@@ -5,19 +5,22 @@
     /* Modules */
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    /* JavaScript Support */
+    "checkJs": true,
     /* Emit */
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "outDir": "./dist/types",
+    "noEmit": true,
     /* Interop Constraints */
     "forceConsistentCasingInFileNames": true,
     /* Type Checking */
     "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
-    //"noUncheckedIndexedAccess": true
+    /* Completeness */
+    "skipLibCheck": true
   },
-  "include": ["src/**/*.ts"]
+  "include": ["./src/**/*"]
 }

@@ -17,8 +17,8 @@
   "exports": "./dist/index.js",
   "main": "./dist/index.js",
   "scripts": {
-    "fix": "biome check --apply .",
-    "fix:unsafe": "biome check --apply-unsafe .",
+    "fix": "biome check --apply . && tsc",
+    "fix:unsafe": "biome check --apply-unsafe . && tsc",
     "build": "tsup ./src/index.ts --format esm --target es2022 --dts --clean && attw -P . --ignore-rules cjs-resolves-to-esm",
     "patch": "npm run fix && npm run build && npm version patch && git push --follow-tags",
     "minor": "npm run fix && npm run build && npm version minor && git push --follow-tags",
