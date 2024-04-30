@@ -14,7 +14,6 @@
     "dist"
   ],
   "type": "module",
-  "exports": "./dist/index.js",
   "main": "./dist/index.js",
   "scripts": {
     "fix": "biome check --apply . && tsc",
