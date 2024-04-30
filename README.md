@@ -27,7 +27,7 @@ index.ts
 import { DiscordHono } from 'discord-hono'
 
 const app = new DiscordHono()
-app.command('hello', c => c.res('world!'))
+  .command('hello', c => c.res('world!'))
 
 export default app
 ```
@@ -35,18 +35,20 @@ export default app
 register.ts
 
 ```ts
-import dotenv from 'dotenv'
-import process from 'node:process'
-import { Command, Option, register } from 'discord-hono'
-dotenv.config({ path: '.dev.vars' })
+import { config } from 'dotenv'
+import { env } from 'node:process'
+import { Command, register } from 'discord-hono'
+config({ path: '.dev.vars' })
 
-const commands = [new Command('hello', 'response world')]
+const commands = [
+  new Command('hello', 'response world'),
+]
 
-await register(
+register(
   commands,
-  process.env.DISCORD_APPLICATION_ID,
-  process.env.DISCORD_TOKEN,
-  //process.env.DISCORD_TEST_GUILD_ID,
+  env.DISCORD_APPLICATION_ID,
+  env.DISCORD_TOKEN,
+  //env.DISCORD_TEST_GUILD_ID,
 )
 ```
 
