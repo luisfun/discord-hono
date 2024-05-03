@@ -1,3 +1,5 @@
+import { sleep } from '../utils'
+
 type XRateLimit = {
   RetryAfter: string | null
   Limit: string | null
@@ -44,5 +46,3 @@ const getXRateLimit = (res: Response) => ({
   Scope: res.headers.get('X-RateLimit-Scope'),
   Global: res.headers.get('X-RateLimit-Global'),
 })
-
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, Math.max(ms, 0)))

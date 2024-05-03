@@ -1,5 +1,5 @@
 import type { ArgFileData, CustomResponseData } from '../types'
-import { addToken, apiUrl, formData, errorDev } from '../utils'
+import { addToken, apiUrl, errorDev, formData } from '../utils'
 
 /**
  * [API Create Message](https://discord.com/developers/docs/resources/channel#create-message)
@@ -12,7 +12,7 @@ export const postMessage = async (
   data?: CustomResponseData,
   file?: ArgFileData,
 ) => {
-  if (!token) throw errorDev("DISCORD_TOKEN")
+  if (!token) throw errorDev('DISCORD_TOKEN')
   try {
     return await fetch(
       `${apiUrl}/channels/${channelId}/messages`,
@@ -28,7 +28,7 @@ export const postMessage = async (
  * [API Delete Message](https://discord.com/developers/docs/resources/channel#delete-message)
  */
 export const deleteMessage = async (token: string | undefined, channelId: string, messageId: string) => {
-  if (!token) throw errorDev("DISCORD_TOKEN")
+  if (!token) throw errorDev('DISCORD_TOKEN')
   try {
     return await fetch(`${apiUrl}/channels/${channelId}/messages/${messageId}`, addToken(token, { method: 'DELETE' }))
   } catch (e) {
@@ -38,6 +38,7 @@ export const deleteMessage = async (token: string | undefined, channelId: string
 }
 
 /**
+ * @deprecated
  * [API Followup Message](https://discord.com/developers/docs/interactions/receiving-and-responding#followup-messages)
  * Used to send messages after resDefer.
  * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
@@ -49,8 +50,8 @@ export const followupMessage = async (
   data?: CustomResponseData,
   file?: ArgFileData,
 ) => {
-  if (!applicationId) throw errorDev("DISCORD_APPLICATION_ID")
-  if (!interactionToken) throw errorDev("Interaction Token")
+  if (!applicationId) throw errorDev('DISCORD_APPLICATION_ID')
+  if (!interactionToken) throw errorDev('Interaction Token')
   try {
     return await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}`, {
       method: 'POST',
@@ -62,14 +63,17 @@ export const followupMessage = async (
   }
 }
 
+/**
+ * @deprecated
+ */
 export const followupDeleteMessage = async (
   applicationId: string | undefined,
   interactionToken: string | undefined,
   messageId: string | undefined,
 ) => {
-  if (!applicationId) throw errorDev("DISCORD_APPLICATION_ID")
-  if (!interactionToken) throw errorDev("Interaction Token")
-  if (!messageId) throw errorDev("Message Id")
+  if (!applicationId) throw errorDev('DISCORD_APPLICATION_ID')
+  if (!interactionToken) throw errorDev('Interaction Token')
+  if (!messageId) throw errorDev('Message Id')
   try {
     return await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}/messages/${messageId}`, {
       method: 'DELETE',

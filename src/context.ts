@@ -12,7 +12,6 @@ import type {
   APIModalInteractionResponseCallbackData,
   InteractionType,
 } from 'discord-api-types/v10'
-import { followupDeleteMessage, followupMessage } from './api-wrapper/channel-message'
 import { Components } from './builder/components'
 import { Modal } from './builder/modal'
 import type {
@@ -27,7 +26,7 @@ import type {
   InteractionComponentData,
   InteractionModalData,
 } from './types'
-import { ResponseJson, ephemeralData, errorOther } from './utils'
+import { ResponseJson, apiUrl, ephemeralData, errorDev, errorOther, errorSys, fetch429Retry, formData } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -57,15 +56,15 @@ class ContextBase<E extends Env> {
     return this.#env
   }
   get event(): FetchEventLike {
-    if (!(this.#executionCtx && 'respondWith' in this.#executionCtx)) throw errorOther("FetchEvent")
+    if (!(this.#executionCtx && 'respondWith' in this.#executionCtx)) throw errorOther('FetchEvent')
     return this.#executionCtx
   }
   get executionCtx(): ExecutionContext {
-    if (!this.#executionCtx) throw errorOther("ExecutionContext")
+    if (!this.#executionCtx) throw errorOther('ExecutionContext')
     return this.#executionCtx
   }
   get waitUntil(): ExecutionContext['waitUntil'] /*| FetchEventLike["waitUntil"]*/ {
-    if (!this.#executionCtx?.waitUntil) throw errorOther("waitUntil")
+    if (!this.#executionCtx?.waitUntil) throw errorOther('waitUntil')
     return this.#executionCtx.waitUntil.bind(this.#executionCtx)
   }
   // c.set, c.get, c.var.propName is Variables
@@ -189,11 +188,24 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * Used to send messages after resDefer.
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file FileData: { blob: Blob, name: string }
+   * @param retry Number of retries at rate limit. default: 0
    */
-  followup = (data?: CustomResponseData, file?: ArgFileData) =>
-    followupMessage(this.discord.APPLICATION_ID, this.#interaction.token, data, file)
-  followupDelete = () =>
-    followupDeleteMessage(this.discord.APPLICATION_ID, this.#interaction.token, this.#interaction.message?.id)
+  followup = (data?: CustomResponseData, file?: ArgFileData, retry = 0) => {
+    if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
+    return fetch429Retry(
+      `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.#interaction.token}`,
+      { method: 'POST', body: formData(data, file) },
+      retry,
+    )
+  }
+  followupDelete = () => {
+    if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
+    if (!this.#interaction.message?.id) throw errorSys('Message Id')
+    return fetch429Retry(
+      `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.#interaction.token}/messages/${this.#interaction.message?.id}`,
+      { method: 'DELETE' },
+    )
+  }
 }
 
 type CommandValues = Record<string, string | number | boolean | undefined>

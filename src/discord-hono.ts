@@ -70,7 +70,7 @@ class DiscordHonoBase<E extends Env> {
               TOKEN: env?.DISCORD_TOKEN,
               PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY,
             }
-        if (!discord.PUBLIC_KEY) throw errorDev("DISCORD_PUBLIC_KEY")
+        if (!discord.PUBLIC_KEY) throw errorDev('DISCORD_PUBLIC_KEY')
         // verify
         const signature = request.headers.get('x-signature-ed25519')
         const timestamp = request.headers.get('x-signature-timestamp')
@@ -139,13 +139,13 @@ const getHandler = <
   let str = ''
   if (typeof interaction === 'string') str = interaction
   else {
-    if (!interaction?.data) throw errorSys("interaction.data")
+    if (!interaction?.data) throw errorSys('interaction.data')
     const id = interaction.data.custom_id
     str = id.split(';')[0]
     interaction.data.custom_id = id.slice(str.length + 1)
   }
   const handler = handlers.get(str) || handlers.get('')
-  if (!handler) throw errorDev("Handler")
+  if (!handler) throw errorDev('Handler')
   return { handler, interaction }
 }
 

@@ -12,8 +12,8 @@ export const register = async (
   token: string | undefined,
   guildId?: string | undefined,
 ) => {
-  if (!token) throw errorDev("DISCORD_TOKEN")
-  if (!applicationId) throw errorDev("DISCORD_APPLICATION_ID")
+  if (!token) throw errorDev('DISCORD_TOKEN')
+  if (!applicationId) throw errorDev('DISCORD_APPLICATION_ID')
   const url = guildId
     ? `${apiUrl}/applications/${applicationId}/guilds/${guildId}/commands`
     : `${apiUrl}/applications/${applicationId}/commands`
