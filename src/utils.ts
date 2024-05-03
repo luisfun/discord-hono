@@ -37,6 +37,9 @@ export const formData = (data?: CustomResponseData, file?: ArgFileData) => {
   return body
 }
 
+/**
+ * @deprecated
+ */
 export const ephemeralData = (data?: CustomResponseData) => {
   if (typeof data === 'string') data = { content: data }
   return { ...data, flags: 1 << 6 }

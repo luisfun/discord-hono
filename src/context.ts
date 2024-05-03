@@ -1,17 +1,14 @@
 import type {
   APIBaseInteraction,
+  APICommandAutocompleteInteractionResponseCallbackData,
   APIInteractionResponse,
-  APIInteractionResponseChannelMessageWithSource,
-  APIInteractionResponseDeferredChannelMessageWithSource,
-  APIInteractionResponseDeferredMessageUpdate,
-  APIInteractionResponseUpdateMessage,
+  APIInteractionResponseCallbackData,
   APIMessageButtonInteractionData,
   APIMessageChannelSelectInteractionData,
   APIMessageMentionableSelectInteractionData,
   APIMessageRoleSelectInteractionData,
   APIMessageStringSelectInteractionData,
   APIMessageUserSelectInteractionData,
-  APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
   InteractionType,
 } from 'discord-api-types/v10'
@@ -90,9 +87,18 @@ type InteractionData<T extends 2 | 3 | 4 | 5> =
   T extends 3 ? InteractionComponentData :
   T extends 5 ? InteractionModalData :
   InteractionCommandData
+type InteractionCallbackType = 1 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+// biome-ignore format: ternary operator
+type InteractionCallbackData<T extends InteractionCallbackType> =
+  T extends 4 | 7 ? CustomResponseData :
+  T extends 5 ? Pick<APIInteractionResponseCallbackData, "flags"> :
+  T extends 8 ? APICommandAutocompleteInteractionResponseCallbackData :
+  T extends 9 ? APIModalInteractionResponseCallbackData :
+  undefined // 1, 6, 10
 class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> extends ContextBase<E> {
   #req: Request
   #interaction: D
+  #ephemeral: boolean | undefined = undefined
   constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordKey, interaction: D) {
     super(env, executionCtx, discord)
     this.#req = req
@@ -108,9 +114,17 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   get interaction(): D {
     return this.#interaction
   }
+  /**
+   * @param bool default true
+   */
+  ephemeral = (bool = true) => {
+    this.#ephemeral = bool
+    return this
+  }
 
   /**
-   * [Check Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type)
+   * @deprecated
+   * use c.res()
    */
   resBase = (json: APIInteractionResponse) => {
     if ('data' in json && json.data) {
@@ -125,37 +139,61 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   /**
    * Response to request.
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
+   * @param type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type)
    * @returns Response
    */
-  res = (data: CustomResponseData) => this.resBase({ type: 4, data } as APIInteractionResponseChannelMessageWithSource)
+  res = <T extends InteractionCallbackType = 4>(data: InteractionCallbackData<T>, type: T = 4 as T) => {
+    let json: APIInteractionResponse
+    const flags = this.#ephemeral ? 1 << 6 : 0
+    switch (type) {
+      case 4:
+      case 7: {
+        const fixedData = data as InteractionCallbackData<4 | 7> // ts
+        if (typeof fixedData === 'string') {
+          json = { data: { flags, content: fixedData }, type }
+        } else if ('components' in fixedData) {
+          const components =
+            fixedData.components instanceof Components ? fixedData.components.build() : fixedData.components
+          json = { data: { flags, ...fixedData, components }, type }
+        } else {
+          json = { data: { flags, ...(fixedData as Omit<InteractionCallbackData<4 | 7>, 'components'>) }, type }
+        }
+        break
+      }
+      case 5: {
+        const fixedData = data as InteractionCallbackData<5> // ts
+        json = { data: { flags, ...fixedData }, type }
+        break
+      }
+      case 8:
+      case 9: {
+        // @ts-expect-error To reduce the amount of code
+        json = { data, type }
+        break
+      }
+      default: // 1, 6, 10
+        json = { type }
+    }
+    return new ResponseJson(json)
+  }
+  /**
+   * @deprecated
+   * use c.ephemeral().res()
+   */
   resEphemeral = (data: CustomResponseData) => this.res(ephemeralData(data))
   resDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
     if (handler) this.waitUntil(handler(this, ...args))
-    return this.resBase({ type: 5 } as APIInteractionResponseDeferredChannelMessageWithSource)
+    return this.res({}, 5)
   }
-  /* not working
-  resDeferEphemeral = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
-    if (handler) this.waitUntil(handler(this, ...args))
-    return this.resBase({ type: 5, flags: 1 << 6 } as APIInteractionResponseDeferredChannelMessageWithSource)
-  }
-  */
   /**
    * Used to send messages after resDefer.
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file FileData: { blob: Blob, name: string }
    */
-  followup = async (data?: CustomResponseData, file?: ArgFileData) =>
-    await followupMessage(this.discord.APPLICATION_ID, this.#interaction.token, data, file)
-  /* not working
-  followupEphemeral = async (data?: CustomResponseData, file?: ArgFileData) =>
-    await this.followup(ephemeralData(data), file)
-  */
-  followupDelete = async (applicationId?: string, interactionToken?: string, messageId?: string) => {
-    const appId = applicationId || this.discord.APPLICATION_ID
-    const token = interactionToken || this.#interaction.token
-    const mId = messageId || this.#interaction.message?.id
-    return await followupDeleteMessage(appId, token, mId)
-  }
+  followup = (data?: CustomResponseData, file?: ArgFileData) =>
+    followupMessage(this.discord.APPLICATION_ID, this.#interaction.token, data, file)
+  followupDelete = () =>
+    followupDeleteMessage(this.discord.APPLICATION_ID, this.#interaction.token, this.#interaction.message?.id)
 }
 
 type CommandValues = Record<string, string | number | boolean | undefined>
@@ -206,7 +244,7 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
 
   resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
     const data = e instanceof Modal ? e.build() : e
-    return this.resBase({ type: 9, data } as APIModalInteractionResponse)
+    return this.res(data, 9)
   }
 }
 
@@ -238,11 +276,11 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
 
   resUpdate = (data: CustomResponseData) => {
     if (typeof data === 'string') data = { content: data }
-    return this.resBase({ type: 7, data } as APIInteractionResponseUpdateMessage)
+    return this.res(data, 7)
   }
   resUpdateDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
     if (handler) this.waitUntil(handler(this, ...args))
-    return this.resBase({ type: 6 } as APIInteractionResponseDeferredMessageUpdate)
+    return this.res(undefined, 6)
   }
   /**
    * Delete the previous message and post a new one.
@@ -250,14 +288,18 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
    * Internally, it hits the API endpoint of followup.
    */
   resRepost = (data?: CustomResponseData) => {
-    if (!data) return this.resUpdateDefer(async () => await this.followupDelete())
+    if (!data) return this.resUpdateDefer(this.followupDelete)
     this.waitUntil(this.followupDelete())
     return this.res(data)
   }
+  /**
+   * @deprecated
+   * use c.ephemeral().resRepost()
+   */
   resRepostEphemeral = (data: CustomResponseData) => this.resRepost(ephemeralData(data))
   resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
     const data = e instanceof Modal ? e.build() : e
-    return this.resBase({ type: 9, data } as APIModalInteractionResponse)
+    return this.res(data, 9)
   }
 }
 
