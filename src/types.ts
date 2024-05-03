@@ -18,14 +18,9 @@ export type Env = {
   Variables?: Record<string, unknown>
 }
 
-////////// EnvDiscord //////////
+////////// DiscordEnv //////////
 
-export type EnvDiscordKey = {
-  DISCORD_TOKEN?: string
-  DISCORD_PUBLIC_KEY?: string
-  DISCORD_APPLICATION_ID?: string
-}
-export type DiscordKey = {
+export type DiscordEnv = {
   TOKEN?: string
   PUBLIC_KEY?: string
   APPLICATION_ID?: string
@@ -49,7 +44,7 @@ export type ApplicationCommand = Omit<
 
 ////////// EnvHandler //////////
 
-export type DiscordKeyHandler<E extends Env> = (env: E['Bindings']) => DiscordKey
+export type DiscordEnvHandler<E extends Env> = (env: E['Bindings']) => DiscordEnv
 
 ////////// CronEvent //////////
 // https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled/#syntax

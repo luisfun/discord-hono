@@ -1,4 +1,4 @@
-export type { ApplicationCommand, DiscordKeyHandler } from './types'
+export type { ApplicationCommand, DiscordEnvHandler } from './types'
 export type * from './context'
 export * from './discord-hono'
 export * from './register'

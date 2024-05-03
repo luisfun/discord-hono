@@ -18,7 +18,7 @@ import type {
   ArgFileData,
   CronEvent,
   CustomCallbackData,
-  DiscordKey,
+  DiscordEnv,
   Env,
   ExecutionContext,
   FetchEventLike,
@@ -54,9 +54,9 @@ interface SetVar<E extends Env> {
 class ContextBase<E extends Env> {
   #env: E['Bindings'] = {}
   #executionCtx: ExecutionCtx
-  protected discord: DiscordKey
+  protected discord: DiscordEnv
   #var: E['Variables'] = {}
-  constructor(env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordKey) {
+  constructor(env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv) {
     this.#env = env
     this.#executionCtx = executionCtx
     this.discord = discord
@@ -108,7 +108,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   #req: Request
   #interaction: D
   #ephemeral: boolean | undefined = undefined
-  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordKey, interaction: D) {
+  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv, interaction: D) {
     super(env, executionCtx, discord)
     this.#req = req
     this.#interaction = interaction
@@ -221,7 +221,7 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
     req: Request,
     env: E['Bindings'],
     executionCtx: ExecutionCtx,
-    discord: DiscordKey,
+    discord: DiscordEnv,
     interaction: InteractionData<2>,
   ) {
     super(req, env, executionCtx, discord, interaction)
@@ -280,7 +280,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
     req: Request,
     env: E['Bindings'],
     executionCtx: ExecutionCtx,
-    discord: DiscordKey,
+    discord: DiscordEnv,
     interaction: InteractionData<3>,
   ) {
     super(req, env, executionCtx, discord, interaction as ComponentInteractionData<T>)
@@ -321,7 +321,7 @@ export class ModalContext<E extends Env = any> extends RequestContext<E, Interac
     req: Request,
     env: E['Bindings'],
     executionCtx: ExecutionCtx,
-    discord: DiscordKey,
+    discord: DiscordEnv,
     interaction: InteractionData<5>,
   ) {
     super(req, env, executionCtx, discord, interaction)
@@ -342,7 +342,7 @@ export class ModalContext<E extends Env = any> extends RequestContext<E, Interac
 
 export class CronContext<E extends Env = any> extends ContextBase<E> {
   #cronEvent: CronEvent
-  constructor(event: CronEvent, env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordKey) {
+  constructor(event: CronEvent, env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv) {
     super(env, executionCtx, discord)
     this.#cronEvent = event
   }

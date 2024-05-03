@@ -2,10 +2,9 @@ import type { APIBaseInteraction, APIInteractionResponsePong, InteractionType } 
 import { CommandContext, ComponentContext, CronContext, ModalContext } from './context'
 import type {
   CronEvent,
-  DiscordKey,
-  DiscordKeyHandler,
+  DiscordEnv,
+  DiscordEnvHandler,
   Env,
-  EnvDiscordKey,
   ExecutionContext,
   InteractionCommandData,
   InteractionComponentData,
@@ -14,17 +13,22 @@ import type {
 import { ResponseJson, errorDev, errorSys } from './utils'
 import { verify } from './verify'
 
-type Options = { verify: Verify }
 type Verify = (
   body: string,
   signature: string | null,
   timestamp: string | null,
   publicKey: string,
 ) => Promise<boolean> | boolean
+type Options<E extends Env> = { verify: Verify; discordEnv: DiscordEnvHandler<E> }
 type CommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
 type ComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<Response> | Response
 type ModalHandler<E extends Env = any> = (c: ModalContext<E>) => Promise<Response> | Response
 type CronHandler<E extends Env = any> = (c: CronContext<E>) => Promise<unknown>
+type EnvDiscordEnv = {
+  DISCORD_TOKEN?: string
+  DISCORD_PUBLIC_KEY?: string
+  DISCORD_APPLICATION_ID?: string
+}
 
 class DiscordHonoBase<E extends Env> {
   #verify: Verify = verify
@@ -32,9 +36,10 @@ class DiscordHonoBase<E extends Env> {
   #componentHandlers = new Map<string, ComponentHandler<E>>()
   #modalHandlers = new Map<string, ModalHandler<E>>()
   #cronHandlers = new Map<string, CronHandler<E>>()
-  #discordKeyHandler: DiscordKeyHandler<E> | undefined = undefined
-  constructor(options?: Options) {
+  #discordEnvHandler: DiscordEnvHandler<E> | undefined = undefined
+  constructor(options?: Options<E>) {
     if (options?.verify) this.#verify = options.verify
+    if (options?.discordEnv) this.#discordEnvHandler = options.discordEnv
   }
 
   command = (command: string, handler: CommandHandler<E>) => {
@@ -53,23 +58,31 @@ class DiscordHonoBase<E extends Env> {
     this.#cronHandlers.set(cronId, handler)
     return this
   }
-  discordKey = (handler: DiscordKeyHandler<E>) => {
-    this.#discordKeyHandler = handler
+  /**
+   * @deprecated
+   * use init options
+   * new DiscordHono({ discordEnv: (env) => {***} })
+   */
+  discordKey = (handler: DiscordEnvHandler<E>) => {
+    this.#discordEnvHandler = handler
     return this
   }
+  #discordEnv = (env?: EnvDiscordEnv): DiscordEnv => {
+    const discordEnv = this.#discordEnvHandler ? this.#discordEnvHandler(env) : {}
+    return {
+      APPLICATION_ID: env?.DISCORD_APPLICATION_ID,
+      TOKEN: env?.DISCORD_TOKEN,
+      PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY,
+      ...discordEnv,
+    }
+  }
 
-  fetch = async (request: Request, env?: E['Bindings'] & EnvDiscordKey, executionCtx?: ExecutionContext) => {
+  fetch = async (request: Request, env?: E['Bindings'] & EnvDiscordEnv, executionCtx?: ExecutionContext) => {
     switch (request.method) {
       case 'GET':
         return new Response('powered by Discord Hono🔥')
       case 'POST': {
-        const discord = this.#discordKeyHandler
-          ? this.#discordKeyHandler(env)
-          : {
-              APPLICATION_ID: env?.DISCORD_APPLICATION_ID,
-              TOKEN: env?.DISCORD_TOKEN,
-              PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY,
-            }
+        const discord = this.#discordEnv(env)
         if (!discord.PUBLIC_KEY) throw errorDev('DISCORD_PUBLIC_KEY')
         // verify
         const signature = request.headers.get('x-signature-ed25519')
@@ -111,14 +124,8 @@ class DiscordHonoBase<E extends Env> {
     }
   }
 
-  scheduled = async (event: CronEvent, env: E['Bindings'] | EnvDiscordKey, executionCtx?: ExecutionContext) => {
-    const discord = this.#discordKeyHandler
-      ? this.#discordKeyHandler(env)
-      : ({
-          APPLICATION_ID: env?.DISCORD_APPLICATION_ID,
-          TOKEN: env?.DISCORD_TOKEN,
-          PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY,
-        } as DiscordKey)
+  scheduled = async (event: CronEvent, env: E['Bindings'] & EnvDiscordEnv, executionCtx?: ExecutionContext) => {
+    const discord = this.#discordEnv(env)
     const { handler } = getHandler<CronHandler>(this.#cronHandlers, event.cron)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(new CronContext(event, env, executionCtx, discord)))
     else {
