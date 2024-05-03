@@ -1,6 +1,6 @@
 import { Command } from './builder/command'
 import type { ApplicationCommand } from './types'
-import { apiUrl } from './utils'
+import { apiUrl, errorDev } from './utils'
 
 // cloudflare-sample-app
 // Copyright (c) 2022 Justin Beckwith
@@ -12,8 +12,8 @@ export const register = async (
   token: string | undefined,
   guildId?: string | undefined,
 ) => {
-  if (!token) throw new Error('The DISCORD_TOKEN environment variable is required.')
-  if (!applicationId) throw new Error('The DISCORD_APPLICATION_ID environment variable is required.')
+  if (!token) throw errorDev("DISCORD_TOKEN")
+  if (!applicationId) throw errorDev("DISCORD_APPLICATION_ID")
   const url = guildId
     ? `${apiUrl}/applications/${applicationId}/guilds/${guildId}/commands`
     : `${apiUrl}/applications/${applicationId}/commands`

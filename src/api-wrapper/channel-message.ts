@@ -1,5 +1,5 @@
 import type { ArgFileData, CustomResponseData } from '../types'
-import { addToken, apiUrl, formData } from '../utils'
+import { addToken, apiUrl, formData, errorDev } from '../utils'
 
 /**
  * [API Create Message](https://discord.com/developers/docs/resources/channel#create-message)
@@ -12,7 +12,7 @@ export const postMessage = async (
   data?: CustomResponseData,
   file?: ArgFileData,
 ) => {
-  if (!token) throw new Error('DISCORD_TOKEN is not set.')
+  if (!token) throw errorDev("DISCORD_TOKEN")
   try {
     return await fetch(
       `${apiUrl}/channels/${channelId}/messages`,
@@ -28,7 +28,7 @@ export const postMessage = async (
  * [API Delete Message](https://discord.com/developers/docs/resources/channel#delete-message)
  */
 export const deleteMessage = async (token: string | undefined, channelId: string, messageId: string) => {
-  if (!token) throw new Error('DISCORD_TOKEN is not set.')
+  if (!token) throw errorDev("DISCORD_TOKEN")
   try {
     return await fetch(`${apiUrl}/channels/${channelId}/messages/${messageId}`, addToken(token, { method: 'DELETE' }))
   } catch (e) {
@@ -49,8 +49,8 @@ export const followupMessage = async (
   data?: CustomResponseData,
   file?: ArgFileData,
 ) => {
-  if (!applicationId) throw new Error('DISCORD_APPLICATION_ID is not set.')
-  if (!interactionToken) throw new Error('Interaction Token is not set.')
+  if (!applicationId) throw errorDev("DISCORD_APPLICATION_ID")
+  if (!interactionToken) throw errorDev("Interaction Token")
   try {
     return await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}`, {
       method: 'POST',
@@ -67,9 +67,9 @@ export const followupDeleteMessage = async (
   interactionToken: string | undefined,
   messageId: string | undefined,
 ) => {
-  if (!applicationId) throw new Error('DISCORD_APPLICATION_ID is not set.')
-  if (!interactionToken) throw new Error('Interaction Token is not set.')
-  if (!messageId) throw new Error('Message Id is not set.')
+  if (!applicationId) throw errorDev("DISCORD_APPLICATION_ID")
+  if (!interactionToken) throw errorDev("Interaction Token")
+  if (!messageId) throw errorDev("Message Id")
   try {
     return await fetch(`${apiUrl}/webhooks/${applicationId}/${interactionToken}/messages/${messageId}`, {
       method: 'DELETE',

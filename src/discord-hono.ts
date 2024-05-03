@@ -11,7 +11,7 @@ import type {
   InteractionComponentData,
   InteractionModalData,
 } from './types'
-import { ResponseJson } from './utils'
+import { ResponseJson, errorDev, errorSys } from './utils'
 import { verify } from './verify'
 
 type Options = { verify: Verify }
@@ -70,7 +70,7 @@ class DiscordHonoBase<E extends Env> {
               TOKEN: env?.DISCORD_TOKEN,
               PUBLIC_KEY: env?.DISCORD_PUBLIC_KEY,
             }
-        if (!discord.PUBLIC_KEY) throw new Error('There is no DISCORD_PUBLIC_KEY.')
+        if (!discord.PUBLIC_KEY) throw errorDev("DISCORD_PUBLIC_KEY")
         // verify
         const signature = request.headers.get('x-signature-ed25519')
         const timestamp = request.headers.get('x-signature-timestamp')
@@ -101,8 +101,7 @@ class DiscordHonoBase<E extends Env> {
             return await handler(new ModalContext(request, env, executionCtx, discord, interaction))
           }
           default: {
-            console.warn('interaction.type: ', data.type)
-            console.warn('Not yet implemented.')
+            console.error(`interaction.type: ${data.type}\nNot yet implemented`)
             return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
           }
         }
@@ -123,7 +122,7 @@ class DiscordHonoBase<E extends Env> {
     const { handler } = getHandler<CronHandler>(this.#cronHandlers, event.cron)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(new CronContext(event, env, executionCtx, discord)))
     else {
-      console.log('The process does not apply waitUntil.')
+      console.log('The process does not apply waitUntil')
       await handler(new CronContext(event, env, executionCtx, discord))
     }
   }
@@ -140,13 +139,13 @@ const getHandler = <
   let str = ''
   if (typeof interaction === 'string') str = interaction
   else {
-    if (!interaction?.data) throw new Error('There is no interaction.data.')
+    if (!interaction?.data) throw errorSys("interaction.data")
     const id = interaction.data.custom_id
     str = id.split(';')[0]
     interaction.data.custom_id = id.slice(str.length + 1)
   }
   const handler = handlers.get(str) || handlers.get('')
-  if (!handler) throw new Error('Handlers is not set.')
+  if (!handler) throw errorDev("Handler")
   return { handler, interaction }
 }
 

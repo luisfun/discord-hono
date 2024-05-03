@@ -27,7 +27,7 @@ import type {
   InteractionComponentData,
   InteractionModalData,
 } from './types'
-import { ResponseJson, ephemeralData } from './utils'
+import { ResponseJson, ephemeralData, errorOther } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -57,15 +57,15 @@ class ContextBase<E extends Env> {
     return this.#env
   }
   get event(): FetchEventLike {
-    if (!(this.#executionCtx && 'respondWith' in this.#executionCtx)) throw new Error('This context has no FetchEvent.')
+    if (!(this.#executionCtx && 'respondWith' in this.#executionCtx)) throw errorOther("FetchEvent")
     return this.#executionCtx
   }
   get executionCtx(): ExecutionContext {
-    if (!this.#executionCtx) throw new Error('This context has no ExecutionContext.')
+    if (!this.#executionCtx) throw errorOther("ExecutionContext")
     return this.#executionCtx
   }
   get waitUntil(): ExecutionContext['waitUntil'] /*| FetchEventLike["waitUntil"]*/ {
-    if (!this.#executionCtx?.waitUntil) throw new Error('This context has no waitUntil.')
+    if (!this.#executionCtx?.waitUntil) throw errorOther("waitUntil")
     return this.#executionCtx.waitUntil.bind(this.#executionCtx)
   }
   // c.set, c.get, c.var.propName is Variables

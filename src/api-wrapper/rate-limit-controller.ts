@@ -23,7 +23,7 @@ export class ApiRateLimitController {
     if (!this.response || !this.xRateLimit) return this
     if (this.response.status === 429) {
       const ms = Number(this.xRateLimit.RetryAfter || 60) * 1000
-      console.log('===== API Rate Limit =====\nsleep: ', ms, '\n', this.xRateLimit, '\n')
+      console.warn('===== API Rate Limit =====\nsleep: ', ms, '\n', this.xRateLimit, '\n')
       await sleep(ms)
     } else {
       const ms = Math.max((3 - Number(this.xRateLimit.Remaining || 5)) * 500, 0)
