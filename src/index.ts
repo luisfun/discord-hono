@@ -1,9 +1,7 @@
 export type { ApplicationCommand, DiscordEnvHandler } from './types'
 export type * from './context'
 export * from './discord-hono'
-export * from './register'
+export * from './builder'
+export * from './rest-api'
+// @deprecated
 export * from './api-wrapper/channel-message'
-export * from './api-wrapper/rate-limit-controller'
-export * from './builder/command'
-export * from './builder/components'
-export * from './builder/modal'

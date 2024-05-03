@@ -12,31 +12,20 @@ import type {
   APIModalInteractionResponseCallbackData,
   InteractionType,
 } from 'discord-api-types/v10'
-import { Components } from './builder/components'
 import { Modal } from './builder/modal'
 import type {
-  FileData,
   CronEvent,
   CustomCallbackData,
   DiscordEnv,
   Env,
   ExecutionContext,
   FetchEventLike,
+  FileData,
   InteractionCommandData,
   InteractionComponentData,
   InteractionModalData,
 } from './types'
-import {
-  ResponseJson,
-  apiUrl,
-  ephemeralData,
-  errorDev,
-  errorOther,
-  errorSys,
-  fetch429Retry,
-  formData,
-  prepareData,
-} from './utils'
+import { ResponseJson, apiUrl, errorDev, errorOther, errorSys, fetch429Retry, formData, prepareData } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -135,16 +124,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @deprecated
    * use c.res()
    */
-  resBase = (json: APIInteractionResponse) => {
-    if ('data' in json && json.data) {
-      if (typeof json.data === 'string') json.data = { content: json.data }
-      else if ('components' in json.data) {
-        const components = json.data.components
-        json.data.components = components instanceof Components ? components.build() : components
-      }
-    }
-    return new ResponseJson(json)
-  }
+  resBase = (json: APIInteractionResponse) => this.res('data' in json ? json.data : {}, json.type)
   /**
    * Response to request.
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
@@ -179,7 +159,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @deprecated
    * use c.ephemeral().res()
    */
-  resEphemeral = (data: CustomCallbackData) => this.res(ephemeralData(data))
+  resEphemeral = (data: CustomCallbackData) => this.ephemeral().res(data)
   resDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
     if (handler) this.waitUntil(handler(this, ...args))
     return this.res({}, 5)
@@ -308,7 +288,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
    * @deprecated
    * use c.ephemeral().resRepost()
    */
-  resRepostEphemeral = (data: CustomCallbackData) => this.resRepost(ephemeralData(data))
+  resRepostEphemeral = (data: CustomCallbackData) => this.ephemeral().resRepost(data)
   resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
     const data = e instanceof Modal ? e.build() : e
     return this.res(data, 9)

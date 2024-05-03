@@ -1,6 +1,6 @@
 import type { APIInteractionResponseCallbackData } from 'discord-api-types/v10'
 import { Components } from './builder/components'
-import type { FileData, CustomCallbackData } from './types'
+import type { CustomCallbackData, FileData } from './types'
 
 export const apiUrl = 'https://discord.com/api/v10'
 
@@ -18,7 +18,7 @@ export class ResponseJson extends Response {
   }
 }
 
-export const addToken = (token: string, init?: RequestInit): RequestInit => ({
+export const addToken = (token: string, init?: Parameters<typeof fetch>[1]): Parameters<typeof fetch>[1] => ({
   ...init,
   headers: {
     ...init?.headers,
@@ -69,12 +69,4 @@ export const fetch429Retry = async (
     await sleep(retryOffset)
     return fetch429Retry(input, init, retry - 1)
   }
-}
-
-/**
- * @deprecated
- */
-export const ephemeralData = (data?: CustomCallbackData) => {
-  if (typeof data === 'string') data = { content: data }
-  return { ...data, flags: 1 << 6 }
 }

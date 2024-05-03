@@ -1,31 +1,9 @@
-import type { FileData, CustomCallbackData } from '../types'
+import type { CustomCallbackData, FileData } from '../types'
 import { addToken, apiUrl, errorDev, formData } from '../utils'
 
 /**
- * [API Create Message](https://discord.com/developers/docs/resources/channel#create-message)
- * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
- * @param file FileData: { blob: Blob, name: string }
- */
-export const postMessage = async (
-  token: string | undefined,
-  channelId: string,
-  data?: CustomCallbackData,
-  file?: FileData,
-) => {
-  if (!token) throw errorDev('DISCORD_TOKEN')
-  try {
-    return await fetch(
-      `${apiUrl}/channels/${channelId}/messages`,
-      addToken(token, { method: 'POST', body: formData(data, file) }),
-    )
-  } catch (e) {
-    console.warn('API fetch() Error: POST message\n', e)
-    return undefined
-  }
-}
-
-/**
- * [API Delete Message](https://discord.com/developers/docs/resources/channel#delete-message)
+ * @deprecated
+ * use rest(token).channels(id).messages(id).delete()
  */
 export const deleteMessage = async (token: string | undefined, channelId: string, messageId: string) => {
   if (!token) throw errorDev('DISCORD_TOKEN')
