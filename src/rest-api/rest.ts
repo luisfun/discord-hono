@@ -24,7 +24,10 @@ type ChannelMessageGetResult<M extends string | undefined> = M extends string
  * get: { response, result }
  * other: response
  */
-export const rest = (token: string) => {
+/**
+ * @param token required
+ */
+export const rest = (token: string | undefined) => {
   if (!token) throw errorDev('DISCORD_TOKEN')
   const init = (init: Parameters<typeof fetch>[1]): Parameters<typeof fetch>[1] => addToken(token, init)
   const initGet = init(mGet)
@@ -32,7 +35,10 @@ export const rest = (token: string) => {
   const initPost = init(mPost)
   const initDelete = init(mDelete)
   return {
-    channels: (channelId: string) => {
+    /**
+     * @param channelId required
+     */
+    channels: (channelId: string | undefined) => {
       if (!channelId) throw errorDev('Channel Id')
       const channelUrl = `${apiUrl}/channels/${channelId}`
       return {
@@ -57,8 +63,8 @@ export const rest = (token: string) => {
           return {
             // ****************************** Not done yet: messages() のパラメータ
             /**
-             * messages() -> [get message list](https://discord.com/developers/docs/resources/channel#get-channel-messages)
-             * messages(messageId) -> [get message](https://discord.com/developers/docs/resources/channel#get-channel-message)
+             * messages().get() -> [get message list](https://discord.com/developers/docs/resources/channel#get-channel-messages)
+             * messages(messageId).get() -> [get message](https://discord.com/developers/docs/resources/channel#get-channel-message)
              */
             get: async () => {
               const response = await fetch429Retry(messageUrl, initGet)
@@ -66,7 +72,7 @@ export const rest = (token: string) => {
             },
             // ****************************** Not done yet: formData() の再設計
             /**
-             * messages() -> [post message](https://discord.com/developers/docs/resources/channel#create-message)
+             * messages().post("data") -> [post message](https://discord.com/developers/docs/resources/channel#create-message)
              */
             post: (jsonBody: RESTPostAPIChannelMessageJSONBody, file?: FileData) => {
               return fetch429Retry(messageUrl, init({ ...mPost, body: formData(jsonBody, file) }))
@@ -98,8 +104,8 @@ export const rest = (token: string) => {
                   return { response, result: (await response.json()) as RESTGetAPIChannelMessageReactionUsersResult }
                 },
                 /**
-                 * reactions() -> [delete all reactions](https://discord.com/developers/docs/resources/channel#delete-all-reactions)
-                 * reactions(emoji) -> [delete all reactions for emoji](https://discord.com/developers/docs/resources/channel#delete-all-reactions-for-emoji)
+                 * reactions().delete() -> [delete all reactions](https://discord.com/developers/docs/resources/channel#delete-all-reactions)
+                 * reactions(emoji).delete() -> [delete all reactions for emoji](https://discord.com/developers/docs/resources/channel#delete-all-reactions-for-emoji)
                  */
                 delete: () => fetch429Retry(reactionUrl, initDelete),
                 me: () => {
