@@ -17,7 +17,7 @@ import { Modal } from './builder/modal'
 import type {
   ArgFileData,
   CronEvent,
-  CustomResponseData,
+  CustomCallbackData,
   DiscordKey,
   Env,
   ExecutionContext,
@@ -26,7 +26,17 @@ import type {
   InteractionComponentData,
   InteractionModalData,
 } from './types'
-import { ResponseJson, apiUrl, ephemeralData, errorDev, errorOther, errorSys, fetch429Retry, formData } from './utils'
+import {
+  ResponseJson,
+  apiUrl,
+  ephemeralData,
+  errorDev,
+  errorOther,
+  errorSys,
+  fetch429Retry,
+  formData,
+  prepareData,
+} from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -89,7 +99,7 @@ type InteractionData<T extends 2 | 3 | 4 | 5> =
 type InteractionCallbackType = 1 | 4 | 5 | 6 | 7 | 8 | 9 | 10
 // biome-ignore format: ternary operator
 type InteractionCallbackData<T extends InteractionCallbackType> =
-  T extends 4 | 7 ? CustomResponseData :
+  T extends 4 | 7 ? CustomCallbackData :
   T extends 5 ? Pick<APIInteractionResponseCallbackData, "flags"> :
   T extends 8 ? APICommandAutocompleteInteractionResponseCallbackData :
   T extends 9 ? APIModalInteractionResponseCallbackData :
@@ -147,21 +157,11 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     switch (type) {
       case 4:
       case 7: {
-        const fixedData = data as InteractionCallbackData<4 | 7> // ts
-        if (typeof fixedData === 'string') {
-          json = { data: { flags, content: fixedData }, type }
-        } else if ('components' in fixedData) {
-          const components =
-            fixedData.components instanceof Components ? fixedData.components.build() : fixedData.components
-          json = { data: { flags, ...fixedData, components }, type }
-        } else {
-          json = { data: { flags, ...(fixedData as Omit<InteractionCallbackData<4 | 7>, 'components'>) }, type }
-        }
+        json = { data: { flags, ...prepareData(data as InteractionCallbackData<4 | 7>) }, type }
         break
       }
       case 5: {
-        const fixedData = data as InteractionCallbackData<5> // ts
-        json = { data: { flags, ...fixedData }, type }
+        json = { data: { flags, ...(data as InteractionCallbackData<5>) }, type }
         break
       }
       case 8:
@@ -179,7 +179,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @deprecated
    * use c.ephemeral().res()
    */
-  resEphemeral = (data: CustomResponseData) => this.res(ephemeralData(data))
+  resEphemeral = (data: CustomCallbackData) => this.res(ephemeralData(data))
   resDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
     if (handler) this.waitUntil(handler(this, ...args))
     return this.res({}, 5)
@@ -190,7 +190,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param file FileData: { blob: Blob, name: string }
    * @param retry Number of retries at rate limit. default: 0
    */
-  followup = (data?: CustomResponseData, file?: ArgFileData, retry = 0) => {
+  followup = (data?: CustomCallbackData, file?: ArgFileData, retry = 0) => {
     if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
     return fetch429Retry(
       `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.#interaction.token}`,
@@ -286,7 +286,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
     super(req, env, executionCtx, discord, interaction as ComponentInteractionData<T>)
   }
 
-  resUpdate = (data: CustomResponseData) => {
+  resUpdate = (data: CustomCallbackData) => {
     if (typeof data === 'string') data = { content: data }
     return this.res(data, 7)
   }
@@ -299,7 +299,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
    * If the argument is empty, only message deletion is performed.
    * Internally, it hits the API endpoint of followup.
    */
-  resRepost = (data?: CustomResponseData) => {
+  resRepost = (data?: CustomCallbackData) => {
     if (!data) return this.resUpdateDefer(this.followupDelete)
     this.waitUntil(this.followupDelete())
     return this.res(data)
@@ -308,7 +308,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
    * @deprecated
    * use c.ephemeral().resRepost()
    */
-  resRepostEphemeral = (data: CustomResponseData) => this.resRepost(ephemeralData(data))
+  resRepostEphemeral = (data: CustomCallbackData) => this.resRepost(ephemeralData(data))
   resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
     const data = e instanceof Modal ? e.build() : e
     return this.res(data, 9)

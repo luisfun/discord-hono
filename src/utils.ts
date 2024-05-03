@@ -1,5 +1,6 @@
+import type { APIInteractionResponseCallbackData } from 'discord-api-types/v10'
 import { Components } from './builder/components'
-import type { ArgFileData, CustomResponseData } from './types'
+import type { ArgFileData, CustomCallbackData } from './types'
 
 export const apiUrl = 'https://discord.com/api/v10'
 
@@ -25,12 +26,18 @@ export const addToken = (token: string, init?: RequestInit): RequestInit => ({
   },
 })
 
-export const formData = (data?: CustomResponseData, file?: ArgFileData) => {
+export const prepareData = (data: CustomCallbackData): APIInteractionResponseCallbackData => {
+  if (typeof data === 'string') return { content: data }
+  if (data?.components) {
+    const components = data.components instanceof Components ? data.components.build() : data.components
+    return { ...data, components }
+  }
+  return data as Omit<CustomCallbackData, 'components'>
+}
+
+export const formData = (data?: CustomCallbackData, file?: ArgFileData) => {
   const body = new FormData()
-  if (typeof data === 'string') data = { content: data }
-  if (data?.components)
-    data.components = data.components instanceof Components ? data.components.build() : data.components
-  if (data) body.append('payload_json', JSON.stringify(data))
+  if (data) body.append('payload_json', JSON.stringify(prepareData(data)))
   if (Array.isArray(file))
     for (let i = 0, len = file.length; i < len; i++) body.append(`files[${i}]`, file[i].blob, file[i].name)
   else if (file) body.append('files[0]', file.blob, file.name)
@@ -67,7 +74,7 @@ export const fetch429Retry = async (
 /**
  * @deprecated
  */
-export const ephemeralData = (data?: CustomResponseData) => {
+export const ephemeralData = (data?: CustomCallbackData) => {
   if (typeof data === 'string') data = { content: data }
   return { ...data, flags: 1 << 6 }
 }

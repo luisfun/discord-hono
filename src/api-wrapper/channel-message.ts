@@ -1,4 +1,4 @@
-import type { ArgFileData, CustomResponseData } from '../types'
+import type { ArgFileData, CustomCallbackData } from '../types'
 import { addToken, apiUrl, errorDev, formData } from '../utils'
 
 /**
@@ -9,7 +9,7 @@ import { addToken, apiUrl, errorDev, formData } from '../utils'
 export const postMessage = async (
   token: string | undefined,
   channelId: string,
-  data?: CustomResponseData,
+  data?: CustomCallbackData,
   file?: ArgFileData,
 ) => {
   if (!token) throw errorDev('DISCORD_TOKEN')
@@ -47,7 +47,7 @@ export const deleteMessage = async (token: string | undefined, channelId: string
 export const followupMessage = async (
   applicationId: string | undefined,
   interactionToken: string | undefined,
-  data?: CustomResponseData,
+  data?: CustomCallbackData,
   file?: ArgFileData,
 ) => {
   if (!applicationId) throw errorDev('DISCORD_APPLICATION_ID')

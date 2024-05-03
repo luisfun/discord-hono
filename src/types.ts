@@ -88,7 +88,7 @@ export type InteractionComponentData = APIBaseInteraction<
 >
 export type InteractionModalData = APIBaseInteraction<InteractionType.ModalSubmit, APIModalSubmission>
 
-export type CustomResponseData =
+export type CustomCallbackData =
   | (Omit<APIInteractionResponseCallbackData, 'components'> & {
       components?: Components | APIInteractionResponseCallbackData['components']
     })
