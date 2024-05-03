@@ -1,6 +1,6 @@
 import type { APIInteractionResponseCallbackData } from 'discord-api-types/v10'
 import { Components } from './builder/components'
-import type { ArgFileData, CustomCallbackData } from './types'
+import type { FileData, CustomCallbackData } from './types'
 
 export const apiUrl = 'https://discord.com/api/v10'
 
@@ -35,7 +35,7 @@ export const prepareData = (data: CustomCallbackData): APIInteractionResponseCal
   return data as Omit<CustomCallbackData, 'components'>
 }
 
-export const formData = (data?: CustomCallbackData, file?: ArgFileData) => {
+export const formData = (data?: CustomCallbackData, file?: FileData) => {
   const body = new FormData()
   if (data) body.append('payload_json', JSON.stringify(prepareData(data)))
   if (Array.isArray(file))

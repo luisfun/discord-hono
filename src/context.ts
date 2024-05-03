@@ -15,7 +15,7 @@ import type {
 import { Components } from './builder/components'
 import { Modal } from './builder/modal'
 import type {
-  ArgFileData,
+  FileData,
   CronEvent,
   CustomCallbackData,
   DiscordEnv,
@@ -190,7 +190,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * @param file FileData: { blob: Blob, name: string }
    * @param retry Number of retries at rate limit. default: 0
    */
-  followup = (data?: CustomCallbackData, file?: ArgFileData, retry = 0) => {
+  followup = (data?: CustomCallbackData, file?: FileData, retry = 0) => {
     if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
     return fetch429Retry(
       `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.#interaction.token}`,

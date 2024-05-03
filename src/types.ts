@@ -91,8 +91,8 @@ export type CustomCallbackData =
 
 ////////// FileData //////////
 
-type FileData = {
+type FileDataUnit = {
   blob: Blob
   name: string
 }
-export type ArgFileData = FileData | FileData[]
+export type FileData = FileDataUnit | FileDataUnit[]
