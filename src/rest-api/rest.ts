@@ -70,20 +70,17 @@ export const rest = (token: string | undefined) => {
               const response = await fetch429Retry(messageUrl, initGet)
               return { response, result: (await response.json()) as ChannelMessageGetResult<M> }
             },
-            // ****************************** Not done yet: formData() の再設計
             /**
              * messages().post("data") -> [post message](https://discord.com/developers/docs/resources/channel#create-message)
              */
             post: (jsonBody: RESTPostAPIChannelMessageJSONBody, file?: FileData) => {
               return fetch429Retry(messageUrl, init({ ...mPost, body: formData(jsonBody, file) }))
             },
-            // ****************************** Not done yet: formData() の再設計
             /**
              * https://discord.com/developers/docs/resources/channel#edit-message
              */
             patch: (jsonBody: RESTPatchAPIChannelMessageJSONBody, file?: FileData) => {
-              // @ts-expect-error
-              return fetch429Retry(messageUrl, init({ ...mPatch, body: formData(jsonBody, file) })) // formData 見直し
+              return fetch429Retry(messageUrl, init({ ...mPatch, body: formData(jsonBody, file) }))
             },
             /**
              * https://discord.com/developers/docs/resources/channel#delete-message

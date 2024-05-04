@@ -1,6 +1,5 @@
-import type { APIInteractionResponseCallbackData } from 'discord-api-types/v10'
 import { Components } from './builder/components'
-import type { CustomCallbackData, FileData } from './types'
+import type { CustomCallbackBase, CustomCallbackData, FileData } from './types'
 
 export const apiUrl = 'https://discord.com/api/v10'
 
@@ -26,16 +25,16 @@ export const addToken = (token: string, init?: Parameters<typeof fetch>[1]): Par
   },
 })
 
-export const prepareData = (data: CustomCallbackData): APIInteractionResponseCallbackData => {
+export const prepareData = <T extends CustomCallbackBase>(data: CustomCallbackData<T>) => {
   if (typeof data === 'string') return { content: data }
   if (data?.components) {
     const components = data.components instanceof Components ? data.components.build() : data.components
     return { ...data, components }
   }
-  return data as Omit<CustomCallbackData, 'components'>
+  return data as Omit<CustomCallbackData<T>, 'components'>
 }
 
-export const formData = (data?: CustomCallbackData, file?: FileData) => {
+export const formData = <T extends CustomCallbackBase>(data?: CustomCallbackData<T>, file?: FileData) => {
   const body = new FormData()
   if (data) body.append('payload_json', JSON.stringify(prepareData(data)))
   if (Array.isArray(file))

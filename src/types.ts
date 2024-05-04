@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   APIApplicationCommand,
   APIApplicationCommandInteractionData,
@@ -8,6 +7,8 @@ import type {
   APIModalSubmission,
   ApplicationCommandType,
   InteractionType,
+  RESTPatchAPIChannelMessageJSONBody,
+  RESTPostAPIChannelMessageJSONBody,
 } from 'discord-api-types/v10'
 import type { Components } from './builder/components'
 
@@ -44,7 +45,7 @@ export type ApplicationCommand = Omit<
 
 ////////// EnvHandler //////////
 
-export type DiscordEnvHandler<E extends Env> = (env: E['Bindings']) => DiscordEnv
+export type DiscordEnvHandler<E extends Env = Env> = (env: E['Bindings']) => DiscordEnv
 
 ////////// CronEvent //////////
 // https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled/#syntax
@@ -83,10 +84,12 @@ export type InteractionComponentData = APIBaseInteraction<
 >
 export type InteractionModalData = APIBaseInteraction<InteractionType.ModalSubmit, APIModalSubmission>
 
-export type CustomCallbackData =
-  | (Omit<APIInteractionResponseCallbackData, 'components'> & {
-      components?: Components | APIInteractionResponseCallbackData['components']
-    })
+export type CustomCallbackBase =
+  | APIInteractionResponseCallbackData
+  | RESTPostAPIChannelMessageJSONBody
+  | RESTPatchAPIChannelMessageJSONBody
+export type CustomCallbackData<T extends CustomCallbackBase = APIInteractionResponseCallbackData> =
+  | (Omit<T, 'components'> & { components?: Components | T['components'] })
   | string
 
 ////////// FileData //////////
