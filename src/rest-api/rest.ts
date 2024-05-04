@@ -73,14 +73,14 @@ export const rest = (token: string | undefined) => {
             /**
              * messages().post("data") -> [post message](https://discord.com/developers/docs/resources/channel#create-message)
              */
-            post: (jsonBody: RESTPostAPIChannelMessageJSONBody, file?: FileData) => {
-              return fetch429Retry(messageUrl, init({ ...mPost, body: formData(jsonBody, file) }))
+            post: (data: RESTPostAPIChannelMessageJSONBody | undefined, file?: FileData) => {
+              return fetch429Retry(messageUrl, init({ ...mPost, body: formData(data, file) }))
             },
             /**
              * https://discord.com/developers/docs/resources/channel#edit-message
              */
-            patch: (jsonBody: RESTPatchAPIChannelMessageJSONBody, file?: FileData) => {
-              return fetch429Retry(messageUrl, init({ ...mPatch, body: formData(jsonBody, file) }))
+            patch: (data: RESTPatchAPIChannelMessageJSONBody | undefined, file?: FileData) => {
+              return fetch429Retry(messageUrl, init({ ...mPatch, body: formData(data, file) }))
             },
             /**
              * https://discord.com/developers/docs/resources/channel#delete-message
