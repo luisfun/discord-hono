@@ -283,6 +283,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
   resUpdateDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) =>
     this.resDeferUpdate(handler, ...args)
   /**
+   * @deprecated
    * Delete the previous message and post a new one.
    * If the argument is empty, only message deletion is performed.
    * Internally, it hits the API endpoint of followup.
