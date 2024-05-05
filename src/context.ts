@@ -91,7 +91,7 @@ type InteractionCallbackData<T extends InteractionCallbackType> =
   T extends 4 | 7 ? CustomCallbackData :
   T extends 5 ? Pick<APIInteractionResponseCallbackData, "flags"> :
   T extends 8 ? APICommandAutocompleteInteractionResponseCallbackData :
-  T extends 9 ? APIModalInteractionResponseCallbackData :
+  T extends 9 ? Modal | APIModalInteractionResponseCallbackData :
   undefined // 1, 6, 10
 class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> extends ContextBase<E> {
   #req: Request
@@ -144,10 +144,14 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
         json = { data: { flags, ...(data as InteractionCallbackData<5>) }, type }
         break
       }
-      case 8:
+      case 8: {
+        json = { data: { ...(data as InteractionCallbackData<8>) }, type }
+        break
+      }
       case 9: {
-        // @ts-expect-error To reduce the amount of code
-        json = { data, type }
+        const d = data as InteractionCallbackData<9>
+        if (d instanceof Modal) json = { data: d.build(), type }
+        else json = { data: d, type }
         break
       }
       default: // 1, 6, 10
@@ -172,6 +176,10 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    */
   followup = (data?: CustomCallbackData, file?: FileData, retry = 0) => {
     if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
+    // biome-ignore format: ternary operator
+    data = data
+      ? { flags: this.#ephemeral ? 1 << 6 : 0, ...prepareData(data) }
+      : this.#ephemeral ? { flags: 1 << 6 } : undefined
     return fetch429Retry(
       `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.#interaction.token}`,
       { method: 'POST', body: formData(data, file) },
@@ -234,10 +242,7 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
     return this.#values
   }
 
-  resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
-    const data = e instanceof Modal ? e.build() : e
-    return this.res(data, 9)
-  }
+  resModal = (data: Modal | APIModalInteractionResponseCallbackData) => this.res(data, 9)
 }
 
 type ComponentType = 'Button' | 'Select' | 'Other Select' | unknown
@@ -266,14 +271,17 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
     super(req, env, executionCtx, discord, interaction as ComponentInteractionData<T>)
   }
 
-  resUpdate = (data: CustomCallbackData) => {
-    if (typeof data === 'string') data = { content: data }
-    return this.res(data, 7)
-  }
-  resUpdateDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
+  resUpdate = (data: CustomCallbackData) => this.res(data, 7)
+  resDeferUpdate = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
     if (handler) this.waitUntil(handler(this, ...args))
     return this.res(undefined, 6)
   }
+  /**
+   * @deprecated
+   * rename -> c.resDeferUpdate()
+   */
+  resUpdateDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) =>
+    this.resDeferUpdate(handler, ...args)
   /**
    * Delete the previous message and post a new one.
    * If the argument is empty, only message deletion is performed.
@@ -289,10 +297,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
    * use c.ephemeral().resRepost()
    */
   resRepostEphemeral = (data: CustomCallbackData) => this.ephemeral().resRepost(data)
-  resModal = (e: Modal | APIModalInteractionResponseCallbackData) => {
-    const data = e instanceof Modal ? e.build() : e
-    return this.res(data, 9)
-  }
+  resModal = (data: Modal | APIModalInteractionResponseCallbackData) => this.res(data, 9)
 }
 
 export class ModalContext<E extends Env = any> extends RequestContext<E, InteractionData<5>> {
