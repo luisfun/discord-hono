@@ -284,9 +284,13 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
     this.resDeferUpdate(handler, ...args)
   /**
    * @deprecated
-   * Delete the previous message and post a new one.
-   * If the argument is empty, only message deletion is performed.
-   * Internally, it hits the API endpoint of followup.
+   * ```ts
+   * // self-delete
+   * return c.resDeferUpdate(c.followupDelete)
+   * // repost
+   * c.waitUntil(c.followupDelete)
+   * return c.res(data)
+   * ```
    */
   resRepost = (data?: CustomCallbackData) => {
     if (!data) return this.resUpdateDefer(this.followupDelete)
