@@ -37,14 +37,8 @@ class DiscordHonoBase<E extends Env> {
   #componentHandlers = new Map<string, ComponentHandler<E>>()
   #modalHandlers = new Map<string, ModalHandler<E>>()
   #cronHandlers = new Map<string, CronHandler<E>>()
-  /**
-   * @deprecated
-   */
-  // @ts-expect-error
-  #discordEnvHandler: DiscordEnvHandler<E> | undefined = undefined
   constructor(options?: Options<E>) {
     if (options?.verify) this.#verify = options.verify
-    if (options?.discordEnv) this.#discordEnvHandler = options.discordEnv
     this.#discordEnv = env => {
       const discordEnv = options?.discordEnv ? options.discordEnv(env) : {}
       return {
@@ -70,15 +64,6 @@ class DiscordHonoBase<E extends Env> {
   }
   cron = (cronId: string, handler: CronHandler<E>) => {
     this.#cronHandlers.set(cronId, handler)
-    return this
-  }
-  /**
-   * @deprecated
-   * use init options
-   * new DiscordHono({ discordEnv: (env) => {***} })
-   */
-  discordKey = (handler: DiscordEnvHandler<E>) => {
-    this.#discordEnvHandler = handler
     return this
   }
 
