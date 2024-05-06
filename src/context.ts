@@ -164,8 +164,8 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * use c.ephemeral().res()
    */
   resEphemeral = (data: CustomCallbackData) => this.ephemeral().res(data)
-  resDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
-    if (handler) this.waitUntil(handler(this, ...args))
+  resDefer = (handler?: (c: this) => Promise<unknown>) => {
+    if (handler) this.waitUntil(handler(this))
     return this.res({}, 5)
   }
   /**
@@ -272,16 +272,15 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
   }
 
   resUpdate = (data: CustomCallbackData) => this.res(data, 7)
-  resDeferUpdate = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) => {
-    if (handler) this.waitUntil(handler(this, ...args))
+  resDeferUpdate = (handler?: (c: this) => Promise<unknown>) => {
+    if (handler) this.waitUntil(handler(this))
     return this.res(undefined, 6)
   }
   /**
    * @deprecated
    * rename -> c.resDeferUpdate()
    */
-  resUpdateDefer = <T>(handler?: (c: this, ...args: T[]) => Promise<unknown>, ...args: T[]) =>
-    this.resDeferUpdate(handler, ...args)
+  resUpdateDefer = (handler?: (c: this) => Promise<unknown>) => this.resDeferUpdate(handler)
   /**
    * @deprecated
    * ```ts
