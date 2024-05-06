@@ -14,6 +14,9 @@ import type {
 
 type ComponentClass = Button | LinkButton | Select | UserSelect | RoleSelect | MentionableSelect | ChannelSelect
 
+/**
+ * https://discord.com/developers/docs/interactions/message-components
+ */
 export class Components {
   #components: APIActionRowComponent<APIMessageActionRowComponent>[] = []
   row = (...e: (ComponentClass | APIMessageActionRowComponent)[]) => {
@@ -63,7 +66,7 @@ type ButtonStyle = 'Primary' | 'Secondary' | 'Success' | 'Danger'
 export class Button extends ButtonBase {
   /**
    * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
-   * @param buttonStyle default 'Primary'
+   * @param buttonStyle default: 'Primary'
    */
   constructor(uniqueId: string, label: string, buttonStyle: ButtonStyle = 'Primary') {
     // biome-ignore format: ternary operator

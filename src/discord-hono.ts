@@ -144,7 +144,7 @@ const getHandler = <
  * @sample
  * ```ts
  * const app = new DiscordHono()
- * app.commands(commands)
+ *   .command('hello', c => c.res('world'))
  * export default app
  * ```
  */

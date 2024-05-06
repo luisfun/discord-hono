@@ -6,6 +6,17 @@ import { apiUrl, errorDev } from '../utils'
 // Copyright (c) 2022 Justin Beckwith
 // https://github.com/discord/cloudflare-sample-app/blob/main/LICENSE
 
+/**
+ * @sample
+ * ```ts
+ * register(
+ *   commands,
+ *   env.DISCORD_APPLICATION_ID,
+ *   env.DISCORD_TOKEN,
+ *   //env.DISCORD_TEST_GUILD_ID,
+ * )
+ * ```
+ */
 export const register = async (
   commands: (Command | ApplicationCommand)[],
   applicationId: string | undefined,

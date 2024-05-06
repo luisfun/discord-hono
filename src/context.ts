@@ -103,6 +103,9 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     this.#interaction = interaction
   }
 
+  /**
+   * raw Request
+   */
   get req(): Request {
     return this.#req
   }
@@ -113,7 +116,12 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     return this.#interaction
   }
   /**
+   * Only visible to the user who invoked the Interaction
    * @param bool default true
+   * @sample
+   * ```ts
+   * return c.ephemeral().res('Personalized Text')
+   * ```
    */
   ephemeral = (bool = true) => {
     this.#ephemeral = bool
@@ -121,9 +129,8 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   }
 
   /**
-   * Response to request.
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
-   * @param type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type)
+   * @param type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) default: 4 (respond to an interaction with a message)
    * @returns Response
    */
   res = <T extends InteractionCallbackType = 4>(data: InteractionCallbackData<T>, type: T = 4 as T) => {
@@ -154,15 +161,27 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     }
     return new ResponseJson(json)
   }
+  /**
+   * ACK an interaction and edit a response later, the user sees a loading state
+   * @sample
+   * ```ts
+   * return c.resDefer(c => c.followup('Delayed Message'))
+   * ```
+   */
   resDefer = (handler?: (c: this) => Promise<unknown>) => {
     if (handler) this.waitUntil(handler(this))
     return this.res({}, 5)
   }
+
   /**
-   * Used to send messages after resDefer.
+   * Used to send messages after resDefer
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
-   * @param file FileData: { blob: Blob, name: string }
+   * @param file FileData: { blob: Blob, name: string } | { blob: Blob, name: string }[]
    * @param retry Number of retries at rate limit. default: 0
+   * @sample
+   * ```ts
+   * return c.resDefer(c => c.followup('Image file', { blob: Blob, name: 'image.png' }))
+   * ```
    */
   followup = (data?: CustomCallbackData, file?: FileData, retry = 0) => {
     if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
@@ -176,6 +195,13 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
       retry,
     )
   }
+  /**
+   * Delete the self message
+   * @sample
+   * ```ts
+   * return c.resDeferUpdate(c.followupDelete)
+   * ```
+   */
   followupDelete = () => {
     if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
     if (!this.#interaction.message?.id) throw errorSys('Message Id')
@@ -225,13 +251,41 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
     }
   }
 
+  /**
+   * This object is useful when using subcommands
+   * @sample
+   * ```ts
+   * switch (c.sub.string) {
+   *   case 'sub1':
+   *     return c.res('sub1')
+   *   case 'group sub2':
+   *     return c.res('g-sub2')
+   * }
+   * ```
+   */
   get sub(): SubCommands {
     return this.#sub
   }
+  /**
+   * You can get the value of the command option here
+   * @sample
+   * ```ts
+   * const option = c.values.optionName
+   * ```
+   */
   get values(): CommandValues {
     return this.#values
   }
 
+  /**
+   * Response for modal window display
+   * @sample
+   * ```ts
+   * return c.resModal(new Modal('unique-id', 'Title')
+   *   .row(new TextInput('custom_id', 'Label'))
+   * )
+   * ```
+   */
   resModal = (data: Modal | APIModalInteractionResponseCallbackData) => this.res(data, 9)
 }
 
@@ -261,11 +315,26 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
     super(req, env, executionCtx, discord, interaction as ComponentInteractionData<T>)
   }
 
+  /**
+   * for components, edit the message the component was attached to
+   */
   resUpdate = (data: CustomCallbackData) => this.res(data, 7)
+  /**
+   * for components, ACK an interaction and edit the original message later; the user does not see a loading state
+   */
   resDeferUpdate = (handler?: (c: this) => Promise<unknown>) => {
     if (handler) this.waitUntil(handler(this))
     return this.res(undefined, 6)
   }
+  /**
+   * Response for modal window display
+   * @sample
+   * ```ts
+   * return c.resModal(new Modal('unique-id', 'Title')
+   *   .row(new TextInput('custom_id', 'Label'))
+   * )
+   * ```
+   */
   resModal = (data: Modal | APIModalInteractionResponseCallbackData) => this.res(data, 9)
 }
 
@@ -289,6 +358,13 @@ export class ModalContext<E extends Env = any> extends RequestContext<E, Interac
     }
   }
 
+  /**
+   * You can get the value of the modal textinput here
+   * @sample
+   * ```ts
+   * const text = c.values.textinputId
+   * ```
+   */
   get values() {
     return this.#values
   }
