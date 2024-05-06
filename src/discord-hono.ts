@@ -61,7 +61,7 @@ class DiscordHonoBase<E extends Env> {
     return this
   }
 
-  fetch = async (request: Request, env?: E['Bindings'] & DiscordEnvBindings, executionCtx?: ExecutionContext) => {
+  fetch = async (request: Request, env?: E['Bindings'], executionCtx?: ExecutionContext) => {
     switch (request.method) {
       case 'GET':
         return new Response('powered by Discord Hono🔥')
@@ -108,7 +108,7 @@ class DiscordHonoBase<E extends Env> {
     }
   }
 
-  scheduled = async (event: CronEvent, env: E['Bindings'] & DiscordEnvBindings, executionCtx?: ExecutionContext) => {
+  scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
     const discord = this.#discordEnv(env)
     const { handler } = getHandler<CronHandler>(this.#cronHandlers, event.cron)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(new CronContext(event, env, executionCtx, discord)))
