@@ -3,23 +3,17 @@ import { CommandContext, ComponentContext, CronContext, ModalContext } from './c
 import type {
   CronEvent,
   DiscordEnv,
-  DiscordEnvHandler,
   Env,
   ExecutionContext,
+  InitOptions,
   InteractionCommandData,
   InteractionComponentData,
   InteractionModalData,
+  Verify,
 } from './types'
 import { ResponseJson, errorDev, errorSys } from './utils'
 import { verify } from './verify'
 
-type Verify = (
-  body: string,
-  signature: string | null,
-  timestamp: string | null,
-  publicKey: string,
-) => Promise<boolean> | boolean
-type Options<E extends Env> = { verify: Verify; discordEnv: DiscordEnvHandler<E> }
 type CommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
 type ComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<Response> | Response
 type ModalHandler<E extends Env = any> = (c: ModalContext<E>) => Promise<Response> | Response
@@ -37,7 +31,7 @@ class DiscordHonoBase<E extends Env> {
   #componentHandlers = new Map<string, ComponentHandler<E>>()
   #modalHandlers = new Map<string, ModalHandler<E>>()
   #cronHandlers = new Map<string, CronHandler<E>>()
-  constructor(options?: Options<E>) {
+  constructor(options?: InitOptions<E>) {
     if (options?.verify) this.#verify = options.verify
     this.#discordEnv = env => {
       const discordEnv = options?.discordEnv ? options.discordEnv(env) : {}

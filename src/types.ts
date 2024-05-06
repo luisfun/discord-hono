@@ -43,9 +43,16 @@ export type ApplicationCommand = Omit<
   version?: string
 }
 
-////////// EnvHandler //////////
+////////// InitOptions //////////
 
-export type DiscordEnvHandler<E extends Env = Env> = (env: E['Bindings']) => DiscordEnv
+export type Verify = (
+  body: string,
+  signature: string | null,
+  timestamp: string | null,
+  publicKey: string,
+) => Promise<boolean> | boolean
+type DiscordEnvHandler<E extends Env = Env> = (env: E['Bindings']) => DiscordEnv
+export type InitOptions<E extends Env> = { verify: Verify; discordEnv: DiscordEnvHandler<E> }
 
 ////////// CronEvent //////////
 // https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled/#syntax
