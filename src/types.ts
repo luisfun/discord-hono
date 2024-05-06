@@ -52,7 +52,10 @@ export type Verify = (
   publicKey: string,
 ) => Promise<boolean> | boolean
 type DiscordEnvHandler<E extends Env = Env> = (env: E['Bindings']) => DiscordEnv
-export type InitOptions<E extends Env> = { verify: Verify; discordEnv: DiscordEnvHandler<E> }
+export type InitOptions<E extends Env> = {
+  verify?: Verify
+  discordEnv?: DiscordEnvHandler<E>
+}
 
 ////////// CronEvent //////////
 // https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled/#syntax
