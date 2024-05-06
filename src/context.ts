@@ -121,11 +121,6 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   }
 
   /**
-   * @deprecated
-   * use c.res()
-   */
-  resBase = (json: APIInteractionResponse) => this.res('data' in json ? json.data : {}, json.type)
-  /**
    * Response to request.
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type)
@@ -159,11 +154,6 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     }
     return new ResponseJson(json)
   }
-  /**
-   * @deprecated
-   * use c.ephemeral().res()
-   */
-  resEphemeral = (data: CustomCallbackData) => this.ephemeral().res(data)
   resDefer = (handler?: (c: this) => Promise<unknown>) => {
     if (handler) this.waitUntil(handler(this))
     return this.res({}, 5)
@@ -276,31 +266,6 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
     if (handler) this.waitUntil(handler(this))
     return this.res(undefined, 6)
   }
-  /**
-   * @deprecated
-   * rename -> c.resDeferUpdate()
-   */
-  resUpdateDefer = (handler?: (c: this) => Promise<unknown>) => this.resDeferUpdate(handler)
-  /**
-   * @deprecated
-   * ```ts
-   * // self-delete
-   * return c.resDeferUpdate(c.followupDelete)
-   * // repost
-   * c.waitUntil(c.followupDelete)
-   * return c.res(data)
-   * ```
-   */
-  resRepost = (data?: CustomCallbackData) => {
-    if (!data) return this.resUpdateDefer(this.followupDelete)
-    this.waitUntil(this.followupDelete())
-    return this.res(data)
-  }
-  /**
-   * @deprecated
-   * use c.ephemeral().resRepost()
-   */
-  resRepostEphemeral = (data: CustomCallbackData) => this.ephemeral().resRepost(data)
   resModal = (data: Modal | APIModalInteractionResponseCallbackData) => this.res(data, 9)
 }
 
