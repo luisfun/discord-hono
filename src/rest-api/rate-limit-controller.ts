@@ -11,7 +11,7 @@ type XRateLimit = {
   Global: string | null
 }
 
-export class ApiRateLimitController {
+export class RateLimitController {
   protected response: Response | undefined = undefined
   protected xRateLimit: XRateLimit | undefined = undefined
   set res(res: Response | undefined) {
