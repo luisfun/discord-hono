@@ -86,10 +86,15 @@ export const rest = (token: string | undefined) => {
              * https://discord.com/developers/docs/resources/channel#delete-message
              */
             delete: () => fetch429Retry(messageUrl, initDelete),
-            /**
-             * https://discord.com/developers/docs/resources/channel#crosspost-message
-             */
-            crosspost: () => fetch429Retry(`${messageUrl}/crosspost`, initPost),
+            crosspost: () => {
+              const crosspostUrl = `${messageUrl}/crosspost`
+              return {
+                /**
+                 * https://discord.com/developers/docs/resources/channel#crosspost-message
+                 */
+                post: () => fetch429Retry(crosspostUrl, initPost),
+              }
+            },
             reactions: (emoji?: string) => {
               const reactionUrl = emoji ? `${messageUrl}/reactions/${emoji}` : `${messageUrl}/reactions`
               return {
