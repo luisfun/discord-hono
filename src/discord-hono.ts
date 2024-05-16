@@ -26,14 +26,14 @@ type DiscordEnvBindings = {
 
 class DiscordHonoBase<E extends Env> {
   #verify: Verify = verify
-  #discordEnv: (env: DiscordEnvBindings | undefined) => DiscordEnv
+  #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
   #commandHandlers = new Map<string, CommandHandler<E>>()
   #componentHandlers = new Map<string, ComponentHandler<E>>()
   #modalHandlers = new Map<string, ModalHandler<E>>()
   #cronHandlers = new Map<string, CronHandler<E>>()
   constructor(options?: InitOptions<E>) {
     if (options?.verify) this.#verify = options.verify
-    this.#discordEnv = env => {
+    this.#discord = env => {
       const discordEnv = options?.discordEnv ? options.discordEnv(env) : {}
       return {
         APPLICATION_ID: env?.DISCORD_APPLICATION_ID,
@@ -56,8 +56,8 @@ class DiscordHonoBase<E extends Env> {
     this.#modalHandlers.set(modalId, handler)
     return this
   }
-  cron = (cronId: string, handler: CronHandler<E>) => {
-    this.#cronHandlers.set(cronId, handler)
+  cron = (cron: string, handler: CronHandler<E>) => {
+    this.#cronHandlers.set(cron, handler)
     return this
   }
 
@@ -66,7 +66,7 @@ class DiscordHonoBase<E extends Env> {
       case 'GET':
         return new Response('powered by Discord Hono🔥')
       case 'POST': {
-        const discord = this.#discordEnv(env)
+        const discord = this.#discord(env)
         if (!discord.PUBLIC_KEY) throw errorDev('DISCORD_PUBLIC_KEY')
         // verify
         const body = await request.text()
@@ -109,7 +109,7 @@ class DiscordHonoBase<E extends Env> {
   }
 
   scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
-    const discord = this.#discordEnv(env)
+    const discord = this.#discord(env)
     const { handler } = getHandler<CronHandler>(this.#cronHandlers, event.cron)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(new CronContext(event, env, executionCtx, discord)))
     else {
