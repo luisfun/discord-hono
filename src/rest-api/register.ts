@@ -25,13 +25,16 @@ export const register = async (
 ) => {
   if (!token) throw errorDev('DISCORD_TOKEN')
   if (!applicationId) throw errorDev('DISCORD_APPLICATION_ID')
+
   const url = guildId
     ? `${apiUrl}/applications/${applicationId}/guilds/${guildId}/commands`
     : `${apiUrl}/applications/${applicationId}/commands`
-  const applicationCommands = commands.map(cmd => {
-    if (cmd instanceof Command) return cmd.build()
-    return cmd
-  })
+  const body = JSON.stringify(
+    commands.map(cmd => {
+      if (cmd instanceof Command) return cmd.build()
+      return cmd
+    }),
+  )
 
   const response = await fetch(url, {
     headers: {
@@ -39,24 +42,22 @@ export const register = async (
       Authorization: `Bot ${token}`,
     },
     method: 'PUT',
-    body: JSON.stringify(applicationCommands),
+    body,
   })
 
   if (response.ok) {
     const data = await response.json()
-    console.log(JSON.stringify(data, null, 2))
-    console.log('Registered all commands')
+    console.log(`${JSON.stringify(data, null, 2)}\n===== ✅ Success =====`)
   } else {
-    let errorText = `Error registering commands \n ${response.url}: ${response.status} ${response.statusText}`
+    let errorText = `Error registering commands\n${response.url}: ${response.status} ${response.statusText}`
     try {
       const error = await response.text()
       if (error) {
-        errorText = `${errorText} \n\n ${error}`
+        errorText += `\n\n${error}`
       }
-    } catch (err) {
-      console.error('Error reading body from request:', err)
+    } catch (e) {
+      errorText += `\n\nError reading body from request:\n${e}`
     }
-    console.error(errorText)
-    console.error('Error registering commands')
+    console.error(`${errorText}\n===== ⚠️ Error =====`)
   }
 }
