@@ -1,6 +1,6 @@
 {
   "name": "discord-hono",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "This module enables you to easily build a Discord Bot that runs on Cloudflare workers",
   "author": "Luis (https://github.com/luisfun)",
   "homepage": "https://github.com/luisfun/discord-hono",
