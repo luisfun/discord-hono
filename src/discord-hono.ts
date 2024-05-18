@@ -27,10 +27,15 @@ type DiscordEnvBindings = {
 class DiscordHonoBase<E extends Env> {
   #verify: Verify = verify
   #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
-  #commandHandlers = new Map<string, CommandHandler<E>>()
-  #componentHandlers = new Map<string, ComponentHandler<E>>()
-  #modalHandlers = new Map<string, ModalHandler<E>>()
+  #commandHandlers = new Map<string | RegExp, CommandHandler<E>>()
+  #componentHandlers = new Map<string | RegExp, ComponentHandler<E>>()
+  #modalHandlers = new Map<string | RegExp, ModalHandler<E>>()
   #cronHandlers = new Map<string, CronHandler<E>>()
+  #regexpFlag = {
+    command: false,
+    component: false,
+    modal: false,
+  }
   constructor(options?: InitOptions<E>) {
     if (options?.verify) this.#verify = options.verify
     this.#discord = env => {
@@ -44,16 +49,19 @@ class DiscordHonoBase<E extends Env> {
     }
   }
 
-  command = (command: string, handler: CommandHandler<E>) => {
+  command = (command: string | RegExp, handler: CommandHandler<E>) => {
     this.#commandHandlers.set(command, handler)
+    if (command instanceof RegExp) this.#regexpFlag.command = true
     return this
   }
-  component = (componentId: string, handler: ComponentHandler<E>) => {
+  component = (componentId: string | RegExp, handler: ComponentHandler<E>) => {
     this.#componentHandlers.set(componentId, handler)
+    if (componentId instanceof RegExp) this.#regexpFlag.component = true
     return this
   }
-  modal = (modalId: string, handler: ModalHandler<E>) => {
+  modal = (modalId: string | RegExp, handler: ModalHandler<E>) => {
     this.#modalHandlers.set(modalId, handler)
+    if (modalId instanceof RegExp) this.#regexpFlag.modal = true
     return this
   }
   cron = (cron: string, handler: CronHandler<E>) => {
@@ -83,19 +91,28 @@ class DiscordHonoBase<E extends Env> {
           }
           case 2: {
             const interaction = data as InteractionCommandData
-            const { handler } = getHandler<CommandHandler>(this.#commandHandlers, interaction.data?.name.toLowerCase())
-            return await handler(new CommandContext(request, env, executionCtx, discord, interaction))
+            const { handler, key } = getHandler<CommandHandler>(
+              this.#commandHandlers,
+              interaction.data?.name.toLowerCase(),
+              this.#regexpFlag.command,
+            )
+            return await handler(new CommandContext(request, env, executionCtx, discord, interaction, key))
           }
           case 3: {
-            const { handler, interaction } = getHandler<ComponentHandler>(
+            const { handler, interaction, key } = getHandler<ComponentHandler>(
               this.#componentHandlers,
               data as InteractionComponentData,
+              this.#regexpFlag.component,
             )
-            return await handler(new ComponentContext(request, env, executionCtx, discord, interaction))
+            return await handler(new ComponentContext(request, env, executionCtx, discord, interaction, key))
           }
           case 5: {
-            const { handler, interaction } = getHandler<ModalHandler>(this.#modalHandlers, data as InteractionModalData)
-            return await handler(new ModalContext(request, env, executionCtx, discord, interaction))
+            const { handler, interaction, key } = getHandler<ModalHandler>(
+              this.#modalHandlers,
+              data as InteractionModalData,
+              this.#regexpFlag.modal,
+            )
+            return await handler(new ModalContext(request, env, executionCtx, discord, interaction, key))
           }
           default: {
             console.error(`interaction.type: ${data.type}\nNot yet implemented`)
@@ -121,23 +138,33 @@ class DiscordHonoBase<E extends Env> {
 
 const getHandler = <
   H extends CommandHandler | ComponentHandler | ModalHandler | CronHandler,
-  Hs extends Map<string, H> = any,
+  Hs extends Map<string | RegExp, H> = any,
   I extends string | undefined | InteractionComponentData | InteractionModalData = any,
 >(
   handlers: Hs,
   interaction: I,
+  regexp?: boolean,
 ) => {
-  let str = ''
-  if (typeof interaction === 'string') str = interaction
+  let key = ''
+  if (typeof interaction === 'string') key = interaction
   else {
     if (!interaction?.data) throw errorSys('interaction.data')
     const id = interaction.data.custom_id
-    str = id.split(';')[0]
-    interaction.data.custom_id = id.slice(str.length + 1)
+    key = id.split(';')[0]
+    interaction.data.custom_id = id.slice(key.length + 1)
   }
-  const handler = handlers.get(str) || handlers.get('')
+  let handler: H | undefined
+  if (regexp !== true) handler = handlers.get(key)
+  else
+    for (const k of handlers.keys()) {
+      if (k === key || (k instanceof RegExp && k.exec(key))) {
+        handler = handlers.get(k)
+        break
+      }
+    }
+  handler ||= handlers.get('')
   if (!handler) throw errorDev('Handler')
-  return { handler, interaction }
+  return { handler, interaction, key }
 }
 
 /**

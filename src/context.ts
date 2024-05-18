@@ -96,11 +96,20 @@ type InteractionCallbackData<T extends InteractionCallbackType> =
 class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> extends ContextBase<E> {
   #req: Request
   #interaction: D
+  #key: string
   #ephemeral: boolean | undefined = undefined
-  constructor(req: Request, env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv, interaction: D) {
+  constructor(
+    req: Request,
+    env: E['Bindings'],
+    executionCtx: ExecutionCtx,
+    discord: DiscordEnv,
+    interaction: D,
+    key: string,
+  ) {
     super(env, executionCtx, discord)
     this.#req = req
     this.#interaction = interaction
+    this.#key = key
   }
 
   /**
@@ -114,6 +123,12 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    */
   get interaction(): D {
     return this.#interaction
+  }
+  /**
+   *
+   */
+  get key(): string {
+    return this.#key
   }
   /**
    * Only visible to the user who invoked the Interaction
@@ -227,8 +242,9 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
     executionCtx: ExecutionCtx,
     discord: DiscordEnv,
     interaction: InteractionData<2>,
+    key: string,
   ) {
-    super(req, env, executionCtx, discord, interaction)
+    super(req, env, executionCtx, discord, interaction, key)
     if (interaction?.data && 'options' in interaction.data) {
       let options = interaction.data.options
       if (options?.[0].type === 2) {
@@ -311,8 +327,9 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
     executionCtx: ExecutionCtx,
     discord: DiscordEnv,
     interaction: InteractionData<3>,
+    key: string,
   ) {
-    super(req, env, executionCtx, discord, interaction as ComponentInteractionData<T>)
+    super(req, env, executionCtx, discord, interaction as ComponentInteractionData<T>, key)
   }
 
   /**
@@ -346,8 +363,9 @@ export class ModalContext<E extends Env = any> extends RequestContext<E, Interac
     executionCtx: ExecutionCtx,
     discord: DiscordEnv,
     interaction: InteractionData<5>,
+    key: string,
   ) {
-    super(req, env, executionCtx, discord, interaction)
+    super(req, env, executionCtx, discord, interaction, key)
     const modalRows = interaction.data?.components
     if (modalRows) {
       for (const modalRow of modalRows) {
