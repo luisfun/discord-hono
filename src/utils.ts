@@ -17,6 +17,14 @@ export class ResponseJson extends Response {
   }
 }
 
+export class RegexMap<K = any, V = any> extends Map<K, V> {
+  match(key: K) {
+    if (typeof key === 'string')
+      for (const k of this.keys()) if (k === key || (k instanceof RegExp && k.test(key))) return this.get(k)
+    return this.get(key)
+  }
+}
+
 export const addToken = (token: string, init?: Parameters<typeof fetch>[1]): Parameters<typeof fetch>[1] => ({
   ...init,
   headers: {

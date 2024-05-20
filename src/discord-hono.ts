@@ -11,7 +11,7 @@ import type {
   InteractionModalData,
   Verify,
 } from './types'
-import { ResponseJson, errorDev, errorSys } from './utils'
+import { RegexMap, ResponseJson, errorDev, errorSys } from './utils'
 import { verify } from './verify'
 
 type CommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
@@ -27,10 +27,10 @@ type DiscordEnvBindings = {
 class DiscordHonoBase<E extends Env> {
   #verify: Verify = verify
   #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
-  #commandHandlers = new Map<string | RegExp, CommandHandler<E>>()
-  #componentHandlers = new Map<string | RegExp, ComponentHandler<E>>()
-  #modalHandlers = new Map<string | RegExp, ModalHandler<E>>()
-  #cronHandlers = new Map<string, CronHandler<E>>()
+  #commandHandlers = new RegexMap<string | RegExp, CommandHandler<E>>()
+  #componentHandlers = new RegexMap<string | RegExp, ComponentHandler<E>>()
+  #modalHandlers = new RegexMap<string | RegExp, ModalHandler<E>>()
+  #cronHandlers = new RegexMap<string, CronHandler<E>>()
   #regexpFlag = {
     command: false,
     component: false,
@@ -138,7 +138,7 @@ class DiscordHonoBase<E extends Env> {
 
 const getHandler = <
   H extends CommandHandler | ComponentHandler | ModalHandler | CronHandler,
-  Hs extends Map<string | RegExp, H> = any,
+  Hs extends RegexMap<string | RegExp, H> = any,
   I extends string | undefined | InteractionComponentData | InteractionModalData = any,
 >(
   handlers: Hs,
@@ -153,16 +153,7 @@ const getHandler = <
     key = id.split(';')[0]
     interaction.data.custom_id = id.slice(key.length + 1)
   }
-  let handler: H | undefined
-  if (regexp !== true) handler = handlers.get(key)
-  else
-    for (const k of handlers.keys()) {
-      if (k === key || (k instanceof RegExp && k.exec(key))) {
-        handler = handlers.get(k)
-        break
-      }
-    }
-  handler ||= handlers.get('')
+  const handler = (regexp !== true ? handlers.get(key) : handlers.match(key)) || handlers.get('')
   if (!handler) throw errorDev('Handler')
   return { handler, interaction, key }
 }
