@@ -44,11 +44,13 @@ class ContextBase<E extends Env> {
   #env: E['Bindings'] = {}
   #executionCtx: ExecutionCtx
   protected discord: DiscordEnv
+  #key: string
   #var: E['Variables'] = {}
-  constructor(env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv) {
+  constructor(env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv, key: string) {
     this.#env = env
     this.#executionCtx = executionCtx
     this.discord = discord
+    this.#key = key
   }
 
   get env(): E['Bindings'] {
@@ -77,6 +79,12 @@ class ContextBase<E extends Env> {
   get var(): Readonly<E['Variables'] & ContextVariableMap> {
     return { ...this.#var } as never
   }
+  /**
+   * Handler triggered string
+   */
+  get key(): string {
+    return this.#key
+  }
 }
 
 // biome-ignore format: ternary operator
@@ -96,7 +104,6 @@ type InteractionCallbackData<T extends InteractionCallbackType> =
 class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> extends ContextBase<E> {
   #req: Request
   #interaction: D
-  #key: string
   #ephemeral: boolean | undefined = undefined
   constructor(
     req: Request,
@@ -106,10 +113,9 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
     interaction: D,
     key: string,
   ) {
-    super(env, executionCtx, discord)
+    super(env, executionCtx, discord, key)
     this.#req = req
     this.#interaction = interaction
-    this.#key = key
   }
 
   /**
@@ -123,12 +129,6 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    */
   get interaction(): D {
     return this.#interaction
-  }
-  /**
-   *
-   */
-  get key(): string {
-    return this.#key
   }
   /**
    * Only visible to the user who invoked the Interaction
@@ -390,8 +390,8 @@ export class ModalContext<E extends Env = any> extends RequestContext<E, Interac
 
 export class CronContext<E extends Env = any> extends ContextBase<E> {
   #cronEvent: CronEvent
-  constructor(event: CronEvent, env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv) {
-    super(env, executionCtx, discord)
+  constructor(event: CronEvent, env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv, key: string) {
+    super(env, executionCtx, discord, key)
     this.#cronEvent = event
   }
 
