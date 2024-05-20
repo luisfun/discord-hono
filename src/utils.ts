@@ -18,6 +18,9 @@ export class ResponseJson extends Response {
 }
 
 export class RegexMap<K = any, V = any> extends Map<K, V> {
+  /**
+   * When the key is regex, perform regex.test(key) and return the value when it matches.
+   */
   match(key: K) {
     if (typeof key === 'string')
       for (const k of this.keys()) if (k === key || (k instanceof RegExp && k.test(key))) return this.get(k)
