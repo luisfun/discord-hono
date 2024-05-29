@@ -26,9 +26,11 @@ type ChannelMessageGetResult<M extends string | undefined> = M extends string
  */
 /**
  * @param token required
+ * @param retry Number of retries at rate limit. default: 0
  */
-export const rest = (token: string | undefined) => {
+export const rest = (token: string | undefined, retry = 0) => {
   if (!token) throw errorDev('DISCORD_TOKEN')
+  const fetchRest = (input: Parameters<typeof fetch>[0], init: Parameters<typeof fetch>[1]) => fetch429Retry(input, init, retry)
   const init = (init: Parameters<typeof fetch>[1]): Parameters<typeof fetch>[1] => addToken(token, init)
   const initGet = init(mGet)
   const initPut = init(mPut)
@@ -46,7 +48,7 @@ export const rest = (token: string | undefined) => {
          * https://discord.com/developers/docs/resources/channel#get-channel
          */
         get: async () => {
-          const response = await fetch429Retry(channelUrl, initGet)
+          const response = await fetchRest(channelUrl, initGet)
           return { response, result: (await response.json()) as RESTGetAPIChannelResult }
         },
         // ****************************** Not done yet
@@ -57,7 +59,7 @@ export const rest = (token: string | undefined) => {
         /**
          * https://discord.com/developers/docs/resources/channel#deleteclose-channel
          */
-        delete: () => fetch429Retry(channelUrl, initDelete),
+        delete: () => fetchRest(channelUrl, initDelete),
         messages: <M extends string | undefined>(messageId?: M) => {
           const messageUrl = messageId ? `${channelUrl}/messages/${messageId}` : `${channelUrl}/messages`
           return {
@@ -67,32 +69,32 @@ export const rest = (token: string | undefined) => {
              * messages(messageId).get() -> [get message](https://discord.com/developers/docs/resources/channel#get-channel-message)
              */
             get: async () => {
-              const response = await fetch429Retry(messageUrl, initGet)
+              const response = await fetchRest(messageUrl, initGet)
               return { response, result: (await response.json()) as ChannelMessageGetResult<M> }
             },
             /**
              * messages().post("data") -> [post message](https://discord.com/developers/docs/resources/channel#create-message)
              */
             post: (data: RESTPostAPIChannelMessageJSONBody | undefined, file?: FileData) => {
-              return fetch429Retry(messageUrl, init({ ...mPost, body: formData(data, file) }))
+              return fetchRest(messageUrl, init({ ...mPost, body: formData(data, file) }))
             },
             /**
              * https://discord.com/developers/docs/resources/channel#edit-message
              */
             patch: (data: RESTPatchAPIChannelMessageJSONBody | undefined, file?: FileData) => {
-              return fetch429Retry(messageUrl, init({ ...mPatch, body: formData(data, file) }))
+              return fetchRest(messageUrl, init({ ...mPatch, body: formData(data, file) }))
             },
             /**
              * https://discord.com/developers/docs/resources/channel#delete-message
              */
-            delete: () => fetch429Retry(messageUrl, initDelete),
+            delete: () => fetchRest(messageUrl, initDelete),
             crosspost: () => {
               const crosspostUrl = `${messageUrl}/crosspost`
               return {
                 /**
                  * https://discord.com/developers/docs/resources/channel#crosspost-message
                  */
-                post: () => fetch429Retry(crosspostUrl, initPost),
+                post: () => fetchRest(crosspostUrl, initPost),
               }
             },
             reactions: (emoji?: string) => {
@@ -102,25 +104,25 @@ export const rest = (token: string | undefined) => {
                  * https://discord.com/developers/docs/resources/channel#get-reactions
                  */
                 get: async () => {
-                  const response = await fetch429Retry(reactionUrl, initGet)
+                  const response = await fetchRest(reactionUrl, initGet)
                   return { response, result: (await response.json()) as RESTGetAPIChannelMessageReactionUsersResult }
                 },
                 /**
                  * reactions().delete() -> [delete all reactions](https://discord.com/developers/docs/resources/channel#delete-all-reactions)
                  * reactions(emoji).delete() -> [delete all reactions for emoji](https://discord.com/developers/docs/resources/channel#delete-all-reactions-for-emoji)
                  */
-                delete: () => fetch429Retry(reactionUrl, initDelete),
+                delete: () => fetchRest(reactionUrl, initDelete),
                 me: () => {
                   const meUrl = `${reactionUrl}/@me`
                   return {
                     /**
                      * https://discord.com/developers/docs/resources/channel#create-reaction
                      */
-                    put: () => fetch429Retry(meUrl, initPut),
+                    put: () => fetchRest(meUrl, initPut),
                     /**
                      * https://discord.com/developers/docs/resources/channel#delete-own-reaction
                      */
-                    delete: () => fetch429Retry(meUrl, initDelete),
+                    delete: () => fetchRest(meUrl, initDelete),
                   }
                 },
                 user: (userId: string) => {
@@ -129,7 +131,7 @@ export const rest = (token: string | undefined) => {
                     /**
                      * https://discord.com/developers/docs/resources/channel#delete-user-reaction
                      */
-                    delete: () => fetch429Retry(userUrl, initDelete),
+                    delete: () => fetchRest(userUrl, initDelete),
                   }
                 },
               }
