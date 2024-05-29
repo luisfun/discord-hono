@@ -47,7 +47,7 @@ export const prepareData = <T extends CustomCallbackBase>(data: CustomCallbackDa
 
 export const formData = <T extends CustomCallbackBase>(data?: CustomCallbackData<T>, file?: FileData) => {
   const body = new FormData()
-  if (data) body.append('payload_json', JSON.stringify(prepareData(data)))
+  if (data && Object.keys(data).length !== 0) body.append('payload_json', JSON.stringify(prepareData(data)))
   if (Array.isArray(file))
     for (let i = 0, len = file.length; i < len; i++) body.append(`files[${i}]`, file[i].blob, file[i].name)
   else if (file) body.append('files[0]', file.blob, file.name)

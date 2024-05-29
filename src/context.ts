@@ -104,7 +104,7 @@ type InteractionCallbackData<T extends InteractionCallbackType> =
 class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> extends ContextBase<E> {
   #req: Request
   #interaction: D
-  #ephemeral: boolean | undefined = undefined
+  #flags: { flags?: number } = {}
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -139,7 +139,7 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * ```
    */
   ephemeral = (bool = true) => {
-    this.#ephemeral = bool
+    this.#flags = bool ? { flags: 1 << 6 } : {}
     return this
   }
 
@@ -150,15 +150,14 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    */
   res = <T extends InteractionCallbackType = 4>(data: InteractionCallbackData<T>, type: T = 4 as T) => {
     let json: APIInteractionResponse
-    const flags = this.#ephemeral ? 1 << 6 : 0
     switch (type) {
       case 4:
       case 7: {
-        json = { data: { flags, ...prepareData(data as InteractionCallbackData<4 | 7>) }, type }
+        json = { data: { ...this.#flags, ...prepareData(data as InteractionCallbackData<4 | 7>) }, type }
         break
       }
       case 5: {
-        json = { data: { flags, ...(data as InteractionCallbackData<5>) }, type }
+        json = { data: { ...this.#flags, ...(data as InteractionCallbackData<5>) }, type }
         break
       }
       case 8: {
@@ -198,15 +197,11 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
    * return c.resDefer(c => c.followup('Image file', { blob: Blob, name: 'image.png' }))
    * ```
    */
-  followup = (data?: CustomCallbackData, file?: FileData, retry = 0) => {
+  followup = (data: CustomCallbackData = {}, file?: FileData, retry = 0) => {
     if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
-    // biome-ignore format: ternary operator
-    data = data
-      ? { flags: this.#ephemeral ? 1 << 6 : 0, ...prepareData(data) }
-      : this.#ephemeral ? { flags: 1 << 6 } : undefined
     return fetch429Retry(
       `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.#interaction.token}`,
-      { method: 'POST', body: formData(data, file) },
+      { method: 'POST', body: formData({ ...this.#flags, ...prepareData(data) }, file) },
       retry,
     )
   }
