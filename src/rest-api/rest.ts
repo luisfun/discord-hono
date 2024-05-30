@@ -30,7 +30,8 @@ type ChannelMessageGetResult<M extends string | undefined> = M extends string
  */
 export const rest = (token: string | undefined, retry = 0) => {
   if (!token) throw errorDev('DISCORD_TOKEN')
-  const fetchRest = (input: Parameters<typeof fetch>[0], init: Parameters<typeof fetch>[1]) => fetch429Retry(input, init, retry)
+  const fetchRest = (input: Parameters<typeof fetch>[0], init: Parameters<typeof fetch>[1]) =>
+    fetch429Retry(input, init, retry)
   const init = (init: Parameters<typeof fetch>[1]): Parameters<typeof fetch>[1] => addToken(token, init)
   const initGet = init(mGet)
   const initPut = init(mPut)

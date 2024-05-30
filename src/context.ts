@@ -83,7 +83,9 @@ class ContextBase<E extends Env> {
   get: GetVar<E> = (key: string) => {
     return this.#var ? this.#var[key] : undefined
   }
-  get var(): Readonly<ContextVariableMap & (IsAny<E['Variables']> extends true ? Record<string, any> : E['Variables'])> {
+  get var(): Readonly<
+    ContextVariableMap & (IsAny<E['Variables']> extends true ? Record<string, any> : E['Variables'])
+  > {
     return { ...this.#var } as never
   }
 }
@@ -223,7 +225,6 @@ class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> ex
   }
 }
 
-type CommandValues = Record<string, string | number | boolean | undefined>
 type SubCommands = {
   group: string
   command: string
@@ -231,7 +232,6 @@ type SubCommands = {
 }
 export class CommandContext<E extends Env = any> extends RequestContext<E, InteractionData<2>> {
   #sub: SubCommands = { group: '', command: '', string: '' }
-  #values: CommandValues = {}
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -254,11 +254,11 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
         options = options[0].options
       }
       if (options) {
-        this.#values = options?.reduce((obj: CommandValues, e) => {
-          if (e.type === 1 || e.type === 2) return obj // for ts-error
-          obj[e.name] = e.value
-          return obj
-        }, {})
+        for (const e of options) {
+          if (e.type === 1 || e.type === 2) return // ts-error
+          // @ts-expect-error
+          this.set(e.name, e.value)
+        }
       }
     }
   }
@@ -279,14 +279,15 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
     return this.#sub
   }
   /**
+   * @deprecated
    * You can get the value of the command option here
    * @sample
    * ```ts
    * const option = c.values.optionName
    * ```
    */
-  get values(): CommandValues {
-    return this.#values
+  get values() {
+    return this.var
   }
 
   /**
@@ -352,7 +353,6 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
 }
 
 export class ModalContext<E extends Env = any> extends RequestContext<E, InteractionData<5>> {
-  #values: Record<string, string | undefined> = {}
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -366,13 +366,15 @@ export class ModalContext<E extends Env = any> extends RequestContext<E, Interac
     if (modalRows) {
       for (const modalRow of modalRows) {
         for (const modal of modalRow.components) {
-          this.#values[modal.custom_id] = modal.value
+          // @ts-expect-error
+          this.set(modal.custom_id, modal.value)
         }
       }
     }
   }
 
   /**
+   * @deprecated
    * You can get the value of the modal textinput here
    * @sample
    * ```ts
@@ -380,7 +382,7 @@ export class ModalContext<E extends Env = any> extends RequestContext<E, Interac
    * ```
    */
   get values() {
-    return this.#values
+    return this.var
   }
 }
 
