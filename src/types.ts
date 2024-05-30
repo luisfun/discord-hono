@@ -51,10 +51,9 @@ export type Verify = (
   timestamp: string | null,
   publicKey: string,
 ) => Promise<boolean> | boolean
-type DiscordEnvHandler<E extends Env = Env> = (env: E['Bindings']) => DiscordEnv
 export type InitOptions<E extends Env> = {
   verify?: Verify
-  discordEnv?: DiscordEnvHandler<E>
+  discordEnv?: (env: E['Bindings']) => DiscordEnv
 }
 
 ////////// CronEvent //////////
