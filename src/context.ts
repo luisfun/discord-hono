@@ -31,14 +31,15 @@ type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
 // biome-ignore lint: Same definition as Hono
 type ContextVariableMap = {}
-interface GetVar<E extends Env> {
-  <Key extends keyof ContextVariableMap>(key: Key): ContextVariableMap[Key]
-  <Key extends keyof E['Variables']>(key: Key): E['Variables'][Key]
-}
 interface SetVar<E extends Env> {
   <Key extends keyof ContextVariableMap>(key: Key, value: ContextVariableMap[Key]): void
   <Key extends keyof E['Variables']>(key: Key, value: E['Variables'][Key]): void
 }
+interface GetVar<E extends Env> {
+  <Key extends keyof ContextVariableMap>(key: Key): ContextVariableMap[Key]
+  <Key extends keyof E['Variables']>(key: Key): E['Variables'][Key]
+}
+type IsAny<T> = boolean extends (T extends never ? true : false) ? true : false
 
 class ContextBase<E extends Env> {
   #env: E['Bindings'] = {}
@@ -68,22 +69,22 @@ class ContextBase<E extends Env> {
     if (!this.#executionCtx?.waitUntil) throw errorOther('waitUntil')
     return this.#executionCtx.waitUntil.bind(this.#executionCtx)
   }
-  // c.set, c.get, c.var.propName is Variables
-  set: SetVar<E> = (key: string, value: unknown) => {
-    this.#var ??= {}
-    this.#var[key as string] = value
-  }
-  get: GetVar<E> = (key: string) => {
-    return this.#var ? this.#var[key] : undefined
-  }
-  get var(): Readonly<E['Variables'] & ContextVariableMap> {
-    return { ...this.#var } as never
-  }
   /**
    * Handler triggered string
    */
   get key(): string {
     return this.#key
+  }
+  // c.set, c.get, c.var.propName is Variables
+  set: SetVar<E> = (key: string, value: unknown) => {
+    this.#var ??= {}
+    this.#var[key] = value
+  }
+  get: GetVar<E> = (key: string) => {
+    return this.#var ? this.#var[key] : undefined
+  }
+  get var(): Readonly<ContextVariableMap & (IsAny<E['Variables']> extends true ? Record<string, any> : E['Variables'])> {
+    return { ...this.#var } as never
   }
 }
 
