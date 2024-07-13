@@ -25,8 +25,10 @@ index.ts
 ```ts
 import { DiscordHono } from 'discord-hono'
 
-export default new DiscordHono()
+const app = new DiscordHono()
   .command('hello', c => c.res('world!'))
+
+export default app
 ```
 
 register.ts
