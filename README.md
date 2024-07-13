@@ -16,7 +16,6 @@ Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors!
 ```shell
 npm i discord-hono
 npm i -D discord-api-types # When using TypeScript
-npm i -D dotenv # When using 'npm run register'
 ```
 
 ## Sample Code
@@ -26,19 +25,14 @@ index.ts
 ```ts
 import { DiscordHono } from 'discord-hono'
 
-const app = new DiscordHono()
+export default new DiscordHono()
   .command('hello', c => c.res('world!'))
-
-export default app
 ```
 
 register.ts
 
 ```ts
-import { config } from 'dotenv'
-import { env } from 'node:process'
 import { Command, register } from 'discord-hono'
-config({ path: '.dev.vars' })
 
 const commands = [
   new Command('hello', 'response world'),
@@ -46,9 +40,9 @@ const commands = [
 
 register(
   commands,
-  env.DISCORD_APPLICATION_ID,
-  env.DISCORD_TOKEN,
-  //env.DISCORD_TEST_GUILD_ID,
+  process.env.DISCORD_APPLICATION_ID,
+  process.env.DISCORD_TOKEN,
+  //process.env.DISCORD_TEST_GUILD_ID,
 )
 ```
 
