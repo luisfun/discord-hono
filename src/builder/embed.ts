@@ -1,5 +1,8 @@
 import type { APIEmbed, APIEmbedField } from 'discord-api-types/v10'
 
+/**
+ * [Embed Structure](https://discord.com/developers/docs/resources/message#embed-object)
+ */
 export class Embed {
   #embed: APIEmbed = {}
   protected assign = (embed: APIEmbed) => {
