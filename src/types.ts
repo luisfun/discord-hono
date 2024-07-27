@@ -11,8 +11,8 @@ import type {
   RESTPatchAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessageJSONBody,
 } from 'discord-api-types/v10'
-import type { Components } from './builder/components'
 import type { Embed } from './builder'
+import type { Components } from './builder/components'
 
 ////////// Env //////////
 
@@ -100,7 +100,10 @@ export type CustomCallbackBase =
   | RESTPostAPIChannelMessageJSONBody
   | RESTPatchAPIChannelMessageJSONBody
 export type CustomCallbackData<T extends CustomCallbackBase = APIInteractionResponseCallbackData> =
-  | (Omit<T, 'components' | "embeds"> & { components?: Components | T['components'], embeds?: (APIEmbed | Embed)[] | null })
+  | (Omit<T, 'components' | 'embeds'> & {
+      components?: Components | T['components']
+      embeds?: (APIEmbed | Embed)[] | null
+    })
   | string
 
 ////////// FileData //////////

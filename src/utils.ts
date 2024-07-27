@@ -44,7 +44,7 @@ export const prepareData = <T extends CustomCallbackBase>(data: CustomCallbackDa
     data = { ...data, components }
   }
   if (data?.embeds) {
-    const embeds = data.embeds.map(embed => embed instanceof Embed ? embed.build() : embed)
+    const embeds = data.embeds.map(embed => (embed instanceof Embed ? embed.build() : embed))
     data = { ...data, embeds }
   }
   return data as T
