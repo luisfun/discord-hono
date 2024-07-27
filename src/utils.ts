@@ -1,3 +1,4 @@
+import { Embed } from './builder'
 import { Components } from './builder/components'
 import type { CustomCallbackBase, CustomCallbackData, FileData } from './types'
 
@@ -40,9 +41,13 @@ export const prepareData = <T extends CustomCallbackBase>(data: CustomCallbackDa
   if (typeof data === 'string') return { content: data }
   if (data?.components) {
     const components = data.components instanceof Components ? data.components.build() : data.components
-    return { ...data, components }
+    data = { ...data, components }
   }
-  return data as Omit<CustomCallbackData<T>, 'components'>
+  if (data?.embeds) {
+    const embeds = data.embeds.map(embed => embed instanceof Embed ? embed.build() : embed)
+    data = { ...data, embeds }
+  }
+  return data as T
 }
 
 export const formData = <T extends CustomCallbackBase>(data?: CustomCallbackData<T>, file?: FileData) => {
