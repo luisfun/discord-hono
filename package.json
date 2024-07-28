@@ -16,8 +16,8 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "fix": "biome check --apply . && tsc",
-    "fix:unsafe": "biome check --apply-unsafe . && tsc",
+    "fix": "biome check --write . && tsc",
+    "fix:unsafe": "biome check --write --unsafe . && tsc",
     "build": "tsup src/index.ts --format esm --target es2022 --dts --clean && attw -P . --ignore-rules cjs-resolves-to-esm",
     "patch": "npm run fix && npm run build && npm version patch && git push --follow-tags",
     "minor": "npm run fix && npm run build && npm version minor && git push --follow-tags",
@@ -26,9 +26,9 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.15.3",
-    "@biomejs/biome": "1.7.1",
-    "discord-api-types": "^0.37.83",
-    "tsup": "^8.0.2",
-    "typescript": "^5.4.5"
+    "@biomejs/biome": "1.8.3",
+    "discord-api-types": "^0.37.93",
+    "tsup": "^8.2.3",
+    "typescript": "^5.5.4"
   }
 }

@@ -56,7 +56,6 @@ class ButtonBase {
     Object.assign(this.component, component)
     return this
   }
-  emoji = (e: APIButtonComponent['emoji']) => this.a({ emoji: e })
   disabled = (e: APIButtonComponent['disabled']) => this.a({ disabled: e })
   build = () => this.component
 }
@@ -78,6 +77,7 @@ export class Button extends ButtonBase {
       1
     super(uniqueId, label, style)
   }
+  emoji = (e: APIButtonComponentWithCustomId['emoji']) => this.a({ emoji: e })
   custom_id = //(handler: (c: ComponentContext<E>) => Promise<string> | string) => this.a({ custom_id: this.uniqueStr + (await handler()) })
     (e: APIButtonComponentWithCustomId['custom_id']) => this.a({ custom_id: this.uniqueStr + e })
 }
@@ -88,6 +88,7 @@ export class LinkButton extends ButtonBase {
   constructor(url: string, label: string) {
     super(url, label, 5)
   }
+  emoji = (e: APIButtonComponentWithURL['emoji']) => this.a({ emoji: e })
 }
 
 type OmitSelect =

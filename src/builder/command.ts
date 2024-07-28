@@ -53,12 +53,16 @@ export class Command {
   name_localizations = (e: Cmd['name_localizations']) => this.a({ name_localizations: e })
   description_localizations = (e: Cmd['description_localizations']) => this.a({ description_localizations: e })
   default_member_permissions = (e: Cmd['default_member_permissions']) => this.a({ default_member_permissions: e })
+  /**
+   * @deprecated
+   * Use `contexts` instead
+   */
   dm_permission = (e: Cmd['dm_permission'] = true) => this.a({ dm_permission: e })
   nsfw = (e: Cmd['nsfw'] = true) => this.a({ nsfw: e })
-  // @ts-expect-error
-  integration_types = (e: (0 | 1)[] /*Cmd['integration_types']*/) => this.a({ integration_types: e })
-  // @ts-expect-error
-  contexts = (e: (0 | 1 | 2)[] /*Cmd['contexts']*/) => this.a({ contexts: e })
+  // integration_types = (...e: ApplicationIntegrationType[]) => this.a({ integration_types: e })
+  integration_types = (e: Cmd['integration_types']) => this.a({ integration_types: e })
+  // contexts = (...e: InteractionContextType) => this.a({ contexts: e })
+  contexts = (e: Cmd['contexts']) => this.a({ contexts: e })
   version = (e: Cmd['version']) => this.a({ version: e })
   // options
   options = (...e: (OptionAllClass | APIApplicationCommandOption)[]) => {
