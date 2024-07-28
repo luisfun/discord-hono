@@ -42,24 +42,24 @@ export class Command {
     this.#command = { name, description }
   }
 
-  private assign = (command: Omit<Cmd, 'name' | 'description'>) => {
+  private a = (command: Omit<Cmd, 'name' | 'description'>) => {
     Object.assign(this.#command, command)
     return this
   }
-  id = (e: Cmd['id']) => this.assign({ id: e })
-  application_id = (e: Cmd['application_id']) => this.assign({ application_id: e })
-  guild_id = (e: Cmd['guild_id']) => this.assign({ guild_id: e })
-  type = (e: Cmd['type']) => this.assign({ type: e })
-  name_localizations = (e: Cmd['name_localizations']) => this.assign({ name_localizations: e })
-  description_localizations = (e: Cmd['description_localizations']) => this.assign({ description_localizations: e })
-  default_member_permissions = (e: Cmd['default_member_permissions']) => this.assign({ default_member_permissions: e })
-  dm_permission = (e: Cmd['dm_permission'] = true) => this.assign({ dm_permission: e })
-  nsfw = (e: Cmd['nsfw'] = true) => this.assign({ nsfw: e })
+  id = (e: Cmd['id']) => this.a({ id: e })
+  application_id = (e: Cmd['application_id']) => this.a({ application_id: e })
+  guild_id = (e: Cmd['guild_id']) => this.a({ guild_id: e })
+  type = (e: Cmd['type']) => this.a({ type: e })
+  name_localizations = (e: Cmd['name_localizations']) => this.a({ name_localizations: e })
+  description_localizations = (e: Cmd['description_localizations']) => this.a({ description_localizations: e })
+  default_member_permissions = (e: Cmd['default_member_permissions']) => this.a({ default_member_permissions: e })
+  dm_permission = (e: Cmd['dm_permission'] = true) => this.a({ dm_permission: e })
+  nsfw = (e: Cmd['nsfw'] = true) => this.a({ nsfw: e })
   // @ts-expect-error
-  integration_types = (e: (0 | 1)[] /*Cmd['integration_types']*/) => this.assign({ integration_types: e })
+  integration_types = (e: (0 | 1)[] /*Cmd['integration_types']*/) => this.a({ integration_types: e })
   // @ts-expect-error
-  contexts = (e: (0 | 1 | 2)[] /*Cmd['contexts']*/) => this.assign({ contexts: e })
-  version = (e: Cmd['version']) => this.assign({ version: e })
+  contexts = (e: (0 | 1 | 2)[] /*Cmd['contexts']*/) => this.a({ contexts: e })
+  version = (e: Cmd['version']) => this.a({ version: e })
   // options
   options = (...e: (OptionAllClass | APIApplicationCommandOption)[]) => {
     const options = e.map(opt => {
@@ -78,7 +78,7 @@ export class Command {
         return opt.build()
       return opt
     })
-    return this.assign({ options })
+    return this.a({ options })
   }
   build = () => this.#command
 }
@@ -101,14 +101,14 @@ class OptionBase {
     // @ts-expect-error *************** 型定義がおかしい？ 分からない
     this.option = { name, description, type }
   }
-  protected assign = (option: OmitOption) => {
+  protected a = (option: OmitOption) => {
     Object.assign(this.option, option)
     return this
   }
-  name_localizations = (e: APIApplicationCommandOption['name_localizations']) => this.assign({ name_localizations: e })
+  name_localizations = (e: APIApplicationCommandOption['name_localizations']) => this.a({ name_localizations: e })
   description_localizations = (e: APIApplicationCommandOption['description_localizations']) =>
-    this.assign({ description_localizations: e })
-  required = (e: APIApplicationCommandOption['required'] = true) => this.assign({ required: e })
+    this.a({ description_localizations: e })
+  required = (e: APIApplicationCommandOption['required'] = true) => this.a({ required: e })
   build = () => this.option
 }
 
@@ -131,7 +131,7 @@ export class SubCommand extends OptionBase {
         return opt.build() as APIApplicationCommandBasicOption
       return opt
     })
-    return this.assign({ options })
+    return this.a({ options })
   }
 }
 
@@ -143,7 +143,7 @@ export class SubGroup extends OptionBase {
     const options = e.map(opt =>
       opt instanceof SubCommand ? (opt.build() as APIApplicationCommandSubcommandOption) : opt,
     )
-    return this.assign({ options })
+    return this.a({ options })
   }
 }
 
@@ -156,10 +156,10 @@ export class Option extends OptionBase {
   constructor(name: string, description: string) {
     super(name, description, 3)
   }
-  choices = (...e: APIApplicationCommandOptionChoice<string>[]) => this.assign({ choices: e })
-  min_length = (e: APIApplicationCommandStringOption['min_length']) => this.assign({ min_length: e })
-  max_length = (e: APIApplicationCommandStringOption['max_length']) => this.assign({ max_length: e })
-  autocomplete = (e: APIApplicationCommandStringOption['autocomplete']) => this.assign({ autocomplete: e })
+  choices = (...e: APIApplicationCommandOptionChoice<string>[]) => this.a({ choices: e })
+  min_length = (e: APIApplicationCommandStringOption['min_length']) => this.a({ min_length: e })
+  max_length = (e: APIApplicationCommandStringOption['max_length']) => this.a({ max_length: e })
+  autocomplete = (e: APIApplicationCommandStringOption['autocomplete']) => this.a({ autocomplete: e })
 }
 
 type TypeNumberOption = APIApplicationCommandIntegerOption | APIApplicationCommandNumberOption
@@ -170,10 +170,10 @@ export class NumberOption extends OptionBase {
   constructor(name: string, description: string, type?: 'integer' | 'number') {
     super(name, description, type === 'integer' ? 4 : 10)
   }
-  choices = (...e: APIApplicationCommandOptionChoice<number>[]) => this.assign({ choices: e })
-  min_value = (e: TypeNumberOption['min_value']) => this.assign({ min_value: e })
-  max_value = (e: TypeNumberOption['max_value']) => this.assign({ max_value: e })
-  autocomplete = (e: TypeNumberOption['autocomplete']) => this.assign({ autocomplete: e })
+  choices = (...e: APIApplicationCommandOptionChoice<number>[]) => this.a({ choices: e })
+  min_value = (e: TypeNumberOption['min_value']) => this.a({ min_value: e })
+  max_value = (e: TypeNumberOption['max_value']) => this.a({ max_value: e })
+  autocomplete = (e: TypeNumberOption['autocomplete']) => this.a({ autocomplete: e })
 }
 
 export class BooleanOption extends OptionBase {
@@ -192,7 +192,7 @@ export class ChannelOption extends OptionBase {
   constructor(name: string, description: string) {
     super(name, description, 7)
   }
-  channel_types = (e: APIApplicationCommandChannelOption['channel_types']) => this.assign({ channel_types: e })
+  channel_types = (e: APIApplicationCommandChannelOption['channel_types']) => this.a({ channel_types: e })
 }
 
 export class RoleOption extends OptionBase {

@@ -52,12 +52,12 @@ class ButtonBase {
     this.component =
       style === 5 ? { type: 2, label, style, url: str } : { type: 2, label, style, custom_id: this.uniqueStr }
   }
-  protected assign = (component: OmitButton) => {
+  protected a = (component: OmitButton) => {
     Object.assign(this.component, component)
     return this
   }
-  emoji = (e: APIButtonComponent['emoji']) => this.assign({ emoji: e })
-  disabled = (e: APIButtonComponent['disabled']) => this.assign({ disabled: e })
+  emoji = (e: APIButtonComponent['emoji']) => this.a({ emoji: e })
+  disabled = (e: APIButtonComponent['disabled']) => this.a({ disabled: e })
   build = () => this.component
 }
 
@@ -78,8 +78,8 @@ export class Button extends ButtonBase {
       1
     super(uniqueId, label, style)
   }
-  custom_id = //(handler: (c: ComponentContext<E>) => Promise<string> | string) => this.assign({ custom_id: this.uniqueStr + (await handler()) })
-    (e: APIButtonComponentWithCustomId['custom_id']) => this.assign({ custom_id: this.uniqueStr + e })
+  custom_id = //(handler: (c: ComponentContext<E>) => Promise<string> | string) => this.a({ custom_id: this.uniqueStr + (await handler()) })
+    (e: APIButtonComponentWithCustomId['custom_id']) => this.a({ custom_id: this.uniqueStr + e })
 }
 export class LinkButton extends ButtonBase {
   /**
@@ -103,15 +103,15 @@ class SelectBase {
     this.uniqueStr = `${uniqueId};`
     this.component = type === 3 ? { type, custom_id: this.uniqueStr, options: [] } : { type, custom_id: this.uniqueStr }
   }
-  protected assign = (component: OmitSelect | { custom_id?: string }) => {
+  protected a = (component: OmitSelect | { custom_id?: string }) => {
     Object.assign(this.component, component)
     return this
   }
-  custom_id = (e: APISelectMenuComponent['custom_id']) => this.assign({ custom_id: this.uniqueStr + e })
-  placeholder = (e: APISelectMenuComponent['placeholder']) => this.assign({ placeholder: e })
-  min_values = (e: APISelectMenuComponent['min_values']) => this.assign({ min_values: e })
-  max_values = (e: APISelectMenuComponent['max_values']) => this.assign({ max_values: e })
-  disabled = (e: APISelectMenuComponent['disabled']) => this.assign({ disabled: e })
+  custom_id = (e: APISelectMenuComponent['custom_id']) => this.a({ custom_id: this.uniqueStr + e })
+  placeholder = (e: APISelectMenuComponent['placeholder']) => this.a({ placeholder: e })
+  min_values = (e: APISelectMenuComponent['min_values']) => this.a({ min_values: e })
+  max_values = (e: APISelectMenuComponent['max_values']) => this.a({ max_values: e })
+  disabled = (e: APISelectMenuComponent['disabled']) => this.a({ disabled: e })
   build = () => this.component
 }
 
@@ -123,30 +123,30 @@ export class Select extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 3)
   }
-  options = (e: APIStringSelectComponent['options']) => this.assign({ options: e })
+  options = (e: APIStringSelectComponent['options']) => this.a({ options: e })
 }
 export class UserSelect extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 5)
   }
-  default_values = (e: APIUserSelectComponent['default_values']) => this.assign({ default_values: e })
+  default_values = (e: APIUserSelectComponent['default_values']) => this.a({ default_values: e })
 }
 export class RoleSelect extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 6)
   }
-  default_values = (e: APIRoleSelectComponent['default_values']) => this.assign({ default_values: e })
+  default_values = (e: APIRoleSelectComponent['default_values']) => this.a({ default_values: e })
 }
 export class MentionableSelect extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 7)
   }
-  default_values = (e: APIMentionableSelectComponent['default_values']) => this.assign({ default_values: e })
+  default_values = (e: APIMentionableSelectComponent['default_values']) => this.a({ default_values: e })
 }
 export class ChannelSelect extends SelectBase {
   constructor(uniqueId: string) {
     super(uniqueId, 8)
   }
-  channel_types = (e: APIChannelSelectComponent['channel_types']) => this.assign({ channel_types: e })
-  default_values = (e: APIChannelSelectComponent['default_values']) => this.assign({ default_values: e })
+  channel_types = (e: APIChannelSelectComponent['channel_types']) => this.a({ channel_types: e })
+  default_values = (e: APIChannelSelectComponent['default_values']) => this.a({ default_values: e })
 }

@@ -28,15 +28,15 @@ export class TextInput {
   constructor(custom_id: string, label: string, inputStyle?: 'Single' | 'Multi') {
     this.#component = { type: 4, custom_id, label, style: inputStyle === 'Multi' ? 2 : 1 }
   }
-  #assign = (component: Omit<APITextInputComponent, 'type' | 'custom_id' | 'label' | 'style'>) => {
+  #a = (component: Omit<APITextInputComponent, 'type' | 'custom_id' | 'label' | 'style'>) => {
     Object.assign(this.#component, component)
     return this
   }
   // https://discord.com/developers/docs/interactions/message-components#text-input-object
-  min_length = (e: APITextInputComponent['min_length']) => this.#assign({ min_length: e })
-  max_length = (e: APITextInputComponent['max_length']) => this.#assign({ max_length: e })
-  required = (e: APITextInputComponent['required'] = true) => this.#assign({ required: e })
-  value = (e: APITextInputComponent['value']) => this.#assign({ value: e })
-  placeholder = (e: APITextInputComponent['placeholder']) => this.#assign({ placeholder: e })
+  min_length = (e: APITextInputComponent['min_length']) => this.#a({ min_length: e })
+  max_length = (e: APITextInputComponent['max_length']) => this.#a({ max_length: e })
+  required = (e: APITextInputComponent['required'] = true) => this.#a({ required: e })
+  value = (e: APITextInputComponent['value']) => this.#a({ value: e })
+  placeholder = (e: APITextInputComponent['placeholder']) => this.#a({ placeholder: e })
   build = () => this.#component
 }
