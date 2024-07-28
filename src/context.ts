@@ -315,7 +315,7 @@ type ComponentInteractionData<T extends ComponentType> =
     | APIMessageChannelSelectInteractionData
   >
 export class ComponentContext<E extends Env = any, T extends ComponentType = unknown> extends RequestContext<
-  E,
+  E & { Variables: { custom_id?: string } },
   ComponentInteractionData<T>
 > {
   constructor(
@@ -327,6 +327,8 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
     key: string,
   ) {
     super(req, env, executionCtx, discord, interaction as ComponentInteractionData<T>, key)
+    // @ts-expect-error
+    this.set('custom_id', interaction.data?.custom_id)
   }
 
   /**
