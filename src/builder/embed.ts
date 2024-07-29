@@ -9,6 +9,7 @@ export class Embed {
     Object.assign(this.#embed, embed)
     return this
   }
+  build = () => this.#embed
   author = (e: APIEmbed['author']) => this.a({ author: e })
   color = (e: APIEmbed['color']) => this.a({ color: e })
   description = (e: APIEmbed['description']) => this.a({ description: e })
@@ -19,8 +20,10 @@ export class Embed {
   thumbnail = (e: APIEmbed['thumbnail']) => this.a({ thumbnail: e })
   timestamp = (e: APIEmbed['timestamp']) => this.a({ timestamp: e })
   title = (e: APIEmbed['title']) => this.a({ title: e })
+  /**
+   * @deprecated
+   */
   type = (e: APIEmbed['type']) => this.a({ type: e })
   url = (e: APIEmbed['url']) => this.a({ url: e })
   video = (e: APIEmbed['video']) => this.a({ video: e })
-  build = () => this.#embed
 }

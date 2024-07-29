@@ -1,18 +1,21 @@
 import type {
   APIActionRowComponent,
-  APIButtonComponent,
   APIButtonComponentWithCustomId,
+  APIButtonComponentWithSKUId,
   APIButtonComponentWithURL,
   APIChannelSelectComponent,
   APIMentionableSelectComponent,
   APIMessageActionRowComponent,
+  APIMessageComponentEmoji,
   APIRoleSelectComponent,
-  APISelectMenuComponent,
+  APISelectMenuOption,
   APIStringSelectComponent,
   APIUserSelectComponent,
+  ChannelType,
 } from 'discord-api-types/v10'
+import { warnNotUse } from '../utils'
 
-type ComponentClass = Button | LinkButton | Select | UserSelect | RoleSelect | MentionableSelect | ChannelSelect
+type ComponentClass = Button<any> | LinkButton | Select | UserSelect | RoleSelect | MentionableSelect | ChannelSelect
 
 /**
  * https://discord.com/developers/docs/interactions/message-components
@@ -40,114 +43,232 @@ export class Components {
   build = () => this.#components
 }
 
-type OmitButton =
-  | Omit<APIButtonComponentWithCustomId, 'type' | 'style'>
-  | Omit<APIButtonComponentWithURL, 'type' | 'style' | 'url'>
-class ButtonBase {
-  protected uniqueStr: string
-  protected component: APIButtonComponent
-  // ***************************** label or emoji でいけるのか検証したい
-  constructor(str: string, label: string, style: 1 | 2 | 3 | 4 | 5) {
-    this.uniqueStr = `${str};`
-    this.component =
-      style === 5 ? { type: 2, label, style, url: str } : { type: 2, label, style, custom_id: this.uniqueStr }
+export class Button<T extends 'Primary' | 'Secondary' | 'Success' | 'Danger' | 'Link' | 'SKU' = 'Primary'> {
+  #style: 1 | 2 | 3 | 4 | 5 | 6
+  #uniqueStr = ''
+  // biome-ignore format: ternary operator
+  #component:
+    T extends 'Link' ? APIButtonComponentWithURL :
+    T extends 'SKU' ? APIButtonComponentWithSKUId :
+    APIButtonComponentWithCustomId
+  /**
+   * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
+   * @param str Basic: unique_id, Link: URL, SKU: sku_id
+   * @param label Ignore: SKU
+   * @param buttonStyle Default: 'Primary'
+   */
+  constructor(str: string, label: string, buttonStyle: T = 'Primary' as T) {
+    const styleNum = {
+      Primary: 1,
+      Secondary: 2,
+      Success: 3,
+      Danger: 4,
+      Link: 5,
+      SKU: 6,
+    } as const
+    const style = styleNum[buttonStyle] || 1
+    this.#style = style
+    switch (style) {
+      case 5:
+        // @ts-expect-error
+        this.#component = { type: 2, label, style, url: str }
+        break
+      case 6:
+        // @ts-expect-error
+        this.#component = { type: 2, style, sku_id: str }
+        break
+      default:
+        this.#uniqueStr = `${str};`
+        // @ts-expect-error
+        this.#component = { type: 2, label, style, custom_id: this.#uniqueStr }
+    }
   }
-  protected a = (component: OmitButton) => {
-    Object.assign(this.component, component)
+  build = () => this.#component
+  #assign = (
+    component:
+      | Omit<APIButtonComponentWithCustomId, 'type' | 'style'>
+      | Omit<APIButtonComponentWithURL, 'type' | 'style' | 'url'>
+      | Omit<APIButtonComponentWithSKUId, 'type' | 'style' | 'sku_id'>,
+  ) => {
+    Object.assign(this.#component, component)
     return this
   }
-  disabled = (e: APIButtonComponent['disabled']) => this.a({ disabled: e })
-  build = () => this.component
-}
-
-type ButtonStyle = 'Primary' | 'Secondary' | 'Success' | 'Danger'
-
-export class Button extends ButtonBase {
   /**
-   * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
-   * @param buttonStyle default: 'Primary'
+   * available: ALL
+   * @param e Default: true
    */
-  constructor(uniqueId: string, label: string, buttonStyle: ButtonStyle = 'Primary') {
-    // biome-ignore format: ternary operator
-    const style =
-      buttonStyle === 'Primary' ? 1 :
-      buttonStyle === 'Secondary' ? 2 :
-      buttonStyle === 'Success' ? 3 :
-      buttonStyle === 'Danger' ? 4 :
-      1
-    super(uniqueId, label, style)
+  disabled = (e = true) => this.#assign({ disabled: e })
+  /**
+   * available: Primary, Secondary, Success, Danger, Link
+   */
+  emoji = (e: T extends 'SKU' ? undefined : APIMessageComponentEmoji) => {
+    if (this.#style === 6) {
+      warnNotUse('Button.emoji')
+      return this
+    }
+    return this.#assign({ emoji: e })
   }
-  emoji = (e: APIButtonComponentWithCustomId['emoji']) => this.a({ emoji: e })
-  custom_id = //(handler: (c: ComponentContext<E>) => Promise<string> | string) => this.a({ custom_id: this.uniqueStr + (await handler()) })
-    (e: APIButtonComponentWithCustomId['custom_id']) => this.a({ custom_id: this.uniqueStr + e })
-}
-export class LinkButton extends ButtonBase {
   /**
-   * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
+   * available: Primary, Secondary, Success, Danger
    */
+  custom_id = (e: T extends 'Link' | 'SKU' ? undefined : string) => {
+    if (this.#style === 5 || this.#style === 6) {
+      warnNotUse('Button.custom_id')
+      return this
+    }
+    return this.#assign({ custom_id: this.#uniqueStr + e })
+  }
+}
+/**
+ * @deprecated Integrated into Button
+ */
+export class LinkButton extends Button<'Link'> {
   constructor(url: string, label: string) {
-    super(url, label, 5)
+    super(url, label, 'Link')
   }
-  emoji = (e: APIButtonComponentWithURL['emoji']) => this.a({ emoji: e })
 }
 
-type OmitSelect =
-  | Omit<APIStringSelectComponent, 'type' | 'custom_id'>
-  | Omit<APIUserSelectComponent, 'type' | 'custom_id'>
-  | Omit<APIRoleSelectComponent, 'type' | 'custom_id'>
-  | Omit<APIMentionableSelectComponent, 'type' | 'custom_id'>
-  | Omit<APIChannelSelectComponent, 'type' | 'custom_id'>
-class SelectBase {
-  protected uniqueStr: string
-  protected component: APISelectMenuComponent
-  constructor(uniqueId: string, type: 3 | 5 | 6 | 7 | 8) {
-    this.uniqueStr = `${uniqueId};`
-    this.component = type === 3 ? { type, custom_id: this.uniqueStr, options: [] } : { type, custom_id: this.uniqueStr }
+export class Select<T extends 'String' | 'User' | 'Role' | 'Mentionable' | 'Channel' = 'String'> {
+  #type: 3 | 5 | 6 | 7 | 8
+  #uniqueStr: string
+  // biome-ignore format: ternary operator
+  #component:
+    T extends 'User' ? APIUserSelectComponent :
+    T extends 'Role' ? APIRoleSelectComponent :
+    T extends 'Mentionable' ? APIMentionableSelectComponent :
+    T extends 'Channel' ? APIChannelSelectComponent :
+    APIStringSelectComponent
+  constructor(uniqueId: string, selectType: T = 'String' as T) {
+    const typeNum = {
+      String: 3,
+      User: 5,
+      Role: 6,
+      Mentionable: 7,
+      Channel: 8,
+    } as const
+    const type = typeNum[selectType]
+    this.#type = type
+    this.#uniqueStr = `${uniqueId};`
+    // @ts-expect-error
+    this.#component =
+      type === 3 ? { type, custom_id: this.#uniqueStr, options: [] } : { type, custom_id: this.#uniqueStr }
   }
-  protected a = (component: OmitSelect | { custom_id?: string }) => {
-    Object.assign(this.component, component)
+  build = () => this.#component
+  #assign = (
+    component: (
+      | Omit<APIStringSelectComponent, 'type' | 'custom_id'>
+      | Omit<APIUserSelectComponent, 'type' | 'custom_id'>
+      | Omit<APIRoleSelectComponent, 'type' | 'custom_id'>
+      | Omit<APIMentionableSelectComponent, 'type' | 'custom_id'>
+      | Omit<APIChannelSelectComponent, 'type' | 'custom_id'>
+    ) & { custom_id?: string },
+  ) => {
+    Object.assign(this.#component, component)
     return this
   }
-  custom_id = (e: APISelectMenuComponent['custom_id']) => this.a({ custom_id: this.uniqueStr + e })
-  placeholder = (e: APISelectMenuComponent['placeholder']) => this.a({ placeholder: e })
-  min_values = (e: APISelectMenuComponent['min_values']) => this.a({ min_values: e })
-  max_values = (e: APISelectMenuComponent['max_values']) => this.a({ max_values: e })
-  disabled = (e: APISelectMenuComponent['disabled']) => this.a({ disabled: e })
-  build = () => this.component
+  /**
+   * available: ALL
+   */
+  custom_id = (e: string) => this.#assign({ custom_id: this.#uniqueStr + e })
+  /**
+   * available: ALL
+   */
+  placeholder = (e: string) => this.#assign({ placeholder: e })
+  /**
+   * available: ALL
+   */
+  min_values = (e: number) => this.#assign({ min_values: e })
+  /**
+   * available: ALL
+   */
+  max_values = (e: number) => this.#assign({ max_values: e })
+  /**
+   * available: ALL
+   * @param e Default: true
+   */
+  disabled = (e = true) => this.#assign({ disabled: e })
+  /**
+   * required and available: String
+   *
+   * [Select Option Structure](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure)
+   */
+  options = (...e: T extends 'String' ? APISelectMenuOption[] : undefined[]) => {
+    if (this.#type !== 3) {
+      warnNotUse('Select.options')
+      return this
+    }
+    // @ts-expect-error
+    return this.#assign({ options: e })
+  }
+  /**
+   * available: User, Role, Channel, Mentionable
+   *
+   * [Select Default Value Structure](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-default-value-structure)
+   */
+  default_values = (
+    ...e: T extends 'String'
+      ? undefined[]
+      : {
+          id: string
+          // biome-ignore format: ternary operator
+          type:
+            T extends 'User' ? 'user' :
+            T extends 'Role' ? 'role' :
+            T extends 'Channel' ? 'channel' :
+            'user' | 'role'
+        }[]
+  ): this => {
+    if (this.#type === 3) {
+      warnNotUse('Select.default_values')
+      return this
+    }
+    // @ts-expect-error
+    return this.#assign({ default_values: e })
+  }
+  /**
+   * available: Channel
+   *
+   * [Channel Types](https://discord.com/developers/docs/resources/channel#channel-object-channel-types)
+   */
+  channel_types = (...e: T extends 'Channel' ? ChannelType[] : undefined[]) => {
+    if (this.#type !== 8) {
+      warnNotUse('Select.channel_types')
+      return this
+    }
+    // @ts-expect-error
+    return this.#assign({ channel_types: e })
+  }
 }
 
-export class Select extends SelectBase {
-  /**
-   * [Select Structure](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-menu-structure)
-   * .options() require
-   */
+/**
+ * @deprecated Integrated into Select
+ */
+export class UserSelect extends Select<'User'> {
   constructor(uniqueId: string) {
-    super(uniqueId, 3)
+    super(uniqueId, 'User')
   }
-  options = (e: APIStringSelectComponent['options']) => this.a({ options: e })
 }
-export class UserSelect extends SelectBase {
+/**
+ * @deprecated Integrated into Select
+ */
+export class RoleSelect extends Select<'Role'> {
   constructor(uniqueId: string) {
-    super(uniqueId, 5)
+    super(uniqueId, 'Role')
   }
-  default_values = (e: APIUserSelectComponent['default_values']) => this.a({ default_values: e })
 }
-export class RoleSelect extends SelectBase {
+/**
+ * @deprecated Integrated into Select
+ */
+export class MentionableSelect extends Select<'Mentionable'> {
   constructor(uniqueId: string) {
-    super(uniqueId, 6)
+    super(uniqueId, 'Mentionable')
   }
-  default_values = (e: APIRoleSelectComponent['default_values']) => this.a({ default_values: e })
 }
-export class MentionableSelect extends SelectBase {
+/**
+ * @deprecated Integrated into Select
+ */
+export class ChannelSelect extends Select<'Channel'> {
   constructor(uniqueId: string) {
-    super(uniqueId, 7)
+    super(uniqueId, 'Channel')
   }
-  default_values = (e: APIMentionableSelectComponent['default_values']) => this.a({ default_values: e })
-}
-export class ChannelSelect extends SelectBase {
-  constructor(uniqueId: string) {
-    super(uniqueId, 8)
-  }
-  channel_types = (e: APIChannelSelectComponent['channel_types']) => this.a({ channel_types: e })
-  default_values = (e: APIChannelSelectComponent['default_values']) => this.a({ default_values: e })
 }
