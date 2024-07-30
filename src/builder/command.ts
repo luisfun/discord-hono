@@ -1,5 +1,4 @@
 import type {
-  APIApplicationCommand,
   APIApplicationCommandAttachmentOption, // 11
   APIApplicationCommandBasicOption,
   APIApplicationCommandBooleanOption, // 5
@@ -18,6 +17,7 @@ import type {
   ApplicationIntegrationType,
   ChannelType,
   InteractionContextType,
+  Locale,
 } from 'discord-api-types/v10'
 import type { ApplicationCommand } from '../types'
 import { warnNotUse } from '../utils'
@@ -56,9 +56,8 @@ export class Command {
    * [Application Command Types](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types)
    */
   type = (e: ApplicationCommandType) => this.#assign({ type: e })
-  name_localizations = (e: APIApplicationCommand['name_localizations']) => this.#assign({ name_localizations: e })
-  description_localizations = (e: APIApplicationCommand['description_localizations']) =>
-    this.#assign({ description_localizations: e })
+  name_localizations = (e: Partial<Record<Locale, string>>) => this.#assign({ name_localizations: e })
+  description_localizations = (e: Partial<Record<Locale, string>>) => this.#assign({ description_localizations: e })
   default_member_permissions = (e: string | null) => this.#assign({ default_member_permissions: e })
   /**
    * @deprecated Use `contexts` instead
@@ -122,12 +121,11 @@ class OptionBase {
   /**
    * available: ALL
    */
-  name_localizations = (e: APIApplicationCommandOption['name_localizations']) => this.a({ name_localizations: e })
+  name_localizations = (e: Partial<Record<Locale, string>>) => this.a({ name_localizations: e })
   /**
    * available: ALL
    */
-  description_localizations = (e: APIApplicationCommandOption['description_localizations']) =>
-    this.a({ description_localizations: e })
+  description_localizations = (e: Partial<Record<Locale, string>>) => this.a({ description_localizations: e })
   /**
    * available: ALL
    */
