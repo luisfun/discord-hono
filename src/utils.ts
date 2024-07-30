@@ -62,7 +62,7 @@ export const formData = <T extends CustomCallbackBase>(data?: CustomCallbackData
 export const errorSys = (e: string) => new Error(`${e} not found`) // system
 export const errorDev = (e: string) => new Error(`${e} is missing`) // developer
 export const errorOther = (e: string) => new Error(`There is no ${e}`) // other
-export const warnNotUse = (e: string) => console.warn(`${e} not available`) // builder error
+export const warnNotUse = (e: string) => console.warn(`⚠️ ${e} not available`) // builder error
 
 export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, Math.max(ms, 0)))
 

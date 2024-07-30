@@ -17,7 +17,14 @@ import type {
 } from 'discord-api-types/v10'
 import { warnNotUse } from '../utils'
 
-type ComponentClass = Button | LinkButton | Select | UserSelect | RoleSelect | MentionableSelect | ChannelSelect
+type ComponentClass =
+  | Button<any>
+  | LinkButton
+  | Select<any>
+  | UserSelect
+  | RoleSelect
+  | MentionableSelect
+  | ChannelSelect
 
 /**
  * https://discord.com/developers/docs/interactions/message-components

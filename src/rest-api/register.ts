@@ -11,9 +11,9 @@ import { apiUrl, errorDev } from '../utils'
  * ```ts
  * register(
  *   commands,
- *   env.DISCORD_APPLICATION_ID,
- *   env.DISCORD_TOKEN,
- *   //env.DISCORD_TEST_GUILD_ID,
+ *   process.env.DISCORD_APPLICATION_ID,
+ *   process.env.DISCORD_TOKEN,
+ *   //process.env.DISCORD_TEST_GUILD_ID,
  * )
  * ```
  */
@@ -46,8 +46,7 @@ export const register = async (
   })
 
   if (response.ok) {
-    const data = await response.json()
-    console.log(`${JSON.stringify(data, null, 2)}\n===== ✅ Success =====`)
+    console.log('===== ✅ Success =====')
   } else {
     let errorText = `Error registering commands\n${response.url}: ${response.status} ${response.statusText}`
     try {
