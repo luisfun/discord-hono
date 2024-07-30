@@ -1,5 +1,7 @@
 import type {
   APIActionRowComponent,
+  APIBaseSelectMenuComponent,
+  APIButtonComponent,
   APIButtonComponentWithCustomId,
   APIButtonComponentWithSKUId,
   APIButtonComponentWithURL,
@@ -15,7 +17,7 @@ import type {
 } from 'discord-api-types/v10'
 import { warnNotUse } from '../utils'
 
-type ComponentClass = Button<any> | LinkButton | Select | UserSelect | RoleSelect | MentionableSelect | ChannelSelect
+type ComponentClass = Button | LinkButton | Select | UserSelect | RoleSelect | MentionableSelect | ChannelSelect
 
 /**
  * https://discord.com/developers/docs/interactions/message-components
@@ -46,11 +48,7 @@ export class Components {
 export class Button<T extends 'Primary' | 'Secondary' | 'Success' | 'Danger' | 'Link' | 'SKU' = 'Primary'> {
   #style: 1 | 2 | 3 | 4 | 5 | 6
   #uniqueStr = ''
-  // biome-ignore format: ternary operator
-  #component:
-    T extends 'Link' ? APIButtonComponentWithURL :
-    T extends 'SKU' ? APIButtonComponentWithSKUId :
-    APIButtonComponentWithCustomId
+  #component: APIButtonComponent
   /**
    * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object-button-structure)
    * @param str Basic: unique_id, Link: URL, SKU: sku_id
@@ -70,20 +68,21 @@ export class Button<T extends 'Primary' | 'Secondary' | 'Success' | 'Danger' | '
     this.#style = style
     switch (style) {
       case 5:
-        // @ts-expect-error
         this.#component = { type: 2, label, style, url: str }
         break
       case 6:
-        // @ts-expect-error
         this.#component = { type: 2, style, sku_id: str }
         break
       default:
         this.#uniqueStr = `${str};`
-        // @ts-expect-error
         this.#component = { type: 2, label, style, custom_id: this.#uniqueStr }
     }
   }
-  build = () => this.#component
+  // biome-ignore format: ternary operator
+  build = () => this.#component as
+    T extends 'Link' ? APIButtonComponentWithURL :
+    T extends 'SKU' ? APIButtonComponentWithSKUId :
+    APIButtonComponentWithCustomId
   #assign = (
     component:
       | Omit<APIButtonComponentWithCustomId, 'type' | 'style'>
@@ -131,13 +130,7 @@ export class LinkButton extends Button<'Link'> {
 export class Select<T extends 'String' | 'User' | 'Role' | 'Mentionable' | 'Channel' = 'String'> {
   #type: 3 | 5 | 6 | 7 | 8
   #uniqueStr: string
-  // biome-ignore format: ternary operator
-  #component:
-    T extends 'User' ? APIUserSelectComponent :
-    T extends 'Role' ? APIRoleSelectComponent :
-    T extends 'Mentionable' ? APIMentionableSelectComponent :
-    T extends 'Channel' ? APIChannelSelectComponent :
-    APIStringSelectComponent
+  #component: APIBaseSelectMenuComponent<any> & { options?: APISelectMenuOption[] }
   constructor(uniqueId: string, selectType: T = 'String' as T) {
     const typeNum = {
       String: 3,
@@ -149,11 +142,16 @@ export class Select<T extends 'String' | 'User' | 'Role' | 'Mentionable' | 'Chan
     const type = typeNum[selectType]
     this.#type = type
     this.#uniqueStr = `${uniqueId};`
-    // @ts-expect-error
     this.#component =
       type === 3 ? { type, custom_id: this.#uniqueStr, options: [] } : { type, custom_id: this.#uniqueStr }
   }
-  build = () => this.#component
+  // biome-ignore format: ternary operator
+  build = () => this.#component as
+    T extends 'User' ? APIUserSelectComponent :
+    T extends 'Role' ? APIRoleSelectComponent :
+    T extends 'Mentionable' ? APIMentionableSelectComponent :
+    T extends 'Channel' ? APIChannelSelectComponent :
+    APIStringSelectComponent
   #assign = (
     component: (
       | Omit<APIStringSelectComponent, 'type' | 'custom_id'>

@@ -119,9 +119,18 @@ class OptionBase {
     Object.assign(this.#option, option)
     return this
   }
+  /**
+   * available: ALL
+   */
   name_localizations = (e: APIApplicationCommandOption['name_localizations']) => this.a({ name_localizations: e })
+  /**
+   * available: ALL
+   */
   description_localizations = (e: APIApplicationCommandOption['description_localizations']) =>
     this.a({ description_localizations: e })
+  /**
+   * available: ALL
+   */
   required = (e = true) => this.a({ required: e })
 }
 
