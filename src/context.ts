@@ -41,7 +41,7 @@ interface GetVar<E extends Env> {
 }
 type IsAny<T> = boolean extends (T extends never ? true : false) ? true : false
 
-class ContextBase<E extends Env> {
+abstract class ContextBase<E extends Env> {
   #env: E['Bindings'] = {}
   #executionCtx: ExecutionCtx
   protected discord: DiscordEnv
@@ -104,7 +104,7 @@ type InteractionCallbackData<T extends InteractionCallbackType> =
   T extends 8 ? APICommandAutocompleteInteractionResponseCallbackData :
   T extends 9 ? Modal | APIModalInteractionResponseCallbackData :
   undefined // 1, 6, 10
-class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> extends ContextBase<E> {
+abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> extends ContextBase<E> {
   #req: Request
   #interaction: D
   #flags: { flags?: number } = {}

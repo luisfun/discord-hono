@@ -24,19 +24,17 @@ type DiscordEnvBindings = {
   DISCORD_APPLICATION_ID?: string
 }
 
-class DiscordHonoBase<E extends Env> {
+abstract class DiscordHonoBase<E extends Env> {
   #verify: Verify = verify
   #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
   #commandMap = new RegexMap<string | RegExp, CommandHandler<E>>()
   #componentMap = new RegexMap<string | RegExp, ComponentHandler<E>>()
   #modalMap = new RegexMap<string | RegExp, ModalHandler<E>>()
   #cronMap = new RegexMap<string | RegExp, CronHandler<E>>()
-  #regex = {
-    command: false,
-    component: false,
-    modal: false,
-    cron: false,
-  }
+  #isCommandRegex = false
+  #isComponentRegex = false
+  #isModalRegex = false
+  #isCronRegex = false
   constructor(options?: InitOptions<E>) {
     if (options?.verify) this.#verify = options.verify
     this.#discord = env => {
@@ -52,22 +50,22 @@ class DiscordHonoBase<E extends Env> {
 
   command = (command: string | RegExp, handler: CommandHandler<E>) => {
     this.#commandMap.set(command, handler)
-    if (command instanceof RegExp) this.#regex.command = true
+    if (command instanceof RegExp) this.#isCommandRegex = true
     return this
   }
   component = (componentId: string | RegExp, handler: ComponentHandler<E>) => {
     this.#componentMap.set(componentId, handler)
-    if (componentId instanceof RegExp) this.#regex.component = true
+    if (componentId instanceof RegExp) this.#isComponentRegex = true
     return this
   }
   modal = (modalId: string | RegExp, handler: ModalHandler<E>) => {
     this.#modalMap.set(modalId, handler)
-    if (modalId instanceof RegExp) this.#regex.modal = true
+    if (modalId instanceof RegExp) this.#isModalRegex = true
     return this
   }
   cron = (cron: string | RegExp, handler: CronHandler<E>) => {
     this.#cronMap.set(cron, handler)
-    if (cron instanceof RegExp) this.#regex.cron = true
+    if (cron instanceof RegExp) this.#isCronRegex = true
     return this
   }
 
@@ -96,7 +94,7 @@ class DiscordHonoBase<E extends Env> {
             const { handler, key } = getHandler<CommandHandler>(
               this.#commandMap,
               interaction.data?.name.toLowerCase(),
-              this.#regex.command,
+              this.#isCommandRegex,
             )
             return await handler(new CommandContext(request, env, executionCtx, discord, interaction, key))
           }
@@ -104,7 +102,7 @@ class DiscordHonoBase<E extends Env> {
             const { handler, interaction, key } = getHandler<ComponentHandler>(
               this.#componentMap,
               data as InteractionComponentData,
-              this.#regex.component,
+              this.#isComponentRegex,
             )
             return await handler(new ComponentContext(request, env, executionCtx, discord, interaction, key))
           }
@@ -112,7 +110,7 @@ class DiscordHonoBase<E extends Env> {
             const { handler, interaction, key } = getHandler<ModalHandler>(
               this.#modalMap,
               data as InteractionModalData,
-              this.#regex.modal,
+              this.#isModalRegex,
             )
             return await handler(new ModalContext(request, env, executionCtx, discord, interaction, key))
           }
@@ -129,7 +127,7 @@ class DiscordHonoBase<E extends Env> {
 
   scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
     const discord = this.#discord(env)
-    const { handler, key } = getHandler<CronHandler>(this.#cronMap, event.cron, this.#regex.cron)
+    const { handler, key } = getHandler<CronHandler>(this.#cronMap, event.cron, this.#isCronRegex)
     const c = new CronContext(event, env, executionCtx, discord, key)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(c))
     else {
