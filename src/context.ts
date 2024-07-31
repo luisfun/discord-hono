@@ -353,7 +353,10 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
   resModal = (data: Modal | APIModalInteractionResponseCallbackData) => this.res(data, 9)
 }
 
-export class ModalContext<E extends Env = any> extends RequestContext<E & { Variables: { custom_id?: string } }, InteractionData<5>> {
+export class ModalContext<E extends Env = any> extends RequestContext<
+  E & { Variables: { custom_id?: string } },
+  InteractionData<5>
+> {
   constructor(
     req: Request,
     env: E['Bindings'],

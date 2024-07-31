@@ -26,7 +26,7 @@ export class Modal {
     return this
   }
   /**
-   * @param {...(TextInput | APITextInputComponent)} e 
+   * @param {...(TextInput | APITextInputComponent)} e
    * @returns {this}
    */
   row = (...e: (TextInput | APITextInputComponent)[]) => {

@@ -8,10 +8,10 @@ import { apiUrl, errorDev } from '../utils'
 
 /**
  * [Docs](https://discord-hono.luis.fun/rest-api/register/)
- * @param {(Command | ApplicationCommand)[]} commands 
- * @param {string} application_id 
- * @param {string} token 
- * @param {string} [guild_id] 
+ * @param {(Command | ApplicationCommand)[]} commands
+ * @param {string} application_id
+ * @param {string} token
+ * @param {string} [guild_id]
  */
 export const register = async (
   commands: (Command | ApplicationCommand)[],
