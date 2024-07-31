@@ -1,5 +1,4 @@
 import { Embed } from './builder'
-import { Components } from './builder/components'
 import type { CustomCallbackBase, CustomCallbackData, FileData } from './types'
 
 export const apiUrl = 'https://discord.com/api/v10'
@@ -40,7 +39,7 @@ export const addToken = (token: string, init?: Parameters<typeof fetch>[1]): Par
 export const prepareData = <T extends CustomCallbackBase>(data: CustomCallbackData<T>) => {
   if (typeof data === 'string') return { content: data }
   if (data?.components) {
-    const components = data.components instanceof Components ? data.components.build() : data.components
+    const components = '_build' in data.components ? data.components._build() : data.components
     data = { ...data, components }
   }
   if (data?.embeds) {
@@ -62,7 +61,6 @@ export const formData = <T extends CustomCallbackBase>(data?: CustomCallbackData
 export const errorSys = (e: string) => new Error(`${e} not found`) // system
 export const errorDev = (e: string) => new Error(`${e} is missing`) // developer
 export const errorOther = (e: string) => new Error(`There is no ${e}`) // other
-export const warnNotUse = (e: string) => console.warn(`⚠️ ${e} not available`) // builder error
 
 export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, Math.max(ms, 0)))
 

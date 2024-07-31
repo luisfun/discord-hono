@@ -18,4 +18,4 @@ export abstract class Builder<Obj extends object> {
 }
 
 export const warnBuilder = (clas: string, type: string, method: string) =>
-  console.warn(`${clas}(${type}).${method} is not available`)
+  console.warn(`⚠️ ${clas}(${type}).${method} is not available`)

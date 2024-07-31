@@ -168,9 +168,9 @@ type OptionType =
   | 'Attachment'
 export class Option<T extends OptionType = 'String'> extends CommandBase<APIApplicationCommandBasicOption> {
   #type: OptionType
-  #assign = (name: string, doType: OptionType[], obj: Partial<APIApplicationCommandBasicOption>) => {
+  #assign = (method: string, doType: OptionType[], obj: Partial<APIApplicationCommandBasicOption>) => {
     if (!doType.includes(this.#type)) {
-      warnBuilder('Option', this.#type, name)
+      warnBuilder('Option', this.#type, method)
       return this
     }
     return this.a(obj)
