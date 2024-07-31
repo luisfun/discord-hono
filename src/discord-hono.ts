@@ -139,10 +139,9 @@ abstract class DiscordHonoBase<E extends Env> {
 
 const getHandler = <
   H extends CommandHandler | ComponentHandler | ModalHandler | CronHandler,
-  M extends RegexMap<string | RegExp, H> = any,
   I extends string | undefined | InteractionComponentData | InteractionModalData = any,
 >(
-  map: M,
+  map: RegexMap<string | RegExp, H>,
   interaction: I,
   regex?: boolean,
 ) => {
