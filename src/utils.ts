@@ -1,4 +1,3 @@
-import { Embed } from './builder'
 import type { CustomCallbackBase, CustomCallbackData, FileData } from './types'
 
 export const apiUrl = 'https://discord.com/api/v10'
@@ -43,7 +42,7 @@ export const prepareData = <T extends CustomCallbackBase>(data: CustomCallbackDa
     data = { ...data, components }
   }
   if (data?.embeds) {
-    const embeds = data.embeds.map(embed => (embed instanceof Embed ? embed.build() : embed))
+    const embeds = data.embeds.map(embed => ('_build' in embed ? embed._build() : embed))
     data = { ...data, embeds }
   }
   return data as T
