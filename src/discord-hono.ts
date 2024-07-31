@@ -91,7 +91,7 @@ abstract class DiscordHonoBase<E extends Env> {
           }
           case 2: {
             const interaction = data as InteractionCommandData
-            const { handler, key } = getHandler<CommandHandler>(
+            const { handler, key } = getHandler<CommandHandler<E>>(
               this.#commandMap,
               interaction.data?.name.toLowerCase(),
               this.#isCommandRegex,
@@ -99,7 +99,7 @@ abstract class DiscordHonoBase<E extends Env> {
             return await handler(new CommandContext(request, env, executionCtx, discord, interaction, key))
           }
           case 3: {
-            const { handler, interaction, key } = getHandler<ComponentHandler>(
+            const { handler, interaction, key } = getHandler<ComponentHandler<E>>(
               this.#componentMap,
               data as InteractionComponentData,
               this.#isComponentRegex,
@@ -107,7 +107,7 @@ abstract class DiscordHonoBase<E extends Env> {
             return await handler(new ComponentContext(request, env, executionCtx, discord, interaction, key))
           }
           case 5: {
-            const { handler, interaction, key } = getHandler<ModalHandler>(
+            const { handler, interaction, key } = getHandler<ModalHandler<E>>(
               this.#modalMap,
               data as InteractionModalData,
               this.#isModalRegex,
@@ -127,7 +127,7 @@ abstract class DiscordHonoBase<E extends Env> {
 
   scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
     const discord = this.#discord(env)
-    const { handler, key } = getHandler<CronHandler>(this.#cronMap, event.cron, this.#isCronRegex)
+    const { handler, key } = getHandler<CronHandler<E>>(this.#cronMap, event.cron, this.#isCronRegex)
     const c = new CronContext(event, env, executionCtx, discord, key)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(c))
     else {
