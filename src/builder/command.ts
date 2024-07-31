@@ -1,18 +1,9 @@
 import type {
-  APIApplicationCommandAttachmentOption, // 11
   APIApplicationCommandBasicOption,
-  APIApplicationCommandBooleanOption, // 5
-  APIApplicationCommandChannelOption, // 7
-  APIApplicationCommandIntegerOption, // 4
-  APIApplicationCommandMentionableOption, // 9
-  APIApplicationCommandNumberOption, // 10
   APIApplicationCommandOption,
   APIApplicationCommandOptionChoice,
-  APIApplicationCommandRoleOption, // 8
-  APIApplicationCommandStringOption, // 3
   APIApplicationCommandSubcommandGroupOption, // 2
   APIApplicationCommandSubcommandOption, // 1
-  APIApplicationCommandUserOption, // 6
   ApplicationCommandType,
   ApplicationIntegrationType,
   ChannelType,
@@ -20,172 +11,177 @@ import type {
   Locale,
 } from 'discord-api-types/v10'
 import type { ApplicationCommand } from '../types'
-import { warnNotUse } from '../utils'
+import { Builder, warnBuilder } from './utils'
 
-type OptionClass =
-  | Option<any>
-  | NumberOption
-  | BooleanOption
-  | UserOption
-  | ChannelOption
-  | RoleOption
-  | MentionableOption
-  | AttachmentOption
-
-type OptionAllClass = OptionClass | SubCommand | SubGroup
-
-export class Command {
-  #command: ApplicationCommand
+abstract class CommandBase<Obj extends ApplicationCommand | APIApplicationCommandOption> extends Builder<Obj> {
   /**
    * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object)
-   * @param name 1-32 character name
-   * @param description 1-100 character description for CHAT_INPUT commands, empty string for USER and MESSAGE commands
+   * @param {string} name 1-32 character name; `CHAT_INPUT` command names must be all lowercase matching `^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$`
+   * @param {string} description 1-100 character description for `CHAT_INPUT` commands, empty string for `USER` and `MESSAGE` commands
    */
   constructor(name: string, description = '') {
-    this.#command = { name, description }
+    super({ name, description } as Obj)
   }
-  build = () => this.#command
-  #assign = (command: Omit<ApplicationCommand, 'name' | 'description'>) => {
-    Object.assign(this.#command, command)
-    return this
-  }
-  id = (e: string) => this.#assign({ id: e })
-  application_id = (e: string) => this.#assign({ application_id: e })
-  guild_id = (e: string) => this.#assign({ guild_id: e })
+  /**
+   * [Locale](https://discord.com/developers/docs/reference#locales)
+   *
+   * Localization dictionary for the name field. Values follow the same restrictions as name
+   * @param {Partial<Record<Locale, string>>} e
+   * @returns {this}
+   */
+  name_localizations = (e: Partial<Record<Locale, string>>) => this.a({ name_localizations: e } as Obj)
+  /**
+   * [Locale](https://discord.com/developers/docs/reference#locales)
+   *
+   * Localization dictionary for the description field. Values follow the same restrictions as description
+   * @param {Partial<Record<Locale, string>>} e
+   * @returns {this}
+   */
+  description_localizations = (e: Partial<Record<Locale, string>>) => this.a({ description_localizations: e } as Obj)
+}
+
+export class Command extends CommandBase<ApplicationCommand> {
+  /**
+   * @param {string} e
+   * @returns {this}
+   */
+  id = (e: string) => this.a({ id: e })
   /**
    * [Application Command Types](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types)
+   * @param {ApplicationCommandType} e
+   * @returns {this}
    */
-  type = (e: ApplicationCommandType) => this.#assign({ type: e })
-  name_localizations = (e: Partial<Record<Locale, string>>) => this.#assign({ name_localizations: e })
-  description_localizations = (e: Partial<Record<Locale, string>>) => this.#assign({ description_localizations: e })
-  default_member_permissions = (e: string | null) => this.#assign({ default_member_permissions: e })
+  type = (e: ApplicationCommandType) => this.a({ type: e })
+  /**
+   * @param {string} e
+   * @returns {this}
+   */
+  application_id = (e: string) => this.a({ application_id: e })
+  /**
+   * Guild id of the command, if not global
+   * @param {string} e
+   * @returns {this}
+   */
+  guild_id = (e: string) => this.a({ guild_id: e })
+  /**
+   * @param {...(Option | APIApplicationCommandOption)} e
+   * @returns {this}
+   */
+  options = (...e: (Option<any> | SubGroup | SubCommand | APIApplicationCommandOption)[]) =>
+    this.a({ options: e.map(option => ('_build' in option ? option._build() : option)) })
+  /**
+   * @param {string | null} e
+   * @returns {this}
+   */
+  default_member_permissions = (e: string | null) => this.a({ default_member_permissions: e })
   /**
    * @deprecated Use `contexts` instead
+   * @param {boolean} [e=true]
+   * @returns {this}
    */
-  dm_permission = (e = true) => this.#assign({ dm_permission: e })
-  nsfw = (e = true) => this.#assign({ nsfw: e })
+  dm_permission = (e = true) => this.a({ dm_permission: e })
+  /**
+   * Whether the command is enabled by default when the app is added to a guild
+   *
+   * If missing, this property should be assumed as `true`
+   * @deprecated Use `default_member_permissions` instead
+   * @param {boolean} [e=true]
+   * @returns {this}
+   */
+  default_permission = (e = true) => this.a({ default_permission: e })
+  /**
+   * Indicates whether the command is age-restricted
+   * @param {boolean} [e=true]
+   * @returns {this}
+   */
+  nsfw = (e = true) => this.a({ nsfw: e })
   /**
    * [Application Integration Types](https://discord.com/developers/docs/resources/application#application-object-application-integration-types)
+   *
+   * Installation context(s) where the command is available, only for globally-scoped commands.
+   * @unstable
+   * @param {...ApplicationIntegrationType} e
+   * @returns {this}
    */
-  integration_types = (...e: ApplicationIntegrationType[]) => this.#assign({ integration_types: e })
+  integration_types = (...e: ApplicationIntegrationType[]) => this.a({ integration_types: e })
   /**
    * [Interaction Context Types](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-context-types)
+   *
+   * Interaction context(s) where the command can be used, only for globally-scoped commands.
+   * @unstable
+   * @param {...InteractionContextType} e
+   * @returns {this}
    */
-  contexts = (...e: InteractionContextType[]) => this.#assign({ contexts: e })
-  version = (e: string) => this.#assign({ version: e })
-  options = (...e: (OptionAllClass | APIApplicationCommandOption)[]) => {
-    const options = e.map(opt => {
-      if (
-        opt instanceof SubCommand ||
-        opt instanceof SubGroup ||
-        opt instanceof Option ||
-        opt instanceof NumberOption ||
-        opt instanceof BooleanOption ||
-        opt instanceof UserOption ||
-        opt instanceof ChannelOption ||
-        opt instanceof RoleOption ||
-        opt instanceof MentionableOption ||
-        opt instanceof AttachmentOption
-      )
-        return opt.build()
-      return opt
-    })
-    return this.#assign({ options })
-  }
+  contexts = (...e: InteractionContextType[]) => this.a({ contexts: e })
+  /**
+   * @param {string} e
+   * @returns {this}
+   */
+  version = (e: string) => this.a({ version: e })
 }
 
-class OptionBase {
-  #option: APIApplicationCommandOption
-  constructor(name: string, description: string, type: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11) {
-    // @ts-expect-error
-    this.#option = { name, description, type }
-  }
-  build = () => this.#option
-  protected a = (
-    option:
-      | Omit<APIApplicationCommandSubcommandOption, 'name' | 'description' | 'type'>
-      | Omit<APIApplicationCommandSubcommandGroupOption, 'name' | 'description' | 'type'>
-      | Omit<APIApplicationCommandStringOption, 'name' | 'description' | 'type'>
-      | Omit<APIApplicationCommandIntegerOption, 'name' | 'description' | 'type'>
-      | Omit<APIApplicationCommandBooleanOption, 'name' | 'description' | 'type'>
-      | Omit<APIApplicationCommandUserOption, 'name' | 'description' | 'type'>
-      | Omit<APIApplicationCommandChannelOption, 'name' | 'description' | 'type'>
-      | Omit<APIApplicationCommandRoleOption, 'name' | 'description' | 'type'>
-      | Omit<APIApplicationCommandMentionableOption, 'name' | 'description' | 'type'>
-      | Omit<APIApplicationCommandNumberOption, 'name' | 'description' | 'type'>
-      | Omit<APIApplicationCommandAttachmentOption, 'name' | 'description' | 'type'>,
-  ) => {
-    Object.assign(this.#option, option)
-    return this
+export class SubGroup extends CommandBase<APIApplicationCommandSubcommandGroupOption> {
+  /**
+   * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object)
+   * @param {string} name 1-32 character name
+   * @param {string} description 1-100 character description
+   */
+  constructor(name: string, description = '') {
+    super(name, description)
+    this.a({ type: 2 })
   }
   /**
-   * available: ALL
+   * @param {...(SubCommand | APIApplicationCommandSubcommandOption)} e
+   * @returns {this}
    */
-  name_localizations = (e: Partial<Record<Locale, string>>) => this.a({ name_localizations: e })
+  options = (...e: (SubCommand | APIApplicationCommandSubcommandOption)[]) =>
+    this.a({ options: e.map(option => ('_build' in option ? option._build() : option)) })
+}
+
+export class SubCommand extends CommandBase<APIApplicationCommandSubcommandOption> {
   /**
-   * available: ALL
+   * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object)
+   * @param {string} name 1-32 character name
+   * @param {string} description 1-100 character description
    */
-  description_localizations = (e: Partial<Record<Locale, string>>) => this.a({ description_localizations: e })
+  constructor(name: string, description = '') {
+    super(name, description)
+    this.a({ type: 1 })
+  }
   /**
-   * available: ALL
+   * @param {...(Option | APIApplicationCommandBasicOption)} e
+   * @returns {this}
    */
-  required = (e = true) => this.a({ required: e })
+  options = (...e: (Option<any> | APIApplicationCommandBasicOption)[]) =>
+    this.a({ options: e.map(option => ('_build' in option ? option._build() : option)) })
 }
 
-export class SubCommand extends OptionBase {
-  constructor(name: string, description: string) {
-    super(name, description, 1)
+type OptionType =
+  | 'String'
+  | 'Integer'
+  | 'Number'
+  | 'Boolean'
+  | 'User'
+  | 'Channel'
+  | 'Role'
+  | 'Mentionable'
+  | 'Attachment'
+export class Option<T extends OptionType = 'String'> extends CommandBase<APIApplicationCommandBasicOption> {
+  #type: OptionType
+  #assign = (name: string, doType: OptionType[], obj: Partial<APIApplicationCommandBasicOption>) => {
+    if (!doType.includes(this.#type)) {
+      warnBuilder('Option', this.#type, name)
+      return this
+    }
+    return this.a(obj)
   }
-  options = (...e: (OptionClass | APIApplicationCommandBasicOption)[]) => {
-    const options = e.map(opt => {
-      if (
-        opt instanceof Option ||
-        opt instanceof NumberOption ||
-        opt instanceof BooleanOption ||
-        opt instanceof UserOption ||
-        opt instanceof ChannelOption ||
-        opt instanceof RoleOption ||
-        opt instanceof MentionableOption ||
-        opt instanceof AttachmentOption
-      )
-        return opt.build() as APIApplicationCommandBasicOption
-      return opt
-    })
-    return this.a({ options })
-  }
-}
-
-export class SubGroup extends OptionBase {
-  constructor(name: string, description: string) {
-    super(name, description, 2)
-  }
-  options = (...e: (SubCommand | APIApplicationCommandSubcommandOption)[]) => {
-    const options = e.map(opt =>
-      opt instanceof SubCommand ? (opt.build() as APIApplicationCommandSubcommandOption) : opt,
-    )
-    return this.a({ options })
-  }
-}
-
-export class Option<
-  T extends
-    | 'String'
-    | 'Integer'
-    | 'Number'
-    | 'Boolean'
-    | 'User'
-    | 'Channel'
-    | 'Role'
-    | 'Mentionable'
-    | 'Attachment' = 'String',
-> extends OptionBase {
-  #type: 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11
   /**
    * [Command Option Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-structure)
-   * @param name 1-32 character name
-   * @param description 1-100 character description
+   * @param {string} name 1-32 character name
+   * @param {string} description 1-100 character description
+   * @param {"String" | "Integer" | "Number" | "Boolean" | "User" | "Channel" | "Role" | "Mentionable" | "Attachment"} [option_type="String"]
    */
-  constructor(name: string, description: string, type: T = 'String' as T) {
+  constructor(name: string, description: string, option_type: T = 'String' as T) {
     const typeNum = {
       String: 3,
       Integer: 4,
@@ -197,11 +193,19 @@ export class Option<
       Number: 10,
       Attachment: 11,
     } as const
-    super(name, description, typeNum[type])
-    this.#type = typeNum[type]
+    super(name, description)
+    this.a({ type: typeNum[option_type] || 3 })
+    this.#type = option_type
   }
   /**
+   * @param {boolean} [e=true]
+   * @returns {this}
+   */
+  required = (e = true) => this.a({ required: e })
+  /**
    * available: String, Integer, Number
+   * @param {...APIApplicationCommandOptionChoice<string | number>} e
+   * @returns {this}
    */
   choices = (
     // biome-ignore format: ternary operator
@@ -209,64 +213,57 @@ export class Option<
       T extends 'String' ? APIApplicationCommandOptionChoice<string>[] :
       T extends 'Integer' | 'Number' ? APIApplicationCommandOptionChoice<number>[] :
       undefined[]
-  ) => {
-    if (this.#type !== 3 && this.#type !== 4 && this.#type !== 10) {
-      warnNotUse('Option.choices')
-      return this
-    }
-    // @ts-expect-error
-    return this.a({ choices: e })
-  }
-  /**
-   * available: String, Integer, Number
-   */
-  min_length = (e: T extends 'String' | 'Integer' | 'Number' ? number : undefined) => {
-    if (this.#type !== 3 && this.#type !== 4 && this.#type !== 10) {
-      warnNotUse('Option.min_length')
-      return this
-    }
-    return this.a({ min_length: e })
-  }
-  /**
-   * available: String, Integer, Number
-   */
-  max_length = (e: T extends 'String' | 'Integer' | 'Number' ? number : undefined) => {
-    if (this.#type !== 3 && this.#type !== 4 && this.#type !== 10) {
-      warnNotUse('Option.max_length')
-      return this
-    }
-    return this.a({ max_length: e })
-  }
-  /**
-   * available: String, Integer, Number
-   * @param e Default: true
-   */
-  autocomplete = (e?: T extends 'String' | 'Integer' | 'Number' ? boolean : undefined) => {
-    if (this.#type !== 3 && this.#type !== 4 && this.#type !== 10) {
-      warnNotUse('Option.autocomplete')
-      return this
-    }
-    return this.a({ autocomplete: e !== false })
-  }
+  ) =>
+    this.#assign('choices', ['String', 'Integer', 'Number'], { choices: e as APIApplicationCommandOptionChoice<any>[] })
   /**
    * available: Channel
    *
    * [Channel Types](https://discord.com/developers/docs/resources/channel#channel-object-channel-types)
+   * @param {...ChannelType} e
+   * @returns {this}
    */
-  channel_types = (...e: T extends 'Channel' ? ChannelType[] : undefined[]) => {
-    if (this.#type !== 7) {
-      warnNotUse('Option.channel_types')
-      return this
-    }
+  channel_types = (...e: T extends 'Channel' ? ChannelType[] : undefined[]) =>
     // @ts-expect-error
-    return this.a({ channel_types: e })
-  }
+    this.#assign('channel_types', ['Channel'], { channel_types: e as ChannelType[] })
+  /**
+   * available: Integer, Number
+   * @param e
+   * @returns {this}
+   */
+  min_value = (e: T extends 'Integer' | 'Number' ? number : undefined) =>
+    this.#assign('min_value', ['Integer', 'Number'], { min_value: e })
+  /**
+   * available: Integer, Number
+   * @param e
+   * @returns {this}
+   */
+  max_value = (e: T extends 'Integer' | 'Number' ? number : undefined) =>
+    this.#assign('max_value', ['Integer', 'Number'], { max_value: e })
+  /**
+   * available: String
+   * @param e 0 - 6000
+   * @returns {this}
+   */
+  min_length = (e: T extends 'String' ? number : undefined) => this.#assign('min_length', ['String'], { min_length: e })
+  /**
+   * available: String
+   * @param e 1 - 6000
+   * @returns {this}
+   */
+  max_length = (e: T extends 'String' ? number : undefined) => this.#assign('max_length', ['String'], { max_length: e })
+  /**
+   * available: String, Integer, Number
+   * @param e default: true
+   * @returns {this}
+   */
+  autocomplete = (e?: T extends 'String' | 'Integer' | 'Number' ? boolean : undefined) =>
+    this.#assign('autocomplete', ['String', 'Integer', 'Number'], { autocomplete: e !== false })
 }
 
 /**
  * @deprecated
  */
-export class NumberOption extends Option<'Integer' | 'Number'> {
+export class NumberOption extends Option<any> {
   constructor(name: string, description: string, type?: 'integer' | 'number') {
     super(name, description, type === 'integer' ? 'Integer' : 'Number')
   }
@@ -274,7 +271,7 @@ export class NumberOption extends Option<'Integer' | 'Number'> {
 /**
  * @deprecated
  */
-export class BooleanOption extends Option<'Boolean'> {
+export class BooleanOption extends Option<any> {
   constructor(name: string, description: string) {
     super(name, description, 'Boolean')
   }
@@ -282,7 +279,7 @@ export class BooleanOption extends Option<'Boolean'> {
 /**
  * @deprecated
  */
-export class UserOption extends Option<'User'> {
+export class UserOption extends Option<any> {
   constructor(name: string, description: string) {
     super(name, description, 'User')
   }
@@ -290,7 +287,7 @@ export class UserOption extends Option<'User'> {
 /**
  * @deprecated
  */
-export class ChannelOption extends Option<'Channel'> {
+export class ChannelOption extends Option<any> {
   constructor(name: string, description: string) {
     super(name, description, 'Channel')
   }
@@ -298,7 +295,7 @@ export class ChannelOption extends Option<'Channel'> {
 /**
  * @deprecated
  */
-export class RoleOption extends Option<'Role'> {
+export class RoleOption extends Option<any> {
   constructor(name: string, description: string) {
     super(name, description, 'Role')
   }
@@ -306,7 +303,7 @@ export class RoleOption extends Option<'Role'> {
 /**
  * @deprecated
  */
-export class MentionableOption extends Option<'Mentionable'> {
+export class MentionableOption extends Option<any> {
   constructor(name: string, description: string) {
     super(name, description, 'Mentionable')
   }
@@ -314,7 +311,7 @@ export class MentionableOption extends Option<'Mentionable'> {
 /**
  * @deprecated
  */
-export class AttachmentOption extends Option<'Attachment'> {
+export class AttachmentOption extends Option<any> {
   constructor(name: string, description: string) {
     super(name, description, 'Attachment')
   }

@@ -31,7 +31,7 @@ export const register = async (
     : `${apiUrl}/applications/${applicationId}/commands`
   const body = JSON.stringify(
     commands.map(cmd => {
-      if (cmd instanceof Command) return cmd.build()
+      if (cmd instanceof Command) return cmd._build()
       return cmd
     }),
   )
