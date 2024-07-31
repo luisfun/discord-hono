@@ -353,7 +353,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
   resModal = (data: Modal | APIModalInteractionResponseCallbackData) => this.res(data, 9)
 }
 
-export class ModalContext<E extends Env = any> extends RequestContext<E, InteractionData<5>> {
+export class ModalContext<E extends Env = any> extends RequestContext<E & { Variables: { custom_id?: string } }, InteractionData<5>> {
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -363,6 +363,8 @@ export class ModalContext<E extends Env = any> extends RequestContext<E, Interac
     key: string,
   ) {
     super(req, env, executionCtx, discord, interaction, key)
+    // @ts-expect-error
+    this.set('custom_id', interaction.data?.custom_id)
     const modalRows = interaction.data?.components
     if (modalRows) {
       for (const modalRow of modalRows) {

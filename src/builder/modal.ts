@@ -25,6 +25,10 @@ export class Modal {
     this.#data.custom_id = this.#uniqueStr + e
     return this
   }
+  /**
+   * @param {...(TextInput | APITextInputComponent)} e 
+   * @returns {this}
+   */
   row = (...e: (TextInput | APITextInputComponent)[]) => {
     this.#data.components.push({
       type: 1,
