@@ -12,7 +12,7 @@ import type {
   APIModalInteractionResponseCallbackData,
   InteractionType,
 } from 'discord-api-types/v10'
-import { Modal } from './builder/modal'
+import type { Modal } from './builder/modal'
 import type {
   CronEvent,
   CustomCallbackData,
@@ -169,8 +169,7 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
       }
       case 9: {
         const d = data as InteractionCallbackData<9>
-        if (d instanceof Modal) json = { data: d.build(), type }
-        else json = { data: d, type }
+        json = '_build' in d ? { data: d._build(), type } : { data: d, type }
         break
       }
       default: // 1, 6, 10
