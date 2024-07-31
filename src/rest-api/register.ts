@@ -7,28 +7,24 @@ import { apiUrl, errorDev } from '../utils'
 // https://github.com/discord/cloudflare-sample-app/blob/main/LICENSE
 
 /**
- * @sample
- * ```ts
- * register(
- *   commands,
- *   process.env.DISCORD_APPLICATION_ID,
- *   process.env.DISCORD_TOKEN,
- *   //process.env.DISCORD_TEST_GUILD_ID,
- * )
- * ```
+ * [Docs](https://discord-hono.luis.fun/rest-api/register/)
+ * @param {(Command | ApplicationCommand)[]} commands 
+ * @param {string} application_id 
+ * @param {string} token 
+ * @param {string} [guild_id] 
  */
 export const register = async (
   commands: (Command | ApplicationCommand)[],
-  applicationId: string | undefined,
+  application_id: string | undefined,
   token: string | undefined,
-  guildId?: string | undefined,
+  guild_id?: string | undefined,
 ) => {
   if (!token) throw errorDev('DISCORD_TOKEN')
-  if (!applicationId) throw errorDev('DISCORD_APPLICATION_ID')
+  if (!application_id) throw errorDev('DISCORD_APPLICATION_ID')
 
-  const url = guildId
-    ? `${apiUrl}/applications/${applicationId}/guilds/${guildId}/commands`
-    : `${apiUrl}/applications/${applicationId}/commands`
+  const url = guild_id
+    ? `${apiUrl}/applications/${application_id}/guilds/${guild_id}/commands`
+    : `${apiUrl}/applications/${application_id}/commands`
   const body = JSON.stringify(
     commands.map(cmd => {
       if (cmd instanceof Command) return cmd._build()
