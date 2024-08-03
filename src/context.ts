@@ -169,7 +169,7 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
       }
       case 9: {
         const d = data as InteractionCallbackData<9>
-        json = '_build' in d ? { data: d._build(), type } : { data: d, type }
+        json = 'toJSON' in d ? { data: d.toJSON(), type } : { data: d, type }
         break
       }
       default: // 1, 6, 10

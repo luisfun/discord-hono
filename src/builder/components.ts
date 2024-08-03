@@ -24,7 +24,7 @@ export class Components {
     if (this.#components.length >= 5) console.warn('You can have up to 5 Action Rows per message')
     this.#components.push({
       type: 1,
-      components: e.map(component => ('_build' in component ? component._build() : component)),
+      components: e.map(component => ('toJSON' in component ? component.toJSON() : component)),
     })
     return this
   }
@@ -32,7 +32,7 @@ export class Components {
    * export object
    * @returns {Obj}
    */
-  _build = () => this.#components
+  toJSON = () => this.#components
 }
 
 type ButtonStyle = 'Primary' | 'Secondary' | 'Success' | 'Danger' | 'Link' | 'SKU'

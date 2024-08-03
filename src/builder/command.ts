@@ -68,7 +68,7 @@ export class Command extends CommandBase<ApplicationCommand> {
    * @returns {this}
    */
   options = (...e: (Option<any> | SubGroup | SubCommand | APIApplicationCommandOption)[]) =>
-    this.a({ options: e.map(option => ('_build' in option ? option._build() : option)) })
+    this.a({ options: e.map(option => ('toJSON' in option ? option.toJSON() : option)) })
   /**
    * @param {string | null} e
    * @returns {this}
@@ -135,7 +135,7 @@ export class SubGroup extends CommandBase<APIApplicationCommandSubcommandGroupOp
    * @returns {this}
    */
   options = (...e: (SubCommand | APIApplicationCommandSubcommandOption)[]) =>
-    this.a({ options: e.map(option => ('_build' in option ? option._build() : option)) })
+    this.a({ options: e.map(option => ('toJSON' in option ? option.toJSON() : option)) })
 }
 
 export class SubCommand extends CommandBase<APIApplicationCommandSubcommandOption> {
@@ -153,7 +153,7 @@ export class SubCommand extends CommandBase<APIApplicationCommandSubcommandOptio
    * @returns {this}
    */
   options = (...e: (Option<any> | APIApplicationCommandBasicOption)[]) =>
-    this.a({ options: e.map(option => ('_build' in option ? option._build() : option)) })
+    this.a({ options: e.map(option => ('toJSON' in option ? option.toJSON() : option)) })
 }
 
 type OptionType =

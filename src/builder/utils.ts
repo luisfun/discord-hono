@@ -1,4 +1,4 @@
-export abstract class Builder<Obj extends object> {
+export abstract class Builder<Obj extends {}> {
   #store: Obj
   constructor(init: Obj) {
     this.#store = init
@@ -11,10 +11,10 @@ export abstract class Builder<Obj extends object> {
     return this
   }
   /**
-   * export object
+   * export json object
    * @returns {Obj}
    */
-  _build = () => this.#store
+  toJSON = () => ({ ...this.#store })
 }
 
 export const warnBuilder = (clas: string, type: string, method: string) =>

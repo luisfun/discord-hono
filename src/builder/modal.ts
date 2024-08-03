@@ -16,7 +16,7 @@ export class Modal {
    * export data
    * @returns {APIModalInteractionResponseCallbackData}
    */
-  _build = () => this.#data
+  toJSON = () => this.#data
   /**
    * @param {string} e
    * @returns {this}
@@ -32,7 +32,7 @@ export class Modal {
   row = (...e: (TextInput | APITextInputComponent)[]) => {
     this.#data.components.push({
       type: 1,
-      components: e.map(component => ('_build' in component ? component._build() : component)),
+      components: e.map(component => ('toJSON' in component ? component.toJSON() : component)),
     })
     return this
   }
