@@ -13,6 +13,9 @@ import type {
 } from 'discord-api-types/v10'
 import { Builder, warnBuilder } from './utils'
 
+/**
+ * [Message Components](https://discord.com/developers/docs/interactions/message-components)
+ */
 export class Components {
   #components: APIActionRowComponent<APIMessageActionRowComponent>[] = []
   /**
@@ -29,7 +32,7 @@ export class Components {
     return this
   }
   /**
-   * export object
+   * export json object
    * @returns {Obj}
    */
   toJSON = () => this.#components

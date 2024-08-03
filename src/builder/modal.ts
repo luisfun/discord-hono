@@ -13,7 +13,7 @@ export class Modal {
     this.#data = { title, custom_id: this.#uniqueStr, components: [] }
   }
   /**
-   * export data
+   * export json data
    * @returns {APIModalInteractionResponseCallbackData}
    */
   toJSON = () => this.#data
