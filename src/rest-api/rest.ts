@@ -9,6 +9,123 @@ import type {
 import type { FileData } from '../types'
 import { addToken, apiUrl, errorDev, fetch429Retry, formData } from '../utils'
 
+type GetPath =
+  // Messages https://discord.com/developers/docs/resources/message
+  | '/channels/{channel.id}/messages'
+  | '/channels/{channel.id}/messages/{message.id}'
+  | '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}'
+
+type GetResult<P extends GetPath> = P extends '/channels/{channel.id}/messages'
+  ? RESTGetAPIChannelMessagesResult
+  : P extends '/channels/{channel.id}/messages/{message.id}'
+    ? RESTGetAPIChannelMessageResult
+    : P extends '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}'
+      ? RESTGetAPIChannelMessageReactionUsersResult
+      : undefined
+
+type PutPath =
+  // Messages https://discord.com/developers/docs/resources/message
+  '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me'
+
+type PostPath =
+  // Messages https://discord.com/developers/docs/resources/message
+  | '/channels/{channel.id}/messages'
+  | '/channels/{channel.id}/messages/{message.id}/crosspost'
+  | '/channels/{channel.id}/messages/bulk-delete'
+
+type PatchPath =
+  // Messages https://discord.com/developers/docs/resources/message
+  '/channels/{channel.id}/messages/{message.id}'
+
+type DeletePath =
+  // Messages https://discord.com/developers/docs/resources/message
+  | '/channels/{channel.id}/messages/{message.id}'
+  | '/channels/{channel.id}/messages/{message.id}/reactions'
+  | '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}'
+  | '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me'
+  | '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}/{user.id}'
+
+type Variables<P extends GetPath | PutPath | PostPath | PatchPath | DeletePath> = P extends
+  | '/channels/{channel.id}/messages'
+  | '/channels/{channel.id}/messages/bulk-delete'
+  ? [string]
+  : P extends
+        | '/channels/{channel.id}/messages/{message.id}'
+        | '/channels/{channel.id}/messages/{message.id}/crosspost'
+        | '/channels/{channel.id}/messages/{message.id}/reactions'
+    ? [string, string]
+    : P extends
+          | '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me'
+          | '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}'
+      ? [string, string, string]
+      : P extends '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}/{user.id}'
+        ? [string, string, string, string]
+        : []
+
+export class Rest {
+  #fetch
+  constructor(token: string, retry = 0) {
+    this.#fetch = (
+      path: string,
+      variables: string[],
+      method: 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE',
+      body?: BodyInit,
+    ) => {
+      const url =
+        apiUrl +
+        path
+          .replace(' ', '')
+          // Decompose path into array format
+          .split('{')
+          .flatMap(str => str.split('}'))
+          // Replace the contents of {} in the path
+          .map((str, i) => {
+            if (i % 2 === 0) return str
+            return variables[Math.trunc(i / 2)]
+          })
+          .join('')
+      const init = {
+        method,
+        body,
+        headers: body
+          ? { 'content-type': body instanceof FormData ? 'multipart/form-data' : 'application/json' }
+          : undefined,
+      }
+      return fetch429Retry(url, addToken(token, init), retry)
+    }
+  }
+  get = async <P extends GetPath>(path: P, variables: Variables<P>) => {
+    const response = await this.#fetch(path, variables, 'GET')
+    return { response, result: (await response.json()) as GetResult<P> }
+  }
+  put = <P extends PutPath>(path: P, variables: Variables<P>) => this.#fetch(path, variables, 'PUT')
+  post = <P extends PostPath>(path: P, variables: Variables<P>, data: any, file?: FileData) => {
+    let body: BodyInit
+    switch (path) {
+      case '/channels/{channel.id}/messages':
+        body = formData(data, file)
+        break
+      default:
+        body = JSON.stringify(data)
+    }
+    return this.#fetch(path, variables, 'POST', body)
+  }
+  patch = <P extends PatchPath>(path: P, variables: Variables<P>, data: any, file?: FileData) => {
+    let body: BodyInit
+    switch (path) {
+      case '/channels/{channel.id}/messages/{message.id}':
+        body = formData(data, file)
+        break
+      default:
+        body = JSON.stringify(data)
+    }
+    return this.#fetch(path, variables, 'PATCH', body)
+  }
+  delete = <P extends DeletePath>(path: P, variables: Variables<P>) => this.#fetch(path, variables, 'DELETE')
+}
+
+//const a = new Rest("").post("/channels/{channel.id}/messages", [""], "")
+
 const mGet = { method: 'GET' } as const
 const mPut = { method: 'PUT' } as const
 const mPost = { method: 'POST' } as const
