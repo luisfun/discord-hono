@@ -27,8 +27,9 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.15.3",
     "@biomejs/biome": "1.8.3",
+    "@discordjs/builders": "^1.8.2",
     "discord-api-types": "^0.37.93",
-    "tsup": "^8.2.3",
+    "tsup": "^8.2.4",
     "typescript": "^5.5.4"
   }
 }

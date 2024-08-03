@@ -1,3 +1,4 @@
+import type { EmbedBuilder } from '@discordjs/builders'
 import type {
   APIApplicationCommand,
   APIApplicationCommandInteractionData,
@@ -102,7 +103,7 @@ export type CustomCallbackBase =
 export type CustomCallbackData<T extends CustomCallbackBase = APIInteractionResponseCallbackData> =
   | (Omit<T, 'components' | 'embeds'> & {
       components?: Components | T['components']
-      embeds?: (APIEmbed | Embed)[] | null
+      embeds?: (Embed | EmbedBuilder | APIEmbed)[] | null
     })
   | string
 

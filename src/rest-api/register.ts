@@ -1,4 +1,5 @@
-import { Command } from '../builder/command'
+import type { SlashCommandBuilder } from '@discordjs/builders'
+import type { Command } from '../builder/command'
 import type { ApplicationCommand } from '../types'
 import { apiUrl, errorDev } from '../utils'
 
@@ -8,13 +9,13 @@ import { apiUrl, errorDev } from '../utils'
 
 /**
  * [Docs](https://discord-hono.luis.fun/rest-api/register/)
- * @param {(Command | ApplicationCommand)[]} commands
+ * @param {(Command | SlashCommandBuilder | ApplicationCommand)[]} commands
  * @param {string} application_id
  * @param {string} token
  * @param {string} [guild_id]
  */
 export const register = async (
-  commands: (Command | ApplicationCommand)[],
+  commands: (Command | SlashCommandBuilder | ApplicationCommand)[],
   application_id: string | undefined,
   token: string | undefined,
   guild_id?: string | undefined,
@@ -25,12 +26,7 @@ export const register = async (
   const url = guild_id
     ? `${apiUrl}/applications/${application_id}/guilds/${guild_id}/commands`
     : `${apiUrl}/applications/${application_id}/commands`
-  const body = JSON.stringify(
-    commands.map(cmd => {
-      if (cmd instanceof Command) return cmd.toJSON()
-      return cmd
-    }),
-  )
+  const body = JSON.stringify(commands.map(cmd => ('toJSON' in cmd ? cmd.toJSON() : cmd)))
 
   const response = await fetch(url, {
     headers: {
