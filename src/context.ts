@@ -121,6 +121,7 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
   #req: Request
   #interaction: D
   #flags: { flags?: number } = {}
+  #DISCORD_APPLICATION_ID: string | undefined
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -132,6 +133,7 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
     super(env, executionCtx, discord, key)
     this.#req = req
     this.#interaction = interaction
+    this.#DISCORD_APPLICATION_ID = discord.APPLICATION_ID
   }
 
   /**
@@ -215,9 +217,9 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
    * ```
    */
   followup = (data: CustomCallbackData = {}, file?: FileData, retry = 0) => {
-    if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
+    if (!this.#DISCORD_APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
     return fetch429Retry(
-      `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.#interaction.token}`,
+      `${apiUrl}/webhooks/${this.#DISCORD_APPLICATION_ID}/${this.#interaction.token}`,
       { method: 'POST', body: formData({ ...this.#flags, ...prepareData(data) }, file) },
       retry,
     )
@@ -231,10 +233,10 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
    * ```
    */
   followupDelete = () => {
-    if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
+    if (!this.#DISCORD_APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
     if (!this.#interaction.message?.id) throw errorSys('Message Id')
     return fetch429Retry(
-      `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.#interaction.token}/messages/${this.#interaction.message?.id}`,
+      `${apiUrl}/webhooks/${this.#DISCORD_APPLICATION_ID}/${this.#interaction.token}/messages/${this.#interaction.message?.id}`,
       { method: 'DELETE' },
     )
   }

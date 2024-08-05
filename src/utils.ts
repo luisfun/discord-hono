@@ -37,14 +37,10 @@ export const addToken = (token: string, init?: Parameters<typeof fetch>[1]): Par
 
 export const prepareData = <T extends CustomCallbackBase>(data: CustomCallbackData<T>) => {
   if (typeof data === 'string') return { content: data }
-  if (data?.components) {
-    const components = 'toJSON' in data.components ? data.components.toJSON() : data.components
-    data = { ...data, components }
-  }
-  if (data?.embeds) {
-    const embeds = data.embeds.map(embed => ('toJSON' in embed ? embed.toJSON() : embed))
-    data = { ...data, embeds }
-  }
+  const components = data?.components
+  const embeds = data?.embeds
+  if (components) data = { ...data, components: 'toJSON' in components ? components.toJSON() : components }
+  if (embeds) data = { ...data, embeds: embeds.map(embed => ('toJSON' in embed ? embed.toJSON() : embed)) }
   return data as T
 }
 
