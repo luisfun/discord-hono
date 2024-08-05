@@ -79,15 +79,15 @@ abstract class ContextBase<E extends Env> {
     return this.#key
   }
   /**
-   * @param {string} key 
-   * @param {unknown} value 
+   * @param {string} key
+   * @param {unknown} value
    */
   set: SetVar<E> = (key: string, value: unknown) => {
     this.#var ??= {}
     this.#var[key] = value
   }
   /**
-   * @param {string} key 
+   * @param {string} key
    * @returns {unknown}
    */
   get: GetVar<E> = (key: string) => {

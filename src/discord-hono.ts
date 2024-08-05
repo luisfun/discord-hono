@@ -37,7 +37,7 @@ abstract class DiscordHonoBase<E extends Env> {
   #isCronRegex = false
   /**
    * [Documentation](https://discord-hono.luis.fun/interactions/discord-hono/)
-   * @param {InitOptions} options 
+   * @param {InitOptions} options
    */
   constructor(options?: InitOptions<E>) {
     if (options?.verify) this.#verify = options.verify
@@ -54,7 +54,7 @@ abstract class DiscordHonoBase<E extends Env> {
 
   /**
    * @param {string | RegExp} command Match the first argument of `Command`
-   * @param handler 
+   * @param handler
    * @returns {this}
    */
   command = (command: string | RegExp, handler: CommandHandler<E>) => {
@@ -64,7 +64,7 @@ abstract class DiscordHonoBase<E extends Env> {
   }
   /**
    * @param {string | RegExp} component_id Match the first argument of `Button` or `Select`
-   * @param handler 
+   * @param handler
    * @returns {this}
    */
   component = (component_id: string | RegExp, handler: ComponentHandler<E>) => {
@@ -74,7 +74,7 @@ abstract class DiscordHonoBase<E extends Env> {
   }
   /**
    * @param {string | RegExp} modal_id Match the first argument of `Modal`
-   * @param handler 
+   * @param handler
    * @returns {this}
    */
   modal = (modal_id: string | RegExp, handler: ModalHandler<E>) => {
@@ -84,7 +84,7 @@ abstract class DiscordHonoBase<E extends Env> {
   }
   /**
    * @param cron Match the crons in the toml file
-   * @param handler 
+   * @param handler
    * @returns {this}
    */
   cron = (cron: string | RegExp, handler: CronHandler<E>) => {
@@ -94,9 +94,9 @@ abstract class DiscordHonoBase<E extends Env> {
   }
 
   /**
-   * @param {Request} request 
-   * @param {Record<string, unknown>} env 
-   * @param executionCtx 
+   * @param {Request} request
+   * @param {Record<string, unknown>} env
+   * @param executionCtx
    * @returns {Promise<Response>}
    */
   fetch = async (request: Request, env?: E['Bindings'], executionCtx?: ExecutionContext) => {
@@ -157,9 +157,9 @@ abstract class DiscordHonoBase<E extends Env> {
 
   /**
    * Methods triggered by cloudflare workers' crons
-   * @param event 
-   * @param {Record<string, unknown>} env 
-   * @param executionCtx 
+   * @param event
+   * @param {Record<string, unknown>} env
+   * @param executionCtx
    */
   scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
     const discord = this.#discord(env)

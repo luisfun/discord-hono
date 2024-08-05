@@ -98,7 +98,7 @@ type Variables<P extends GetPath | PutPath | PostPath | PatchPath | DeletePath> 
 export class Rest {
   #fetch
   /**
-   * [Docs](https://discord-hono.luis.fun/rest-api/rest/)
+   * [Documentation](https://discord-hono.luis.fun/rest-api/rest/)
    *
    * Supports: [Messages](https://discord.com/developers/docs/resources/message)
    * @param {string} token
