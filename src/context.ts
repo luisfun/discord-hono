@@ -54,6 +54,9 @@ abstract class ContextBase<E extends Env> {
     this.#key = key
   }
 
+  /**
+   * Environment Variables
+   */
   get env(): E['Bindings'] {
     return this.#env
   }
@@ -75,14 +78,24 @@ abstract class ContextBase<E extends Env> {
   get key(): string {
     return this.#key
   }
-  // c.set, c.get, c.var.propName is Variables
+  /**
+   * @param {string} key 
+   * @param {unknown} value 
+   */
   set: SetVar<E> = (key: string, value: unknown) => {
     this.#var ??= {}
     this.#var[key] = value
   }
+  /**
+   * @param {string} key 
+   * @returns {unknown}
+   */
   get: GetVar<E> = (key: string) => {
     return this.#var ? this.#var[key] : undefined
   }
+  /**
+   * Variables object
+   */
   get var(): Readonly<
     ContextVariableMap & (IsAny<E['Variables']> extends true ? Record<string, any> : E['Variables'])
   > {
@@ -135,7 +148,7 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
   }
   /**
    * Only visible to the user who invoked the Interaction
-   * @param bool default true
+   * @param {boolean} [bool=true]
    * @sample
    * ```ts
    * return c.ephemeral().res('Personalized Text')
@@ -148,8 +161,8 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
 
   /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
-   * @param type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) default: 4 (respond to an interaction with a message)
-   * @returns Response
+   * @param {1 | 4 | 5 | 6 | 7 | 8 | 9 | 10} type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) default: 4 (respond to an interaction with a message)
+   * @returns {Response}
    */
   res = <T extends InteractionCallbackType = 4>(data: InteractionCallbackData<T>, type: T = 4 as T) => {
     let json: APIInteractionResponse
@@ -179,6 +192,8 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
   }
   /**
    * ACK an interaction and edit a response later, the user sees a loading state
+   * @param {(c: this) => Promise<unknown>} handler
+   * @returns {Response}
    * @sample
    * ```ts
    * return c.resDefer(c => c.followup('Delayed Message'))
@@ -193,7 +208,7 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
    * Used to send messages after resDefer
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file FileData: { blob: Blob, name: string } | { blob: Blob, name: string }[]
-   * @param retry Number of retries at rate limit. default: 0
+   * @param {number} [retry=0] Number of retries at rate limit
    * @sample
    * ```ts
    * return c.resDefer(c => c.followup('Image file', { blob: Blob, name: 'image.png' }))
@@ -209,6 +224,7 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
   }
   /**
    * Delete the self message
+   * @returns {Promise<Response>}
    * @sample
    * ```ts
    * return c.resDeferUpdate(c.followupDelete)
@@ -291,6 +307,8 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
 
   /**
    * Response for modal window display
+   * @param {Modal} data
+   * @returns {Response}
    * @sample
    * ```ts
    * return c.resModal(new Modal('unique-id', 'Title')
@@ -332,10 +350,14 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
 
   /**
    * for components, edit the message the component was attached to
+   * @param data
+   * @returns {Response}
    */
   resUpdate = (data: CustomCallbackData) => this.res(data, 7)
   /**
    * for components, ACK an interaction and edit the original message later; the user does not see a loading state
+   * @param {((c: this) => Promise<unknown>)} handler
+   * @returns {Response}
    */
   resDeferUpdate = (handler?: (c: this) => Promise<unknown>) => {
     if (handler) this.waitUntil(handler(this))
@@ -343,6 +365,8 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
   }
   /**
    * Response for modal window display
+   * @param {Modal} data
+   * @returns {Response}
    * @sample
    * ```ts
    * return c.resModal(new Modal('unique-id', 'Title')
@@ -399,6 +423,9 @@ export class CronContext<E extends Env = any> extends ContextBase<E> {
     this.#cronEvent = event
   }
 
+  /**
+   * Cron Event
+   */
   get cronEvent(): CronEvent {
     return this.#cronEvent
   }

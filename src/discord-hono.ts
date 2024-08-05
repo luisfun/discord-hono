@@ -35,6 +35,10 @@ abstract class DiscordHonoBase<E extends Env> {
   #isComponentRegex = false
   #isModalRegex = false
   #isCronRegex = false
+  /**
+   * [Documentation](https://discord-hono.luis.fun/interactions/discord-hono/)
+   * @param {InitOptions} options 
+   */
   constructor(options?: InitOptions<E>) {
     if (options?.verify) this.#verify = options.verify
     this.#discord = env => {
@@ -48,27 +52,53 @@ abstract class DiscordHonoBase<E extends Env> {
     }
   }
 
+  /**
+   * @param {string | RegExp} command Match the first argument of `Command`
+   * @param handler 
+   * @returns {this}
+   */
   command = (command: string | RegExp, handler: CommandHandler<E>) => {
     this.#commandMap.set(command, handler)
     if (command instanceof RegExp) this.#isCommandRegex = true
     return this
   }
-  component = (componentId: string | RegExp, handler: ComponentHandler<E>) => {
-    this.#componentMap.set(componentId, handler)
-    if (componentId instanceof RegExp) this.#isComponentRegex = true
+  /**
+   * @param {string | RegExp} component_id Match the first argument of `Button` or `Select`
+   * @param handler 
+   * @returns {this}
+   */
+  component = (component_id: string | RegExp, handler: ComponentHandler<E>) => {
+    this.#componentMap.set(component_id, handler)
+    if (component_id instanceof RegExp) this.#isComponentRegex = true
     return this
   }
-  modal = (modalId: string | RegExp, handler: ModalHandler<E>) => {
-    this.#modalMap.set(modalId, handler)
-    if (modalId instanceof RegExp) this.#isModalRegex = true
+  /**
+   * @param {string | RegExp} modal_id Match the first argument of `Modal`
+   * @param handler 
+   * @returns {this}
+   */
+  modal = (modal_id: string | RegExp, handler: ModalHandler<E>) => {
+    this.#modalMap.set(modal_id, handler)
+    if (modal_id instanceof RegExp) this.#isModalRegex = true
     return this
   }
+  /**
+   * @param cron Match the crons in the toml file
+   * @param handler 
+   * @returns {this}
+   */
   cron = (cron: string | RegExp, handler: CronHandler<E>) => {
     this.#cronMap.set(cron, handler)
     if (cron instanceof RegExp) this.#isCronRegex = true
     return this
   }
 
+  /**
+   * @param {Request} request 
+   * @param {Record<string, unknown>} env 
+   * @param executionCtx 
+   * @returns {Promise<Response>}
+   */
   fetch = async (request: Request, env?: E['Bindings'], executionCtx?: ExecutionContext) => {
     switch (request.method) {
       case 'GET':
@@ -125,6 +155,12 @@ abstract class DiscordHonoBase<E extends Env> {
     }
   }
 
+  /**
+   * Methods triggered by cloudflare workers' crons
+   * @param event 
+   * @param {Record<string, unknown>} env 
+   * @param executionCtx 
+   */
   scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
     const discord = this.#discord(env)
     const { handler, key } = getHandler<CronHandler<E>>(this.#cronMap, event.cron, this.#isCronRegex)
@@ -158,12 +194,4 @@ const getHandler = <
   return { handler, interaction, key }
 }
 
-/**
- * @sample
- * ```ts
- * const app = new DiscordHono()
- *   .command('hello', c => c.res('world'))
- * export default app
- * ```
- */
 export class DiscordHono<E extends Env = Env> extends DiscordHonoBase<E> {}
