@@ -4,7 +4,9 @@ import type {
   RESTGetAPIChannelMessageResult,
   RESTGetAPIChannelMessagesQuery,
   RESTGetAPIChannelMessagesResult,
+  RESTGetCurrentApplicationResult,
   RESTPatchAPIChannelMessageJSONBody,
+  RESTPatchCurrentApplicationJSONBody,
   RESTPostAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessagesBulkDeleteJSONBody,
 } from 'discord-api-types/v10'
@@ -12,6 +14,8 @@ import type { FileData } from '../types'
 import { addToken, apiUrl, errorDev, fetch429Retry, formData } from '../utils'
 
 type GetPath =
+  // Application https://discord.com/developers/docs/resources/application
+  | '/applications/@me'
   // Messages https://discord.com/developers/docs/resources/message
   | '/channels/{channel.id}/messages'
   | '/channels/{channel.id}/messages/{message.id}'
@@ -26,14 +30,17 @@ type GetQuery<P extends GetPath> =
       : undefined
 
 type GetResult<P extends GetPath> =
-  // Messages https://discord.com/developers/docs/resources/message
-  P extends '/channels/{channel.id}/messages'
-    ? RESTGetAPIChannelMessagesResult
-    : P extends '/channels/{channel.id}/messages/{message.id}'
-      ? RESTGetAPIChannelMessageResult
-      : P extends '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}'
-        ? RESTGetAPIChannelMessageReactionUsersResult
-        : undefined
+  // Application https://discord.com/developers/docs/resources/application
+  P extends '/applications/@me'
+    ? RESTGetCurrentApplicationResult
+    : // Messages https://discord.com/developers/docs/resources/message
+      P extends '/channels/{channel.id}/messages'
+      ? RESTGetAPIChannelMessagesResult
+      : P extends '/channels/{channel.id}/messages/{message.id}'
+        ? RESTGetAPIChannelMessageResult
+        : P extends '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}'
+          ? RESTGetAPIChannelMessageReactionUsersResult
+          : undefined
 
 type PutPath =
   // Messages https://discord.com/developers/docs/resources/message
@@ -58,12 +65,19 @@ type PostFile<P extends PostPath> =
   P extends '/channels/{channel.id}/messages' ? FileData : undefined
 
 type PatchPath =
+  // Application https://discord.com/developers/docs/resources/application
+  | '/applications/@me'
   // Messages https://discord.com/developers/docs/resources/message
-  '/channels/{channel.id}/messages/{message.id}'
+  | '/channels/{channel.id}/messages/{message.id}'
 
 type PatchData<P extends PatchPath> =
-  // Messages https://discord.com/developers/docs/resources/message
-  P extends '/channels/{channel.id}/messages/{message.id}' ? RESTPatchAPIChannelMessageJSONBody : undefined
+  // Application https://discord.com/developers/docs/resources/application
+  P extends '/applications/@me'
+    ? RESTPatchCurrentApplicationJSONBody
+    : // Messages https://discord.com/developers/docs/resources/message
+      P extends '/channels/{channel.id}/messages/{message.id}'
+      ? RESTPatchAPIChannelMessageJSONBody
+      : undefined
 
 type PatchFile<P extends PatchPath> =
   // Messages https://discord.com/developers/docs/resources/message
@@ -164,6 +178,7 @@ export class Rest {
    * @returns {Promise<Response>}
    */
   patch = <P extends PatchPath>(path: P, variables: Variables<P>, data: PatchData<P>, file?: PatchFile<P>) => {
+    // @ts-expect-error
     const body = file ? formData(data, file) : JSON.stringify(data)
     return this.#fetch(path, variables, 'PATCH', body)
   }
