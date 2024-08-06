@@ -295,17 +295,6 @@ export class CommandContext<E extends Env = any> extends RequestContext<E, Inter
   get sub(): SubCommands {
     return this.#sub
   }
-  /**
-   * @deprecated
-   * You can get the value of the command option here
-   * @sample
-   * ```ts
-   * const option = c.values.optionName
-   * ```
-   */
-  get values() {
-    return this.var
-  }
 
   /**
    * Response for modal window display
@@ -403,18 +392,6 @@ export class ModalContext<E extends Env = any> extends RequestContext<
         }
       }
     }
-  }
-
-  /**
-   * @deprecated
-   * You can get the value of the modal textinput here
-   * @sample
-   * ```ts
-   * const text = c.values.textinputId
-   * ```
-   */
-  get values() {
-    return this.var
   }
 }
 
