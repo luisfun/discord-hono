@@ -44,7 +44,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
   #uniqueStr = ''
   #assign = (method: string, doNotStyle: ButtonStyle[], obj: Partial<APIButtonComponent>) => {
     if (doNotStyle.includes(this.#style)) {
-      warnBuilder('Option', this.#style, method)
+      warnBuilder('Button', this.#style, method)
       return this
     }
     return this.a(obj)
@@ -114,7 +114,7 @@ export class Select<T extends SelectType = 'String'> extends Builder<SelectCompo
   #uniqueStr = ''
   #assign = (method: string, doType: SelectType[], obj: Partial<SelectComponent>) => {
     if (!doType.includes(this.#type)) {
-      warnBuilder('Option', this.#type, method)
+      warnBuilder('Select', this.#type, method)
       return this
     }
     return this.a(obj)
