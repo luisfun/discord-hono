@@ -85,9 +85,13 @@ abstract class DiscordHonoBase<E extends Env> {
    * @param handler
    * @returns {this}
    */
-  autocomplete = (command: string | RegExp, handler: AutocompleteHandler<E>) => {
+  autocomplete = (command: string | RegExp, handler: AutocompleteHandler<E>, commandHandler?: CommandHandler<E>) => {
     this.#autocompleteMap.set(command, handler)
-    if (command instanceof RegExp) this.#isAutocompleteRegex = true
+    if (commandHandler) this.#commandMap.set(command, commandHandler)
+    if (command instanceof RegExp) {
+      this.#isAutocompleteRegex = true
+      if (commandHandler) this.#isCommandRegex = true
+    }
     return this
   }
   /**
