@@ -1,5 +1,10 @@
-import type { APIBaseInteraction, APIInteractionResponsePong, InteractionType } from 'discord-api-types/v10'
-import { CommandContext, ComponentContext, CronContext, ModalContext } from './context'
+import type {
+  APIApplicationCommandAutocompleteInteraction,
+  APIBaseInteraction,
+  APIInteractionResponsePong,
+  InteractionType,
+} from 'discord-api-types/v10'
+import { AutocompleteContext, CommandContext, ComponentContext, CronContext, ModalContext } from './context'
 import type {
   CronEvent,
   DiscordEnv,
@@ -16,6 +21,7 @@ import { verify } from './verify'
 
 type CommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
 type ComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<Response> | Response
+type AutocompleteHandler<E extends Env = any> = (c: AutocompleteContext<E>) => Promise<Response> | Response
 type ModalHandler<E extends Env = any> = (c: ModalContext<E>) => Promise<Response> | Response
 type CronHandler<E extends Env = any> = (c: CronContext<E>) => Promise<unknown>
 type DiscordEnvBindings = {
@@ -29,10 +35,12 @@ abstract class DiscordHonoBase<E extends Env> {
   #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
   #commandMap = new RegexMap<string | RegExp, CommandHandler<E>>()
   #componentMap = new RegexMap<string | RegExp, ComponentHandler<E>>()
+  #autocompleteMap = new RegexMap<string | RegExp, AutocompleteHandler<E>>()
   #modalMap = new RegexMap<string | RegExp, ModalHandler<E>>()
   #cronMap = new RegexMap<string | RegExp, CronHandler<E>>()
   #isCommandRegex = false
   #isComponentRegex = false
+  #isAutocompleteRegex = false
   #isModalRegex = false
   #isCronRegex = false
   /**
@@ -70,6 +78,16 @@ abstract class DiscordHonoBase<E extends Env> {
   component = (component_id: string | RegExp, handler: ComponentHandler<E>) => {
     this.#componentMap.set(component_id, handler)
     if (component_id instanceof RegExp) this.#isComponentRegex = true
+    return this
+  }
+  /**
+   * @param {string | RegExp} command Match the first argument of `Command`
+   * @param handler
+   * @returns {this}
+   */
+  autocomplete = (command: string | RegExp, handler: AutocompleteHandler<E>) => {
+    this.#autocompleteMap.set(command, handler)
+    if (command instanceof RegExp) this.#isAutocompleteRegex = true
     return this
   }
   /**
@@ -136,6 +154,15 @@ abstract class DiscordHonoBase<E extends Env> {
             )
             return await handler(new ComponentContext(request, env, executionCtx, discord, interaction, key))
           }
+          case 4: {
+            const interaction = data as APIApplicationCommandAutocompleteInteraction
+            const { handler, key } = getHandler<AutocompleteHandler<E>>(
+              this.#autocompleteMap,
+              interaction.data?.name.toLowerCase(),
+              this.#isAutocompleteRegex,
+            )
+            return await handler(new AutocompleteContext(request, env, executionCtx, discord, interaction, key))
+          }
           case 5: {
             const { handler, interaction, key } = getHandler<ModalHandler<E>>(
               this.#modalMap,
@@ -174,7 +201,7 @@ abstract class DiscordHonoBase<E extends Env> {
 }
 
 const getHandler = <
-  H extends CommandHandler | ComponentHandler | ModalHandler | CronHandler,
+  H extends CommandHandler | ComponentHandler | ModalHandler | AutocompleteHandler | CronHandler,
   I extends string | undefined | InteractionComponentData | InteractionModalData = any,
 >(
   map: RegexMap<string | RegExp, H>,

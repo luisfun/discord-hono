@@ -1,4 +1,8 @@
 import type {
+  APIApplicationCommandAutocompleteInteraction,
+  APIApplicationCommandInteractionDataIntegerOption,
+  APIApplicationCommandInteractionDataNumberOption,
+  APIApplicationCommandInteractionDataStringOption,
   APIBaseInteraction,
   APICommandAutocompleteInteractionResponseCallbackData,
   APIInteractionResponse,
@@ -41,7 +45,7 @@ interface GetVar<E extends Env> {
 }
 type IsAny<T> = boolean extends (T extends never ? true : false) ? true : false
 
-abstract class ContextBase<E extends Env> {
+abstract class ContextAll<E extends Env> {
   #env: E['Bindings'] = {}
   #executionCtx: ExecutionCtx
   protected discord: DiscordEnv
@@ -107,21 +111,12 @@ abstract class ContextBase<E extends Env> {
 type InteractionData<T extends 2 | 3 | 4 | 5> =
   T extends 2 ? InteractionCommandData :
   T extends 3 ? InteractionComponentData :
+  T extends 4 ? APIApplicationCommandAutocompleteInteraction :
   T extends 5 ? InteractionModalData :
   InteractionCommandData
-type InteractionCallbackType = 1 | 4 | 5 | 6 | 7 | 8 | 9 | 10
-// biome-ignore format: ternary operator
-type InteractionCallbackData<T extends InteractionCallbackType> =
-  T extends 4 | 7 ? CustomCallbackData :
-  T extends 5 ? Pick<APIInteractionResponseCallbackData, "flags"> :
-  T extends 8 ? APICommandAutocompleteInteractionResponseCallbackData :
-  T extends 9 ? Modal | APIModalInteractionResponseCallbackData :
-  undefined // 1, 6, 10
-abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> extends ContextBase<E> {
+abstract class Context2345<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> extends ContextAll<E> {
   #req: Request
   #interaction: D
-  #flags: { flags?: number } = {}
-  #DISCORD_APPLICATION_ID: string | undefined
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -133,7 +128,6 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
     super(env, executionCtx, discord, key)
     this.#req = req
     this.#interaction = interaction
-    this.#DISCORD_APPLICATION_ID = discord.APPLICATION_ID
   }
 
   /**
@@ -148,6 +142,34 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
   get interaction(): D {
     return this.#interaction
   }
+}
+
+type InteractionCallbackType = 1 | 4 | 5 | 6 | 7 | 9 | 10
+// biome-ignore format: ternary operator
+type InteractionCallbackData<T extends InteractionCallbackType> =
+  T extends 4 | 7 ? CustomCallbackData :
+  T extends 5 ? Pick<APIInteractionResponseCallbackData, "flags"> :
+  T extends 9 ? Modal | APIModalInteractionResponseCallbackData :
+  undefined // 1, 6, 10
+abstract class Context235<E extends Env, D extends InteractionData<2 | 3 | 5>> extends Context2345<E, D> {
+  #interactionToken: string
+  #interactionMessageId: string | undefined
+  #DISCORD_APPLICATION_ID: string | undefined
+  #flags: { flags?: number } = {}
+  constructor(
+    req: Request,
+    env: E['Bindings'],
+    executionCtx: ExecutionCtx,
+    discord: DiscordEnv,
+    interaction: D,
+    key: string,
+  ) {
+    super(req, env, executionCtx, discord, interaction, key)
+    this.#interactionToken = interaction.token
+    this.#interactionMessageId = interaction.message?.id
+    this.#DISCORD_APPLICATION_ID = discord.APPLICATION_ID
+  }
+
   /**
    * Only visible to the user who invoked the Interaction
    * @param {boolean} [bool=true]
@@ -163,7 +185,7 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
 
   /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
-   * @param {1 | 4 | 5 | 6 | 7 | 8 | 9 | 10} type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) default: 4 (respond to an interaction with a message)
+   * @param {1 | 4 | 5 | 6 | 7 | 9 | 10} type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) default: 4 (respond to an interaction with a message)
    * @returns {Response}
    */
   res = <T extends InteractionCallbackType = 4>(data: InteractionCallbackData<T>, type: T = 4 as T) => {
@@ -176,10 +198,6 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
       }
       case 5: {
         json = { data: { ...this.#flags, ...(data as InteractionCallbackData<5>) }, type }
-        break
-      }
-      case 8: {
-        json = { data: { ...(data as InteractionCallbackData<8>) }, type }
         break
       }
       case 9: {
@@ -219,7 +237,7 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
   followup = (data: CustomCallbackData = {}, file?: FileData, retry = 0) => {
     if (!this.#DISCORD_APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
     return fetch429Retry(
-      `${apiUrl}/webhooks/${this.#DISCORD_APPLICATION_ID}/${this.#interaction.token}`,
+      `${apiUrl}/webhooks/${this.#DISCORD_APPLICATION_ID}/${this.#interactionToken}`,
       { method: 'POST', body: formData({ ...this.#flags, ...prepareData(data) }, file) },
       retry,
     )
@@ -234,9 +252,9 @@ abstract class RequestContext<E extends Env, D extends InteractionData<2 | 3 | 4
    */
   followupDelete = () => {
     if (!this.#DISCORD_APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
-    if (!this.#interaction.message?.id) throw errorSys('Message Id')
+    if (!this.#interactionMessageId) throw errorSys('Message Id')
     return fetch429Retry(
-      `${apiUrl}/webhooks/${this.#DISCORD_APPLICATION_ID}/${this.#interaction.token}/messages/${this.#interaction.message?.id}`,
+      `${apiUrl}/webhooks/${this.#DISCORD_APPLICATION_ID}/${this.#interactionToken}/messages/${this.#interactionMessageId}`,
       { method: 'DELETE' },
     )
   }
@@ -247,7 +265,7 @@ type SubCommands = {
   command: string
   string: string
 }
-export class CommandContext<E extends Env = any> extends RequestContext<E, InteractionData<2>> {
+export class CommandContext<E extends Env = any> extends Context235<E, InteractionData<2>> {
   #sub: SubCommands = { group: '', command: '', string: '' }
   constructor(
     req: Request,
@@ -322,7 +340,7 @@ type ComponentInteractionData<T extends ComponentType> =
     | APIMessageMentionableSelectInteractionData
     | APIMessageChannelSelectInteractionData
   >
-export class ComponentContext<E extends Env = any, T extends ComponentType = unknown> extends RequestContext<
+export class ComponentContext<E extends Env = any, T extends ComponentType = unknown> extends Context235<
   E & { Variables: { custom_id?: string } },
   ComponentInteractionData<T>
 > {
@@ -368,7 +386,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
   resModal = (data: Modal | APIModalInteractionResponseCallbackData) => this.res(data, 9)
 }
 
-export class ModalContext<E extends Env = any> extends RequestContext<
+export class ModalContext<E extends Env = any> extends Context235<
   E & { Variables: { custom_id?: string } },
   InteractionData<5>
 > {
@@ -395,7 +413,39 @@ export class ModalContext<E extends Env = any> extends RequestContext<
   }
 }
 
-export class CronContext<E extends Env = any> extends ContextBase<E> {
+type AutocompleteOption =
+  | APIApplicationCommandInteractionDataStringOption
+  | APIApplicationCommandInteractionDataIntegerOption
+  | APIApplicationCommandInteractionDataNumberOption
+export class AutocompleteContext<E extends Env = any> extends Context2345<
+  E & { Variables: { focused?: AutocompleteOption } },
+  InteractionData<4>
+> {
+  constructor(
+    req: Request,
+    env: E['Bindings'],
+    executionCtx: ExecutionCtx,
+    discord: DiscordEnv,
+    interaction: InteractionData<4>,
+    key: string,
+  ) {
+    super(req, env, executionCtx, discord, interaction, key)
+    // @ts-expect-error
+    this.set(
+      'focused',
+      (interaction.data.options as AutocompleteOption[]).find(e => e.focused),
+    )
+  }
+
+  /**
+   * @param choices [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
+   * @returns {Response}
+   */
+  res = (...choices: Required<APICommandAutocompleteInteractionResponseCallbackData>['choices']) =>
+    new ResponseJson({ data: { choices }, type: 8 })
+}
+
+export class CronContext<E extends Env = any> extends ContextAll<E> {
   #cronEvent: CronEvent
   constructor(event: CronEvent, env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv, key: string) {
     super(env, executionCtx, discord, key)
