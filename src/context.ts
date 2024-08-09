@@ -417,10 +417,8 @@ type AutocompleteOption =
   | APIApplicationCommandInteractionDataStringOption
   | APIApplicationCommandInteractionDataIntegerOption
   | APIApplicationCommandInteractionDataNumberOption
-export class AutocompleteContext<E extends Env = any> extends Context2345<
-  E & { Variables: { focused?: AutocompleteOption } },
-  InteractionData<4>
-> {
+export class AutocompleteContext<E extends Env = any> extends Context2345<E, InteractionData<4>> {
+  #focused: AutocompleteOption | undefined
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -430,11 +428,21 @@ export class AutocompleteContext<E extends Env = any> extends Context2345<
     key: string,
   ) {
     super(req, env, executionCtx, discord, interaction, key)
-    // @ts-expect-error
-    this.set(
-      'focused',
-      (interaction.data.options as AutocompleteOption[]).find(e => e.focused),
-    )
+    const options = interaction.data.options as AutocompleteOption[]
+    this.#focused = options.find(e => e.focused)
+    for (const option of options) {
+      // @ts-expect-error
+      this.set(option.name, option.value)
+    }
+  }
+
+  /**
+   * Focused Option
+   *
+   * [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data)
+   */
+  get focused() {
+    return this.#focused
   }
 
   /**
