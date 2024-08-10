@@ -17,7 +17,7 @@ import type {
   APIModalInteractionResponseCallbackData,
   InteractionType,
 } from 'discord-api-types/v10'
-import type { Modal } from './builder/modal'
+import type { Autocomplete, Modal } from './builder'
 import type {
   CronEvent,
   CustomCallbackData,
@@ -451,11 +451,11 @@ export class AutocompleteContext<E extends Env = any> extends Context2345<E, Int
   }
 
   /**
-   * @param choices [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
+   * @param {Autocomplete | APICommandAutocompleteInteractionResponseCallbackData} e [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
    * @returns {Response}
    */
-  res = (...choices: Required<APICommandAutocompleteInteractionResponseCallbackData>['choices']) =>
-    new ResponseJson({ data: { choices }, type: 8 })
+  res = (e: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData) =>
+    new ResponseJson({ data: 'toJSON' in e ? e.toJSON() : e, type: 8 })
 }
 
 export class CronContext<E extends Env = any> extends ContextAll<E> {
