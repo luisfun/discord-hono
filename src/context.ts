@@ -451,11 +451,16 @@ export class AutocompleteContext<E extends Env = any> extends Context2345<E, Int
   }
 
   /**
-   * @param {Autocomplete | APICommandAutocompleteInteractionResponseCallbackData} e [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
+   * @deprecated Use `resAutocomplete` instead
+   */
+  res = (e: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData) => this.resAutocomplete(e)
+
+  /**
+   * @param {Autocomplete | APICommandAutocompleteInteractionResponseCallbackData} data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
    * @returns {Response}
    */
-  res = (e: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData) =>
-    new ResponseJson({ data: 'toJSON' in e ? e.toJSON() : e, type: 8 })
+  resAutocomplete = (data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData) =>
+    new ResponseJson({ data: 'toJSON' in data ? data.toJSON() : data, type: 8 })
 }
 
 export class CronContext<E extends Env = any> extends ContextAll<E> {
