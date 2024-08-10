@@ -2,6 +2,7 @@ import type {
   APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandInteractionDataIntegerOption,
   APIApplicationCommandInteractionDataNumberOption,
+  APIApplicationCommandInteractionDataOption,
   APIApplicationCommandInteractionDataStringOption,
   APIBaseInteraction,
   APICommandAutocompleteInteractionResponseCallbackData,
@@ -260,13 +261,8 @@ abstract class Context235<E extends Env, D extends InteractionData<2 | 3 | 5>> e
   }
 }
 
-type SubCommands = {
-  group: string
-  command: string
-  string: string
-}
 export class CommandContext<E extends Env = any> extends Context235<E, InteractionData<2>> {
-  #sub: SubCommands = { group: '', command: '', string: '' }
+  #sub = { group: '', command: '', string: '' }
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -276,24 +272,12 @@ export class CommandContext<E extends Env = any> extends Context235<E, Interacti
     key: string,
   ) {
     super(req, env, executionCtx, discord, interaction, key)
-    if (interaction?.data && 'options' in interaction.data) {
-      let options = interaction.data.options
-      if (options?.[0].type === 2) {
-        this.#sub.group = options[0].name
-        this.#sub.string = `${options[0].name} `
-        options = options[0].options
-      }
-      if (options?.[0].type === 1) {
-        this.#sub.command = options[0].name
-        this.#sub.string += options[0].name
-        options = options[0].options
-      }
-      if (options) {
-        for (const e of options) {
-          if (e.type === 1 || e.type === 2) return // ts-error
-          // @ts-expect-error
-          this.set(e.name, e.value)
-        }
+    const { sub, options } = getOptions(interaction)
+    this.#sub = sub
+    if (options) {
+      for (const e of options) {
+        // @ts-expect-error
+        this.set(e.name, e.value)
       }
     }
   }
@@ -310,7 +294,7 @@ export class CommandContext<E extends Env = any> extends Context235<E, Interacti
    * }
    * ```
    */
-  get sub(): SubCommands {
+  get sub() {
     return this.#sub
   }
 
@@ -418,6 +402,7 @@ type AutocompleteOption =
   | APIApplicationCommandInteractionDataIntegerOption
   | APIApplicationCommandInteractionDataNumberOption
 export class AutocompleteContext<E extends Env = any> extends Context2345<E, InteractionData<4>> {
+  #sub = { group: '', command: '', string: '' }
   #focused: AutocompleteOption | undefined
   constructor(
     req: Request,
@@ -428,12 +413,32 @@ export class AutocompleteContext<E extends Env = any> extends Context2345<E, Int
     key: string,
   ) {
     super(req, env, executionCtx, discord, interaction, key)
-    const options = interaction.data.options as AutocompleteOption[]
-    this.#focused = options.find(e => e.focused)
-    for (const option of options) {
-      // @ts-expect-error
-      this.set(option.name, option.value)
+    const { sub, options } = getOptions(interaction)
+    this.#sub = sub
+    if (options) {
+      for (const e of options) {
+        const type = e.type
+        if ((type === 3 || type === 4 || type === 10) && e.focused) this.#focused = e
+        // @ts-expect-error
+        this.set(e.name, e.value)
+      }
     }
+  }
+
+  /**
+   * This object is useful when using subcommands
+   * @sample
+   * ```ts
+   * switch (c.sub.string) {
+   *   case 'sub1':
+   *     return c.res('sub1')
+   *   case 'group sub2':
+   *     return c.res('g-sub2')
+   * }
+   * ```
+   */
+  get sub() {
+    return this.#sub
   }
 
   /**
@@ -466,4 +471,23 @@ export class CronContext<E extends Env = any> extends ContextAll<E> {
   get cronEvent(): CronEvent {
     return this.#cronEvent
   }
+}
+
+const getOptions = (interaction: InteractionData<2 | 4>) => {
+  const sub = { group: '', command: '', string: '' }
+  let options: APIApplicationCommandInteractionDataOption[] | undefined = undefined
+  if (interaction?.data && 'options' in interaction.data) {
+    options = interaction.data.options
+    if (options?.[0].type === 2) {
+      sub.group = options[0].name
+      sub.string = `${options[0].name} `
+      options = options[0].options
+    }
+    if (options?.[0].type === 1) {
+      sub.command = options[0].name
+      sub.string += options[0].name
+      options = options[0].options
+    }
+  }
+  return { sub, options }
 }
