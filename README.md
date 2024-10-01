@@ -1,4 +1,4 @@
-# 🔥 Discord Hono [![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono) [![Bundle Size](https://img.shields.io/bundlephobia/min/discord-hono)](https://bundlephobia.com/package/discord-hono)
+# 🔥 Discord Hono [![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/discord-hono)](https://bundlephobia.com/package/discord-hono)
 
 [👉 Documentation](https://discord-hono.luis.fun)
 
