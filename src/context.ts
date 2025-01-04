@@ -451,11 +451,6 @@ export class AutocompleteContext<E extends Env = any> extends Context2345<E, Int
   }
 
   /**
-   * @deprecated Use `resAutocomplete` instead
-   */
-  res = (e: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData) => this.resAutocomplete(e)
-
-  /**
    * @param {Autocomplete | APICommandAutocompleteInteractionResponseCallbackData} data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
    * @returns {Response}
    */
