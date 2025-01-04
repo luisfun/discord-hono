@@ -3,8 +3,6 @@
 
 const Ed25519 = { name: 'NODE-ED25519', namedCurve: 'NODE-ED25519', public: true } as const
 
-type Algorithm = 'Ed25519' | typeof Ed25519
-
 const hex2bin = (hex: string) => {
   const bin = new Uint8Array(Math.ceil(hex.length / 2))
   for (let i = 0, len = bin.length; i < len; i++) {
@@ -19,7 +17,7 @@ export const verify = async (
   timestamp: string | null,
   publicKey: string,
   subtle: SubtleCrypto = crypto.subtle,
-  algorithm: Algorithm = Ed25519,
+  algorithm: 'Ed25519' | typeof Ed25519 = Ed25519,
 ) => {
   if (!body || !signature || !timestamp) return false
   return await subtle.verify(
