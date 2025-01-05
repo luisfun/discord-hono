@@ -6,18 +6,17 @@ import { errorOther } from './utils'
 
 const hex2bin = (hex: string) => {
   const bin = new Uint8Array(Math.ceil(hex.length / 2))
-  for (let i = 0; i < bin.length; i++) bin[i] = Number.parseInt(hex.substr(i * 2, 2), 16)
+  for (let i = 0; i < bin.length; i++) bin[i] = Number.parseInt(hex.slice(i * 2, i * 2 + 2), 16)
   return bin
 }
 
 export const verify = async (body: string, signature: string | null, timestamp: string | null, publicKey: string) => {
   if (!body || !signature || !timestamp) return false
   // biome-ignore format: ternary operator
-  const subtle: SubtleCrypto | undefined =
-    typeof window !== 'undefined' && window.crypto ? window.crypto.subtle :
-    typeof globalThis !== 'undefined' && globalThis.crypto ? globalThis.crypto.subtle :
-    typeof crypto !== 'undefined' ? crypto.subtle :
-    undefined
+  const { subtle } =
+    typeof window !== 'undefined' && window.crypto ? window.crypto :
+    typeof globalThis !== 'undefined' && globalThis.crypto ? globalThis.crypto :
+    typeof crypto !== 'undefined' ? crypto : {}
   if (subtle === undefined) throw errorOther('Crypto API')
   return await subtle.verify(
     { name: 'Ed25519' },
