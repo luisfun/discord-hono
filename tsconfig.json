@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     /* Language and Environment */
-    "target": "ES2020",
+    "target": "ES2022",
     /* Modules */
     "module": "ESNext",
     "moduleResolution": "Bundler",
