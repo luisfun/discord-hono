@@ -15,6 +15,7 @@
   ],
   "type": "module",
   "main": "dist/index.js",
+  "engines": { "node": ">=18.4.0" },
   "scripts": {
     "fix": "biome check --write . && tsc",
     "fix:unsafe": "biome check --write --unsafe . && tsc",
