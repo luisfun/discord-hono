@@ -55,7 +55,11 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {string} label The label to be displayed on the button. max 80 characters - Ignore: SKU
    * @param {"Primary" | "Secondary" | "Success" | "Danger" | "Link" | "SKU"} [button_style="Primary"]
    */
-  constructor(str: string, label: T extends 'SKU' ? '' | undefined : string, button_style: T = 'Primary' as T) {
+  constructor(
+    str: string,
+    labels: T extends 'SKU' ? '' | undefined : string | [string | APIMessageComponentEmoji, string],
+    button_style: T = 'Primary' as T,
+  ) {
     const styleNum = {
       Primary: 1,
       Secondary: 2,
@@ -66,6 +70,8 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
     } as const
     const style = styleNum[button_style] || 1
     const custom_id = `${str};`
+    const isArrayLabels = Array.isArray(labels)
+    const label: string | undefined = isArrayLabels ? labels[1] : labels
     let obj: APIButtonComponent
     switch (style) {
       case 5:
@@ -80,13 +86,15 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
     super(obj)
     this.#style = button_style
     this.#uniqueStr = custom_id
+    if (isArrayLabels) this.emoji(labels[0] as T extends 'SKU' ? undefined : string | APIMessageComponentEmoji)
   }
   /**
    * available: Primary, Secondary, Success, Danger, Link
-   * @param {APIMessageComponentEmoji} e
+   * @param {string | APIMessageComponentEmoji} e
    * @returns {this}
    */
-  emoji = (e: T extends 'SKU' ? undefined : APIMessageComponentEmoji) => this.#assign('emoji', ['SKU'], { emoji: e })
+  emoji = (e: T extends 'SKU' ? undefined : string | APIMessageComponentEmoji) =>
+    this.#assign('emoji', ['SKU'], { emoji: typeof e === 'string' ? { name: e } : e })
   /**
    * available: Primary, Secondary, Success, Danger
    * @param {string} e
