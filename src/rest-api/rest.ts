@@ -12,99 +12,107 @@ import type {
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import { addToken, apiUrl, errorDev, fetch429Retry, formData } from '../utils'
+import type {
+  _applications_$_activityinstances_$,
+  _applications_me,
+  _channels_$_messages,
+  _channels_$_messages_$,
+  _channels_$_messages_$_crosspost,
+  _channels_$_messages_$_reactions,
+  _channels_$_messages_$_reactions_$,
+  _channels_$_messages_$_reactions_$_$,
+  _channels_$_messages_$_reactions_$_me,
+  _channels_$_messages_bulkdelete,
+} from './rest-path'
 
 type GetPath =
   // Application https://discord.com/developers/docs/resources/application
-  | '/applications/@me'
+  | typeof _applications_me
   // Messages https://discord.com/developers/docs/resources/message
-  | '/channels/{channel.id}/messages'
-  | '/channels/{channel.id}/messages/{message.id}'
-  | '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}'
+  | typeof _channels_$_messages
+  | typeof _channels_$_messages_$
+  | typeof _channels_$_messages_$_reactions_$
 
 type GetQuery<P extends GetPath> =
   // Messages https://discord.com/developers/docs/resources/message
-  P extends '/channels/{channel.id}/messages'
+  P extends typeof _channels_$_messages
     ? RESTGetAPIChannelMessagesQuery
-    : P extends '/channels/{channel.id}/messages/{message.id}'
+    : P extends typeof _channels_$_messages_$
       ? RESTGetAPIChannelMessageReactionUsersQuery
       : undefined
 
 type GetResult<P extends GetPath> =
   // Application https://discord.com/developers/docs/resources/application
-  P extends '/applications/@me'
+  P extends typeof _applications_me
     ? RESTGetCurrentApplicationResult
     : // Messages https://discord.com/developers/docs/resources/message
-      P extends '/channels/{channel.id}/messages'
+      P extends typeof _channels_$_messages
       ? RESTGetAPIChannelMessagesResult
-      : P extends '/channels/{channel.id}/messages/{message.id}'
+      : P extends typeof _channels_$_messages_$
         ? RESTGetAPIChannelMessageResult
-        : P extends '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}'
+        : P extends typeof _channels_$_messages_$_reactions_$
           ? RESTGetAPIChannelMessageReactionUsersResult
           : undefined
 
 type PutPath =
   // Messages https://discord.com/developers/docs/resources/message
-  '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me'
+  typeof _channels_$_messages_$_reactions_$_me
 
 type PostPath =
   // Messages https://discord.com/developers/docs/resources/message
-  | '/channels/{channel.id}/messages'
-  | '/channels/{channel.id}/messages/{message.id}/crosspost'
-  | '/channels/{channel.id}/messages/bulk-delete'
+  typeof _channels_$_messages | typeof _channels_$_messages_$_crosspost | typeof _channels_$_messages_bulkdelete
 
 type PostData<P extends PostPath> =
   // Messages https://discord.com/developers/docs/resources/message
-  P extends '/channels/{channel.id}/messages'
+  P extends typeof _channels_$_messages
     ? RESTPostAPIChannelMessageJSONBody
-    : P extends '/channels/{channel.id}/messages/bulk-delete'
+    : P extends typeof _channels_$_messages_bulkdelete
       ? RESTPostAPIChannelMessagesBulkDeleteJSONBody
       : undefined
 
 type PostFile<P extends PostPath> =
   // Messages https://discord.com/developers/docs/resources/message
-  P extends '/channels/{channel.id}/messages' ? FileData : undefined
+  P extends typeof _channels_$_messages ? FileData : undefined
 
 type PatchPath =
   // Application https://discord.com/developers/docs/resources/application
-  | '/applications/@me'
+  | typeof _applications_me
   // Messages https://discord.com/developers/docs/resources/message
-  | '/channels/{channel.id}/messages/{message.id}'
+  | typeof _channels_$_messages_$
 
 type PatchData<P extends PatchPath> =
   // Application https://discord.com/developers/docs/resources/application
-  P extends '/applications/@me'
+  P extends typeof _applications_me
     ? RESTPatchCurrentApplicationJSONBody
     : // Messages https://discord.com/developers/docs/resources/message
-      P extends '/channels/{channel.id}/messages/{message.id}'
+      P extends typeof _channels_$_messages_$
       ? RESTPatchAPIChannelMessageJSONBody
       : undefined
 
 type PatchFile<P extends PatchPath> =
   // Messages https://discord.com/developers/docs/resources/message
-  P extends '/channels/{channel.id}/messages/{message.id}' ? FileData : undefined
+  P extends typeof _channels_$_messages_$ ? FileData : undefined
 
 type DeletePath =
   // Messages https://discord.com/developers/docs/resources/message
-  | '/channels/{channel.id}/messages/{message.id}'
-  | '/channels/{channel.id}/messages/{message.id}/reactions'
-  | '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}'
-  | '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me'
-  | '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}/{user.id}'
+  | typeof _channels_$_messages_$
+  | typeof _channels_$_messages_$_reactions
+  | typeof _channels_$_messages_$_reactions_$
+  | typeof _channels_$_messages_$_reactions_$_me
+  | typeof _channels_$_messages_$_reactions_$_$
 
 type Variables<P extends GetPath | PutPath | PostPath | PatchPath | DeletePath> = P extends
-  | '/channels/{channel.id}/messages'
-  | '/channels/{channel.id}/messages/bulk-delete'
+  | typeof _channels_$_messages
+  | typeof _channels_$_messages_bulkdelete
   ? [string]
   : P extends
-        | '/channels/{channel.id}/messages/{message.id}'
-        | '/channels/{channel.id}/messages/{message.id}/crosspost'
-        | '/channels/{channel.id}/messages/{message.id}/reactions'
+        | typeof _channels_$_messages_$
+        | typeof _channels_$_messages_$_crosspost
+        | typeof _channels_$_messages_$_reactions
     ? [string, string]
-    : P extends
-          | '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}/@me'
-          | '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}'
+    : P extends typeof _channels_$_messages_$_reactions_$_me | typeof _channels_$_messages_$_reactions_$
       ? [string, string, string]
-      : P extends '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}/{user.id}'
+      : P extends typeof _channels_$_messages_$_reactions_$_$
         ? [string, string, string, string]
         : []
 
