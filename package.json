@@ -3,6 +3,10 @@
   "version": "0.9.1",
   "description": "This library enables you to easily build Discord bots on Cloudflare Workers",
   "author": "Luis (https://github.com/luisfun)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luisfun/discord-hono"
+  },
   "homepage": "https://github.com/luisfun/discord-hono",
   "license": "MIT",
   "keywords": [
