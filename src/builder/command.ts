@@ -7,6 +7,7 @@ import type {
   ApplicationCommandType,
   ApplicationIntegrationType,
   ChannelType,
+  EntryPointCommandHandlerType,
   InteractionContextType,
   Locale,
 } from 'discord-api-types/v10'
@@ -64,6 +65,7 @@ export class Command extends CommandBase<ApplicationCommand> {
    */
   guild_id = (e: string) => this.a({ guild_id: e })
   /**
+   * Valid Types: 1:CHAT_INPUT
    * @param {...(Option | APIApplicationCommandOption)} e
    * @returns {this}
    */
@@ -118,6 +120,14 @@ export class Command extends CommandBase<ApplicationCommand> {
    * @returns {this}
    */
   version = (e: string) => this.a({ version: e })
+  /**
+   * Valid Types: 4:PRIMARY_ENTRY_POINT
+   *
+   * [Hander Types](https://discord.com/developers/docs/interactions/application-commands#application-command-object-entry-point-command-handler-types)
+   * @param e
+   * @returns
+   */
+  handler = (e: EntryPointCommandHandlerType) => this.a({ handler: e })
 }
 
 export class SubGroup extends CommandBase<APIApplicationCommandSubcommandGroupOption> {

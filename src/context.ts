@@ -145,7 +145,7 @@ abstract class Context2345<E extends Env, D extends InteractionData<2 | 3 | 4 | 
   }
 }
 
-type InteractionCallbackType = 1 | 4 | 5 | 6 | 7 | 9 | 10
+type InteractionCallbackType = 1 | 4 | 5 | 6 | 7 | 9 | 10 | 12
 // biome-ignore format: ternary operator
 type InteractionCallbackData<T extends InteractionCallbackType> =
   T extends 4 | 7 ? CustomCallbackData :
@@ -186,7 +186,7 @@ abstract class Context235<E extends Env, D extends InteractionData<2 | 3 | 5>> e
 
   /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
-   * @param {1 | 4 | 5 | 6 | 7 | 9 | 10} type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) default: 4 (respond to an interaction with a message)
+   * @param {1 | 4 | 5 | 6 | 7 | 9 | 10 | 12} type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) default: 4 (respond to an interaction with a message)
    * @returns {Response}
    */
   res = <T extends InteractionCallbackType = 4>(data: InteractionCallbackData<T>, type: T = 4 as T) => {
@@ -206,7 +206,7 @@ abstract class Context235<E extends Env, D extends InteractionData<2 | 3 | 5>> e
         json = 'toJSON' in d ? { data: d.toJSON(), type } : { data: d, type }
         break
       }
-      default: // 1, 6, 10
+      default: // 1, 6, 10, 12
         json = { type }
     }
     return new ResponseJson(json)
