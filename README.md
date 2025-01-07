@@ -1,15 +1,17 @@
 # 🔥 Discord Hono [![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/discord-hono)](https://bundlephobia.com/package/discord-hono)
 
+**This library enables you to easily build Discord bots on Cloudflare Workers**
+
 [👉 Documentation](https://discord-hono.luis.fun)
 
-This project is heavily influenced by [Hono](https://github.com/honojs/hono).  
+This project is influenced by [Hono](https://github.com/honojs/hono).  
 Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors!
 
 ## Features
 
-- **Easy Build** - Verify included. Code for each command is easier to write.
-- **Lightweight** - We make them as light as possible. Discord Hono has zero dependencies.
-- **TypeScript** - TypeScript support.
+- **Intuitive API** - Influenced by Hono, offering a familiar and easy-to-use interface
+- **Lightweight** - Zero dependencies, optimized for performance
+- **Type-Safe** - Native support for TypeScript
 
 ## Install
 
