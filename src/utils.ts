@@ -17,16 +17,10 @@ export class ResponseJson extends Response {
 }
 
 export class RegexMap<K = any, V = any> extends Map<K, V> {
-  /**
-   * When the key is regex, perform regex.test(key) and return the value when it matches.
-   */
-  match(key: K) {
-    if (typeof key === 'string') {
-      const keys = Array.from(this.keys())
-      if (keys.some(k => k instanceof RegExp))
-        for (const k of keys) if (k === key || (k instanceof RegExp && k.test(key))) return this.get(k)
-    }
-    return this.get(key)
+  override get(key: K) {
+    const value = super.get(key)
+    if (!value && typeof key === 'string') for (const [k, v] of this) if (k instanceof RegExp && k.test(key)) return v
+    return value
   }
 }
 

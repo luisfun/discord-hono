@@ -202,7 +202,7 @@ const getHandler = <
     key = id.split(';')[0]
     interaction.data.custom_id = id.slice(key.length + 1)
   }
-  const handler = map.match(key) || map.get('')
+  const handler = map.get(key) || map.get('')
   if (!handler) throw errorDev('Handler')
   return { handler, interaction, key }
 }
