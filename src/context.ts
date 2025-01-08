@@ -1,21 +1,18 @@
 import type {
   APIApplicationCommandAutocompleteInteraction,
+  APIApplicationCommandInteraction,
   APIApplicationCommandInteractionDataIntegerOption,
   APIApplicationCommandInteractionDataNumberOption,
   APIApplicationCommandInteractionDataOption,
   APIApplicationCommandInteractionDataStringOption,
-  APIBaseInteraction,
   APICommandAutocompleteInteractionResponseCallbackData,
   APIInteractionResponse,
   APIInteractionResponseCallbackData,
-  APIMessageButtonInteractionData,
-  APIMessageChannelSelectInteractionData,
-  APIMessageMentionableSelectInteractionData,
-  APIMessageRoleSelectInteractionData,
-  APIMessageStringSelectInteractionData,
-  APIMessageUserSelectInteractionData,
+  APIMessageComponentButtonInteraction,
+  APIMessageComponentInteraction,
+  APIMessageComponentSelectMenuInteraction,
   APIModalInteractionResponseCallbackData,
-  InteractionType,
+  APIModalSubmitInteraction,
 } from 'discord-api-types/v10'
 import type { Autocomplete, Modal } from './builder'
 import type {
@@ -26,9 +23,6 @@ import type {
   ExecutionContext,
   FetchEventLike,
   FileData,
-  InteractionCommandData,
-  InteractionComponentData,
-  InteractionModalData,
 } from './types'
 import { ResponseJson, apiUrl, errorDev, errorOther, errorSys, fetch429Retry, formData, prepareData } from './utils'
 
@@ -109,13 +103,13 @@ abstract class ContextAll<E extends Env> {
 }
 
 // biome-ignore format: ternary operator
-type InteractionData<T extends 2 | 3 | 4 | 5> =
-  T extends 2 ? InteractionCommandData :
-  T extends 3 ? InteractionComponentData :
+type APIInteraction<T extends 2 | 3 | 4 | 5> =
+  T extends 2 ? APIApplicationCommandInteraction :
+  T extends 3 ? APIMessageComponentInteraction :
   T extends 4 ? APIApplicationCommandAutocompleteInteraction :
-  T extends 5 ? InteractionModalData :
-  InteractionCommandData
-abstract class Context2345<E extends Env, D extends InteractionData<2 | 3 | 4 | 5>> extends ContextAll<E> {
+  T extends 5 ? APIModalSubmitInteraction :
+  APIApplicationCommandInteraction
+abstract class Context2345<E extends Env, D extends APIInteraction<2 | 3 | 4 | 5>> extends ContextAll<E> {
   #req: Request
   #interaction: D
   constructor(
@@ -152,7 +146,7 @@ type InteractionCallbackData<T extends InteractionCallbackType> =
   T extends 5 ? Pick<APIInteractionResponseCallbackData, "flags"> :
   T extends 9 ? Modal | APIModalInteractionResponseCallbackData :
   undefined // 1, 6, 10
-abstract class Context235<E extends Env, D extends InteractionData<2 | 3 | 5>> extends Context2345<E, D> {
+abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> extends Context2345<E, D> {
   #interactionToken: string
   #interactionMessageId: string | undefined
   #DISCORD_APPLICATION_ID: string | undefined
@@ -261,14 +255,14 @@ abstract class Context235<E extends Env, D extends InteractionData<2 | 3 | 5>> e
   }
 }
 
-export class CommandContext<E extends Env = any> extends Context235<E, InteractionData<2>> {
+export class CommandContext<E extends Env = any> extends Context235<E, APIInteraction<2>> {
   #sub = { group: '', command: '', string: '' }
   constructor(
     req: Request,
     env: E['Bindings'],
     executionCtx: ExecutionCtx,
     discord: DiscordEnv,
-    interaction: InteractionData<2>,
+    interaction: APIInteraction<2>,
     key: string,
   ) {
     super(req, env, executionCtx, discord, interaction, key)
@@ -312,18 +306,12 @@ export class CommandContext<E extends Env = any> extends Context235<E, Interacti
   resModal = (data: Modal | APIModalInteractionResponseCallbackData) => this.res(data, 9)
 }
 
-type ComponentType = 'Button' | 'Select' | 'Other Select' | unknown
+type ComponentType = 'Button' | 'Select' | unknown
 // biome-ignore format: ternary operator
 type ComponentInteractionData<T extends ComponentType> =
-  T extends 'Button' ? APIBaseInteraction<InteractionType.MessageComponent, APIMessageButtonInteractionData> :
-  T extends 'Select' ? APIBaseInteraction<InteractionType.MessageComponent, APIMessageStringSelectInteractionData> :
-  APIBaseInteraction<
-    InteractionType.MessageComponent,
-    | APIMessageUserSelectInteractionData
-    | APIMessageRoleSelectInteractionData
-    | APIMessageMentionableSelectInteractionData
-    | APIMessageChannelSelectInteractionData
-  >
+  T extends 'Button' ? APIMessageComponentButtonInteraction :
+  T extends 'Select' ? APIMessageComponentSelectMenuInteraction :
+  APIMessageComponentSelectMenuInteraction
 export class ComponentContext<E extends Env = any, T extends ComponentType = unknown> extends Context235<
   E & { Variables: { custom_id?: string } },
   ComponentInteractionData<T>
@@ -333,7 +321,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
     env: E['Bindings'],
     executionCtx: ExecutionCtx,
     discord: DiscordEnv,
-    interaction: InteractionData<3>,
+    interaction: APIInteraction<3>,
     key: string,
   ) {
     super(req, env, executionCtx, discord, interaction as ComponentInteractionData<T>, key)
@@ -372,14 +360,14 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
 
 export class ModalContext<E extends Env = any> extends Context235<
   E & { Variables: { custom_id?: string } },
-  InteractionData<5>
+  APIInteraction<5>
 > {
   constructor(
     req: Request,
     env: E['Bindings'],
     executionCtx: ExecutionCtx,
     discord: DiscordEnv,
-    interaction: InteractionData<5>,
+    interaction: APIInteraction<5>,
     key: string,
   ) {
     super(req, env, executionCtx, discord, interaction, key)
@@ -401,7 +389,7 @@ type AutocompleteOption =
   | APIApplicationCommandInteractionDataStringOption
   | APIApplicationCommandInteractionDataIntegerOption
   | APIApplicationCommandInteractionDataNumberOption
-export class AutocompleteContext<E extends Env = any> extends Context2345<E, InteractionData<4>> {
+export class AutocompleteContext<E extends Env = any> extends Context2345<E, APIInteraction<4>> {
   #sub = { group: '', command: '', string: '' }
   #focused: AutocompleteOption | undefined
   constructor(
@@ -409,7 +397,7 @@ export class AutocompleteContext<E extends Env = any> extends Context2345<E, Int
     env: E['Bindings'],
     executionCtx: ExecutionCtx,
     discord: DiscordEnv,
-    interaction: InteractionData<4>,
+    interaction: APIInteraction<4>,
     key: string,
   ) {
     super(req, env, executionCtx, discord, interaction, key)
@@ -473,10 +461,10 @@ export class CronContext<E extends Env = any> extends ContextAll<E> {
   }
 }
 
-const getOptions = (interaction: InteractionData<2 | 4>) => {
+const getOptions = (interaction: APIInteraction<2 | 4>) => {
   const sub = { group: '', command: '', string: '' }
   let options: APIApplicationCommandInteractionDataOption[] | undefined = undefined
-  if (interaction?.data && 'options' in interaction.data) {
+  if ('options' in interaction.data) {
     options = interaction.data.options
     if (options?.[0].type === 2) {
       sub.group = options[0].name

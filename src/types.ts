@@ -1,14 +1,9 @@
 import type { EmbedBuilder } from '@discordjs/builders'
 import type {
   APIApplicationCommand,
-  APIApplicationCommandInteractionData,
-  APIBaseInteraction,
   APIEmbed,
   APIInteractionResponseCallbackData,
-  APIMessageComponentInteractionData,
-  APIModalSubmission,
   ApplicationCommandType,
-  InteractionType,
   RESTPatchAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessageJSONBody,
 } from 'discord-api-types/v10'
@@ -85,16 +80,6 @@ export abstract class FetchEventLike {
 }
 
 ////////// InteractionData //////////
-
-export type InteractionCommandData = APIBaseInteraction<
-  InteractionType.ApplicationCommand,
-  APIApplicationCommandInteractionData
->
-export type InteractionComponentData = APIBaseInteraction<
-  InteractionType.MessageComponent,
-  APIMessageComponentInteractionData
->
-export type InteractionModalData = APIBaseInteraction<InteractionType.ModalSubmit, APIModalSubmission>
 
 export type CustomCallbackBase =
   | APIInteractionResponseCallbackData

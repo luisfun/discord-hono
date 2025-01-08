@@ -1,21 +1,6 @@
-import type {
-  APIApplicationCommandAutocompleteInteraction,
-  APIBaseInteraction,
-  APIInteractionResponsePong,
-  InteractionType,
-} from 'discord-api-types/v10'
+import type { APIInteraction, APIInteractionResponsePong } from 'discord-api-types/v10'
 import { AutocompleteContext, CommandContext, ComponentContext, CronContext, ModalContext } from './context'
-import type {
-  CronEvent,
-  DiscordEnv,
-  Env,
-  ExecutionContext,
-  InitOptions,
-  InteractionCommandData,
-  InteractionComponentData,
-  InteractionModalData,
-  Verify,
-} from './types'
+import type { CronEvent, DiscordEnv, Env, ExecutionContext, InitOptions, Verify } from './types'
 import { RegexMap, ResponseJson, errorDev, errorSys } from './utils'
 import { verify } from './verify'
 
@@ -115,57 +100,46 @@ abstract class DiscordHonoBase<E extends Env> {
       case 'POST': {
         const discord = this.#discord(env)
         if (!discord.PUBLIC_KEY) throw errorDev('DISCORD_PUBLIC_KEY')
-        // verify
         const body = await request.text()
-        const signature = request.headers.get('x-signature-ed25519')
-        const timestamp = request.headers.get('x-signature-timestamp')
-        const isValid = await this.#verify(body, signature, timestamp, discord.PUBLIC_KEY)
-        if (!isValid) return new Response('Bad request signature.', { status: 401 })
+        // verify
+        if (
+          !(await this.#verify(
+            body,
+            request.headers.get('x-signature-ed25519'),
+            request.headers.get('x-signature-timestamp'),
+            discord.PUBLIC_KEY,
+          ))
+        )
+          return new Response('Bad Request', { status: 401 })
         // verify end
-        // ************ any 何とかしたい
-        const data: APIBaseInteraction<InteractionType, any> = JSON.parse(body)
-        switch (data.type) {
+        const interaction: APIInteraction = JSON.parse(body)
+        switch (interaction.type) {
           case 1: {
             return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
           }
           case 2: {
-            const interaction = data as InteractionCommandData
-            const { handler, key } = getHandler<CommandHandler<E>>(
-              this.#commandMap,
-              interaction.data?.name.toLowerCase(),
-            )
+            const { handler, key } = getHandler(this.#commandMap, interaction)
             return await handler(new CommandContext(request, env, executionCtx, discord, interaction, key))
           }
           case 3: {
-            const { handler, interaction, key } = getHandler<ComponentHandler<E>>(
-              this.#componentMap,
-              data as InteractionComponentData,
-            )
+            const { handler, key } = getHandler(this.#componentMap, interaction)
             return await handler(new ComponentContext(request, env, executionCtx, discord, interaction, key))
           }
           case 4: {
-            const interaction = data as APIApplicationCommandAutocompleteInteraction
-            const { handler, key } = getHandler<AutocompleteHandler<E>>(
-              this.#autocompleteMap,
-              interaction.data?.name.toLowerCase(),
-            )
+            const { handler, key } = getHandler(this.#autocompleteMap, interaction)
             return await handler(new AutocompleteContext(request, env, executionCtx, discord, interaction, key))
           }
           case 5: {
-            const { handler, interaction, key } = getHandler<ModalHandler<E>>(
-              this.#modalMap,
-              data as InteractionModalData,
-            )
+            const { handler, key } = getHandler(this.#modalMap, interaction)
             return await handler(new ModalContext(request, env, executionCtx, discord, interaction, key))
           }
           default: {
-            console.error(`interaction.type: ${data.type}\nNot yet implemented`)
             return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
           }
         }
       }
       default:
-        return new Response('Not Found.', { status: 404 })
+        return new Response('Not Found', { status: 404 })
     }
   }
 
@@ -177,11 +151,11 @@ abstract class DiscordHonoBase<E extends Env> {
    */
   scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
     const discord = this.#discord(env)
-    const { handler, key } = getHandler<CronHandler<E>>(this.#cronMap, event.cron)
+    const { handler, key } = getHandler(this.#cronMap, event.cron)
     const c = new CronContext(event, env, executionCtx, discord, key)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(c))
     else {
-      console.log('The process does not apply waitUntil')
+      console.log('Not applying waitUntil')
       await handler(c)
     }
   }
@@ -189,22 +163,32 @@ abstract class DiscordHonoBase<E extends Env> {
 
 const getHandler = <
   H extends CommandHandler | ComponentHandler | ModalHandler | AutocompleteHandler | CronHandler,
-  I extends string | undefined | InteractionComponentData | InteractionModalData = any,
+  I extends APIInteraction | string,
 >(
   map: RegexMap<string | RegExp, H>,
   interaction: I,
 ) => {
   let key = ''
-  if (typeof interaction === 'string') key = interaction
-  else {
-    if (!interaction?.data) throw errorSys('interaction.data')
-    const id = interaction.data.custom_id
-    key = id.split(';')[0]
-    interaction.data.custom_id = id.slice(key.length + 1)
-  }
-  const handler = map.get(key) || map.get('')
+  if (typeof interaction !== 'string') {
+    switch (interaction.type) {
+      case 2:
+      case 4:
+        key = interaction.data.name
+        break
+      case 3:
+      case 5: {
+        const id = interaction.data.custom_id
+        key = id.split(';')[0]
+        interaction.data.custom_id = id.slice(key.length + 1)
+        break
+      }
+      default:
+        throw errorSys('getHandler-interaction.type')
+    }
+  } else key = interaction
+  const handler = map.get(key) ?? map.get('')
   if (!handler) throw errorDev('Handler')
-  return { handler, interaction, key }
+  return { handler, key }
 }
 
 export class DiscordHono<E extends Env = Env> extends DiscordHonoBase<E> {}
