@@ -1,7 +1,7 @@
 import type { APIInteraction, APIInteractionResponsePong } from 'discord-api-types/v10'
 import { AutocompleteContext, CommandContext, ComponentContext, CronContext, ModalContext } from './context'
 import type { CronEvent, DiscordEnv, Env, ExecutionContext, InitOptions, Verify } from './types'
-import { RegexMap, ResponseJson, errorDev, errorSys } from './utils'
+import { RegexMap, ResponseJson, errorDev } from './utils'
 import { verify } from './verify'
 
 type CommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
@@ -182,8 +182,6 @@ const getHandler = <
         interaction.data.custom_id = id.slice(key.length + 1)
         break
       }
-      default:
-        throw errorSys('getHandler-interaction.type')
     }
   } else key = interaction
   const handler = map.get(key) ?? map.get('')
