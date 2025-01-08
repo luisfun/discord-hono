@@ -15,6 +15,7 @@ import type {
   APIModalSubmitInteraction,
 } from 'discord-api-types/v10'
 import type { Autocomplete, Modal } from './builder'
+import { Rest } from './rest-api'
 import type {
   CronEvent,
   CustomCallbackData,
@@ -100,6 +101,14 @@ abstract class ContextAll<E extends Env> {
   > {
     return { ...this.#var } as never
   }
+
+  /**
+   * `c.rest` = `new Rest(c.env.DISCORD_TOKEN)`
+   */
+  get rest(): Rest {
+    if (!this.discord.TOKEN) throw errorDev('DISCORD_TOKEN')
+    return new Rest(this.discord.TOKEN)
+  }
 }
 
 // biome-ignore format: ternary operator
@@ -147,23 +156,7 @@ type InteractionCallbackData<T extends InteractionCallbackType> =
   T extends 9 ? Modal | APIModalInteractionResponseCallbackData :
   undefined // 1, 6, 10
 abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> extends Context2345<E, D> {
-  #interactionToken: string
-  #interactionMessageId: string | undefined
-  #DISCORD_APPLICATION_ID: string | undefined
   #flags: { flags?: number } = {}
-  constructor(
-    req: Request,
-    env: E['Bindings'],
-    executionCtx: ExecutionCtx,
-    discord: DiscordEnv,
-    interaction: D,
-    key: string,
-  ) {
-    super(req, env, executionCtx, discord, interaction, key)
-    this.#interactionToken = interaction.token
-    this.#interactionMessageId = interaction.message?.id
-    this.#DISCORD_APPLICATION_ID = discord.APPLICATION_ID
-  }
 
   /**
    * Only visible to the user who invoked the Interaction
@@ -230,9 +223,9 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
    * ```
    */
   followup = (data: CustomCallbackData = {}, file?: FileData, retry = 0) => {
-    if (!this.#DISCORD_APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
+    if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
     return fetch429Retry(
-      `${apiUrl}/webhooks/${this.#DISCORD_APPLICATION_ID}/${this.#interactionToken}`,
+      `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.interaction.token}`,
       { method: 'POST', body: formData({ ...this.#flags, ...prepareData(data) }, file) },
       retry,
     )
@@ -246,10 +239,10 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
    * ```
    */
   followupDelete = () => {
-    if (!this.#DISCORD_APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
-    if (!this.#interactionMessageId) throw errorSys('Message Id')
+    if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
+    if (!this.interaction.message?.id) throw errorSys('Message Id')
     return fetch429Retry(
-      `${apiUrl}/webhooks/${this.#DISCORD_APPLICATION_ID}/${this.#interactionToken}/messages/${this.#interactionMessageId}`,
+      `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.interaction.token}/messages/${this.interaction.message.id}`,
       { method: 'DELETE' },
     )
   }
