@@ -74,31 +74,22 @@ export type GetQuery<P extends GetPath> =
           ? RESTGetAPIChannelMessageReactionUsersQuery
           : undefined
 
+// biome-ignore format: ternary operator
 export type GetResult<P extends GetPath> =
   // Application Commands
-  P extends typeof _applications_$_commands
-    ? RESTGetAPIApplicationCommandsResult
-    : P extends typeof _applications_$_commands_$
-      ? RESTGetAPIApplicationCommandResult
-      : P extends typeof _applications_$_guilds_$_commands
-        ? RESTGetAPIApplicationGuildCommandsResult
-        : P extends typeof _applications_$_guilds_$_commands_$
-          ? RESTGetAPIApplicationGuildCommandResult
-          : P extends typeof _applications_$_guilds_$_commands_permissions
-            ? RESTGetAPIGuildApplicationCommandsPermissionsResult
-            : P extends typeof _applications_$_guilds_$_commands_$_permissions
-              ? RESTGetAPIApplicationCommandPermissionsResult
-              : // Application
-                P extends typeof _applications_me
-                ? RESTGetCurrentApplicationResult
-                : // Messages
-                  P extends typeof _channels_$_messages
-                  ? RESTGetAPIChannelMessagesResult
-                  : P extends typeof _channels_$_messages_$
-                    ? RESTGetAPIChannelMessageResult
-                    : P extends typeof _channels_$_messages_$_reactions_$
-                      ? RESTGetAPIChannelMessageReactionUsersResult
-                      : undefined
+  P extends typeof _applications_$_commands ? RESTGetAPIApplicationCommandsResult :
+  P extends typeof _applications_$_commands_$ ? RESTGetAPIApplicationCommandResult :
+  P extends typeof _applications_$_guilds_$_commands ? RESTGetAPIApplicationGuildCommandsResult :
+  P extends typeof _applications_$_guilds_$_commands_$ ? RESTGetAPIApplicationGuildCommandResult :
+  P extends typeof _applications_$_guilds_$_commands_permissions ? RESTGetAPIGuildApplicationCommandsPermissionsResult :
+  P extends typeof _applications_$_guilds_$_commands_$_permissions ? RESTGetAPIApplicationCommandPermissionsResult :
+  // Application
+  P extends typeof _applications_me ? RESTGetCurrentApplicationResult :
+  // Messages
+  P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
+  P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
+  P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersResult :
+  undefined
 
 export type PutPath =
   // Application Commands
