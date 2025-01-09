@@ -1,3 +1,16 @@
+////////// Application Commands //////////
+// https://discord.com/developers/docs/interactions/application-commands
+
+export const _applications_$_commands = '/applications/{application.id}/commands' as const
+export const _applications_$_commands_$ = '/applications/{application.id}/commands/{command.id}' as const
+export const _applications_$_guilds_$_commands = '/applications/{application.id}/guilds/{guild.id}/commands' as const
+export const _applications_$_guilds_$_commands_$ =
+  '/applications/{application.id}/guilds/{guild.id}/commands/{command.id}' as const
+export const _applications_$_guilds_$_commands_permissions =
+  '/applications/{application.id}/guilds/{guild.id}/commands/permissions' as const
+export const _applications_$_guilds_$_commands_$_permissions =
+  '/applications/{application.id}/guilds/{guild.id}/commands/{command.id}/permissions' as const
+
 ////////// Application //////////
 // https://discord.com/developers/docs/resources/application
 

@@ -1,127 +1,23 @@
-import type {
-  RESTGetAPIChannelMessageReactionUsersQuery,
-  RESTGetAPIChannelMessageReactionUsersResult,
-  RESTGetAPIChannelMessageResult,
-  RESTGetAPIChannelMessagesQuery,
-  RESTGetAPIChannelMessagesResult,
-  RESTGetCurrentApplicationResult,
-  RESTPatchAPIChannelMessageJSONBody,
-  RESTPatchCurrentApplicationJSONBody,
-  RESTPostAPIChannelMessageJSONBody,
-  RESTPostAPIChannelMessagesBulkDeleteJSONBody,
-} from 'discord-api-types/v10'
-import type { FileData } from '../types'
 import { addToken, apiUrl, errorDev, fetch429Retry, formData } from '../utils'
 import type {
-  _applications_$_activityinstances_$,
-  _applications_me,
-  _channels_$_messages,
-  _channels_$_messages_$,
-  _channels_$_messages_$_crosspost,
-  _channels_$_messages_$_reactions,
-  _channels_$_messages_$_reactions_$,
-  _channels_$_messages_$_reactions_$_$,
-  _channels_$_messages_$_reactions_$_me,
-  _channels_$_messages_bulkdelete,
-} from './rest-path'
-
-type GetPath =
-  // Application https://discord.com/developers/docs/resources/application
-  | typeof _applications_me
-  // Messages https://discord.com/developers/docs/resources/message
-  | typeof _channels_$_messages
-  | typeof _channels_$_messages_$
-  | typeof _channels_$_messages_$_reactions_$
-
-type GetQuery<P extends GetPath> =
-  // Messages https://discord.com/developers/docs/resources/message
-  P extends typeof _channels_$_messages
-    ? RESTGetAPIChannelMessagesQuery
-    : P extends typeof _channels_$_messages_$
-      ? RESTGetAPIChannelMessageReactionUsersQuery
-      : undefined
-
-type GetResult<P extends GetPath> =
-  // Application https://discord.com/developers/docs/resources/application
-  P extends typeof _applications_me
-    ? RESTGetCurrentApplicationResult
-    : // Messages https://discord.com/developers/docs/resources/message
-      P extends typeof _channels_$_messages
-      ? RESTGetAPIChannelMessagesResult
-      : P extends typeof _channels_$_messages_$
-        ? RESTGetAPIChannelMessageResult
-        : P extends typeof _channels_$_messages_$_reactions_$
-          ? RESTGetAPIChannelMessageReactionUsersResult
-          : undefined
-
-type PutPath =
-  // Messages https://discord.com/developers/docs/resources/message
-  typeof _channels_$_messages_$_reactions_$_me
-
-type PostPath =
-  // Messages https://discord.com/developers/docs/resources/message
-  typeof _channels_$_messages | typeof _channels_$_messages_$_crosspost | typeof _channels_$_messages_bulkdelete
-
-type PostData<P extends PostPath> =
-  // Messages https://discord.com/developers/docs/resources/message
-  P extends typeof _channels_$_messages
-    ? RESTPostAPIChannelMessageJSONBody
-    : P extends typeof _channels_$_messages_bulkdelete
-      ? RESTPostAPIChannelMessagesBulkDeleteJSONBody
-      : undefined
-
-type PostFile<P extends PostPath> =
-  // Messages https://discord.com/developers/docs/resources/message
-  P extends typeof _channels_$_messages ? FileData : undefined
-
-type PatchPath =
-  // Application https://discord.com/developers/docs/resources/application
-  | typeof _applications_me
-  // Messages https://discord.com/developers/docs/resources/message
-  | typeof _channels_$_messages_$
-
-type PatchData<P extends PatchPath> =
-  // Application https://discord.com/developers/docs/resources/application
-  P extends typeof _applications_me
-    ? RESTPatchCurrentApplicationJSONBody
-    : // Messages https://discord.com/developers/docs/resources/message
-      P extends typeof _channels_$_messages_$
-      ? RESTPatchAPIChannelMessageJSONBody
-      : undefined
-
-type PatchFile<P extends PatchPath> =
-  // Messages https://discord.com/developers/docs/resources/message
-  P extends typeof _channels_$_messages_$ ? FileData : undefined
-
-type DeletePath =
-  // Messages https://discord.com/developers/docs/resources/message
-  | typeof _channels_$_messages_$
-  | typeof _channels_$_messages_$_reactions
-  | typeof _channels_$_messages_$_reactions_$
-  | typeof _channels_$_messages_$_reactions_$_me
-  | typeof _channels_$_messages_$_reactions_$_$
-
-type Variables<P extends GetPath | PutPath | PostPath | PatchPath | DeletePath> = P extends
-  | typeof _channels_$_messages
-  | typeof _channels_$_messages_bulkdelete
-  ? [string]
-  : P extends
-        | typeof _channels_$_messages_$
-        | typeof _channels_$_messages_$_crosspost
-        | typeof _channels_$_messages_$_reactions
-    ? [string, string]
-    : P extends typeof _channels_$_messages_$_reactions_$_me | typeof _channels_$_messages_$_reactions_$
-      ? [string, string, string]
-      : P extends typeof _channels_$_messages_$_reactions_$_$
-        ? [string, string, string, string]
-        : []
+  DeletePath,
+  GetPath,
+  GetQuery,
+  GetResult,
+  PatchData,
+  PatchFile,
+  PatchPath,
+  PostData,
+  PostFile,
+  PostPath,
+  PutPath,
+  Variables,
+} from './rest-types'
 
 export class Rest {
   #fetch
   /**
    * [Documentation](https://discord-hono.luis.fun/rest-api/rest/)
-   *
-   * Supports: [Messages](https://discord.com/developers/docs/resources/message)
    * @param {string} token
    * @param {number} [retry=0] Number of retries when 429 etc.
    */
