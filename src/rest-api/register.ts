@@ -1,21 +1,19 @@
 import type { SlashCommandBuilder } from '@discordjs/builders'
+import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
 import type { Command } from '../builder/command'
-import type { ApplicationCommand } from '../types'
-import { apiUrl, errorDev } from '../utils'
-
-// cloudflare-sample-app
-// Copyright (c) 2022 Justin Beckwith
-// https://github.com/discord/cloudflare-sample-app/blob/main/LICENSE
+import { errorDev } from '../utils'
+import { Rest } from './rest'
+import { _applications_$_commands, _applications_$_guilds_$_commands } from './rest-path'
 
 /**
  * [Docs](https://discord-hono.luis.fun/rest-api/register/)
- * @param {(Command | SlashCommandBuilder | ApplicationCommand)[]} commands
+ * @param {(Command | SlashCommandBuilder | RESTPostAPIApplicationCommandsJSONBody)[]} commands
  * @param {string} application_id
  * @param {string} token
  * @param {string} [guild_id]
  */
 export const register = async (
-  commands: (Command | SlashCommandBuilder | ApplicationCommand)[],
+  commands: (Command | SlashCommandBuilder | RESTPostAPIApplicationCommandsJSONBody)[],
   application_id: string | undefined,
   token: string | undefined,
   guild_id?: string | undefined,
@@ -23,26 +21,19 @@ export const register = async (
   if (!token) throw errorDev('DISCORD_TOKEN')
   if (!application_id) throw errorDev('DISCORD_APPLICATION_ID')
 
-  const url = guild_id
-    ? `${apiUrl}/applications/${application_id}/guilds/${guild_id}/commands`
-    : `${apiUrl}/applications/${application_id}/commands`
-  const body = JSON.stringify(commands.map(cmd => ('toJSON' in cmd ? cmd.toJSON() : cmd)))
+  const rest = new Rest(token)
+  const json = commands.map(cmd => ('toJSON' in cmd ? cmd.toJSON() : cmd))
+  let res: Response
+  // @ts-expect-error 何とかしたい
+  if (guild_id) res = await rest.put(_applications_$_guilds_$_commands, [application_id, guild_id], json)
+  else res = await rest.put(_applications_$_commands, [application_id], json)
 
-  const response = await fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bot ${token}`,
-    },
-    method: 'PUT',
-    body,
-  })
-
-  if (response.ok) {
+  if (res.ok) {
     console.log('===== ✅ Success =====')
   } else {
-    let errorText = `Error registering commands\n${response.url}: ${response.status} ${response.statusText}`
+    let errorText = `Error registering commands\n${res.url}: ${res.status} ${res.statusText}`
     try {
-      const error = await response.text()
+      const error = await res.text()
       if (error) {
         errorText += `\n\n${error}`
       }

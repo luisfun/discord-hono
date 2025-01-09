@@ -1,9 +1,7 @@
 import type { EmbedBuilder } from '@discordjs/builders'
 import type {
-  APIApplicationCommand,
   APIEmbed,
   APIInteractionResponseCallbackData,
-  ApplicationCommandType,
   RESTPatchAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessageJSONBody,
 } from 'discord-api-types/v10'
@@ -23,22 +21,6 @@ export type DiscordEnv = {
   TOKEN?: string
   PUBLIC_KEY?: string
   APPLICATION_ID?: string
-}
-
-////////// Command //////////
-
-/**
- * [Application Command](https://discord.com/developers/docs/interactions/application-commands)
- */
-export type ApplicationCommand = Omit<
-  APIApplicationCommand,
-  'id' | 'type' | 'application_id' | 'default_member_permissions' | 'version'
-> & {
-  id?: string
-  type?: ApplicationCommandType
-  application_id?: string
-  default_member_permissions?: string | null
-  version?: string
 }
 
 ////////// InitOptions //////////

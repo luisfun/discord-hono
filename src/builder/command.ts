@@ -10,11 +10,13 @@ import type {
   EntryPointCommandHandlerType,
   InteractionContextType,
   Locale,
+  RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10'
-import type { ApplicationCommand } from '../types'
 import { Builder, warnBuilder } from './utils'
 
-abstract class CommandBase<Obj extends ApplicationCommand | APIApplicationCommandOption> extends Builder<Obj> {
+abstract class CommandBase<
+  Obj extends RESTPostAPIApplicationCommandsJSONBody | APIApplicationCommandOption,
+> extends Builder<Obj> {
   /**
    * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object)
    * @param {string} name 1-32 character name; `CHAT_INPUT` command names must be all lowercase matching `^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$`
@@ -41,11 +43,12 @@ abstract class CommandBase<Obj extends ApplicationCommand | APIApplicationComman
   description_localizations = (e: Partial<Record<Locale, string>>) => this.a({ description_localizations: e } as Obj)
 }
 
-export class Command extends CommandBase<ApplicationCommand> {
+export class Command extends CommandBase<RESTPostAPIApplicationCommandsJSONBody> {
   /**
    * @param {string} e
    * @returns {this}
    */
+  // @ts-expect-error ??? why
   id = (e: string) => this.a({ id: e })
   /**
    * [Application Command Types](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types)
@@ -57,12 +60,14 @@ export class Command extends CommandBase<ApplicationCommand> {
    * @param {string} e
    * @returns {this}
    */
+  // @ts-expect-error ??? why
   application_id = (e: string) => this.a({ application_id: e })
   /**
    * Guild id of the command, if not global
    * @param {string} e
    * @returns {this}
    */
+  // @ts-expect-error ??? why
   guild_id = (e: string) => this.a({ guild_id: e })
   /**
    * Valid Types: 1:CHAT_INPUT
@@ -119,6 +124,7 @@ export class Command extends CommandBase<ApplicationCommand> {
    * @param {string} e
    * @returns {this}
    */
+  // @ts-expect-error ??? why
   version = (e: string) => this.a({ version: e })
   /**
    * Valid Types: 4:PRIMARY_ENTRY_POINT

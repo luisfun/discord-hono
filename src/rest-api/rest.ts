@@ -10,6 +10,7 @@ import type {
   PostData,
   PostFile,
   PostPath,
+  PutData,
   PutPath,
   Variables,
 } from './rest-types'
@@ -61,7 +62,8 @@ export class Rest {
    * @param {string[]} variables Variable part of official document path
    * @returns {Promise<Response>}
    */
-  put = <P extends PutPath>(path: P, variables: Variables<P>) => this.#fetch(path, variables, 'PUT')
+  put = <P extends PutPath>(path: P, variables: Variables<P>, data?: PutData<P>) =>
+    this.#fetch(path, variables, 'PUT', JSON.stringify(data))
   /**
    * @param {string} path Official document path
    * @param {string[]} variables Variable part of official document path
