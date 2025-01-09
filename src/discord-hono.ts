@@ -118,19 +118,19 @@ abstract class DiscordHonoBase<E extends Env> {
             return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
           }
           case 2: {
-            const { handler, key } = getHandler(this.#commandMap, interaction)
+            const [handler, key] = getHandler(this.#commandMap, interaction)
             return await handler(new CommandContext(request, env, executionCtx, discord, interaction, key))
           }
           case 3: {
-            const { handler, key } = getHandler(this.#componentMap, interaction)
+            const [handler, key] = getHandler(this.#componentMap, interaction)
             return await handler(new ComponentContext(request, env, executionCtx, discord, interaction, key))
           }
           case 4: {
-            const { handler, key } = getHandler(this.#autocompleteMap, interaction)
+            const [handler, key] = getHandler(this.#autocompleteMap, interaction)
             return await handler(new AutocompleteContext(request, env, executionCtx, discord, interaction, key))
           }
           case 5: {
-            const { handler, key } = getHandler(this.#modalMap, interaction)
+            const [handler, key] = getHandler(this.#modalMap, interaction)
             return await handler(new ModalContext(request, env, executionCtx, discord, interaction, key))
           }
           default: {
@@ -144,14 +144,14 @@ abstract class DiscordHonoBase<E extends Env> {
   }
 
   /**
-   * Methods triggered by cloudflare workers' crons
+   * Method triggered by cloudflare workers' crons
    * @param event
    * @param {Record<string, unknown>} env
    * @param executionCtx
    */
   scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
     const discord = this.#discord(env)
-    const { handler, key } = getHandler(this.#cronMap, event.cron)
+    const [handler, key] = getHandler(this.#cronMap, event.cron)
     const c = new CronContext(event, env, executionCtx, discord, key)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(c))
     else {
@@ -167,7 +167,7 @@ const getHandler = <
 >(
   map: RegexMap<string | RegExp, H>,
   interaction: I,
-) => {
+): [H, string] => {
   let key = ''
   if (typeof interaction !== 'string') {
     switch (interaction.type) {
@@ -186,7 +186,7 @@ const getHandler = <
   } else key = interaction
   const handler = map.get(key) ?? map.get('')
   if (!handler) throw errorDev('Handler')
-  return { handler, key }
+  return [handler, key]
 }
 
 export class DiscordHono<E extends Env = Env> extends DiscordHonoBase<E> {}

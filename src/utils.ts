@@ -16,7 +16,7 @@ export class ResponseJson extends Response {
   }
 }
 
-export class RegexMap<K = any, V = any> extends Map<K, V> {
+export class RegexMap<K, V> extends Map<K, V> {
   override get(key: K) {
     const value = super.get(key)
     if (!value && typeof key === 'string') for (const [k, v] of this) if (k instanceof RegExp && k.test(key)) return v
