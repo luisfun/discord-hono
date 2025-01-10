@@ -20,7 +20,6 @@ export class Rest {
   /**
    * [Documentation](https://discord-hono.luis.fun/rest-api/rest/)
    * @param {string} token
-   * @param {number} [retry=0] Number of retries when 429 etc.
    */
   constructor(token: string | undefined) {
     this.#fetch = (
