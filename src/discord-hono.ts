@@ -115,7 +115,7 @@ abstract class DiscordHonoBase<E extends Env> {
         const interaction: APIInteraction = JSON.parse(body)
         switch (interaction.type) {
           case 1: {
-            return new ResponseJson({ type: 1 } as APIInteractionResponsePong)
+            return new ResponseJson({ type: 1 } satisfies APIInteractionResponsePong)
           }
           case 2: {
             const [handler, key] = getHandler(this.#commandMap, interaction)
