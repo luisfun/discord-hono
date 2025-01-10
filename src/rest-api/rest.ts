@@ -1,4 +1,4 @@
-import { addToken, apiUrl, errorDev, fetch429Retry, formData } from '../utils'
+import { addToken, apiUrl, errorDev, formData } from '../utils'
 import type {
   DeletePath,
   GetPath,
@@ -22,7 +22,7 @@ export class Rest {
    * @param {string} token
    * @param {number} [retry=0] Number of retries when 429 etc.
    */
-  constructor(token: string | undefined, retry = 0) {
+  constructor(token: string | undefined) {
     this.#fetch = (
       path: string,
       variables: string[],
@@ -44,7 +44,7 @@ export class Rest {
         body,
         headers: typeof body === 'string' ? { 'content-type': 'application/json' } : undefined,
       }
-      return fetch429Retry(url, addToken(token, init), retry)
+      return fetch(url, addToken(token, init))
     }
   }
   /**

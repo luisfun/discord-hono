@@ -25,7 +25,7 @@ import type {
   FetchEventLike,
   FileData,
 } from './types'
-import { ResponseJson, apiUrl, errorDev, errorOther, errorSys, fetch429Retry, formData, prepareData } from './utils'
+import { ResponseJson, apiUrl, errorDev, errorSys, formData, prepareData } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -61,15 +61,15 @@ abstract class ContextAll<E extends Env> {
     return this.#env
   }
   get event(): FetchEventLike {
-    if (!(this.#executionCtx && 'respondWith' in this.#executionCtx)) throw errorOther('FetchEvent')
+    if (!(this.#executionCtx && 'respondWith' in this.#executionCtx)) throw errorSys('FetchEvent')
     return this.#executionCtx
   }
   get executionCtx(): ExecutionContext {
-    if (!this.#executionCtx) throw errorOther('ExecutionContext')
+    if (!this.#executionCtx) throw errorSys('ExecutionContext')
     return this.#executionCtx
   }
   get waitUntil(): ExecutionContext['waitUntil'] /*| FetchEventLike["waitUntil"]*/ {
-    if (!this.#executionCtx?.waitUntil) throw errorOther('waitUntil')
+    if (!this.#executionCtx?.waitUntil) throw errorSys('waitUntil')
     return this.#executionCtx.waitUntil.bind(this.#executionCtx)
   }
   /**
@@ -216,19 +216,17 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
    * Used to send messages after resDefer
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file FileData: { blob: Blob, name: string } | { blob: Blob, name: string }[]
-   * @param {number} [retry=0] Number of retries at rate limit
    * @sample
    * ```ts
    * return c.resDefer(c => c.followup('Image file', { blob: Blob, name: 'image.png' }))
    * ```
    */
-  followup = (data: CustomCallbackData = {}, file?: FileData, retry = 0) => {
+  followup = (data: CustomCallbackData = {}, file?: FileData) => {
     if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
-    return fetch429Retry(
-      `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.interaction.token}`,
-      { method: 'POST', body: formData({ ...this.#flags, ...prepareData(data) }, file) },
-      retry,
-    )
+    return fetch(`${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.interaction.token}`, {
+      method: 'POST',
+      body: formData({ ...this.#flags, ...prepareData(data) }, file),
+    })
   }
   /**
    * Delete the self message
@@ -241,7 +239,7 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
   followupDelete = () => {
     if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
     if (!this.interaction.message?.id) throw errorSys('Message Id')
-    return fetch429Retry(
+    return fetch(
       `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.interaction.token}/messages/${this.interaction.message.id}`,
       { method: 'DELETE' },
     )

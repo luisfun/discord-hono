@@ -52,27 +52,3 @@ export const formData = <T extends CustomCallbackBase>(data?: CustomCallbackData
 
 export const errorSys = (e: string) => new Error(`${e} not found`) // system
 export const errorDev = (e: string) => new Error(`${e} is missing`) // developer
-export const errorOther = (e: string) => new Error(`There is no ${e}`) // other
-
-export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, Math.max(ms, 0)))
-
-const retryOffset = 1e4
-export const fetch429Retry = async (
-  input: Parameters<typeof fetch>[0],
-  init: Parameters<typeof fetch>[1],
-  retry = 0,
-): Promise<Response> => {
-  let res: Response
-  try {
-    res = await fetch(input, init)
-    if (res.status !== 429 || retry < 1) return res
-    const retryAfter = Number(res.headers.get('Retry-After')) * 1e3
-    await sleep(retryAfter + retryOffset)
-    return fetch429Retry(input, init, retry - 1)
-  } catch {
-    if (retry < 1) throw new Error('fetch error')
-    console.error('fetch error, retry')
-    await sleep(retryOffset)
-    return fetch429Retry(input, init, retry - 1)
-  }
-}
