@@ -16,14 +16,6 @@ export class ResponseJson extends Response {
   }
 }
 
-export class RegexMap<K, V> extends Map<K, V> {
-  override get(key: K) {
-    const value = super.get(key)
-    if (!value && typeof key === 'string') for (const [k, v] of this) if (k instanceof RegExp && k.test(key)) return v
-    return value
-  }
-}
-
 export const addToken = (token: string, init?: Parameters<typeof fetch>[1]): Parameters<typeof fetch>[1] => ({
   ...init,
   headers: {

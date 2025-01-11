@@ -17,7 +17,8 @@
     "rules": {
       "recommended": true,
       "style": {
-        "noParameterAssign": "off" // To reuse the arguments
+        "noParameterAssign": "off", // To reuse the arguments
+        "noNonNullAssertion": "off" // Allow Non Null
       },
       "suspicious": {
         "noExplicitAny": "off" // Allow type any

@@ -1,7 +1,7 @@
 import type { APIInteraction, APIInteractionResponsePong } from 'discord-api-types/v10'
 import { AutocompleteContext, CommandContext, ComponentContext, CronContext, ModalContext } from './context'
 import type { CronEvent, DiscordEnv, Env, ExecutionContext, InitOptions, Verify } from './types'
-import { RegexMap, ResponseJson, errorDev } from './utils'
+import { ResponseJson, errorDev } from './utils'
 import { verify } from './verify'
 
 type CommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
@@ -13,6 +13,15 @@ type DiscordEnvBindings = {
   DISCORD_TOKEN?: string
   DISCORD_PUBLIC_KEY?: string
   DISCORD_APPLICATION_ID?: string
+}
+
+class RegexMap<K, V> extends Map<K, V> {
+  h(key: string): V {
+    if (this.has(key as K)) return this.get(key as K)!
+    for (const [k, v] of this) if (k instanceof RegExp && k.test(key)) return v
+    if (this.has('' as K)) return this.get('' as K)!
+    throw errorDev('Handler')
+  }
 }
 
 abstract class DiscordHonoBase<E extends Env> {
@@ -101,7 +110,6 @@ abstract class DiscordHonoBase<E extends Env> {
         const discord = this.#discord(env)
         if (!discord.PUBLIC_KEY) throw errorDev('DISCORD_PUBLIC_KEY')
         const body = await request.text()
-        // verify
         if (
           !(await this.#verify(
             body,
@@ -111,31 +119,37 @@ abstract class DiscordHonoBase<E extends Env> {
           ))
         )
           return new Response('Bad Request', { status: 401 })
-        // verify end
         const interaction: APIInteraction = JSON.parse(body)
+        const key = (() => {
+          switch (interaction.type) {
+            case 2:
+            case 4:
+              return interaction.data.name
+            case 3:
+            case 5: {
+              const id = interaction.data.custom_id
+              const key = id.split(';')[0]
+              interaction.data.custom_id = id.slice(key.length + 1)
+              return key
+            }
+            default:
+              return ''
+          }
+        })()
+        // biome-ignore format: text width
         switch (interaction.type) {
-          case 1: {
+          case 1:
             return new ResponseJson({ type: 1 } satisfies APIInteractionResponsePong)
-          }
-          case 2: {
-            const [handler, key] = getHandler(this.#commandMap, interaction)
-            return await handler(new CommandContext(request, env, executionCtx, discord, interaction, key))
-          }
-          case 3: {
-            const [handler, key] = getHandler(this.#componentMap, interaction)
-            return await handler(new ComponentContext(request, env, executionCtx, discord, interaction, key))
-          }
-          case 4: {
-            const [handler, key] = getHandler(this.#autocompleteMap, interaction)
-            return await handler(new AutocompleteContext(request, env, executionCtx, discord, interaction, key))
-          }
-          case 5: {
-            const [handler, key] = getHandler(this.#modalMap, interaction)
-            return await handler(new ModalContext(request, env, executionCtx, discord, interaction, key))
-          }
-          default: {
+          case 2:
+            return await this.#commandMap.h(key)(new CommandContext(request, env, executionCtx, discord, interaction, key))
+          case 3:
+            return await this.#componentMap.h(key)(new ComponentContext(request, env, executionCtx, discord, interaction, key))
+          case 4:
+            return await this.#autocompleteMap.h(key)(new AutocompleteContext(request, env, executionCtx, discord, interaction, key))
+          case 5:
+            return await this.#modalMap.h(key)(new ModalContext(request, env, executionCtx, discord, interaction, key))
+          default:
             return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
-          }
         }
       }
       default:
@@ -151,42 +165,11 @@ abstract class DiscordHonoBase<E extends Env> {
    */
   scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
     const discord = this.#discord(env)
-    const [handler, key] = getHandler(this.#cronMap, event.cron)
-    const c = new CronContext(event, env, executionCtx, discord, key)
+    const handler = this.#cronMap.h(event.cron)
+    const c = new CronContext(event, env, executionCtx, discord, event.cron)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(c))
-    else {
-      console.log('Not applying waitUntil')
-      await handler(c)
-    }
+    else await handler(c)
   }
-}
-
-const getHandler = <
-  H extends CommandHandler | ComponentHandler | ModalHandler | AutocompleteHandler | CronHandler,
-  I extends APIInteraction | string,
->(
-  map: RegexMap<string | RegExp, H>,
-  interaction: I,
-): [H, string] => {
-  let key = ''
-  if (typeof interaction !== 'string') {
-    switch (interaction.type) {
-      case 2:
-      case 4:
-        key = interaction.data.name
-        break
-      case 3:
-      case 5: {
-        const id = interaction.data.custom_id
-        key = id.split(';')[0]
-        interaction.data.custom_id = id.slice(key.length + 1)
-        break
-      }
-    }
-  } else key = interaction
-  const handler = map.get(key) ?? map.get('')
-  if (!handler) throw errorDev('Handler')
-  return [handler, key]
 }
 
 export class DiscordHono<E extends Env = Env> extends DiscordHonoBase<E> {}
