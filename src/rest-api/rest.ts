@@ -5,6 +5,7 @@ import type {
   GetQuery,
   GetResult,
   PatchData,
+  PatchDataWithFile,
   PatchFile,
   PatchPath,
   PostData,
@@ -86,8 +87,7 @@ export class Rest {
    * @returns {Promise<Response>}
    */
   patch = <P extends PatchPath>(path: P, variables: Variables<P>, data: PatchData<P>, file?: PatchFile<P>) => {
-    // @ts-expect-error
-    const body = file ? formData(data, file) : JSON.stringify(data)
+    const body = file ? formData(data as PatchDataWithFile<P>, file) : JSON.stringify(data)
     return this.#fetch(path, variables, 'PATCH', body)
   }
   /**

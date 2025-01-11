@@ -167,19 +167,22 @@ export type PatchPath =
   // Messages
   | typeof _channels_$_messages_$
 
+// biome-ignore format: ternary operator
 export type PatchData<P extends PatchPath> =
   // Application Commands
-  P extends typeof _applications_$_commands_$
-    ? RESTPatchAPIApplicationCommandJSONBody
-    : P extends typeof _applications_$_guilds_$_commands_$
-      ? RESTPatchAPIApplicationGuildCommandJSONBody
-      : // Application
-        P extends typeof _applications_me
-        ? RESTPatchCurrentApplicationJSONBody
-        : // Messages
-          P extends typeof _channels_$_messages_$
-          ? RESTPatchAPIChannelMessageJSONBody
-          : undefined
+  P extends typeof _applications_$_commands_$ ? RESTPatchAPIApplicationCommandJSONBody :
+  P extends typeof _applications_$_guilds_$_commands_$ ? RESTPatchAPIApplicationGuildCommandJSONBody :
+  // Application
+  P extends typeof _applications_me ? RESTPatchCurrentApplicationJSONBody :
+  // Messages
+  P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
+  undefined
+
+// biome-ignore format: ternary operator
+export type PatchDataWithFile<P extends PatchPath> =
+  // Messages
+  P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
+  undefined
 
 export type PatchFile<P extends PatchPath> =
   // Messages
