@@ -8,6 +8,7 @@ import type {
   PatchFile,
   PatchPath,
   PostData,
+  PostDataWithFile,
   PostFile,
   PostPath,
   PutData,
@@ -71,8 +72,7 @@ export class Rest {
    * @returns {Promise<Response>}
    */
   post = <P extends PostPath>(path: P, variables: Variables<P>, data: PostData<P>, file?: PostFile<P>) => {
-    // @ts-expect-error
-    const body = file ? formData(data, file) : JSON.stringify(data)
+    const body = file ? formData(data as PostDataWithFile<P>, file) : JSON.stringify(data)
     return this.#fetch(path, variables, 'POST', body)
   }
   /**

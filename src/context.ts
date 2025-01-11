@@ -13,9 +13,10 @@ import type {
   APIMessageComponentSelectMenuInteraction,
   APIModalInteractionResponseCallbackData,
   APIModalSubmitInteraction,
+  RESTPostAPIInteractionFollowupJSONBody,
 } from 'discord-api-types/v10'
 import type { Autocomplete, Modal } from './builder'
-import { Rest } from './rest-api'
+import { Rest, _webhooks_$_$, _webhooks_$_$_messages_$ } from './rest-api'
 import type {
   CronEvent,
   CustomCallbackData,
@@ -25,7 +26,7 @@ import type {
   FetchEventLike,
   FileData,
 } from './types'
-import { ResponseJson, apiUrl, errorDev, errorSys, formData, prepareData } from './utils'
+import { ResponseJson, errorDev, errorSys, prepareData } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -146,7 +147,7 @@ abstract class Context2345<E extends Env, D extends APIInteraction<2 | 3 | 4 | 5
 type InteractionCallbackType = 1 | 4 | 5 | 6 | 7 | 9 | 10 | 12
 // biome-ignore format: ternary operator
 type InteractionCallbackData<T extends InteractionCallbackType> =
-  T extends 4 | 7 ? CustomCallbackData :
+  T extends 4 | 7 ? CustomCallbackData<APIInteractionResponseCallbackData> :
   T extends 5 ? Pick<APIInteractionResponseCallbackData, "flags"> :
   T extends 9 ? Modal | APIModalInteractionResponseCallbackData :
   undefined // 1, 6, 10
@@ -216,12 +217,14 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
    * return c.resDefer(c => c.followup('Image file', { blob: Blob, name: 'image.png' }))
    * ```
    */
-  followup = (data: CustomCallbackData = {}, file?: FileData) => {
+  followup = (data: CustomCallbackData<RESTPostAPIInteractionFollowupJSONBody> = {}, file?: FileData) => {
     if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
-    return fetch(`${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.interaction.token}`, {
-      method: 'POST',
-      body: formData({ ...this.#flags, ...prepareData(data) }, file),
-    })
+    return this.rest.post(
+      _webhooks_$_$,
+      [this.discord.APPLICATION_ID, this.interaction.token],
+      { ...this.#flags, ...prepareData(data) },
+      file,
+    )
   }
   /**
    * Delete the self message
@@ -234,10 +237,11 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
   followupDelete = () => {
     if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
     if (!this.interaction.message?.id) throw errorSys('Message Id')
-    return fetch(
-      `${apiUrl}/webhooks/${this.discord.APPLICATION_ID}/${this.interaction.token}/messages/${this.interaction.message.id}`,
-      { method: 'DELETE' },
-    )
+    return this.rest.delete(_webhooks_$_$_messages_$, [
+      this.discord.APPLICATION_ID,
+      this.interaction.token,
+      this.interaction.message.id,
+    ])
   }
 }
 
@@ -316,7 +320,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
    * @param data
    * @returns {Response}
    */
-  resUpdate = (data: CustomCallbackData) => this.res(data, 7)
+  resUpdate = (data: CustomCallbackData<APIInteractionResponseCallbackData>) => this.res(data, 7)
   /**
    * for components, ACK an interaction and edit the original message later; the user does not see a loading state
    * @param {((c: this) => Promise<unknown>)} handler

@@ -1,9 +1,9 @@
 import type { EmbedBuilder } from '@discordjs/builders'
 import type {
-  APIEmbed,
   APIInteractionResponseCallbackData,
   RESTPatchAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessageJSONBody,
+  RESTPostAPIInteractionFollowupJSONBody,
 } from 'discord-api-types/v10'
 import type { Embed } from './builder'
 import type { Components } from './builder/components'
@@ -67,17 +67,18 @@ export type CustomCallbackBase =
   | APIInteractionResponseCallbackData
   | RESTPostAPIChannelMessageJSONBody
   | RESTPatchAPIChannelMessageJSONBody
-export type CustomCallbackData<T extends CustomCallbackBase = APIInteractionResponseCallbackData> =
+  | RESTPostAPIInteractionFollowupJSONBody
+export type CustomCallbackData<T extends CustomCallbackBase> =
   | (Omit<T, 'components' | 'embeds'> & {
       components?: Components | T['components']
-      embeds?: (Embed | EmbedBuilder | APIEmbed)[] | null
+      embeds?: (Embed | EmbedBuilder)[] | T['embeds']
     })
   | string
 
 ////////// FileData //////////
 
-type FileDataUnit = {
+type FileUnit = {
   blob: Blob
   name: string
 }
-export type FileData = FileDataUnit | FileDataUnit[]
+export type FileData = FileUnit | FileUnit[]

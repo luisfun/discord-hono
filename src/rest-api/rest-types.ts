@@ -21,6 +21,7 @@ import type {
   RESTPostAPIApplicationGuildCommandsJSONBody,
   RESTPostAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessagesBulkDeleteJSONBody,
+  RESTPostAPIInteractionFollowupJSONBody,
   RESTPutAPIApplicationCommandPermissionsJSONBody,
   RESTPutAPIApplicationCommandsJSONBody,
   RESTPutAPIApplicationGuildCommandsJSONBody,
@@ -28,7 +29,7 @@ import type {
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import type {
-  _applications_$_activityinstances_$,
+  //_applications_$_activityinstances_$,
   _applications_$_commands,
   _applications_$_commands_$,
   _applications_$_guilds_$_commands,
@@ -44,9 +45,13 @@ import type {
   _channels_$_messages_$_reactions_$_$,
   _channels_$_messages_$_reactions_$_me,
   _channels_$_messages_bulkdelete,
+  _webhooks_$_$,
+  _webhooks_$_$_messages_$,
 } from './rest-path'
 
 export type GetPath =
+  // Receiving and Responding
+  | typeof _webhooks_$_$_messages_$
   // Application Commands
   | typeof _applications_$_commands
   | typeof _applications_$_commands_$
@@ -113,6 +118,8 @@ export type PutData<P extends PutPath> =
           : undefined
 
 export type PostPath =
+  // Receiving and Responding
+  | typeof _webhooks_$_$
   // Application Commands
   | typeof _applications_$_commands
   | typeof _applications_$_guilds_$_commands
@@ -121,24 +128,37 @@ export type PostPath =
   | typeof _channels_$_messages_$_crosspost
   | typeof _channels_$_messages_bulkdelete
 
+// biome-ignore format: ternary operator
 export type PostData<P extends PostPath> =
+  // Receiving and Responding
+  P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupJSONBody :
   // Application Commands
-  P extends typeof _applications_$_commands
-    ? RESTPostAPIApplicationCommandsJSONBody
-    : P extends typeof _applications_$_guilds_$_commands
-      ? RESTPostAPIApplicationGuildCommandsJSONBody
-      : // Messages
-        P extends typeof _channels_$_messages
-        ? RESTPostAPIChannelMessageJSONBody
-        : P extends typeof _channels_$_messages_bulkdelete
-          ? RESTPostAPIChannelMessagesBulkDeleteJSONBody
-          : undefined
-
-export type PostFile<P extends PostPath> =
+  P extends typeof _applications_$_commands ? RESTPostAPIApplicationCommandsJSONBody :
+  P extends typeof _applications_$_guilds_$_commands ? RESTPostAPIApplicationGuildCommandsJSONBody :
   // Messages
-  P extends typeof _channels_$_messages ? FileData : undefined
+  P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
+  P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
+  undefined
+
+// biome-ignore format: ternary operator
+export type PostDataWithFile<P extends PostPath> =
+  // Receiving and Responding
+  P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupJSONBody :
+  // Messages
+  P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
+  undefined
+
+// biome-ignore format: ternary operator
+export type PostFile<P extends PostPath> = P extends
+  // Receiving and Responding
+  | typeof _webhooks_$_$
+  // Messages
+  | typeof _channels_$_messages
+  ? FileData : undefined
 
 export type PatchPath =
+  // Receiving and Responding
+  | typeof _webhooks_$_$_messages_$
   // Application Commands
   | typeof _applications_$_commands_$
   | typeof _applications_$_guilds_$_commands_$
@@ -166,6 +186,8 @@ export type PatchFile<P extends PatchPath> =
   P extends typeof _channels_$_messages_$ ? FileData : undefined
 
 export type DeletePath =
+  // Receiving and Responding
+  | typeof _webhooks_$_$_messages_$
   // Application Commands
   | typeof _applications_$_commands_$
   | typeof _applications_$_guilds_$_commands_$
@@ -182,6 +204,7 @@ export type Variables<P extends GetPath | PutPath | PostPath | PatchPath | Delet
   | typeof _channels_$_messages_bulkdelete
   ? [string]
   : P extends
+        | typeof _webhooks_$_$
         | typeof _applications_$_commands_$
         | typeof _applications_$_guilds_$_commands
         | typeof _applications_$_guilds_$_commands_permissions
@@ -190,6 +213,7 @@ export type Variables<P extends GetPath | PutPath | PostPath | PatchPath | Delet
         | typeof _channels_$_messages_$_reactions
     ? [string, string]
     : P extends
+          | typeof _webhooks_$_$_messages_$
           | typeof _applications_$_guilds_$_commands_$
           | typeof _applications_$_guilds_$_commands_$_permissions
           | typeof _channels_$_messages_$_reactions_$_me
