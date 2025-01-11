@@ -254,12 +254,8 @@ export class CommandContext<E extends Env = any> extends Context235<E, APIIntera
     super(req, env, executionCtx, discord, interaction, key)
     const { sub, options } = getOptions(interaction)
     this.#sub = sub
-    if (options) {
-      for (const e of options) {
-        // @ts-expect-error
-        this.set(e.name, e.value)
-      }
-    }
+    // @ts-expect-error
+    if (options) for (const e of options) this.set(e.name, e.value)
   }
 
   /**
@@ -360,14 +356,9 @@ export class ModalContext<E extends Env = any> extends Context235<
     // @ts-expect-error
     this.set('custom_id', interaction.data?.custom_id)
     const modalRows = interaction.data?.components
-    if (modalRows) {
-      for (const modalRow of modalRows) {
-        for (const modal of modalRow.components) {
-          // @ts-expect-error
-          this.set(modal.custom_id, modal.value)
-        }
-      }
-    }
+    if (modalRows)
+      // @ts-expect-error
+      for (const modalRow of modalRows) for (const modal of modalRow.components) this.set(modal.custom_id, modal.value)
   }
 }
 
@@ -389,14 +380,13 @@ export class AutocompleteContext<E extends Env = any> extends Context2345<E, API
     super(req, env, executionCtx, discord, interaction, key)
     const { sub, options } = getOptions(interaction)
     this.#sub = sub
-    if (options) {
+    if (options)
       for (const e of options) {
-        const type = e.type
+        const { type } = e
         if ((type === 3 || type === 4 || type === 10) && e.focused) this.#focused = e
         // @ts-expect-error
         this.set(e.name, e.value)
       }
-    }
   }
 
   /**
