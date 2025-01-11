@@ -28,18 +28,22 @@ export const register = async (
   if (guild_id) res = await rest.put(_applications_$_guilds_$_commands, [application_id, guild_id], json)
   else res = await rest.put(_applications_$_commands, [application_id], json)
 
+  let logText = ''
   if (res.ok) {
-    console.log('===== ✅ Success =====')
+    logText = '===== ✅ Success ====='
+    console.log(logText)
   } else {
-    let errorText = `Error registering commands\n${res.url}: ${res.status} ${res.statusText}`
+    logText = `Error registering commands\n${res.url}: ${res.status} ${res.statusText}`
     try {
       const error = await res.text()
       if (error) {
-        errorText += `\n\n${error}`
+        logText += `\n\n${error}`
       }
     } catch (e) {
-      errorText += `\n\nError reading body from request:\n${e}`
+      logText += `\n\nError reading body from request:\n${e}`
     }
-    console.error(`${errorText}\n===== ⚠️ Error =====`)
+    logText += '\n===== ⚠️ Error ====='
+    console.error(logText)
   }
+  return logText
 }
