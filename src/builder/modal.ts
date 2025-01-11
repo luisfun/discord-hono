@@ -1,5 +1,5 @@
 import type { APIModalInteractionResponseCallbackData, APITextInputComponent } from 'discord-api-types/v10'
-import { Builder } from './utils'
+import { Builder, ifThrowHasSemicolon } from './utils'
 
 export class Modal {
   #uniqueStr: string
@@ -9,6 +9,7 @@ export class Modal {
    * @param {string} title
    */
   constructor(unique_id: string, title: string) {
+    ifThrowHasSemicolon(unique_id)
     this.#uniqueStr = `${unique_id};`
     this.#data = { title, custom_id: this.#uniqueStr, components: [] }
   }

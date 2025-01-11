@@ -11,7 +11,7 @@ import type {
   APIUserSelectComponent,
   ChannelType,
 } from 'discord-api-types/v10'
-import { Builder, warnBuilder } from './utils'
+import { Builder, ifThrowHasSemicolon, warnBuilder } from './utils'
 
 /**
  * [Message Components](https://discord.com/developers/docs/interactions/message-components)
@@ -81,6 +81,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
         obj = { type: 2, style, sku_id: str }
         break
       default:
+        ifThrowHasSemicolon(str)
         obj = { type: 2, label, style, custom_id }
     }
     super(obj)
@@ -133,6 +134,7 @@ export class Select<T extends SelectType = 'String'> extends Builder<SelectCompo
    * @param {"String" | "User" | "Role" | "Mentionable" | "Channel"} [selectType="String"]
    */
   constructor(unique_id: string, select_type: T = 'String' as T) {
+    ifThrowHasSemicolon(unique_id)
     const typeNum = {
       String: 3,
       User: 5,
