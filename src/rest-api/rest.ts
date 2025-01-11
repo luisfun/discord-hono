@@ -1,4 +1,4 @@
-import { addToken, apiUrl, errorDev, formData } from '../utils'
+import { errorDev, formData } from '../utils'
 import type {
   DeletePath,
   GetPath,
@@ -16,6 +16,8 @@ import type {
   Variables,
 } from './rest-types'
 
+const API_VER = 'v10'
+
 export class Rest {
   #fetch
   /**
@@ -30,21 +32,22 @@ export class Rest {
       body?: FormData | string,
     ) => {
       if (!token) throw errorDev('DISCORD_TOKEN')
-      const url =
-        apiUrl +
-        path
-          .replace(' ', '')
-          // Decompose path into array format
-          .split(/[{}]/)
-          // Replace the contents of {} in the path
-          .map((str, i) => (i % 2 ? variables[~~(i / 2)] : str))
-          .join('')
-      const init = {
-        method,
-        body,
-        headers: typeof body === 'string' ? { 'content-type': 'application/json' } : undefined,
-      }
-      return fetch(url, addToken(token, init))
+      const Authorization = `Bot ${token}`
+      return fetch(
+        `https://discord.com/api/${
+          API_VER +
+          path
+            .replace(' ', '')
+            .split(/[{}]/)
+            .map((str, i) => (i % 2 ? variables[~~(i / 2)] : str))
+            .join('')
+        }`,
+        {
+          method,
+          body,
+          headers: typeof body === 'string' ? { Authorization, 'content-type': 'application/json' } : { Authorization },
+        },
+      )
     }
   }
   /**

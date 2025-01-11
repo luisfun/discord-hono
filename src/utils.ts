@@ -1,28 +1,16 @@
 import type { CustomCallbackBase, CustomCallbackData, FileData } from './types'
 
-export const apiUrl = 'https://discord.com/api/v10'
-
 export class ResponseJson extends Response {
   constructor(json: object, init?: ResponseInit) {
-    const body = JSON.stringify(json)
-    const initJson = {
+    super(JSON.stringify(json), {
       ...init,
       headers: {
         ...init?.headers,
-        'content-type': 'application/json;charset=UTF-8',
+        'content-type': 'application/json',
       },
-    }
-    super(body, initJson)
+    })
   }
 }
-
-export const addToken = (token: string, init?: Parameters<typeof fetch>[1]): Parameters<typeof fetch>[1] => ({
-  ...init,
-  headers: {
-    ...init?.headers,
-    Authorization: `Bot ${token}`,
-  },
-})
 
 export const prepareData = <T extends CustomCallbackBase>(data: CustomCallbackData<T>) => {
   if (typeof data === 'string') return { content: data }
