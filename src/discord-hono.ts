@@ -4,11 +4,11 @@ import type { CronEvent, DiscordEnv, Env, ExecutionContext, InitOptions, Verify 
 import { ResponseJson, errorDev } from './utils'
 import { verify } from './verify'
 
-type CommandHandler<E extends Env = any> = (c: CommandContext<E>) => Promise<Response> | Response
-type ComponentHandler<E extends Env = any> = (c: ComponentContext<E>) => Promise<Response> | Response
-type AutocompleteHandler<E extends Env = any> = (c: AutocompleteContext<E>) => Promise<Response> | Response
-type ModalHandler<E extends Env = any> = (c: ModalContext<E>) => Promise<Response> | Response
-type CronHandler<E extends Env = any> = (c: CronContext<E>) => Promise<unknown>
+type CommandHandler<E extends Env> = (c: CommandContext<E>) => Promise<Response> | Response
+type ComponentHandler<E extends Env> = (c: ComponentContext<E>) => Promise<Response> | Response
+type AutocompleteHandler<E extends Env> = (c: AutocompleteContext<E>) => Promise<Response> | Response
+type ModalHandler<E extends Env> = (c: ModalContext<E>) => Promise<Response> | Response
+type CronHandler<E extends Env> = (c: CronContext<E>) => Promise<unknown>
 type DiscordEnvBindings = {
   DISCORD_TOKEN?: string
   DISCORD_PUBLIC_KEY?: string

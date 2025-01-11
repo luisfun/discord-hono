@@ -46,7 +46,7 @@ abstract class ContextAll<E extends Env> {
   #executionCtx: ExecutionCtx
   protected discord: DiscordEnv
   #key: string
-  #var: E['Variables'] = {}
+  #var = new Map()
   constructor(env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv, key: string) {
     this.#env = env
     this.#executionCtx = executionCtx
@@ -82,24 +82,19 @@ abstract class ContextAll<E extends Env> {
    * @param {string} key
    * @param {unknown} value
    */
-  set: SetVar<E> = (key: string, value: unknown) => {
-    this.#var ??= {}
-    this.#var[key] = value
-  }
+  set: SetVar<E> = (key: string, value: unknown) => this.#var.set(key, value)
   /**
    * @param {string} key
    * @returns {unknown}
    */
-  get: GetVar<E> = (key: string) => {
-    return this.#var ? this.#var[key] : undefined
-  }
+  get: GetVar<E> = (key: string) => this.#var.get(key)
   /**
    * Variables object
    */
   get var(): Readonly<
     ContextVariableMap & (IsAny<E['Variables']> extends true ? Record<string, any> : E['Variables'])
   > {
-    return { ...this.#var } as never
+    return Object.fromEntries(this.#var)
   }
 
   /**
