@@ -24,7 +24,7 @@ class RegexMap<K, V> extends Map<K, V> {
   }
 }
 
-abstract class DiscordHonoBase<E extends Env> {
+export class DiscordHono<E extends Env = Env> {
   #verify: Verify = verify
   #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
   #commandMap = new RegexMap<string | RegExp, CommandHandler<E>>()
@@ -171,5 +171,3 @@ abstract class DiscordHonoBase<E extends Env> {
     else await handler(c)
   }
 }
-
-export class DiscordHono<E extends Env = Env> extends DiscordHonoBase<E> {}
