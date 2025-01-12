@@ -1,5 +1,5 @@
 export type { InitOptions } from './types'
-export type * from './context'
 export * from './discord-hono'
+export * from './context'
 export * from './builder'
 export * from './rest-api'
