@@ -20,7 +20,7 @@ npm i discord-hono
 npm i -D discord-api-types # When using TypeScript
 ```
 
-## Sample Code
+## Example Code
 
 index.ts
 
@@ -50,14 +50,8 @@ register(
 )
 ```
 
-## Examples
-
-- [Simple Example](https://github.com/luisfun/discord-hono-example)
-- [Playing with AI](https://github.com/luisfun/discord-bot-cloudflare-ai) - Using Cloudflare AI
-- [Deliver website news](https://github.com/luisfun/discord-bot-hoyo-news) - Using Cloudflare D1, Browser Rendering, Cron
-
 ## References
 
 - [Hono](https://github.com/honojs/hono) - [MIT License](https://github.com/honojs/hono/blob/main/LICENSE)
-- [Official Example](https://github.com/discord/cloudflare-sample-app) - [MIT License](https://github.com/discord/cloudflare-sample-app/blob/main/LICENSE)
+- [Discord App](https://github.com/discord/cloudflare-sample-app) - [MIT License](https://github.com/discord/cloudflare-sample-app/blob/main/LICENSE)
 - [Verify for Workers](https://gist.github.com/devsnek/77275f6e3f810a9545440931ed314dc1)

@@ -157,7 +157,7 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
   /**
    * Only visible to the user who invoked the Interaction
    * @param {boolean} [bool=true]
-   * @sample
+   * @example
    * ```ts
    * return c.ephemeral().res('Personalized Text')
    * ```
@@ -198,7 +198,7 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
    * ACK an interaction and edit a response later, the user sees a loading state
    * @param {(c: this) => Promise<unknown>} handler
    * @returns {Response}
-   * @sample
+   * @example
    * ```ts
    * return c.resDefer(c => c.followup('Delayed Message'))
    * ```
@@ -212,7 +212,7 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
    * Used to send messages after resDefer
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file FileData: { blob: Blob, name: string } | { blob: Blob, name: string }[]
-   * @sample
+   * @example
    * ```ts
    * return c.resDefer(c => c.followup('Image file', { blob: Blob, name: 'image.png' }))
    * ```
@@ -229,7 +229,7 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
   /**
    * Delete the self message
    * @returns {Promise<Response>}
-   * @sample
+   * @example
    * ```ts
    * return c.resDeferUpdate(c.followupDelete)
    * ```
@@ -264,7 +264,7 @@ export class CommandContext<E extends Env = any> extends Context235<E, APIIntera
 
   /**
    * This object is useful when using subcommands
-   * @sample
+   * @example
    * ```ts
    * switch (c.sub.string) {
    *   case 'sub1':
@@ -282,7 +282,7 @@ export class CommandContext<E extends Env = any> extends Context235<E, APIIntera
    * Response for modal window display
    * @param {Modal} data
    * @returns {Response}
-   * @sample
+   * @example
    * ```ts
    * return c.resModal(new Modal('unique-id', 'Title')
    *   .row(new TextInput('custom_id', 'Label'))
@@ -334,7 +334,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
    * Response for modal window display
    * @param {Modal} data
    * @returns {Response}
-   * @sample
+   * @example
    * ```ts
    * return c.resModal(new Modal('unique-id', 'Title')
    *   .row(new TextInput('custom_id', 'Label'))
@@ -395,7 +395,7 @@ export class AutocompleteContext<E extends Env = any> extends Context2345<E, API
 
   /**
    * This object is useful when using subcommands
-   * @sample
+   * @example
    * ```ts
    * switch (c.sub.string) {
    *   case 'sub1':
