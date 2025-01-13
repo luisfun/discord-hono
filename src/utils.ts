@@ -1,13 +1,11 @@
 import type { CustomCallbackBase, CustomCallbackData, FileData } from './types'
 
-export class ResponseJson extends Response {
-  constructor(json: object, init?: ResponseInit) {
-    super(JSON.stringify(json), {
-      ...init,
-      headers: {
-        ...init?.headers,
-        'content-type': 'application/json',
-      },
+export class ResponseObject extends Response {
+  constructor(obj: object | FormData, status?: number) {
+    const isForm = obj instanceof FormData
+    super(isForm ? obj : JSON.stringify(obj), {
+      status,
+      headers: isForm ? undefined : { 'content-type': 'application/json' },
     })
   }
 }

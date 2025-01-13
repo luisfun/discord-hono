@@ -26,7 +26,7 @@ import type {
   FetchEventLike,
   FileData,
 } from './types'
-import { ResponseJson, errorDev, errorSys, prepareData } from './utils'
+import { ResponseObject, errorDev, errorSys, formData, prepareData } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -144,13 +144,14 @@ abstract class Context2345<E extends Env, D extends APIInteraction<2 | 3 | 4 | 5
   }
 }
 
-type InteractionCallbackType = 1 | 4 | 5 | 6 | 7 | 9 | 10 | 12
+type CallbackType = 1 | 4 | 5 | 6 | 7 | 9 | 10 | 12
 // biome-ignore format: ternary operator
-type InteractionCallbackData<T extends InteractionCallbackType> =
+type CallbackData<T extends CallbackType> =
   T extends 4 | 7 ? CustomCallbackData<APIInteractionResponseCallbackData> :
   T extends 5 ? Pick<APIInteractionResponseCallbackData, "flags"> :
   T extends 9 ? Modal | APIModalInteractionResponseCallbackData :
   undefined // 1, 6, 10
+type CallbackFile<T extends CallbackType> = T extends 4 | 7 ? FileData : undefined
 abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> extends Context2345<E, D> {
   #flags: { flags?: number } = {}
 
@@ -168,32 +169,38 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
   }
 
   /**
+   * @param {1 | 4 | 5 | 6 | 7 | 9 | 10 | 12} type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type)
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
+   * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
+   * @returns {Response}
+   */
+  protected r = <T extends CallbackType>(type: T, data?: CallbackData<T>, file?: CallbackFile<T>) => {
+    let body: APIInteractionResponse | FormData
+    switch (type) {
+      case 4:
+      case 7:
+        body = { data: { ...this.#flags, ...prepareData(data as CallbackData<4 | 7>) }, type }
+        if (file) body = formData(body, file)
+        break
+      case 5:
+        body = { data: { ...this.#flags, ...(data as CallbackData<5>) }, type }
+        break
+      case 9:
+        body = { data: 'toJSON' in data! ? data.toJSON() : (data as APIModalInteractionResponseCallbackData), type }
+        break
+      default: // 1, 6, 10, 12
+        body = { type }
+    }
+    return new ResponseObject(body)
+  }
+
+  /**
+   * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
+   * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
    * @param {1 | 4 | 5 | 6 | 7 | 9 | 10 | 12} type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) default: 4 (respond to an interaction with a message)
    * @returns {Response}
    */
-  res = <T extends InteractionCallbackType = 4>(data: InteractionCallbackData<T>, type: T = 4 as T) => {
-    let json: APIInteractionResponse
-    switch (type) {
-      case 4:
-      case 7: {
-        json = { data: { ...this.#flags, ...prepareData(data as InteractionCallbackData<4 | 7>) }, type }
-        break
-      }
-      case 5: {
-        json = { data: { ...this.#flags, ...(data as InteractionCallbackData<5>) }, type }
-        break
-      }
-      case 9: {
-        const d = data as InteractionCallbackData<9>
-        json = 'toJSON' in d ? { data: d.toJSON(), type } : { data: d, type }
-        break
-      }
-      default: // 1, 6, 10, 12
-        json = { type }
-    }
-    return new ResponseJson(json)
-  }
+  res = (data: CallbackData<4>, file?: CallbackFile<4>) => this.r(4, data, file)
   /**
    * ACK an interaction and edit a response later, the user sees a loading state
    * @param {(c: this) => Promise<unknown>} handler
@@ -205,13 +212,13 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
    */
   resDefer = (handler?: (c: this) => Promise<unknown>) => {
     if (handler) this.waitUntil(handler(this))
-    return this.res({}, 5)
+    return this.r(5, {})
   }
 
   /**
    * Used to send messages after resDefer
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
-   * @param file FileData: { blob: Blob, name: string } | { blob: Blob, name: string }[]
+   * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
    * @example
    * ```ts
    * return c.resDefer(c => c.followup('Image file', { blob: Blob, name: 'image.png' }))
@@ -289,7 +296,7 @@ export class CommandContext<E extends Env = any> extends Context235<E, APIIntera
    * )
    * ```
    */
-  resModal = (data: Modal | APIModalInteractionResponseCallbackData) => this.res(data, 9)
+  resModal = (data: CallbackData<9>) => this.r(9, data)
 }
 
 type ComponentType = 'Button' | 'Select' | unknown
@@ -318,9 +325,10 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
   /**
    * for components, edit the message the component was attached to
    * @param data
+   * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
    * @returns {Response}
    */
-  resUpdate = (data: CustomCallbackData<APIInteractionResponseCallbackData>) => this.res(data, 7)
+  resUpdate = (data: CallbackData<7>, file?: CallbackFile<7>) => this.r(7, data, file)
   /**
    * for components, ACK an interaction and edit the original message later; the user does not see a loading state
    * @param {((c: this) => Promise<unknown>)} handler
@@ -328,7 +336,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
    */
   resDeferUpdate = (handler?: (c: this) => Promise<unknown>) => {
     if (handler) this.waitUntil(handler(this))
-    return this.res(undefined, 6)
+    return this.r(6)
   }
   /**
    * Response for modal window display
@@ -341,7 +349,7 @@ export class ComponentContext<E extends Env = any, T extends ComponentType = unk
    * )
    * ```
    */
-  resModal = (data: Modal | APIModalInteractionResponseCallbackData) => this.res(data, 9)
+  resModal = (data: CallbackData<9>) => this.r(9, data)
 }
 
 export class ModalContext<E extends Env = any> extends Context235<
@@ -423,7 +431,7 @@ export class AutocompleteContext<E extends Env = any> extends Context2345<E, API
    * @returns {Response}
    */
   resAutocomplete = (data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData) =>
-    new ResponseJson({ data: 'toJSON' in data ? data.toJSON() : data, type: 8 })
+    new ResponseObject({ data: 'toJSON' in data ? data.toJSON() : data, type: 8 })
 }
 
 export class CronContext<E extends Env = any> extends ContextAll<E> {

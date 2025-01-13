@@ -1,10 +1,5 @@
 import type { EmbedBuilder } from '@discordjs/builders'
-import type {
-  APIInteractionResponseCallbackData,
-  RESTPatchAPIChannelMessageJSONBody,
-  RESTPostAPIChannelMessageJSONBody,
-  RESTPostAPIInteractionFollowupJSONBody,
-} from 'discord-api-types/v10'
+import type { APIActionRowComponent, APIEmbed, APIMessageActionRowComponent } from 'discord-api-types/v10'
 import type { Embed } from './builder'
 import type { Components } from './builder/components'
 
@@ -63,11 +58,10 @@ export abstract class FetchEventLike {
 
 ////////// InteractionData //////////
 
-export type CustomCallbackBase =
-  | APIInteractionResponseCallbackData
-  | RESTPostAPIChannelMessageJSONBody
-  | RESTPatchAPIChannelMessageJSONBody
-  | RESTPostAPIInteractionFollowupJSONBody
+export type CustomCallbackBase = object & {
+  components?: APIActionRowComponent<APIMessageActionRowComponent>[] | null
+  embeds?: APIEmbed[] | null
+}
 export type CustomCallbackData<T extends CustomCallbackBase> =
   | (Omit<T, 'components' | 'embeds'> & {
       components?: Components | T['components']

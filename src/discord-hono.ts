@@ -1,7 +1,7 @@
 import type { APIInteraction, APIInteractionResponsePong } from 'discord-api-types/v10'
 import { AutocompleteContext, CommandContext, ComponentContext, CronContext, ModalContext } from './context'
 import type { CronEvent, DiscordEnv, Env, ExecutionContext, InitOptions, Verify } from './types'
-import { ResponseJson, errorDev } from './utils'
+import { ResponseObject, errorDev } from './utils'
 import { verify } from './verify'
 
 export type CommandHandler<E extends Env> = (c: CommandContext<E>) => Promise<Response> | Response
@@ -139,7 +139,7 @@ export class DiscordHono<E extends Env = Env> {
         // biome-ignore format: text width
         switch (interaction.type) {
           case 1:
-            return new ResponseJson({ type: 1 } satisfies APIInteractionResponsePong)
+            return new ResponseObject({ type: 1 } satisfies APIInteractionResponsePong)
           case 2:
             return await this.#commandMap.h(key)(new CommandContext(request, env, executionCtx, discord, interaction, key))
           case 3:
@@ -149,7 +149,7 @@ export class DiscordHono<E extends Env = Env> {
           case 5:
             return await this.#modalMap.h(key)(new ModalContext(request, env, executionCtx, discord, interaction, key))
           default:
-            return new ResponseJson({ error: 'Unknown Type' }, { status: 400 })
+            return new ResponseObject({ error: 'Unknown Type' }, 400)
         }
       }
       default:
