@@ -105,7 +105,7 @@ export class DiscordHono<E extends Env = Env> {
   fetch = async (request: Request, env?: E['Bindings'], executionCtx?: ExecutionContext) => {
     switch (request.method) {
       case 'GET':
-        return new Response('powered by Discord Hono🔥')
+        return new Response('Operational🔥')
       case 'POST': {
         const discord = this.#discord(env)
         if (!discord.PUBLIC_KEY) throw errorDev('DISCORD_PUBLIC_KEY')
