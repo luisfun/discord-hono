@@ -116,9 +116,8 @@ export class DiscordHono<E extends Env = Env, K extends string | RegExp = string
               interaction.data.custom_id = id.slice(key.length + 1)
               return key
             }
-            default:
-              return ''
           }
+          return ''
         })()
         // biome-ignore format: text width
         switch (interaction.type) {
@@ -132,13 +131,11 @@ export class DiscordHono<E extends Env = Env, K extends string | RegExp = string
             return await this.#map.g(4, key)(new AutocompleteContext(request, env, executionCtx, discord, interaction, key))
           case 5:
             return await this.#map.g(5, key)(new ModalContext(request, env, executionCtx, discord, interaction, key))
-          default:
-            return new ResponseObject({ error: 'Unknown Type' }, 400)
         }
+        return new ResponseObject({ error: 'Unknown Type' }, 400)
       }
-      default:
-        return new Response('Not Found', { status: 404 })
     }
+    return new Response('Not Found', { status: 404 })
   }
 
   /**
