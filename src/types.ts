@@ -2,6 +2,8 @@ import type { EmbedBuilder } from '@discordjs/builders'
 import type { APIActionRowComponent, APIEmbed, APIMessageActionRowComponent } from 'discord-api-types/v10'
 import type { Embed } from './builder'
 import type { Components } from './builder/components'
+import type { AutocompleteContext, CommandContext, ComponentContext, CronContext, ModalContext } from './context'
+import type { RegExpMap, StringMap } from './handler-map'
 
 ////////// Env //////////
 
@@ -18,6 +20,24 @@ export type DiscordEnv = {
   APPLICATION_ID?: string
 }
 
+////////// Handler //////////
+
+export type CommandHandler<E extends Env> = (c: CommandContext<E>) => Promise<Response> | Response
+export type ComponentHandler<E extends Env> = (c: ComponentContext<E>) => Promise<Response> | Response
+export type AutocompleteHandler<E extends Env> = (c: AutocompleteContext<E>) => Promise<Response> | Response
+export type ModalHandler<E extends Env> = (c: ModalContext<E>) => Promise<Response> | Response
+export type CronHandler<E extends Env> = (c: CronContext<E>) => Promise<unknown>
+
+export type HandlerNumber = 0 | 2 | 3 | 4 | 5
+// biome-ignore format: ternary operator
+export type AnyHandler<E extends Env, N extends HandlerNumber> =
+  N extends 0 ? CronHandler<E> :
+  N extends 2 ? CommandHandler<E> :
+  N extends 3 ? ComponentHandler<E> :
+  N extends 4 ? AutocompleteHandler<E> :
+  N extends 5 ? ModalHandler<E> :
+  never
+
 ////////// InitOptions //////////
 
 export type Verify = (
@@ -29,6 +49,7 @@ export type Verify = (
 export type InitOptions<E extends Env> = {
   verify?: Verify
   discordEnv?: (env: E['Bindings']) => DiscordEnv
+  HandlerMap?: typeof StringMap | typeof RegExpMap
 }
 
 ////////// CronEvent //////////
