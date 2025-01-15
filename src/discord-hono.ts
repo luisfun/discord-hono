@@ -148,9 +148,8 @@ export class DiscordHono<E extends Env = Env, K extends string | RegExp = string
    * @param executionCtx
    */
   scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
-    const discord = this.#discord(env)
     const handler = this.#map.g(0, event.cron)
-    const c = new CronContext(event, env, executionCtx, discord, event.cron)
+    const c = new CronContext(event, env, executionCtx, this.#discord(env), event.cron)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(c))
     else await handler(c)
   }
