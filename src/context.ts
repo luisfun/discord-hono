@@ -304,7 +304,7 @@ type ComponentType = 'Button' | 'Select' | unknown
 type ComponentInteractionData<T extends ComponentType> =
   T extends 'Button' ? APIMessageComponentButtonInteraction :
   T extends 'Select' ? APIMessageComponentSelectMenuInteraction :
-  APIMessageComponentSelectMenuInteraction
+  APIMessageComponentInteraction
 export class ComponentContext<E extends Env = any, T extends ComponentType = unknown> extends Context235<
   E & { Variables: { custom_id?: string } },
   ComponentInteractionData<T>
