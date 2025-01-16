@@ -48,6 +48,7 @@ abstract class ContextAll<E extends Env> {
   protected discord: DiscordEnv
   #key: string
   #var = new Map()
+  #rest: Rest | undefined = undefined
   constructor(env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv, key: string) {
     this.#env = env
     this.#executionCtx = executionCtx
@@ -103,7 +104,8 @@ abstract class ContextAll<E extends Env> {
    */
   get rest(): Rest {
     if (!this.discord.TOKEN) throw errorDev('DISCORD_TOKEN')
-    return new Rest(this.discord.TOKEN)
+    this.#rest ??= new Rest(this.discord.TOKEN)
+    return this.#rest
   }
 }
 
