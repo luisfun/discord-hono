@@ -265,7 +265,7 @@ export class CommandContext<E extends Env = any> extends Context235<E, APIIntera
     key: string,
   ) {
     super(req, env, executionCtx, discord, interaction, key)
-    const { sub, options } = getOptions(interaction)
+    const [sub, options] = getOptions(interaction)
     this.#sub = sub
     // @ts-expect-error
     if (options) for (const e of options) this.set(e.name, e.value)
@@ -392,7 +392,7 @@ export class AutocompleteContext<E extends Env = any> extends Context2345<E, API
     key: string,
   ) {
     super(req, env, executionCtx, discord, interaction, key)
-    const { sub, options } = getOptions(interaction)
+    const [sub, options] = getOptions(interaction)
     this.#sub = sub
     if (options)
       for (const e of options) {
@@ -467,5 +467,5 @@ const getOptions = (interaction: APIInteraction<2 | 4>) => {
       options = options[0].options
     }
   }
-  return { sub, options }
+  return [sub, options] as const
 }
