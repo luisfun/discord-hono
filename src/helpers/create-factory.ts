@@ -2,7 +2,15 @@ import type { Command } from '../builder/command'
 import type { Button, Select } from '../builder/components'
 import type { Modal } from '../builder/modal'
 import { DiscordHono } from '../discord-hono'
-import type { AutocompleteHandler, CommandHandler, ComponentHandler, CronHandler, Env, ModalHandler, InitOptions } from '../types'
+import type {
+  AutocompleteHandler,
+  CommandHandler,
+  ComponentHandler,
+  CronHandler,
+  Env,
+  InitOptions,
+  ModalHandler,
+} from '../types'
 import { CUSTOM_ID_SEPARATOR } from '../utils'
 
 type CreateReturn<E extends Env> = {
@@ -31,8 +39,8 @@ type CreateReturn<E extends Env> = {
   ) => void
 }
 
-export const createFactory = <E extends Env>(): CreateReturn<E> => ({
-  discord: (init) => new DiscordHono(init),
+export const createFactory = <E extends Env = Env>(): CreateReturn<E> => ({
+  discord: init => new DiscordHono(init),
   command: (command, handler) => ({ command, handler }),
   component: (component, handler) => ({ component, handler }),
   autocomplete: (command, autocomplete, handler) => ({ command, autocomplete, handler }),

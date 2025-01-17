@@ -1,9 +1,9 @@
 import type { SlashCommandBuilder } from '@discordjs/builders'
 import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
 import type { Command } from '../builder/command'
+import { Rest } from '../rest-api/rest'
+import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest-api/rest-path'
 import { errorDev } from '../utils'
-import { Rest } from './rest'
-import { _applications_$_commands, _applications_$_guilds_$_commands } from './rest-path'
 
 /**
  * [Docs](https://discord-hono.luis.fun/rest-api/register/)
