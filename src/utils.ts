@@ -1,5 +1,7 @@
 import type { CustomCallbackBase, CustomCallbackData, FileData } from './types'
 
+export const CUSTOM_ID_SEPARATOR = ';'
+
 export class ResponseObject extends Response {
   constructor(obj: object | FormData, status?: number) {
     const isForm = obj instanceof FormData

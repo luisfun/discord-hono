@@ -11,6 +11,7 @@ import type {
   APIUserSelectComponent,
   ChannelType,
 } from 'discord-api-types/v10'
+import { CUSTOM_ID_SEPARATOR } from '../utils'
 import { Builder, ifThrowHasSemicolon, warnBuilder } from './utils'
 
 /**
@@ -69,7 +70,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
       SKU: 6,
     } as const
     const style = styleNum[button_style] || 1
-    const custom_id = `${str};`
+    const custom_id = str + CUSTOM_ID_SEPARATOR
     const isArrayLabels = Array.isArray(labels)
     const label: string | undefined = isArrayLabels ? labels[1] : labels
     let obj: APIButtonComponent
@@ -143,7 +144,7 @@ export class Select<T extends SelectType = 'String'> extends Builder<SelectCompo
       Channel: 8,
     } as const
     const type = typeNum[select_type] || 3
-    const custom_id = `${unique_id};`
+    const custom_id = unique_id + CUSTOM_ID_SEPARATOR
     super({ type, custom_id } as SelectComponent)
     this.#type = select_type
     this.#uniqueStr = custom_id

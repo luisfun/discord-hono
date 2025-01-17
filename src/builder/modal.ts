@@ -1,4 +1,5 @@
 import type { APIModalInteractionResponseCallbackData, APITextInputComponent } from 'discord-api-types/v10'
+import { CUSTOM_ID_SEPARATOR } from '../utils'
 import { Builder, ifThrowHasSemicolon } from './utils'
 
 export class Modal {
@@ -10,7 +11,7 @@ export class Modal {
    */
   constructor(unique_id: string, title: string) {
     ifThrowHasSemicolon(unique_id)
-    this.#uniqueStr = `${unique_id};`
+    this.#uniqueStr = unique_id + CUSTOM_ID_SEPARATOR
     this.#data = { title, custom_id: this.#uniqueStr, components: [] }
   }
   /**

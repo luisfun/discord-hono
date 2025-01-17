@@ -11,7 +11,7 @@ import type {
   InitOptions,
   Verify,
 } from './types'
-import { ResponseObject, errorDev } from './utils'
+import { CUSTOM_ID_SEPARATOR, ResponseObject, errorDev } from './utils'
 import { verify } from './verify'
 
 type DiscordEnvBindings = {
@@ -112,7 +112,7 @@ export class DiscordHono<E extends Env = Env, K extends string | RegExp = string
             case 3:
             case 5: {
               const id = interaction.data.custom_id
-              const key = id.split(';')[0]
+              const key = id.split(CUSTOM_ID_SEPARATOR)[0]
               interaction.data.custom_id = id.slice(key.length + 1)
               return key
             }
