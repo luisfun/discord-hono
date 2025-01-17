@@ -15,8 +15,8 @@ import type {
   APIModalSubmitInteraction,
   RESTPostAPIInteractionFollowupJSONBody,
 } from 'discord-api-types/v10'
-import type { Autocomplete, Modal } from './builder'
-import { Rest, _webhooks_$_$, _webhooks_$_$_messages_$ } from './rest-api'
+import type { Autocomplete, Modal } from './builders'
+import { Rest, _webhooks_$_$, _webhooks_$_$_messages_$ } from './rest'
 import type {
   CronEvent,
   CustomCallbackData,

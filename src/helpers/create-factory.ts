@@ -1,6 +1,6 @@
-import type { Command } from '../builder/command'
-import type { Button, Select } from '../builder/components'
-import type { Modal } from '../builder/modal'
+import type { Command } from '../builders/command'
+import type { Button, Select } from '../builders/components'
+import type { Modal } from '../builders/modal'
 import { DiscordHono } from '../discord-hono'
 import type {
   AutocompleteHandler,

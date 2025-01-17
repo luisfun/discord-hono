@@ -1,7 +1,7 @@
 import type { EmbedBuilder } from '@discordjs/builders'
 import type { APIActionRowComponent, APIEmbed, APIMessageActionRowComponent } from 'discord-api-types/v10'
-import type { Embed } from './builder'
-import type { Components } from './builder/components'
+import type { Components } from './builders/components'
+import type { Embed } from './builders/embed'
 import type { AutocompleteContext, CommandContext, ComponentContext, CronContext, ModalContext } from './context'
 import type { RegExpMap, StringMap } from './handler-map'
 

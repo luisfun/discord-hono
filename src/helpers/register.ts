@@ -1,8 +1,8 @@
 import type { SlashCommandBuilder } from '@discordjs/builders'
 import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
-import type { Command } from '../builder/command'
-import { Rest } from '../rest-api/rest'
-import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest-api/rest-path'
+import type { Command } from '../builders/command'
+import { Rest } from '../rest/rest'
+import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest/rest-path'
 import { errorDev } from '../utils'
 
 /**
