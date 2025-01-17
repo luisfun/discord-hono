@@ -20,11 +20,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     /* Completeness */
-    "skipLibCheck": true,
-    /* tsc Compile */
-    //"allowImportingTsExtensions": true,
-    "rewriteRelativeImportExtensions": true,
-    "verbatimModuleSyntax": true
+    "skipLibCheck": true
   },
   "include": ["src"]
 }
