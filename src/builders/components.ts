@@ -110,6 +110,14 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @returns {this}
    */
   disabled = (e = true) => this.a({ disabled: e })
+  /**
+   * Overwrite label
+   *
+   * available: Primary, Secondary, Success, Danger, Link
+   * @param {string} e
+   * @returns {this}
+   */
+  label = (e: T extends 'SKU' ? undefined : string) => this.#assign('emoji', ['SKU'], { label: e })
 }
 
 type SelectType = 'String' | 'User' | 'Role' | 'Mentionable' | 'Channel'

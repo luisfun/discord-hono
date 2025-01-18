@@ -38,6 +38,15 @@ export class Modal {
     })
     return this
   }
+  /**
+   * Overwrite title
+   * @param {string} e
+   * @returns {this}
+   */
+  title = (e: string) => {
+    this.#data.title = e
+    return this
+  }
 }
 
 export class TextInput extends Builder<APITextInputComponent> {
