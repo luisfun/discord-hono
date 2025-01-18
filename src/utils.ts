@@ -12,12 +12,15 @@ export class ResponseObject extends Response {
   }
 }
 
+// type any !!!!!!!!!
+export const toJSON = (obj: object) => ('toJSON' in obj && typeof obj.toJSON === 'function' ? obj.toJSON() : obj)
+
 export const prepareData = <T extends CustomCallbackBase>(data: CustomCallbackData<T>) => {
   if (typeof data === 'string') return { content: data }
   const components = data?.components
   const embeds = data?.embeds
-  if (components) data = { ...data, components: 'toJSON' in components ? components.toJSON() : components }
-  if (embeds) data = { ...data, embeds: embeds.map(embed => ('toJSON' in embed ? embed.toJSON() : embed)) }
+  if (components) data = { ...data, components: toJSON(components) }
+  if (embeds) data = { ...data, embeds: embeds.map(toJSON) }
   return data as T
 }
 

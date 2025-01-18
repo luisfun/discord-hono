@@ -14,12 +14,12 @@ import type {
 import { CUSTOM_ID_SEPARATOR } from '../utils'
 
 type CreateReturn<E extends Env> = {
-  discord: (init: InitOptions<E>) => DiscordHono<E>
+  discord: (init?: InitOptions<E>) => DiscordHono<E>
   command: (command: Command, handler: CommandHandler<E>) => { command: Command; handler: CommandHandler<E> }
-  component: (
-    component: Button | Select,
+  component: <C extends Button<any> | Select<any>>(
+    component: C,
     handler: ComponentHandler<E>,
-  ) => { component: Button | Select; handler: ComponentHandler<E> }
+  ) => { component: C; handler: ComponentHandler<E> }
   autocomplete: (
     command: Command,
     autocomplete: AutocompleteHandler<E>,

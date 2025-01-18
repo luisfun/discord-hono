@@ -26,7 +26,7 @@ import type {
   FetchEventLike,
   FileData,
 } from './types'
-import { ResponseObject, errorDev, errorSys, formData, prepareData } from './utils'
+import { ResponseObject, errorDev, errorSys, formData, prepareData, toJSON } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -188,7 +188,7 @@ abstract class Context235<E extends Env, D extends APIInteraction<2 | 3 | 5>> ex
         body = { data: { ...this.#flags, ...(data as CallbackData<5>) }, type }
         break
       case 9:
-        body = { data: 'toJSON' in data! ? data.toJSON() : (data as APIModalInteractionResponseCallbackData), type }
+        body = { data: toJSON(data as CallbackData<9>), type }
         break
       default: // 1, 6, 10, 12
         body = { type }
@@ -433,7 +433,7 @@ export class AutocompleteContext<E extends Env = any> extends Context2345<E, API
    * @returns {Response}
    */
   resAutocomplete = (data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData) =>
-    new ResponseObject({ data: 'toJSON' in data ? data.toJSON() : data, type: 8 })
+    new ResponseObject({ data: toJSON(data), type: 8 })
 }
 
 export class CronContext<E extends Env = any> extends ContextAll<E> {

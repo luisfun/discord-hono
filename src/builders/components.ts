@@ -11,7 +11,7 @@ import type {
   APIUserSelectComponent,
   ChannelType,
 } from 'discord-api-types/v10'
-import { CUSTOM_ID_SEPARATOR } from '../utils'
+import { CUSTOM_ID_SEPARATOR, toJSON } from '../utils'
 import { Builder, ifThrowHasSemicolon, warnBuilder } from './utils'
 
 /**
@@ -28,7 +28,7 @@ export class Components {
     if (this.#components.length >= 5) console.warn('You can have up to 5 Action Rows per message')
     this.#components.push({
       type: 1,
-      components: e.map(component => ('toJSON' in component ? component.toJSON() : component)),
+      components: e.map(toJSON),
     })
     return this
   }

@@ -1,3 +1,4 @@
+import type { FileData } from '../types'
 import { errorDev, formData } from '../utils'
 import type {
   DeletePath,
@@ -5,11 +6,9 @@ import type {
   GetQuery,
   GetResult,
   PatchData,
-  PatchDataWithFile,
   PatchFile,
   PatchPath,
   PostData,
-  PostDataWithFile,
   PostFile,
   PostPath,
   PutData,
@@ -30,9 +29,12 @@ export class Rest {
       path: string,
       variables: string[],
       method: 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE',
-      body?: FormData | string,
+      data?: object,
+      file?: FileData,
     ) => {
       if (!token) throw errorDev('DISCORD_TOKEN')
+      const isJson = !file
+      const body = isJson ? JSON.stringify(data) : formData(data, file)
       const Authorization = `Bot ${token}`
       return fetch(
         `https://discord.com/api/${
@@ -46,7 +48,7 @@ export class Rest {
         {
           method,
           body,
-          headers: typeof body === 'string' ? { Authorization, 'content-type': 'application/json' } : { Authorization },
+          headers: isJson ? { Authorization, 'content-type': 'application/json' } : { Authorization },
         },
       )
     }
@@ -58,7 +60,7 @@ export class Rest {
    * @returns {Promise<{response: Response, result: any}>}
    */
   get = async <P extends GetPath>(path: P, variables: Variables<P>, query?: GetQuery<P>) => {
-    const response = await this.#fetch(path, variables, 'GET', JSON.stringify(query))
+    const response = await this.#fetch(path, variables, 'GET', query)
     return { response, result: (await response.json()) as GetResult<P> }
   }
   /**
@@ -67,7 +69,7 @@ export class Rest {
    * @returns {Promise<Response>}
    */
   put = <P extends PutPath>(path: P, variables: Variables<P>, data?: PutData<P>) =>
-    this.#fetch(path, variables, 'PUT', JSON.stringify(data))
+    this.#fetch(path, variables, 'PUT', data)
   /**
    * @param {string} path Official document path
    * @param {string[]} variables Variable part of official document path
@@ -75,10 +77,8 @@ export class Rest {
    * @param {FileData} file
    * @returns {Promise<Response>}
    */
-  post = <P extends PostPath>(path: P, variables: Variables<P>, data: PostData<P>, file?: PostFile<P>) => {
-    const body = file ? formData(data as PostDataWithFile<P>, file) : JSON.stringify(data)
-    return this.#fetch(path, variables, 'POST', body)
-  }
+  post = <P extends PostPath>(path: P, variables: Variables<P>, data: PostData<P>, file?: PostFile<P>) =>
+    this.#fetch(path, variables, 'POST', data, file)
   /**
    * @param {string} path Official document path
    * @param {string[]} variables Variable part of official document path
@@ -86,10 +86,8 @@ export class Rest {
    * @param {FileData} file
    * @returns {Promise<Response>}
    */
-  patch = <P extends PatchPath>(path: P, variables: Variables<P>, data: PatchData<P>, file?: PatchFile<P>) => {
-    const body = file ? formData(data as PatchDataWithFile<P>, file) : JSON.stringify(data)
-    return this.#fetch(path, variables, 'PATCH', body)
-  }
+  patch = <P extends PatchPath>(path: P, variables: Variables<P>, data: PatchData<P>, file?: PatchFile<P>) =>
+    this.#fetch(path, variables, 'PATCH', data, file)
   /**
    * @param {string} path Official document path
    * @param {string[]} variables Variable part of official document path

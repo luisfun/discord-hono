@@ -140,6 +140,7 @@ export type PostData<P extends PostPath> =
   P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
   undefined
 
+/*
 // biome-ignore format: ternary operator
 export type PostDataWithFile<P extends PostPath> =
   // Receiving and Responding
@@ -147,6 +148,7 @@ export type PostDataWithFile<P extends PostPath> =
   // Messages
   P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
   undefined
+*/
 
 // biome-ignore format: ternary operator
 export type PostFile<P extends PostPath> = P extends
@@ -178,11 +180,13 @@ export type PatchData<P extends PatchPath> =
   P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
   undefined
 
+/*
 // biome-ignore format: ternary operator
 export type PatchDataWithFile<P extends PatchPath> =
   // Messages
   P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
   undefined
+*/
 
 export type PatchFile<P extends PatchPath> =
   // Messages

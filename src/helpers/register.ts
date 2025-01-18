@@ -3,7 +3,7 @@ import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v
 import type { Command } from '../builders/command'
 import { Rest } from '../rest/rest'
 import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest/rest-path'
-import { errorDev } from '../utils'
+import { errorDev, toJSON } from '../utils'
 
 /**
  * [Docs](https://discord-hono.luis.fun/rest-api/register/)
@@ -22,9 +22,8 @@ export const register = async (
   if (!application_id) throw errorDev('DISCORD_APPLICATION_ID')
 
   const rest = new Rest(token)
-  const json = commands.map(cmd => ('toJSON' in cmd ? cmd.toJSON() : cmd))
+  const json = commands.map(toJSON)
   let res: Response
-  // @ts-expect-error 何とかしたい
   if (guild_id) res = await rest.put(_applications_$_guilds_$_commands, [application_id, guild_id], json)
   else res = await rest.put(_applications_$_commands, [application_id], json)
 

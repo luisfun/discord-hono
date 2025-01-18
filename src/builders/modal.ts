@@ -1,5 +1,5 @@
 import type { APIModalInteractionResponseCallbackData, APITextInputComponent } from 'discord-api-types/v10'
-import { CUSTOM_ID_SEPARATOR } from '../utils'
+import { CUSTOM_ID_SEPARATOR, toJSON } from '../utils'
 import { Builder, ifThrowHasSemicolon } from './utils'
 
 export class Modal {
@@ -34,7 +34,7 @@ export class Modal {
   row = (...e: (TextInput | APITextInputComponent)[]) => {
     this.#data.components.push({
       type: 1,
-      components: e.map(component => ('toJSON' in component ? component.toJSON() : component)),
+      components: e.map(toJSON),
     })
     return this
   }

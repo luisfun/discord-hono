@@ -12,6 +12,7 @@ import type {
   Locale,
   RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10'
+import { toJSON } from '../utils'
 import { Builder, warnBuilder } from './utils'
 
 abstract class CommandBase<
@@ -75,7 +76,7 @@ export class Command extends CommandBase<RESTPostAPIApplicationCommandsJSONBody>
    * @returns {this}
    */
   options = (...e: (Option<any> | SubGroup | SubCommand | APIApplicationCommandOption)[]) =>
-    this.a({ options: e.map(option => ('toJSON' in option ? option.toJSON() : option)) })
+    this.a({ options: e.map(toJSON) })
   /**
    * @param {string | null} e
    * @returns {this}
@@ -150,8 +151,7 @@ export class SubGroup extends CommandBase<APIApplicationCommandSubcommandGroupOp
    * @param {...(SubCommand | APIApplicationCommandSubcommandOption)} e
    * @returns {this}
    */
-  options = (...e: (SubCommand | APIApplicationCommandSubcommandOption)[]) =>
-    this.a({ options: e.map(option => ('toJSON' in option ? option.toJSON() : option)) })
+  options = (...e: (SubCommand | APIApplicationCommandSubcommandOption)[]) => this.a({ options: e.map(toJSON) })
 }
 
 export class SubCommand extends CommandBase<APIApplicationCommandSubcommandOption> {
@@ -168,8 +168,7 @@ export class SubCommand extends CommandBase<APIApplicationCommandSubcommandOptio
    * @param {...(Option | APIApplicationCommandBasicOption)} e
    * @returns {this}
    */
-  options = (...e: (Option<any> | APIApplicationCommandBasicOption)[]) =>
-    this.a({ options: e.map(option => ('toJSON' in option ? option.toJSON() : option)) })
+  options = (...e: (Option<any> | APIApplicationCommandBasicOption)[]) => this.a({ options: e.map(toJSON) })
 }
 
 type OptionType =
