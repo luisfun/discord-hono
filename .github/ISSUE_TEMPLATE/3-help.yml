@@ -1,0 +1,27 @@
+name: ❓ help
+description: Unresolvable errors or points where you're stuck
+labels: [help wanted]
+body:
+  - type: input
+    attributes:
+      label: What version of discord-hono are you using?
+      placeholder: 0.0.0
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: What runtime/platform is your app running on? (with version if possible)
+      placeholder: Cloudflare Workers, Deno, Bun, etc.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What are the errors you cannot resolve or the things you do not understand?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What is the expected behavior?
+  - type: textarea
+    attributes:
+      label: Additional information

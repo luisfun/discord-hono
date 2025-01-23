@@ -1,0 +1,21 @@
+name: 🐛 Bug Report
+description: Report an issue that should be fixed
+labels: [bug]
+body:
+  - type: input
+    attributes:
+      label: What version of discord-hono are you using?
+      placeholder: 0.0.0
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What steps can reproduce the bug?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What is the expected behavior?
+  - type: textarea
+    attributes:
+      label: Additional information
