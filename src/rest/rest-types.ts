@@ -26,6 +26,7 @@ import type {
   RESTPutAPIApplicationCommandsJSONBody,
   RESTPutAPIApplicationGuildCommandsJSONBody,
   RESTPutAPIGuildApplicationCommandsPermissionsJSONBody,
+  RESTPatchAPIChannelJSONBody
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import type {
@@ -37,6 +38,7 @@ import type {
   _applications_$_guilds_$_commands_$_permissions,
   _applications_$_guilds_$_commands_permissions,
   _applications_me,
+  _channels_$,
   _channels_$_messages,
   _channels_$_messages_$,
   _channels_$_messages_$_crosspost,
@@ -168,6 +170,8 @@ export type PatchPath =
   | typeof _applications_me
   // Messages
   | typeof _channels_$_messages_$
+  // Channel
+  | typeof _channels_$
 
 // biome-ignore format: ternary operator
 export type PatchData<P extends PatchPath> =
@@ -178,6 +182,8 @@ export type PatchData<P extends PatchPath> =
   P extends typeof _applications_me ? RESTPatchCurrentApplicationJSONBody :
   // Messages
   P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
+  // Channel
+  P extends typeof _channels_$ ? RESTPatchAPIChannelJSONBody :
   undefined
 
 /*
@@ -209,6 +215,7 @@ export type Variables<P extends GetPath | PutPath | PostPath | PatchPath | Delet
   | typeof _applications_$_commands
   | typeof _channels_$_messages
   | typeof _channels_$_messages_bulkdelete
+  | typeof _channels_$
   ? [string]
   : P extends
         | typeof _webhooks_$_$

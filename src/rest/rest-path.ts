@@ -39,3 +39,9 @@ export const _channels_$_messages_$_reactions_$ =
   '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}' as const
 export const _channels_$_messages_$_reactions = '/channels/{channel.id}/messages/{message.id}/reactions' as const
 export const _channels_$_messages_bulkdelete = '/channels/{channel.id}/messages/bulk-delete' as const
+
+
+////////// Channel //////////
+// https://discord.com/developers/docs/resources/channel
+
+export const _channels_$ = '/channels/{channel.id}' as const
