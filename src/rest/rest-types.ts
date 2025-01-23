@@ -15,6 +15,7 @@ import type {
   RESTGetCurrentApplicationResult,
   RESTPatchAPIApplicationCommandJSONBody,
   RESTPatchAPIApplicationGuildCommandJSONBody,
+  RESTPatchAPIChannelJSONBody,
   RESTPatchAPIChannelMessageJSONBody,
   RESTPatchCurrentApplicationJSONBody,
   RESTPostAPIApplicationCommandsJSONBody,
@@ -26,7 +27,6 @@ import type {
   RESTPutAPIApplicationCommandsJSONBody,
   RESTPutAPIApplicationGuildCommandsJSONBody,
   RESTPutAPIGuildApplicationCommandsPermissionsJSONBody,
-  RESTPatchAPIChannelJSONBody
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import type {
