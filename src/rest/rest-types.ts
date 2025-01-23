@@ -29,7 +29,7 @@ import type {
   RESTPatchAPIChannelJSONBody
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
-import {
+import type {
   //_applications_$_activityinstances_$,
   _applications_$_commands,
   _applications_$_commands_$,
