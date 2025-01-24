@@ -301,13 +301,13 @@ export class CommandContext<E extends Env = any> extends Context235<E, APIIntera
   resModal = (data: CallbackData<9>) => this.r(9, data)
 }
 
-type ComponentType = 'Button' | 'Select' | unknown
+type ComponentType = 'Button' | 'Select'
 // biome-ignore format: ternary operator
 type ComponentInteractionData<T extends ComponentType> =
   T extends 'Button' ? APIMessageComponentButtonInteraction :
   T extends 'Select' ? APIMessageComponentSelectMenuInteraction :
   APIMessageComponentInteraction
-export class ComponentContext<E extends Env = any, T extends ComponentType = unknown> extends Context235<
+export class ComponentContext<E extends Env = any, T extends ComponentType = any> extends Context235<
   E & { Variables: { custom_id?: string } },
   ComponentInteractionData<T>
 > {
