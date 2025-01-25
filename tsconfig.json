@@ -5,6 +5,7 @@
     /* Modules */
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "types": ["vitest/globals"],
     /* JavaScript Support */
     "checkJs": true,
     /* Emit */
