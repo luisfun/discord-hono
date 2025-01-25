@@ -1,25 +1,5 @@
 import { Components, Embed } from '.'
-import { CUSTOM_ID_SEPARATOR, ResponseObject, prepareData, toJSON, formData, errorDev, errorSys } from './utils'
-
-describe('Constants and Error', () => {
-  it('CUSTOM_ID_SEPARATOR', () => {
-    expect(CUSTOM_ID_SEPARATOR).toBe(';')
-  })
-
-  it('errorSys function', () => {
-    const errorMessage = 'Sys'
-    const error = errorSys(errorMessage)
-    expect(error).toBeInstanceOf(Error)
-    expect(error.message).toBe('Sys not found')
-  })
-
-  it('errorDev function', () => {
-    const errorMessage = 'Dev'
-    const error = errorDev(errorMessage)
-    expect(error).toBeInstanceOf(Error)
-    expect(error.message).toBe('Dev is missing')
-  })
-})
+import { ResponseObject, prepareData, toJSON, formData, errorDev, errorSys } from './utils'
 
 describe('ResponseObject', () => {
   it('should create a JSON response when given an object', () => {
@@ -174,3 +154,19 @@ describe('formData function', () => {
     expect(appendSpy).toHaveBeenCalledWith('files[0]', mockFile.blob, mockFile.name);
   });
 });
+
+describe('Error function', () => {
+  it('errorSys function', () => {
+    const errorMessage = 'Sys'
+    const error = errorSys(errorMessage)
+    expect(error).toBeInstanceOf(Error)
+    expect(error.message).toBe('Sys not found')
+  })
+
+  it('errorDev function', () => {
+    const errorMessage = 'Dev'
+    const error = errorDev(errorMessage)
+    expect(error).toBeInstanceOf(Error)
+    expect(error.message).toBe('Dev is missing')
+  })
+})
