@@ -26,6 +26,6 @@
     }
   },
   "files": {
-    "ignore": ["dist", "package.json"]
+    "ignore": ["coverage", "dist", "package.json"]
   }
 }
