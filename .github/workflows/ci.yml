@@ -17,5 +17,3 @@ jobs:
       - run: npm ci
       - run: npm run test
       - uses: codecov/codecov-action@v5
-        with:
-          comment: false
