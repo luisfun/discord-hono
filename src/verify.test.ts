@@ -1,5 +1,4 @@
 import { verify } from './verify'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 describe('verify function', () => {
   const mockVerify = vi.fn()
@@ -10,8 +9,8 @@ describe('verify function', () => {
     vi.stubGlobal('crypto', {
       subtle: {
         verify: mockVerify,
-        importKey: mockImportKey
-      }
+        importKey: mockImportKey,
+      },
     })
   })
 
@@ -23,7 +22,9 @@ describe('verify function', () => {
 
   it('should throw an error if public key is invalid', async () => {
     mockImportKey.mockRejectedValue(new Error('Ed25519 raw keys must be exactly 32-bytes'))
-    await expect(verify('body', 'signature', 'timestamp', 'invalidPublicKey')).rejects.toThrow('Ed25519 raw keys must be exactly 32-bytes')
+    await expect(verify('body', 'signature', 'timestamp', 'invalidPublicKey')).rejects.toThrow(
+      'Ed25519 raw keys must be exactly 32-bytes',
+    )
   })
 
   it('should call subtle.verify with correct parameters', async () => {
@@ -37,19 +38,13 @@ describe('verify function', () => {
 
     const result = await verify(body, signature, timestamp, publicKey)
 
-    expect(mockImportKey).toHaveBeenCalledWith(
-      'raw',
-      expect.any(Uint8Array),
-      { name: 'Ed25519' },
-      false,
-      ['verify']
-    )
+    expect(mockImportKey).toHaveBeenCalledWith('raw', expect.any(Uint8Array), { name: 'Ed25519' }, false, ['verify'])
 
     expect(mockVerify).toHaveBeenCalledWith(
       { name: 'Ed25519' },
       'importedKey',
       expect.any(Uint8Array),
-      expect.any(Uint8Array)
+      expect.any(Uint8Array),
     )
 
     expect(result).toBe(true)

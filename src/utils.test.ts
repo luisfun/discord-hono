@@ -1,5 +1,5 @@
 import { Components, Embed } from '.'
-import { ResponseObject, prepareData, toJSON, formData, errorDev, errorSys } from './utils'
+import { ResponseObject, errorDev, errorSys, formData, prepareData, toJSON } from './utils'
 
 describe('ResponseObject', () => {
   it('should create a JSON response when given an object', () => {
@@ -105,55 +105,58 @@ describe('prepareData', () => {
 })
 
 describe('formData function', () => {
-  let appendSpy: ReturnType<typeof vi.fn>;
+  let appendSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    appendSpy = vi.fn();
-    vi.stubGlobal('FormData', vi.fn(() => ({
-      append: appendSpy
-    })));
-  });
+    appendSpy = vi.fn()
+    vi.stubGlobal(
+      'FormData',
+      vi.fn(() => ({
+        append: appendSpy,
+      })),
+    )
+  })
 
   it('should create FormData with payload_json when data is provided', () => {
-    const mockData = { key: 'value' };
-    formData(mockData);
-    
-    expect(appendSpy).toHaveBeenCalledWith('payload_json', JSON.stringify(mockData));
-  });
+    const mockData = { key: 'value' }
+    formData(mockData)
+
+    expect(appendSpy).toHaveBeenCalledWith('payload_json', JSON.stringify(mockData))
+  })
 
   it('should not append payload_json when data is empty', () => {
-    formData({});
-    
-    expect(appendSpy).not.toHaveBeenCalledWith('payload_json', expect.any(String));
-  });
+    formData({})
+
+    expect(appendSpy).not.toHaveBeenCalledWith('payload_json', expect.any(String))
+  })
 
   it('should append single file when file object is provided', () => {
-    const mockFile = { blob: new Blob(), name: 'test.txt' };
-    formData(undefined, mockFile);
-    
-    expect(appendSpy).toHaveBeenCalledWith('files[0]', mockFile.blob, mockFile.name);
-  });
+    const mockFile = { blob: new Blob(), name: 'test.txt' }
+    formData(undefined, mockFile)
+
+    expect(appendSpy).toHaveBeenCalledWith('files[0]', mockFile.blob, mockFile.name)
+  })
 
   it('should append multiple files when file array is provided', () => {
     const mockFiles = [
       { blob: new Blob(), name: 'test1.txt' },
-      { blob: new Blob(), name: 'test2.txt' }
-    ];
-    formData(undefined, mockFiles);
-    
-    expect(appendSpy).toHaveBeenCalledWith('files[0]', mockFiles[0].blob, mockFiles[0].name);
-    expect(appendSpy).toHaveBeenCalledWith('files[1]', mockFiles[1].blob, mockFiles[1].name);
-  });
+      { blob: new Blob(), name: 'test2.txt' },
+    ]
+    formData(undefined, mockFiles)
+
+    expect(appendSpy).toHaveBeenCalledWith('files[0]', mockFiles[0].blob, mockFiles[0].name)
+    expect(appendSpy).toHaveBeenCalledWith('files[1]', mockFiles[1].blob, mockFiles[1].name)
+  })
 
   it('should handle both data and file', () => {
-    const mockData = { key: 'value' };
-    const mockFile = { blob: new Blob(), name: 'test.txt' };
-    formData(mockData, mockFile);
-    
-    expect(appendSpy).toHaveBeenCalledWith('payload_json', JSON.stringify(mockData));
-    expect(appendSpy).toHaveBeenCalledWith('files[0]', mockFile.blob, mockFile.name);
-  });
-});
+    const mockData = { key: 'value' }
+    const mockFile = { blob: new Blob(), name: 'test.txt' }
+    formData(mockData, mockFile)
+
+    expect(appendSpy).toHaveBeenCalledWith('payload_json', JSON.stringify(mockData))
+    expect(appendSpy).toHaveBeenCalledWith('files[0]', mockFile.blob, mockFile.name)
+  })
+})
 
 describe('Error function', () => {
   it('errorSys function', () => {
