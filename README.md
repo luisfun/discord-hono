@@ -1,6 +1,4 @@
-# 🔥 Discord Hono
-
-[![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/discord-hono)](https://bundlephobia.com/package/discord-hono) [![codecov](https://codecov.io/github/luisfun/discord-hono/graph/badge.svg?token=BMMNVXZ51R)](https://codecov.io/github/luisfun/discord-hono) [![Discord](https://img.shields.io/discord/1331893810501914694?label=Discord)](https://discord.gg/KFAgHFwBsr)
+# 🔥 Discord Hono [![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/discord-hono?label=minzip)](https://bundlephobia.com/package/discord-hono) [![Codecov](https://img.shields.io/codecov/c/github/luisfun/discord-hono)](https://codecov.io/github/luisfun/discord-hono) [![Discord](https://img.shields.io/discord/1331893810501914694?label=Discord)](https://discord.gg/KFAgHFwBsr)
 
 **This library enables you to easily build Discord bots on Cloudflare Workers**
 
