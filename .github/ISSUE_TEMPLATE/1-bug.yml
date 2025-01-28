@@ -1,4 +1,4 @@
-name: 🐛 Bug Report
+name: 🐛 Bug
 description: Report an issue that should be fixed
 labels: [bug]
 body:

@@ -1,6 +1,6 @@
-name: ❓ help
+name: ❓ Help
 description: Unresolvable errors or points where you're stuck
-labels: [help wanted]
+labels: [help]
 body:
   - type: input
     attributes:

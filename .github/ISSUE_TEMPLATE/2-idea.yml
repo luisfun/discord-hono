@@ -1,6 +1,6 @@
-name: 🚀 Feature Request
+name: 🚀 Idea
 description: Suggest an idea, feature, or enhancement
-labels: [enhancement]
+labels: [idea]
 body:
   - type: textarea
     attributes:
