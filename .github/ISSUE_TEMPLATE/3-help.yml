@@ -4,24 +4,22 @@ labels: [help]
 body:
   - type: input
     attributes:
-      label: What version of discord-hono are you using?
+      label: discord-hono version
       placeholder: 0.0.0
     validations:
       required: true
   - type: input
     attributes:
-      label: What runtime/platform is your app running on? (with version if possible)
+      label: Runtime / Platform
       placeholder: Cloudflare Workers, Deno, Bun, etc.
+  - type: textarea
+    attributes:
+      label: What you cannot solve
+      placeholder: |
+        - Unresolvable error
+        - Need hints on implementation method
     validations:
       required: true
   - type: textarea
     attributes:
-      label: What are the errors you cannot resolve or the things you do not understand?
-    validations:
-      required: true
-  - type: textarea
-    attributes:
-      label: What is the expected behavior?
-  - type: textarea
-    attributes:
-      label: Additional information
+      label: Additional Info

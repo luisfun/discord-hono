@@ -4,18 +4,19 @@ labels: [bug]
 body:
   - type: input
     attributes:
-      label: What version of discord-hono are you using?
+      label: discord-hono version
       placeholder: 0.0.0
     validations:
       required: true
   - type: textarea
     attributes:
-      label: What steps can reproduce the bug?
+      label: Bug Details
+      placeholder: |
+        - Steps to reproduce the bug
+        - Relevant code examples
+        - Expected behavior vs Actual behavior
     validations:
       required: true
   - type: textarea
     attributes:
-      label: What is the expected behavior?
-  - type: textarea
-    attributes:
-      label: Additional information
+      label: Additional Info

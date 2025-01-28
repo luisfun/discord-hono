@@ -4,6 +4,14 @@ labels: [idea]
 body:
   - type: textarea
     attributes:
-      label: What is the feature you are proposing?
+      label: Idea Description
+      placeholder: |
+        - New features or ideas
+        - References, links, or code snippets
     validations:
       required: true
+  - type: checkboxes
+    attributes:
+      label: Pull Request
+      options:
+        - label: I'm willing to submit a pull request for this idea
