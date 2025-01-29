@@ -13,30 +13,31 @@ import type {
 } from '../types'
 import { CUSTOM_ID_SEPARATOR } from '../utils'
 
-type Var = NonNullable<Env['Variables']>
+// biome-ignore lint: Null Variables
+type Var = {}
 
 type CreateReturn<E extends Env> = {
   discord: (init?: InitOptions<E>) => DiscordHono<E>
   command: <V extends Var>(
     command: Command,
-    handler: CommandHandler<E & { Variables: V }>,
+    handler: CommandHandler<E & { Variables?: V }>,
   ) => { command: Command; handler: CommandHandler<E> }
   component: <V extends Var, C extends Button<any> | Select<any>>(
     component: C,
-    handler: ComponentHandler<E & { Variables: V }>,
+    handler: ComponentHandler<E & { Variables?: V }>,
   ) => { component: C; handler: ComponentHandler<E> }
   autocomplete: <V extends Var>(
     command: Command,
-    autocomplete: AutocompleteHandler<E & { Variables: V }>,
-    handler: CommandHandler<E & { Variables: V }>,
+    autocomplete: AutocompleteHandler<E & { Variables?: V }>,
+    handler: CommandHandler<E & { Variables?: V }>,
   ) => { command: Command; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E> }
   modal: <V extends Var>(
     modal: Modal,
-    handler: ModalHandler<E & { Variables: V }>,
+    handler: ModalHandler<E & { Variables?: V }>,
   ) => { modal: Modal; handler: ModalHandler<E> }
   cron: <V extends Var>(
     cron: string,
-    handler: CronHandler<E & { Variables: V }>,
+    handler: CronHandler<E & { Variables?: V }>,
   ) => { cron: string; handler: CronHandler<E> }
   loader: (
     app: DiscordHono<E>,
