@@ -13,20 +13,31 @@ import type {
 } from '../types'
 import { CUSTOM_ID_SEPARATOR } from '../utils'
 
+type Var = NonNullable<Env['Variables']>
+
 type CreateReturn<E extends Env> = {
   discord: (init?: InitOptions<E>) => DiscordHono<E>
-  command: (command: Command, handler: CommandHandler<E>) => { command: Command; handler: CommandHandler<E> }
-  component: <C extends Button<any> | Select<any>>(
-    component: C,
-    handler: ComponentHandler<E>,
-  ) => { component: C; handler: ComponentHandler<E> }
-  autocomplete: (
+  command: <V extends Var>(
     command: Command,
-    autocomplete: AutocompleteHandler<E>,
-    handler: CommandHandler<E>,
+    handler: CommandHandler<E & { Variables: V }>,
+  ) => { command: Command; handler: CommandHandler<E> }
+  component: <V extends Var, C extends Button<any> | Select<any>>(
+    component: C,
+    handler: ComponentHandler<E & { Variables: V }>,
+  ) => { component: C; handler: ComponentHandler<E> }
+  autocomplete: <V extends Var>(
+    command: Command,
+    autocomplete: AutocompleteHandler<E & { Variables: V }>,
+    handler: CommandHandler<E & { Variables: V }>,
   ) => { command: Command; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E> }
-  modal: (modal: Modal, handler: ModalHandler<E>) => { modal: Modal; handler: ModalHandler<E> }
-  cron: (cron: string, handler: CronHandler<E>) => { cron: string; handler: CronHandler<E> }
+  modal: <V extends Var>(
+    modal: Modal,
+    handler: ModalHandler<E & { Variables: V }>,
+  ) => { modal: Modal; handler: ModalHandler<E> }
+  cron: <V extends Var>(
+    cron: string,
+    handler: CronHandler<E & { Variables: V }>,
+  ) => { cron: string; handler: CronHandler<E> }
   loader: (
     app: DiscordHono<E>,
     wrappers: (
@@ -41,11 +52,15 @@ type CreateReturn<E extends Env> = {
 
 export const createFactory = <E extends Env = Env>(): CreateReturn<E> => ({
   discord: init => new DiscordHono(init),
-  command: (command, handler) => ({ command, handler }),
-  component: (component, handler) => ({ component, handler }),
-  autocomplete: (command, autocomplete, handler) => ({ command, autocomplete, handler }),
-  modal: (modal, handler) => ({ modal, handler }),
-  cron: (cron, handler) => ({ cron, handler }),
+  command: (command, handler) => ({ command, handler: handler as CommandHandler<E> }),
+  component: (component, handler) => ({ component, handler: handler as ComponentHandler<E> }),
+  autocomplete: (command, autocomplete, handler) => ({
+    command,
+    autocomplete: autocomplete as AutocompleteHandler<E>,
+    handler: handler as CommandHandler<E>,
+  }),
+  modal: (modal, handler) => ({ modal, handler: handler as ModalHandler<E> }),
+  cron: (cron, handler) => ({ cron, handler: handler as CronHandler<E> }),
   loader: (app, wrappers) => {
     for (const w of wrappers) {
       if ('command' in w) {
