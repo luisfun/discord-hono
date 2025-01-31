@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CronContext, InteractionContext } from './context'
 import type { AutocompleteContext, CommandContext, ComponentContext, ModalContext } from './types'
+import { ResponseObject } from './utils'
 
 describe('Context Classes', () => {
   const mockEnv = { DISCORD_TOKEN: 'mock-token', DISCORD_APPLICATION_ID: 'mock-app-id' }
@@ -151,6 +152,68 @@ describe('Context Classes', () => {
       const mockCronEvent = { cron: '* * * * *', type: 'cron', scheduledTime: 0 }
       const context = new CronContext(mockCronEvent, mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key')
       expect(context.cronEvent).toEqual(mockCronEvent)
+    })
+  })
+
+  describe('InteractionContext', () => {
+    it('should handle ephemeral responses', async () => {
+      const mockInteraction = {
+        type: 2,
+        data: { name: 'test-command' },
+        token: 'mock-token',
+      }
+      const context = new InteractionContext(
+        mockRequest,
+        mockEnv,
+        mockExecutionCtx,
+        mockDiscordEnv,
+        // @ts-expect-error
+        mockInteraction,
+        'test-key',
+      )
+      const response = context.ephemeral().res({ content: 'Ephemeral response' })
+      expect(response).toBeInstanceOf(ResponseObject)
+      expect((await response.json()).data.flags).toBe(1 << 6)
+    })
+
+    it('should handle followup responses', async () => {
+      const mockInteraction = {
+        type: 2,
+        data: { name: 'test-command' },
+        token: 'mock-token',
+      }
+      const context = new InteractionContext(
+        mockRequest,
+        mockEnv,
+        mockExecutionCtx,
+        mockDiscordEnv,
+        // @ts-expect-error
+        mockInteraction,
+        'test-key',
+      )
+      const response = await context.followup({ content: 'Followup response' })
+      expect(response).toBeInstanceOf(Response)
+    })
+
+    it('should handle modal responses', async () => {
+      const mockInteraction = {
+        type: 2,
+        data: { name: 'test-command' },
+        token: 'mock-token',
+      }
+      const context = new InteractionContext(
+        mockRequest,
+        mockEnv,
+        mockExecutionCtx,
+        mockDiscordEnv,
+        // @ts-expect-error
+        mockInteraction,
+        'test-key',
+      )
+      const modalData = { custom_id: 'modal-id', title: 'Modal Title', components: [] }
+      const response = context.resModal(modalData)
+      expect(response).toBeInstanceOf(ResponseObject)
+      expect((await response.json()).data).toEqual(modalData)
     })
   })
 })
