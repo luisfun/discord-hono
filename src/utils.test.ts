@@ -163,13 +163,13 @@ describe('Error function', () => {
     const errorMessage = 'Sys'
     const error = errorSys(errorMessage)
     expect(error).toBeInstanceOf(Error)
-    expect(error.message).toBe('Sys not found')
+    expect(error.message).toBe('sys: Sys not found')
   })
 
   it('errorDev function', () => {
     const errorMessage = 'Dev'
     const error = errorDev(errorMessage)
     expect(error).toBeInstanceOf(Error)
-    expect(error.message).toBe('Dev is missing')
+    expect(error.message).toBe('dev: Dev is missing')
   })
 })

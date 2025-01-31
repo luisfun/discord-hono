@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { AutocompleteContext, CommandContext, ComponentContext, CronContext, ModalContext } from './context'
+import { CronContext, InteractionContext } from './context'
+import type { AutocompleteContext, CommandContext, ComponentContext, ModalContext } from './types'
 
 describe('Context Classes', () => {
   const mockEnv = { DISCORD_TOKEN: 'mock-token', DISCORD_APPLICATION_ID: 'mock-app-id' }
@@ -22,8 +23,15 @@ describe('Context Classes', () => {
         },
         token: 'mock-token',
       }
-      // @ts-expect-error
-      context = new CommandContext(mockRequest, mockEnv, mockExecutionCtx, mockDiscordEnv, mockInteraction, 'test-key')
+      context = new InteractionContext(
+        mockRequest,
+        mockEnv,
+        mockExecutionCtx,
+        mockDiscordEnv,
+        // @ts-expect-error
+        mockInteraction,
+        'test-key',
+      ) as CommandContext
     })
 
     it('should set options as variables', () => {
@@ -46,7 +54,7 @@ describe('Context Classes', () => {
         },
         token: 'mock-token',
       }
-      const subContext = new CommandContext(
+      const subContext = new InteractionContext(
         mockRequest,
         mockEnv,
         mockExecutionCtx,
@@ -54,7 +62,7 @@ describe('Context Classes', () => {
         // @ts-expect-error
         subCommandInteraction,
         'test-key',
-      )
+      ) as CommandContext
       expect(subContext.sub).toEqual({ group: '', command: 'subcommand', string: 'subcommand' })
       expect(subContext.get('suboption')).toBe('subvalue')
     })
@@ -67,7 +75,7 @@ describe('Context Classes', () => {
         data: { custom_id: 'test-custom-id' },
         token: 'mock-token',
       }
-      const context = new ComponentContext(
+      const context = new InteractionContext(
         mockRequest,
         mockEnv,
         mockExecutionCtx,
@@ -75,7 +83,7 @@ describe('Context Classes', () => {
         // @ts-expect-error
         mockInteraction,
         'test-key',
-      )
+      ) as ComponentContext
       expect(context.get('custom_id')).toBe('test-custom-id')
     })
   })
@@ -97,7 +105,7 @@ describe('Context Classes', () => {
         },
         token: 'mock-token',
       }
-      const context = new ModalContext(
+      const context = new InteractionContext(
         mockRequest,
         mockEnv,
         mockExecutionCtx,
@@ -105,7 +113,7 @@ describe('Context Classes', () => {
         // @ts-expect-error
         mockInteraction,
         'test-key',
-      )
+      ) as ModalContext
       expect(context.get('custom_id')).toBe('test-modal')
       expect(context.get('input1')).toBe('value1')
       expect(context.get('input2')).toBe('value2')
@@ -125,7 +133,7 @@ describe('Context Classes', () => {
         },
         token: 'mock-token',
       }
-      const context = new AutocompleteContext(
+      const context = new InteractionContext(
         mockRequest,
         mockEnv,
         mockExecutionCtx,
@@ -133,7 +141,7 @@ describe('Context Classes', () => {
         // @ts-expect-error
         mockInteraction,
         'test-key',
-      )
+      ) as AutocompleteContext
       expect(context.focused).toEqual({ name: 'option1', type: 3, value: 'value1', focused: true })
     })
   })
