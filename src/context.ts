@@ -104,14 +104,6 @@ abstract class ContextAll<E extends Env> {
   }
 }
 
-type CallbackType = 1 | 4 | 5 | 6 | 7 | 9 | 10 | 12
-// biome-ignore format: ternary operator
-type CallbackData<T extends CallbackType> =
-  T extends 4 | 7 ? CustomCallbackData<APIInteractionResponseCallbackData> :
-  T extends 5 ? Pick<APIInteractionResponseCallbackData, "flags"> :
-  T extends 9 ? Modal | APIModalInteractionResponseCallbackData :
-  undefined // 1, 6, 10
-type CallbackFile<T extends CallbackType> = T extends 4 | 7 ? FileData : undefined
 type AutocompleteOption =
   | APIApplicationCommandInteractionDataStringOption
   | APIApplicationCommandInteractionDataIntegerOption
@@ -215,7 +207,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    * @param {1 | 4 | 5 | 6 | 7 | 9 | 10 | 12} type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) default: 4 (respond to an interaction with a message)
    * @returns {Response}
    */
-  res = (data: CallbackData<4>, file?: CallbackFile<4>) => {
+  res = (data: CustomCallbackData<APIInteractionResponseCallbackData>, file?: FileData) => {
     this.#throwIfNotAllowType([2, 3, 5])
     return this.#res47(4, data, file)
   }
@@ -300,7 +292,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    * )
    * ```
    */
-  resModal = (data: CallbackData<9>) => {
+  resModal = (data: Modal | APIModalInteractionResponseCallbackData) => {
     this.#throwIfNotAllowType([2, 3])
     return new ResponseObject({ type: 9, data: toJSON(data) })
   }
@@ -311,7 +303,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
    * @returns {Response}
    */
-  resUpdate = (data: CallbackData<7>, file?: CallbackFile<7>) => {
+  resUpdate = (data: CustomCallbackData<APIInteractionResponseCallbackData>, file?: FileData) => {
     this.#throwIfNotAllowType([3])
     return this.#res47(7, data, file)
   }
