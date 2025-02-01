@@ -16,6 +16,12 @@ import { CUSTOM_ID_SEPARATOR } from '../utils'
 // biome-ignore lint: Null Variables
 type Var = {}
 
+type ComponentTypes<C extends Button<any> | Select<any>> = C extends Button<any>
+  ? 'Button'
+  : C extends Select<any>
+    ? 'Select'
+    : never
+
 type CreateReturn<E extends Env> = {
   discord: (init?: InitOptions<E>) => DiscordHono<E>
   command: <V extends Var>(
@@ -24,8 +30,8 @@ type CreateReturn<E extends Env> = {
   ) => { command: Command; handler: CommandHandler<E> }
   component: <V extends Var, C extends Button<any> | Select<any>>(
     component: C,
-    handler: ComponentHandler<E & { Variables?: V }>,
-  ) => { component: C; handler: ComponentHandler<E> }
+    handler: ComponentHandler<E & { Variables?: V }, ComponentTypes<C>>,
+  ) => { component: C; handler: ComponentHandler<E, ComponentTypes<C>> }
   autocomplete: <V extends Var>(
     command: Command,
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,
@@ -54,7 +60,7 @@ type CreateReturn<E extends Env> = {
 export const createFactory = <E extends Env = Env>(): CreateReturn<E> => ({
   discord: init => new DiscordHono(init),
   command: (command, handler) => ({ command, handler: handler as CommandHandler<E> }),
-  component: (component, handler) => ({ component, handler: handler as ComponentHandler<E> }),
+  component: (component, handler) => ({ component, handler: handler as ComponentHandler<E, any> }),
   autocomplete: (command, autocomplete, handler) => ({
     command,
     autocomplete: autocomplete as AutocompleteHandler<E>,

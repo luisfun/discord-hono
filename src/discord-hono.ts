@@ -1,5 +1,5 @@
 import type { APIInteraction, APIInteractionResponsePong } from 'discord-api-types/v10'
-import { AutocompleteContext, CommandContext, ComponentContext, CronContext, ModalContext } from './context'
+import { CronContext, InteractionContext } from './context'
 import { type RegExpMap, StringMap } from './handler-map'
 import type {
   AnyHandler,
@@ -119,18 +119,18 @@ export class DiscordHono<E extends Env = Env, K extends string | RegExp = string
           }
           return ''
         })()
-        // biome-ignore format: text width
         switch (interaction.type) {
           case 1:
             return new ResponseObject({ type: 1 } satisfies APIInteractionResponsePong)
           case 2:
-            return await this.#map.g(2, key)(new CommandContext(request, env, executionCtx, discord, interaction, key))
           case 3:
-            return await this.#map.g(3, key)(new ComponentContext(request, env, executionCtx, discord, interaction, key))
           case 4:
-            return await this.#map.g(4, key)(new AutocompleteContext(request, env, executionCtx, discord, interaction, key))
           case 5:
-            return await this.#map.g(5, key)(new ModalContext(request, env, executionCtx, discord, interaction, key))
+            return await this.#map.g(
+              interaction.type,
+              key,
+              // @ts-expect-error
+            )(new InteractionContext(request, env, executionCtx, discord, interaction, key))
         }
         return new ResponseObject({ error: 'Unknown Type' }, 400)
       }

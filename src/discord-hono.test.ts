@@ -56,6 +56,22 @@ describe('DiscordHono', () => {
       expect(response.status).toBe(404)
     })
 
+    it('should return 401 for invalid signature', async () => {
+      const request = new Request('https://example.com', { method: 'POST', body: '{}' })
+      const env = { DISCORD_PUBLIC_KEY: 'test_public_key' }
+      const app = new DiscordHono({ verify: vi.fn().mockResolvedValue(false) })
+      const response = await app.fetch(request, env)
+      expect(response.status).toBe(401)
+    })
+
+    it('should handle interaction correctly', async () => {
+      const request = new Request('https://example.com', { method: 'POST', body: JSON.stringify({ type: 1 }) })
+      const env = { DISCORD_PUBLIC_KEY: 'test_public_key' }
+      const app = new DiscordHono({ verify: vi.fn().mockResolvedValue(true) })
+      const response = await app.fetch(request, env)
+      expect(await response.json()).toEqual({ type: 1 })
+    })
+
     // Note: Testing POST requests would require mocking the verify function and interaction data
   })
 
