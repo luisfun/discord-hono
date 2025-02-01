@@ -126,6 +126,11 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   #throwIfNotAllowType = (allowType: APIInteraction['type'][]) => {
     if (!allowType.includes(this.#interaction.type)) throw new Error('dev: Invalid method')
   }
+  #res47 = (type: 4 | 7, data: CustomCallbackData<APIInteractionResponseCallbackData>, file: FileData | undefined) => {
+    let body: APIInteractionResponse | FormData = { data: { ...this.#flags, ...prepareData(data) }, type }
+    if (file) body = formData(body, file)
+    return new ResponseObject(body)
+  }
   constructor(
     req: Request,
     env: E['Bindings'],
@@ -205,33 +210,6 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   }
 
   /**
-   * @param {1 | 4 | 5 | 6 | 7 | 9 | 10 | 12} type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type)
-   * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
-   * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
-   * @returns {Response}
-   */
-  protected r = <T extends CallbackType>(type: T, data?: CallbackData<T>, file?: CallbackFile<T>) => {
-    this.#throwIfNotAllowType([2, 3, 5])
-    let body: APIInteractionResponse | FormData
-    switch (type) {
-      case 4:
-      case 7:
-        body = { data: { ...this.#flags, ...prepareData(data as CallbackData<4 | 7>) }, type }
-        if (file) body = formData(body, file)
-        break
-      case 5:
-        body = { data: { ...this.#flags, ...(data as CallbackData<5>) }, type }
-        break
-      case 9:
-        body = { data: toJSON(data as CallbackData<9>), type }
-        break
-      default: // 1, 6, 10, 12
-        body = { type }
-    }
-    return new ResponseObject(body)
-  }
-
-  /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
    * @param {1 | 4 | 5 | 6 | 7 | 9 | 10 | 12} type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) default: 4 (respond to an interaction with a message)
@@ -239,7 +217,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    */
   res = (data: CallbackData<4>, file?: CallbackFile<4>) => {
     this.#throwIfNotAllowType([2, 3, 5])
-    return this.r(4, data, file)
+    return this.#res47(4, data, file)
   }
   /**
    * ACK an interaction and edit a response later, the user sees a loading state
@@ -253,7 +231,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   resDefer = (handler?: (c: this) => Promise<unknown>) => {
     this.#throwIfNotAllowType([2, 3, 5])
     if (handler) this.waitUntil(handler(this))
-    return this.r(5, {})
+    return new ResponseObject({ type: 5, data: this.#flags })
   }
 
   /**
@@ -324,7 +302,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    */
   resModal = (data: CallbackData<9>) => {
     this.#throwIfNotAllowType([2, 3])
-    return this.r(9, data)
+    return new ResponseObject({ type: 9, data: toJSON(data) })
   }
 
   /**
@@ -335,7 +313,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    */
   resUpdate = (data: CallbackData<7>, file?: CallbackFile<7>) => {
     this.#throwIfNotAllowType([3])
-    return this.r(7, data, file)
+    return this.#res47(7, data, file)
   }
   /**
    * for components, ACK an interaction and edit the original message later; the user does not see a loading state
@@ -345,7 +323,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   resDeferUpdate = (handler?: (c: this) => Promise<unknown>) => {
     this.#throwIfNotAllowType([3])
     if (handler) this.waitUntil(handler(this))
-    return this.r(6)
+    return new ResponseObject({ type: 6 })
   }
 
   /**
