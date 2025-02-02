@@ -66,8 +66,7 @@ abstract class ContextAll<E extends Env> {
     return this.#executionCtx
   }
   get waitUntil(): ExecutionContext['waitUntil'] /*| FetchEventLike["waitUntil"]*/ {
-    if (!this.#executionCtx?.waitUntil) throw errorSys('waitUntil')
-    return this.#executionCtx.waitUntil.bind(this.#executionCtx)
+    return this.executionCtx.waitUntil.bind(this.executionCtx)
   }
   /**
    * Handler triggered string
