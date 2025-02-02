@@ -203,7 +203,6 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
-   * @param {1 | 4 | 5 | 6 | 7 | 9 | 10 | 12} type [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) default: 4 (respond to an interaction with a message)
    * @returns {Response}
    */
   res = (data: CustomCallbackData<APIInteractionResponseCallbackData>, file?: FileData) => {
