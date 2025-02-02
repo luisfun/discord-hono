@@ -20,6 +20,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    //"erasableSyntaxOnly": true, // ts 5.8
     /* Completeness */
     "skipLibCheck": true
   },
