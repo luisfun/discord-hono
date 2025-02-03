@@ -1,6 +1,5 @@
 import type { APIInteraction, APIInteractionResponsePong } from 'discord-api-types/v10'
 import { CronContext, InteractionContext } from './context'
-import { type RegExpMap, StringMap } from './handler-map'
 import type {
   AnyHandler,
   CronEvent,
@@ -20,10 +19,21 @@ type DiscordEnvBindings = {
   DISCORD_APPLICATION_ID?: string
 }
 
+class HandlerMap<E extends Env> extends Map<string, AnyHandler<E, HandlerNumber>> {
+  s = <N extends HandlerNumber>(num: N, key: string, value: AnyHandler<E, N>) => this.set(`${num}${key}`, value)
+  g = <N extends HandlerNumber>(num: N, key: string): AnyHandler<E, N> =>
+    // @ts-expect-error
+    this.get(`${num}${key}`) ??
+    this.get(`${num}`) ??
+    (() => {
+      throw errorDev('Handler')
+    })()
+}
+
 export class DiscordHono<E extends Env = Env, K extends string | RegExp = string> {
   #verify: Verify = verify
   #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
-  #map: StringMap<E> | RegExpMap<E>
+  #map = new HandlerMap<E>()
   #set = <N extends HandlerNumber>(num: N, key: string | K, value: AnyHandler<E, N>) => {
     // @ts-expect-error
     this.#map.s(num, key, value)
@@ -44,7 +54,6 @@ export class DiscordHono<E extends Env = Env, K extends string | RegExp = string
         ...discordEnv,
       }
     }
-    this.#map = new (options?.HandlerMap ?? StringMap)()
   }
 
   /**

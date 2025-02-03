@@ -13,7 +13,6 @@ import type {
 import type { Components } from './builders/components'
 import type { Embed } from './builders/embed'
 import type { CronContext, InteractionContext } from './context'
-import type { RegExpMap, StringMap } from './handler-map'
 
 ////////// Env //////////
 
@@ -96,7 +95,6 @@ export type Verify = (
 export type InitOptions<E extends Env> = {
   verify?: Verify
   discordEnv?: (env: E['Bindings']) => DiscordEnv
-  HandlerMap?: typeof StringMap | typeof RegExpMap
 }
 
 ////////// CronEvent //////////
