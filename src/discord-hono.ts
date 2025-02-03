@@ -24,7 +24,7 @@ export class DiscordHono<E extends Env = Env, K extends string | RegExp = string
   #verify: Verify = verify
   #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
   #map: StringMap<E> | RegExpMap<E>
-  #set<N extends HandlerNumber>(num: N, key: string | K, value: AnyHandler<E, N>) {
+  #mapSet<N extends HandlerNumber>(num: N, key: string | K, value: AnyHandler<E, N>) {
     // @ts-expect-error
     this.#map.s(num, key, value)
     return this
@@ -53,32 +53,32 @@ export class DiscordHono<E extends Env = Env, K extends string | RegExp = string
    * @param handler
    * @returns {this}
    */
-  command = (command: string | K, handler: AnyHandler<E, 2>) => this.#set(2, command, handler)
+  command = (command: string | K, handler: AnyHandler<E, 2>) => this.#mapSet(2, command, handler)
   /**
    * @param {string | RegExp} component_id Match the first argument of `Button` or `Select`
    * @param handler
    * @returns {this}
    */
-  component = (component_id: string | K, handler: AnyHandler<E, 3>) => this.#set(3, component_id, handler)
+  component = (component_id: string | K, handler: AnyHandler<E, 3>) => this.#mapSet(3, component_id, handler)
   /**
    * @param {string | RegExp} command Match the first argument of `Command`
    * @param handler
    * @returns {this}
    */
   autocomplete = (command: string | K, handler: AnyHandler<E, 4>, commandHandler?: AnyHandler<E, 2>) =>
-    (commandHandler ? this.#set(2, command, commandHandler) : this).#set(4, command, handler)
+    (commandHandler ? this.#mapSet(2, command, commandHandler) : this).#mapSet(4, command, handler)
   /**
    * @param {string | RegExp} modal_id Match the first argument of `Modal`
    * @param handler
    * @returns {this}
    */
-  modal = (modal_id: string | K, handler: AnyHandler<E, 5>) => this.#set(5, modal_id, handler)
+  modal = (modal_id: string | K, handler: AnyHandler<E, 5>) => this.#mapSet(5, modal_id, handler)
   /**
    * @param cron Match the crons in the toml file
    * @param handler
    * @returns {this}
    */
-  cron = (cron: string | K, handler: AnyHandler<E, 0>) => this.#set(0, cron, handler)
+  cron = (cron: string | K, handler: AnyHandler<E, 0>) => this.#mapSet(0, cron, handler)
 
   /**
    * @param {Request} request
