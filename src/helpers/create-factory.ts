@@ -1,11 +1,11 @@
 import type { Command } from '../builders/command'
-import type { Button, Select } from '../builders/components'
 import type { Modal } from '../builders/modal'
 import { DiscordHono } from '../discord-hono'
 import type {
   AutocompleteHandler,
   CommandHandler,
   ComponentHandler,
+  ComponentType,
   CronHandler,
   Env,
   InitOptions,
@@ -16,22 +16,16 @@ import { CUSTOM_ID_SEPARATOR } from '../utils'
 // biome-ignore lint: Null Variables
 type Var = {}
 
-type ComponentTypes<C extends Button<any> | Select<any>> = C extends Button<any>
-  ? 'Button'
-  : C extends Select<any>
-    ? 'Select'
-    : never
-
 type CreateReturn<E extends Env> = {
   discord: (init?: InitOptions<E>) => DiscordHono<E>
   command: <V extends Var>(
     command: Command,
     handler: CommandHandler<E & { Variables?: V }>,
   ) => { command: Command; handler: CommandHandler<E> }
-  component: <V extends Var, C extends Button<any> | Select<any>>(
+  component: <V extends Var, C extends ComponentType>(
     component: C,
-    handler: ComponentHandler<E & { Variables?: V }, ComponentTypes<C>>,
-  ) => { component: C; handler: ComponentHandler<E, ComponentTypes<C>> }
+    handler: ComponentHandler<E & { Variables?: V }, C>,
+  ) => { component: C; handler: ComponentHandler<E, C> }
   autocomplete: <V extends Var>(
     command: Command,
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,

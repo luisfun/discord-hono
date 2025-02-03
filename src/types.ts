@@ -10,7 +10,7 @@ import type {
   APIMessageComponentSelectMenuInteraction,
   APIModalSubmitInteraction,
 } from 'discord-api-types/v10'
-import type { Components } from './builders/components'
+import type { Button, Components, Select } from './builders/components'
 import type { Embed } from './builders/embed'
 import type { CronContext, InteractionContext } from './context'
 
@@ -32,10 +32,12 @@ export type DiscordEnv = {
 ////////// Context //////////
 
 type ExcludeMethods<T, K extends keyof T> = { [P in keyof T as P extends K ? never : P]: T[P] }
+
+export type ComponentType = Button<any> | Select<any> //'Button' | 'Select'
 // biome-ignore format: ternary operator
 type ComponentInteraction<T extends ComponentType> =
-  T extends 'Button' ? APIMessageComponentButtonInteraction :
-  T extends 'Select' ? APIMessageComponentSelectMenuInteraction :
+  T extends Button<any> ? APIMessageComponentButtonInteraction :
+  T extends Select<any> ? APIMessageComponentSelectMenuInteraction :
   APIMessageComponentInteraction
 
 export type CommandContext<E extends Env = any> = ExcludeMethods<
@@ -65,24 +67,13 @@ export type ModalContext<E extends Env = any> = ExcludeMethods<
 
 ////////// Handler //////////
 
-export type ComponentType = 'Button' | 'Select'
 export type CommandHandler<E extends Env> = (c: CommandContext<E>) => Promise<Response> | Response
-export type ComponentHandler<E extends Env, T extends 'Button' | 'Select'> = (
+export type ComponentHandler<E extends Env, T extends ComponentType> = (
   c: ComponentContext<E, T>,
 ) => Promise<Response> | Response
 export type AutocompleteHandler<E extends Env> = (c: AutocompleteContext<E>) => Promise<Response> | Response
 export type ModalHandler<E extends Env> = (c: ModalContext<E>) => Promise<Response> | Response
 export type CronHandler<E extends Env> = (c: CronContext<E>) => Promise<unknown>
-
-export type HandlerNumber = 0 | 2 | 3 | 4 | 5
-// biome-ignore format: ternary operator
-export type AnyHandler<E extends Env, N extends HandlerNumber> =
-  N extends 0 ? CronHandler<E> :
-  N extends 2 ? CommandHandler<E> :
-  N extends 3 ? ComponentHandler<E, any> :
-  N extends 4 ? AutocompleteHandler<E> :
-  N extends 5 ? ModalHandler<E> :
-  never
 
 ////////// InitOptions //////////
 

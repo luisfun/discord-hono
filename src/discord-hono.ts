@@ -1,13 +1,17 @@
 import type { APIInteraction, APIInteractionResponsePong } from 'discord-api-types/v10'
 import { CronContext, InteractionContext } from './context'
 import type {
-  AnyHandler,
+  AutocompleteHandler,
+  CommandHandler,
+  ComponentHandler,
+  ComponentType,
   CronEvent,
+  CronHandler,
   DiscordEnv,
   Env,
   ExecutionContext,
-  HandlerNumber,
   InitOptions,
+  ModalHandler,
   Verify,
 } from './types'
 import { CUSTOM_ID_SEPARATOR, ResponseObject, errorDev } from './utils'
@@ -18,6 +22,16 @@ type DiscordEnvBindings = {
   DISCORD_PUBLIC_KEY?: string
   DISCORD_APPLICATION_ID?: string
 }
+
+type HandlerNumber = 0 | 2 | 3 | 4 | 5
+// biome-ignore format: ternary operator
+type AnyHandler<E extends Env, N extends HandlerNumber> =
+  N extends 0 ? CronHandler<E> :
+  N extends 2 ? CommandHandler<E> :
+  N extends 3 ? ComponentHandler<E, any> :
+  N extends 4 ? AutocompleteHandler<E> :
+  N extends 5 ? ModalHandler<E> :
+  never
 
 class HandlerMap<E extends Env> extends Map<string, AnyHandler<E, HandlerNumber>> {
   s = <N extends HandlerNumber>(num: N, key: string, value: AnyHandler<E, N>) => this.set(`${num}${key}`, value)
@@ -61,32 +75,33 @@ export class DiscordHono<E extends Env = Env, K extends string | RegExp = string
    * @param handler
    * @returns {this}
    */
-  command = (command: string | K, handler: AnyHandler<E, 2>) => this.#set(2, command, handler)
+  command = (command: string | K, handler: CommandHandler<E>) => this.#set(2, command, handler)
   /**
    * @param {string | RegExp} component_id Match the first argument of `Button` or `Select`
    * @param handler
    * @returns {this}
    */
-  component = (component_id: string | K, handler: AnyHandler<E, 3>) => this.#set(3, component_id, handler)
+  component = <T extends ComponentType>(component_id: string | K, handler: ComponentHandler<E, T>) =>
+    this.#set(3, component_id, handler)
   /**
    * @param {string | RegExp} command Match the first argument of `Command`
    * @param handler
    * @returns {this}
    */
-  autocomplete = (command: string | K, handler: AnyHandler<E, 4>, commandHandler?: AnyHandler<E, 2>) =>
+  autocomplete = (command: string | K, handler: AutocompleteHandler<E>, commandHandler?: CommandHandler<E>) =>
     (commandHandler ? this.#set(2, command, commandHandler) : this).#set(4, command, handler)
   /**
    * @param {string | RegExp} modal_id Match the first argument of `Modal`
    * @param handler
    * @returns {this}
    */
-  modal = (modal_id: string | K, handler: AnyHandler<E, 5>) => this.#set(5, modal_id, handler)
+  modal = (modal_id: string | K, handler: ModalHandler<E>) => this.#set(5, modal_id, handler)
   /**
    * @param cron Match the crons in the toml file
    * @param handler
    * @returns {this}
    */
-  cron = (cron: string | K, handler: AnyHandler<E, 0>) => this.#set(0, cron, handler)
+  cron = (cron: string | K, handler: CronHandler<E>) => this.#set(0, cron, handler)
 
   /**
    * @param {Request} request
