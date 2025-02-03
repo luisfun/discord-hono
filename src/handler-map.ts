@@ -18,12 +18,12 @@ export class RegExpMap<
   [3]: Map<K, V> | undefined;
   [4]: Map<K, V> | undefined;
   [5]: Map<K, V> | undefined
-  s(num: N, key: K, value: V) {
+  s = (num: N, key: K, value: V) => {
     this[num] ??= new Map<K, V>()
     this[num].set(key, value)
     return this
   }
-  g<N extends HandlerNumber>(num: N, key: string): AnyHandler<E, N> {
+  g = <N extends HandlerNumber>(num: N, key: string): AnyHandler<E, N> => {
     const map = this[num]
     if (map) {
       // @ts-expect-error
