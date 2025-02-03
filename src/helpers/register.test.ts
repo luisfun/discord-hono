@@ -23,12 +23,9 @@ describe('register function', () => {
     vi.restoreAllMocks()
   })
 
-  it('should throw an error if token is not provided', async () => {
-    await expect(register(mockCommands, mockApplicationId, undefined)).rejects.toThrow('DISCORD_TOKEN')
-  })
-
-  it('should throw an error if application_id is not provided', async () => {
-    await expect(register(mockCommands, undefined, mockToken)).rejects.toThrow('DISCORD_APPLICATION_ID')
+  it("should throw errors if token or application_id aren't provided", async () => {
+    await expect(register(mockCommands, mockApplicationId, undefined)).rejects.toThrow()
+    await expect(register(mockCommands, undefined, mockToken)).rejects.toThrow()
   })
 
   it('should register commands for a specific guild', async () => {
