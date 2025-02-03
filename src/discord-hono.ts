@@ -44,7 +44,6 @@ export class DiscordHono<E extends Env = Env, K extends string | RegExp = string
         ...discordEnv,
       }
     }
-    // @ts-expect-error
     this.#map = new (options?.HandlerMap ?? StringMap)()
   }
 

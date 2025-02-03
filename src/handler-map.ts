@@ -7,19 +7,16 @@ import { errorDev } from './utils'
  * const app = new DiscordHono<Env, RegExp>({HandlerMap: RegExpMap})
  * ```
  */
-export class RegExpMap<
-  E extends Env,
-  N extends HandlerNumber = HandlerNumber,
-  K = string | RegExp,
-  V = AnyHandler<E, N>,
-> {
-  [0]: Map<K, V> | undefined;
-  [2]: Map<K, V> | undefined;
-  [3]: Map<K, V> | undefined;
-  [4]: Map<K, V> | undefined;
-  [5]: Map<K, V> | undefined
-  s = (num: N, key: K, value: V) => {
-    this[num] ??= new Map<K, V>()
+export class RegExpMap<E extends Env> {
+  [0]: Map<string | RegExp, AnyHandler<E, 0>> | undefined;
+  [2]: Map<string | RegExp, AnyHandler<E, 2>> | undefined;
+  [3]: Map<string | RegExp, AnyHandler<E, 3>> | undefined;
+  [4]: Map<string | RegExp, AnyHandler<E, 4>> | undefined;
+  [5]: Map<string | RegExp, AnyHandler<E, 5>> | undefined
+  s = <N extends HandlerNumber>(num: N, key: string | RegExp, value: AnyHandler<E, N>) => {
+    // @ts-expect-error
+    this[num] ??= new Map<string | RegExp, AnyHandler<E, N>>()
+    // @ts-expect-error
     this[num].set(key, value)
     return this
   }
@@ -37,11 +34,8 @@ export class RegExpMap<
   }
 }
 
-export class StringMap<E extends Env, N extends HandlerNumber = HandlerNumber, V = AnyHandler<E, N>> extends Map<
-  string,
-  V
-> {
-  s = (num: N, key: string, value: V) => this.set(`${num}${key}`, value)
+export class StringMap<E extends Env> extends Map<string, AnyHandler<E, HandlerNumber>> {
+  s = <N extends HandlerNumber>(num: N, key: string, value: AnyHandler<E, N>) => this.set(`${num}${key}`, value)
   g = <N extends HandlerNumber>(num: N, key: string): AnyHandler<E, N> =>
     // @ts-expect-error
     this.get(`${num}${key}`) ??
