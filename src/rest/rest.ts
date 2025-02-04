@@ -34,8 +34,6 @@ export class Rest {
       file?: FileData,
     ) => {
       if (!token) throw errorDev('DISCORD_TOKEN')
-      const isJson = !file
-      const body = isJson ? JSON.stringify(data) : formData(data, file)
       const Authorization = `Bot ${token}`
       return fetch(
         `https://discord.com/api/${
@@ -48,8 +46,8 @@ export class Rest {
         }`,
         {
           method,
-          body,
-          headers: isJson ? { Authorization, 'content-type': 'application/json' } : { Authorization },
+          body: file ? formData(data, file) : JSON.stringify(data),
+          headers: file ? { Authorization } : { Authorization, 'content-type': 'application/json' },
         },
       )
     }
@@ -60,10 +58,8 @@ export class Rest {
    * @param query
    * @returns {Promise<{response: Response, result: any}>}
    */
-  get: GetMethod = async <P extends GetPath>(path: P, variables: Variables<P>, query?: GetQuery<P>) => {
-    const response = await this.#fetch(path, variables, 'GET', query)
-    return { response, result: await response.json() }
-  }
+  get: GetMethod = async <P extends GetPath>(path: P, variables: Variables<P>, query?: GetQuery<P>) =>
+    this.#fetch(path, variables, 'GET', query)
   /**
    * @param {string} path Official document path
    * @param {string[]} variables Variable part of official document path

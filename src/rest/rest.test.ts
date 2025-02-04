@@ -28,7 +28,7 @@ describe('Rest', () => {
     const mockResponse = { json: vi.fn().mockResolvedValue({ data: 'mock_data' }) }
     mockFetch.mockResolvedValue(mockResponse)
     // @ts-expect-error
-    const result = await rest.get('/users/{user.id}', ['123'], { query: 'param' })
+    const result = await rest.get('/users/{user.id}', ['123'], { query: 'param' }).then(r => r.json())
 
     expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/users/123', {
       method: 'GET',
@@ -38,7 +38,7 @@ describe('Rest', () => {
       },
       body: '{"query":"param"}',
     })
-    expect(result).toEqual({ response: mockResponse, result: { data: 'mock_data' } })
+    expect(result).toEqual({ data: 'mock_data' })
   })
 
   it('should make a PUT request', async () => {

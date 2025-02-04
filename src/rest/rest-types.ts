@@ -51,6 +51,8 @@ import type {
   _webhooks_$_$_messages_$,
 } from './rest-path'
 
+type TypedResponse<T> = Omit<Response, 'json'> & { json(): Promise<T> }
+
 ////////////////////////////////////////
 //////                            //////
 //////         GetMethod          //////
@@ -117,15 +119,12 @@ type GetResultWithQuery<P extends GetPathWithQuery> =
   undefined
 
 export type GetMethod = {
-  <P extends GetPathNonQuery>(
-    path: P,
-    variables: Variables<P>,
-  ): Promise<{ response: Response; result: GetResultNonQuery<P> }>
+  <P extends GetPathNonQuery>(path: P, variables: Variables<P>): Promise<TypedResponse<GetResultNonQuery<P>>>
   <P extends GetPathWithQuery>(
     path: P,
     variables: Variables<P>,
     query: GetQuery<P>,
-  ): Promise<{ response: Response; result: GetResultWithQuery<P> }>
+  ): Promise<TypedResponse<GetResultWithQuery<P>>>
 }
 
 ////////////////////////////////////////
