@@ -51,22 +51,47 @@ import type {
   _webhooks_$_$_messages_$,
 } from './rest-path'
 
-export type GetPath =
+////////////////////////////////////////
+//////                            //////
+//////         GetMethod          //////
+//////                            //////
+////////////////////////////////////////
+
+type GetPathNonQuery =
   // Receiving and Responding
   | typeof _webhooks_$_$_messages_$
   // Application Commands
-  | typeof _applications_$_commands
   | typeof _applications_$_commands_$
-  | typeof _applications_$_guilds_$_commands
   | typeof _applications_$_guilds_$_commands_$
   | typeof _applications_$_guilds_$_commands_permissions
   | typeof _applications_$_guilds_$_commands_$_permissions
   // Application
   | typeof _applications_me
   // Messages
+  | typeof _channels_$_messages_$_reactions_$
+
+// biome-ignore format: ternary operator
+type GetResultNonQuery<P extends GetPathNonQuery> =
+  // Application Commands
+  P extends typeof _applications_$_commands_$ ? RESTGetAPIApplicationCommandResult :
+  P extends typeof _applications_$_guilds_$_commands_$ ? RESTGetAPIApplicationGuildCommandResult :
+  P extends typeof _applications_$_guilds_$_commands_permissions ? RESTGetAPIGuildApplicationCommandsPermissionsResult :
+  P extends typeof _applications_$_guilds_$_commands_$_permissions ? RESTGetAPIApplicationCommandPermissionsResult :
+  // Application
+  P extends typeof _applications_me ? RESTGetCurrentApplicationResult :
+  // Messages
+  P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersResult :
+  undefined
+
+type GetPathWithQuery =
+  // Application Commands
+  | typeof _applications_$_commands
+  | typeof _applications_$_guilds_$_commands
+  // Messages
   | typeof _channels_$_messages
   | typeof _channels_$_messages_$
-  | typeof _channels_$_messages_$_reactions_$
+
+export type GetPath = GetPathNonQuery | GetPathWithQuery
 
 export type GetQuery<P extends GetPath> =
   // Application Commands
@@ -82,23 +107,38 @@ export type GetQuery<P extends GetPath> =
           : undefined
 
 // biome-ignore format: ternary operator
-export type GetResult<P extends GetPath> =
+type GetResultWithQuery<P extends GetPathWithQuery> =
   // Application Commands
   P extends typeof _applications_$_commands ? RESTGetAPIApplicationCommandsResult :
-  P extends typeof _applications_$_commands_$ ? RESTGetAPIApplicationCommandResult :
   P extends typeof _applications_$_guilds_$_commands ? RESTGetAPIApplicationGuildCommandsResult :
-  P extends typeof _applications_$_guilds_$_commands_$ ? RESTGetAPIApplicationGuildCommandResult :
-  P extends typeof _applications_$_guilds_$_commands_permissions ? RESTGetAPIGuildApplicationCommandsPermissionsResult :
-  P extends typeof _applications_$_guilds_$_commands_$_permissions ? RESTGetAPIApplicationCommandPermissionsResult :
-  // Application
-  P extends typeof _applications_me ? RESTGetCurrentApplicationResult :
   // Messages
   P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
   P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
-  P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersResult :
   undefined
 
-export type PutPath =
+export type GetMethod = {
+  <P extends GetPathNonQuery>(
+    path: P,
+    variables: Variables<P>,
+  ): Promise<{ response: Response; result: GetResultNonQuery<P> }>
+  <P extends GetPathWithQuery>(
+    path: P,
+    variables: Variables<P>,
+    query: GetQuery<P>,
+  ): Promise<{ response: Response; result: GetResultWithQuery<P> }>
+}
+
+////////////////////////////////////////
+//////                            //////
+//////         PutMethod          //////
+//////                            //////
+////////////////////////////////////////
+
+type PutPathNonData =
+  // Messages
+  typeof _channels_$_messages_$_reactions_$_me
+
+type PutPathWithData =
   // Application Commands
   | typeof _applications_$_commands
   | typeof _applications_$_guilds_$_commands
@@ -106,6 +146,8 @@ export type PutPath =
   | typeof _applications_$_guilds_$_commands_permissions
   // Messages
   | typeof _channels_$_messages_$_reactions_$_me
+
+export type PutPath = PutPathNonData | PutPathWithData
 
 export type PutData<P extends PutPath> =
   // Application Commands
@@ -119,16 +161,35 @@ export type PutData<P extends PutPath> =
           ? RESTPutAPIGuildApplicationCommandsPermissionsJSONBody
           : undefined
 
-export type PostPath =
-  // Receiving and Responding
-  | typeof _webhooks_$_$
+export type PutMethod = {
+  <P extends PutPathNonData>(path: P, variables: Variables<P>): Promise<Response>
+  <P extends PutPathWithData>(path: P, variables: Variables<P>, data: PutData<P>): Promise<Response>
+}
+
+////////////////////////////////////////
+//////                            //////
+//////         PostMethod         //////
+//////                            //////
+////////////////////////////////////////
+
+type PostPathNonData =
+  // Messages
+  typeof _channels_$_messages_$_crosspost
+
+type PostPathWithDataNonFile =
   // Application Commands
   | typeof _applications_$_commands
   | typeof _applications_$_guilds_$_commands
   // Messages
-  | typeof _channels_$_messages
-  | typeof _channels_$_messages_$_crosspost
   | typeof _channels_$_messages_bulkdelete
+
+type PostPathWithDataWithFile =
+  // Receiving and Responding
+  | typeof _webhooks_$_$
+  // Messages
+  | typeof _channels_$_messages
+
+export type PostPath = PostPathNonData | PostPathWithDataNonFile | PostPathWithDataWithFile
 
 // biome-ignore format: ternary operator
 export type PostData<P extends PostPath> =
@@ -142,36 +203,41 @@ export type PostData<P extends PostPath> =
   P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
   undefined
 
-/*
-// biome-ignore format: ternary operator
-export type PostDataWithFile<P extends PostPath> =
-  // Receiving and Responding
-  P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupJSONBody :
-  // Messages
-  P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
-  undefined
-*/
+export type PostMethod = {
+  <P extends PostPathNonData>(path: P, variables: Variables<P>): Promise<Response>
+  <P extends PostPathWithDataNonFile>(path: P, variables: Variables<P>, data: PostData<P>): Promise<Response>
+  <P extends PostPathWithDataWithFile>(
+    path: P,
+    variables: Variables<P>,
+    data: PostData<P>,
+    file?: FileData,
+  ): Promise<Response>
+}
 
-// biome-ignore format: ternary operator
-export type PostFile<P extends PostPath> = P extends
-  // Receiving and Responding
-  | typeof _webhooks_$_$
-  // Messages
-  | typeof _channels_$_messages
-  ? FileData : undefined
+////////////////////////////////////////
+//////                            //////
+//////        PatchMethod         //////
+//////                            //////
+////////////////////////////////////////
 
-export type PatchPath =
+type PatchPathNonData =
   // Receiving and Responding
-  | typeof _webhooks_$_$_messages_$
+  typeof _webhooks_$_$_messages_$
+
+type PatchPathWithDataNonFile =
   // Application Commands
   | typeof _applications_$_commands_$
   | typeof _applications_$_guilds_$_commands_$
   // Application
   | typeof _applications_me
-  // Messages
-  | typeof _channels_$_messages_$
   // Channel
   | typeof _channels_$
+
+type PatchPathWithDataWithFile =
+  // Messages
+  typeof _channels_$_messages_$
+
+export type PatchPath = PatchPathNonData | PatchPathWithDataNonFile | PatchPathWithDataWithFile
 
 // biome-ignore format: ternary operator
 export type PatchData<P extends PatchPath> =
@@ -186,17 +252,22 @@ export type PatchData<P extends PatchPath> =
   P extends typeof _channels_$ ? RESTPatchAPIChannelJSONBody :
   undefined
 
-/*
-// biome-ignore format: ternary operator
-export type PatchDataWithFile<P extends PatchPath> =
-  // Messages
-  P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
-  undefined
-*/
+export type PatchMethod = {
+  <P extends PatchPathNonData>(path: P, variables: Variables<P>): Promise<Response>
+  <P extends PatchPathWithDataNonFile>(path: P, variables: Variables<P>, data: PatchData<P>): Promise<Response>
+  <P extends PatchPathWithDataWithFile>(
+    path: P,
+    variables: Variables<P>,
+    data: PatchData<P>,
+    file?: FileData,
+  ): Promise<Response>
+}
 
-export type PatchFile<P extends PatchPath> =
-  // Messages
-  P extends typeof _channels_$_messages_$ ? FileData : undefined
+////////////////////////////////////////
+//////                            //////
+//////        DeleteMethod        //////
+//////                            //////
+////////////////////////////////////////
 
 export type DeletePath =
   // Receiving and Responding
@@ -210,6 +281,12 @@ export type DeletePath =
   | typeof _channels_$_messages_$_reactions_$
   | typeof _channels_$_messages_$_reactions_$_me
   | typeof _channels_$_messages_$_reactions_$_$
+
+////////////////////////////////////////
+//////                            //////
+//////         Variables          //////
+//////                            //////
+////////////////////////////////////////
 
 export type Variables<P extends GetPath | PutPath | PostPath | PatchPath | DeletePath> = P extends
   | typeof _applications_$_commands

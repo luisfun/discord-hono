@@ -2,16 +2,17 @@ import type { FileData } from '../types'
 import { errorDev, formData } from '../utils'
 import type {
   DeletePath,
+  GetMethod,
   GetPath,
   GetQuery,
-  GetResult,
   PatchData,
-  PatchFile,
+  PatchMethod,
   PatchPath,
   PostData,
-  PostFile,
+  PostMethod,
   PostPath,
   PutData,
+  PutMethod,
   PutPath,
   Variables,
 } from './rest-types'
@@ -21,7 +22,7 @@ const API_VER = 'v10'
 export class Rest {
   #fetch
   /**
-   * [Documentation](https://discord-hono.luis.fun/rest-api/rest/)
+   * [Documentation](https://discord-hono.luis.fun/interactions/rest/)
    * @param {string} token
    */
   constructor(token: string | undefined) {
@@ -59,16 +60,16 @@ export class Rest {
    * @param query
    * @returns {Promise<{response: Response, result: any}>}
    */
-  get = async <P extends GetPath>(path: P, variables: Variables<P>, query?: GetQuery<P>) => {
+  get: GetMethod = async <P extends GetPath>(path: P, variables: Variables<P>, query?: GetQuery<P>) => {
     const response = await this.#fetch(path, variables, 'GET', query)
-    return { response, result: (await response.json()) as GetResult<P> }
+    return { response, result: await response.json() }
   }
   /**
    * @param {string} path Official document path
    * @param {string[]} variables Variable part of official document path
    * @returns {Promise<Response>}
    */
-  put = <P extends PutPath>(path: P, variables: Variables<P>, data?: PutData<P>) =>
+  put: PutMethod = <P extends PutPath>(path: P, variables: Variables<P>, data?: PutData<P>) =>
     this.#fetch(path, variables, 'PUT', data)
   /**
    * @param {string} path Official document path
@@ -77,7 +78,7 @@ export class Rest {
    * @param {FileData} file
    * @returns {Promise<Response>}
    */
-  post = <P extends PostPath>(path: P, variables: Variables<P>, data: PostData<P>, file?: PostFile<P>) =>
+  post: PostMethod = <P extends PostPath>(path: P, variables: Variables<P>, data?: PostData<P>, file?: FileData) =>
     this.#fetch(path, variables, 'POST', data, file)
   /**
    * @param {string} path Official document path
@@ -86,7 +87,7 @@ export class Rest {
    * @param {FileData} file
    * @returns {Promise<Response>}
    */
-  patch = <P extends PatchPath>(path: P, variables: Variables<P>, data: PatchData<P>, file?: PatchFile<P>) =>
+  patch: PatchMethod = <P extends PatchPath>(path: P, variables: Variables<P>, data?: PatchData<P>, file?: FileData) =>
     this.#fetch(path, variables, 'PATCH', data, file)
   /**
    * @param {string} path Official document path
