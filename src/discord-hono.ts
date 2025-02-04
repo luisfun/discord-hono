@@ -80,11 +80,12 @@ export class DiscordHono<E extends Env = Env> {
     this.#set(3, component_id, handler)
   /**
    * @param {string | RegExp} command Match the first argument of `Command`
+   * @param autocomplete
    * @param handler
    * @returns {this}
    */
-  autocomplete = (command: string, handler: AutocompleteHandler<E>, commandHandler?: CommandHandler<E>) =>
-    (commandHandler ? this.#set(2, command, commandHandler) : this).#set(4, command, handler)
+  autocomplete = (command: string, autocomplete: AutocompleteHandler<E>, handler?: CommandHandler<E>) =>
+    (handler ? this.#set(2, command, handler) : this).#set(4, command, autocomplete)
   /**
    * @param {string | RegExp} modal_id Match the first argument of `Modal`
    * @param handler
