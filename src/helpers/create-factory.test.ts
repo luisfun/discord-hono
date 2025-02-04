@@ -46,14 +46,14 @@ describe('createFactory', () => {
     expect(result).toEqual({ cron: cronExpression, handler: handlerMock })
   })
 
-  it('should load wrappers into DiscordHono instance', () => {
-    const app = new DiscordHono()
+  it('should load handlers into DiscordHono instance', () => {
+    const app = factory.discord()
     const commandMock = new Command('name', 'description')
     const componentMock = new Button('str', 'label')
     const modalMock = new Modal('unique_id', 'title')
     const handlerMock = vi.fn()
 
-    const wrappers = [
+    const handlers = [
       factory.command(commandMock, handlerMock),
       factory.component(componentMock, handlerMock),
       factory.modal(modalMock, handlerMock),
@@ -65,7 +65,7 @@ describe('createFactory', () => {
     vi.spyOn(app, 'modal')
     vi.spyOn(app, 'cron')
 
-    factory.loader(app, wrappers)
+    app.loader(handlers)
 
     expect(app.command).toHaveBeenCalledWith('name', handlerMock)
     expect(app.component).toHaveBeenCalledWith('str', handlerMock)
@@ -74,9 +74,14 @@ describe('createFactory', () => {
   })
 
   it('should throw an error for unknown wrapper type', () => {
-    const app = new DiscordHono()
-    const unknownWrapper = { unknownProp: 'value' }
+    const app = factory.discord()
+    expect(() => app.loader([{ unknownProp: 'value' } as any])).toThrow('Interaction Loader Unknown Object')
+  })
 
-    expect(() => factory.loader(app, [unknownWrapper as any])).toThrow('Interaction Loader Unknown Object')
+  it('should return a list of commands', () => {
+    const commandMock = new Command('name', 'description')
+    const handlers = [factory.command(commandMock, vi.fn())]
+    const commands = factory.getCommands(handlers)
+    expect(commands).toEqual([commandMock])
   })
 })

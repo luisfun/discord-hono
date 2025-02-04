@@ -13,11 +13,28 @@ import type {
 } from '../types'
 import { CUSTOM_ID_SEPARATOR } from '../utils'
 
+class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
+  loader = (handlers: Handler<E>[]) => {
+    for (const elem of handlers) {
+      if ('command' in elem) {
+        if ('autocomplete' in elem) this.autocomplete(elem.command.toJSON().name, elem.autocomplete, elem.handler)
+        else this.command(elem.command.toJSON().name, elem.handler)
+      } else if ('component' in elem) {
+        const json = elem.component.toJSON()
+        if ('custom_id' in json) this.component(json.custom_id.split(CUSTOM_ID_SEPARATOR)[0], elem.handler)
+      } else if ('modal' in elem) this.modal(elem.modal.toJSON().custom_id.split(CUSTOM_ID_SEPARATOR)[0], elem.handler)
+      else if ('cron' in elem) this.cron(elem.cron, elem.handler)
+      else throw Error('Interaction Loader Unknown Object')
+    }
+    return this
+  }
+}
+
 // biome-ignore lint: Null Variables
 type Var = {}
 
 type CreateReturn<E extends Env> = {
-  discord: (init?: InitOptions<E>) => DiscordHono<E>
+  discord: (init?: InitOptions<E>) => DiscordHonoExtends<E>
   command: <V extends Var>(
     command: Command,
     handler: CommandHandler<E & { Variables?: V }>,
@@ -39,20 +56,18 @@ type CreateReturn<E extends Env> = {
     cron: string,
     handler: CronHandler<E & { Variables?: V }>,
   ) => { cron: string; handler: CronHandler<E> }
-  loader: (
-    app: DiscordHono<E>,
-    wrappers: (
-      | ReturnType<CreateReturn<E>['command']>
-      | ReturnType<CreateReturn<E>['component']>
-      | ReturnType<CreateReturn<E>['autocomplete']>
-      | ReturnType<CreateReturn<E>['modal']>
-      | ReturnType<CreateReturn<E>['cron']>
-    )[],
-  ) => void
+  getCommands: (handlers: Handler<E>[]) => Command[]
 }
 
+type Handler<E extends Env> =
+  | ReturnType<CreateReturn<E>['command']>
+  | ReturnType<CreateReturn<E>['component']>
+  | ReturnType<CreateReturn<E>['autocomplete']>
+  | ReturnType<CreateReturn<E>['modal']>
+  | ReturnType<CreateReturn<E>['cron']>
+
 export const createFactory = <E extends Env = Env>(): CreateReturn<E> => ({
-  discord: init => new DiscordHono(init),
+  discord: init => new DiscordHonoExtends<E>(init),
   command: (command, handler) => ({ command, handler: handler as CommandHandler<E> }),
   component: (component, handler) => ({ component, handler: handler as ComponentHandler<E, any> }),
   autocomplete: (command, autocomplete, handler) => ({
@@ -62,17 +77,5 @@ export const createFactory = <E extends Env = Env>(): CreateReturn<E> => ({
   }),
   modal: (modal, handler) => ({ modal, handler: handler as ModalHandler<E> }),
   cron: (cron, handler) => ({ cron, handler: handler as CronHandler<E> }),
-  loader: (app, wrappers) => {
-    for (const w of wrappers) {
-      if ('command' in w) {
-        if ('autocomplete' in w) app.autocomplete(w.command.toJSON().name, w.autocomplete, w.handler)
-        else app.command(w.command.toJSON().name, w.handler)
-      } else if ('component' in w) {
-        const json = w.component.toJSON()
-        if ('custom_id' in json) app.component(json.custom_id.split(CUSTOM_ID_SEPARATOR)[0], w.handler)
-      } else if ('modal' in w) app.modal(w.modal.toJSON().custom_id.split(CUSTOM_ID_SEPARATOR)[0], w.handler)
-      else if ('cron' in w) app.cron(w.cron, w.handler)
-      else throw Error('Interaction Loader Unknown Object')
-    }
-  },
+  getCommands: handlers => handlers.filter(e => 'command' in e).map(e => e.command),
 })
