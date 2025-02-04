@@ -56,13 +56,14 @@ export class Rest {
    * @param {string} path Official document path
    * @param {string[]} variables Variable part of official document path
    * @param query
-   * @returns {Promise<{response: Response, result: any}>}
+   * @returns {Promise<Response>}
    */
   get: GetMethod = async <P extends GetPath>(path: P, variables: Variables<P>, query?: GetQuery<P>) =>
     this.#fetch(path, variables, 'GET', query)
   /**
    * @param {string} path Official document path
    * @param {string[]} variables Variable part of official document path
+   * @param data
    * @returns {Promise<Response>}
    */
   put: PutMethod = <P extends PutPath>(path: P, variables: Variables<P>, data?: PutData<P>) =>
