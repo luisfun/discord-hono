@@ -27,7 +27,7 @@ describe('verify', () => {
     expect(await verify(body, signature, timestamp, publicKey)).toBe(false)
   })
 
-  describe("correct parameters", () => {
+  describe('correct parameters', () => {
     const mockImportKey = vi.fn().mockResolvedValue('importedKey')
     const mockVerify = vi.fn().mockResolvedValue(true)
     it('should use window.crypto', async () => {
@@ -41,7 +41,7 @@ describe('verify', () => {
       })
       expect(await verify(body, signature, timestamp, publicKey)).toBe(true)
     })
-/*
+    /*
     it('should use globalThis.crypto', async () => {
       vi.stubGlobal('globalThis', {
         crypto: {
@@ -54,7 +54,7 @@ describe('verify', () => {
       expect(await verify(body, signature, timestamp, publicKey)).toBe(true)
     })
 */
-    it("should use crypto", async () => {
+    it('should use crypto', async () => {
       vi.stubGlobal('crypto', {
         subtle: {
           verify: mockVerify,

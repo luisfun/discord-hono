@@ -10,14 +10,14 @@ describe('Context', () => {
   const mockExecutionCtx = { waitUntil: mockWaitUntil, passThroughOnException: vi.fn() }
   const mockDiscordEnv = { TOKEN: 'mock-token', APPLICATION_ID: 'mock-app-id' }
   const mockCronEvent = { cron: '* * * * *', type: 'cron', scheduledTime: 0 }
-  const mockFetchEvent = { 
+  const mockFetchEvent = {
     request: mockRequest,
     respondWith: vi.fn(),
-    ...mockExecutionCtx
+    ...mockExecutionCtx,
   }
 
-  describe("ContextAll", () => {
-    it("should store getters", async () => {
+  describe('ContextAll', () => {
+    it('should store getters', async () => {
       // @ts-expect-error
       const c = new InteractionContext(mockRequest, mockEnv, mockExecutionCtx, mockDiscordEnv, {}, 'key')
       expect(c.env).toBe(mockEnv)
@@ -37,7 +37,7 @@ describe('Context', () => {
   })
 
   describe('InteractionContext', () => {
-    it("should store request, interaction", () => {
+    it('should store request, interaction', () => {
       const mockInteraction = { type: 2, data: { name: 'test' } }
       // @ts-expect-error
       const c = new InteractionContext(mockRequest, mockEnv, mockExecutionCtx, mockDiscordEnv, mockInteraction, 'key')

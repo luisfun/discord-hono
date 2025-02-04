@@ -33,25 +33,21 @@ type AnyHandler<E extends Env, N extends HandlerNumber> =
   N extends 5 ? ModalHandler<E> :
   never
 
-class HandlerMap<E extends Env> extends Map<string, AnyHandler<E, HandlerNumber>> {
-  s = <N extends HandlerNumber>(num: N, key: string, value: AnyHandler<E, N>) => this.set(`${num}${key}`, value)
-  g = <N extends HandlerNumber>(num: N, key: string): AnyHandler<E, N> =>
-    // @ts-expect-error
-    this.get(`${num}${key}`) ??
-    this.get(`${num}`) ??
-    (() => {
-      throw errorDev('Handler')
-    })()
-}
-
 export class DiscordHono<E extends Env = Env> {
   #verify: Verify = verify
   #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
-  #map = new HandlerMap<E>()
+  #map = new Map<string, AnyHandler<E, HandlerNumber>>()
   #set = <N extends HandlerNumber>(num: N, key: string, value: AnyHandler<E, N>) => {
-    this.#map.s(num, key, value)
+    this.#map.set(`${num}${key}`, value)
     return this
   }
+  #get = <N extends HandlerNumber>(num: N, key: string): AnyHandler<E, N> =>
+    // @ts-expect-error
+    this.#map.get(`${num}${key}`) ??
+    this.#map.get(`${num}`) ??
+    (() => {
+      throw errorDev('Handler')
+    })()
   /**
    * [Documentation](https://discord-hono.luis.fun/interactions/discord-hono/)
    * @param {InitOptions} options
@@ -148,7 +144,7 @@ export class DiscordHono<E extends Env = Env> {
           case 3:
           case 4:
           case 5:
-            return await this.#map.g(
+            return await this.#get(
               interaction.type,
               key,
               // @ts-expect-error
@@ -167,7 +163,7 @@ export class DiscordHono<E extends Env = Env> {
    * @param executionCtx
    */
   scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
-    const handler = this.#map.g(0, event.cron)
+    const handler = this.#get(0, event.cron)
     const c = new CronContext(event, env, executionCtx, this.#discord(env), event.cron)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(c))
     else await handler(c)
