@@ -39,9 +39,8 @@ export class Rest {
         `https://discord.com/api/${
           API_VER +
           path
-            .replace(' ', '')
             .split(/[{}]/)
-            .map((str, i) => (i % 2 ? variables[~~(i / 2)] : str))
+            .map((str, i) => (i & 1 ? variables[i >> 1] : str))
             .join('')
         }`,
         {
