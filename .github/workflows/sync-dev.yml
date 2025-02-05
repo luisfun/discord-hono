@@ -23,5 +23,5 @@ jobs:
           git config --global user.email 'action@github.com'
           git fetch origin dev:dev
           git checkout dev
-          git merge origin/main
+          git merge origin/main --allow-unrelated-histories
           git push origin dev
