@@ -27,9 +27,9 @@ jobs:
       - run: npm ci
 
       - name: Test
-      - run: npm run test
-      - run: npm run build
+        run: npm run test
+        run: npm run build
 
       - name: Version upgrade
-      - run: npm version ${{ github.event.inputs.version_type }}
-      - run: git push --follow-tags
+        run: npm version ${{ github.event.inputs.version_type }}
+        run: git push --follow-tags
