@@ -29,6 +29,11 @@ jobs:
       - name: Test
         run: npm run test && npm run build
 
+      - name: Configure Git
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+
       - name: Version upgrade
         run: npm version ${{ github.event.inputs.version_type }}
 
