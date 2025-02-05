@@ -2,6 +2,8 @@ import { Rest } from '../rest/rest'
 import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest/rest-path'
 import { register } from './register'
 
+const mockToken = vi.fn(() => 'mock-token')()
+
 vi.mock('../rest/rest')
 vi.mock('../utils')
 
@@ -9,7 +11,6 @@ describe('register function', () => {
   const mockPut = vi.fn()
   const mockCommands = [{ name: 'test', description: 'A test command' }]
   const mockApplicationId = '123456789'
-  const mockToken = 'mock-token'
 
   beforeEach(() => {
     vi.clearAllMocks()

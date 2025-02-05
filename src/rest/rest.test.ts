@@ -1,6 +1,8 @@
 import { formData } from '../utils'
 import { Rest } from './rest'
 
+const mockToken = vi.fn(() => 'mock-token')()
+
 // モックの作成
 vi.mock('../utils', () => ({
   errorDev: vi.fn((message: string) => new Error(message)),
@@ -9,7 +11,6 @@ vi.mock('../utils', () => ({
 
 describe('Rest', () => {
   let rest: Rest
-  const mockToken = 'mock_token'
   const mockFetch = vi.fn()
 
   beforeEach(() => {
@@ -33,7 +34,7 @@ describe('Rest', () => {
     expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/users/123', {
       method: 'GET',
       headers: {
-        Authorization: 'Bot mock_token',
+        Authorization: `Bot ${mockToken}`,
         'content-type': 'application/json',
       },
       body: '{"query":"param"}',
@@ -49,7 +50,7 @@ describe('Rest', () => {
     expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/guilds/456', {
       method: 'PUT',
       headers: {
-        Authorization: 'Bot mock_token',
+        Authorization: `Bot ${mockToken}`,
         'content-type': 'application/json',
       },
       body: '{"name":"New Guild Name"}',
@@ -68,7 +69,7 @@ describe('Rest', () => {
     expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/channels/789/messages', {
       method: 'POST',
       headers: {
-        Authorization: 'Bot mock_token',
+        Authorization: `Bot ${mockToken}`,
       },
       body: mockFormData,
     })
@@ -83,7 +84,7 @@ describe('Rest', () => {
     expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/channels/101', {
       method: 'PATCH',
       headers: {
-        Authorization: 'Bot mock_token',
+        Authorization: `Bot ${mockToken}`,
         'content-type': 'application/json',
       },
       body: '{"name":"Updated Channel"}',
@@ -98,7 +99,7 @@ describe('Rest', () => {
     expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/channels/202', {
       method: 'DELETE',
       headers: {
-        Authorization: 'Bot mock_token',
+        Authorization: `Bot ${mockToken}`,
         'content-type': 'application/json',
       },
     })
