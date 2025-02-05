@@ -1,3 +1,4 @@
+import type { APIInteraction } from 'discord-api-types/v10'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CronContext, InteractionContext } from './context'
 import type { AutocompleteContext, CommandContext, ComponentContext, ModalContext } from './types'
@@ -18,8 +19,14 @@ describe('Context', () => {
 
   describe('ContextAll', () => {
     it('should store getters', async () => {
-      // @ts-expect-error
-      const c = new InteractionContext(mockRequest, mockEnv, mockExecutionCtx, mockDiscordEnv, {}, 'key')
+      const c = new InteractionContext(
+        mockRequest,
+        mockEnv,
+        mockExecutionCtx,
+        mockDiscordEnv,
+        {} as APIInteraction,
+        'key',
+      )
       expect(c.env).toBe(mockEnv)
       expect(() => c.event).toThrow()
       expect(c.executionCtx).toBe(mockExecutionCtx)
@@ -27,8 +34,14 @@ describe('Context', () => {
       expect(mockWaitUntil).toHaveBeenCalledWith(expect.any(Promise))
       expect(c.key).toBe('key')
 
-      // @ts-expect-error
-      const c2 = new InteractionContext(mockRequest, mockEnv, mockFetchEvent, mockDiscordEnv, {}, 'key')
+      const c2 = new InteractionContext(
+        mockRequest,
+        mockEnv,
+        mockFetchEvent,
+        mockDiscordEnv,
+        {} as APIInteraction,
+        'key',
+      )
       expect(c2.event).toBe(mockFetchEvent)
 
       const c3 = new CronContext(mockCronEvent, mockEnv, undefined, mockDiscordEnv, 'key')
@@ -36,10 +49,23 @@ describe('Context', () => {
     })
   })
 
+  it('var method', () => {
+    const c = new InteractionContext<{ Variables: { key: string } }>(
+      mockRequest,
+      mockEnv,
+      mockExecutionCtx,
+      mockDiscordEnv,
+      {} as APIInteraction,
+      'key',
+    )
+    c.set('key', 'value')
+    expect(c.get('key')).toBe('value')
+    expect(c.var.key).toBe('value')
+  })
+
   describe('InteractionContext', () => {
     it('should store request, interaction', () => {
-      const mockInteraction = { type: 2, data: { name: 'test' } }
-      // @ts-expect-error
+      const mockInteraction = { type: 2, data: { name: 'test' } } as APIInteraction
       const c = new InteractionContext(mockRequest, mockEnv, mockExecutionCtx, mockDiscordEnv, mockInteraction, 'key')
       expect(c.req).toBe(mockRequest)
       expect(c.interaction).toBe(mockInteraction)
@@ -50,13 +76,12 @@ describe('Context', () => {
         type: 2,
         data: { name: 'test-command' },
         token: 'mock-token',
-      }
+      } as APIInteraction
       const context = new InteractionContext(
         mockRequest,
         mockEnv,
         mockExecutionCtx,
         mockDiscordEnv,
-        // @ts-expect-error
         mockInteraction,
         'test-key',
       )
@@ -70,13 +95,12 @@ describe('Context', () => {
         type: 2,
         data: { name: 'test-command' },
         token: 'mock-token',
-      }
+      } as APIInteraction
       const context = new InteractionContext(
         mockRequest,
         mockEnv,
         mockExecutionCtx,
         mockDiscordEnv,
-        // @ts-expect-error
         mockInteraction,
         'test-key',
       )
@@ -89,13 +113,12 @@ describe('Context', () => {
         type: 2,
         data: { name: 'test-command' },
         token: 'mock-token',
-      }
+      } as APIInteraction
       const context = new InteractionContext(
         mockRequest,
         mockEnv,
         mockExecutionCtx,
         mockDiscordEnv,
-        // @ts-expect-error
         mockInteraction,
         'test-key',
       )
@@ -120,13 +143,12 @@ describe('Context', () => {
           ],
         },
         token: 'mock-token',
-      }
+      } as APIInteraction
       context = new InteractionContext(
         mockRequest,
         mockEnv,
         mockExecutionCtx,
         mockDiscordEnv,
-        // @ts-expect-error
         mockInteraction,
         'test-key',
       ) as CommandContext
@@ -151,13 +173,12 @@ describe('Context', () => {
           ],
         },
         token: 'mock-token',
-      }
+      } as APIInteraction
       const subContext = new InteractionContext(
         mockRequest,
         mockEnv,
         mockExecutionCtx,
         mockDiscordEnv,
-        // @ts-expect-error
         subCommandInteraction,
         'test-key',
       ) as CommandContext
@@ -172,13 +193,12 @@ describe('Context', () => {
         type: 3,
         data: { custom_id: 'test-custom-id' },
         token: 'mock-token',
-      }
+      } as APIInteraction
       const context = new InteractionContext(
         mockRequest,
         mockEnv,
         mockExecutionCtx,
         mockDiscordEnv,
-        // @ts-expect-error
         mockInteraction,
         'test-key',
       ) as ComponentContext
@@ -202,13 +222,12 @@ describe('Context', () => {
           ],
         },
         token: 'mock-token',
-      }
+      } as APIInteraction
       const context = new InteractionContext(
         mockRequest,
         mockEnv,
         mockExecutionCtx,
         mockDiscordEnv,
-        // @ts-expect-error
         mockInteraction,
         'test-key',
       ) as ModalContext
@@ -230,13 +249,12 @@ describe('Context', () => {
           ],
         },
         token: 'mock-token',
-      }
+      } as APIInteraction
       const context = new InteractionContext(
         mockRequest,
         mockEnv,
         mockExecutionCtx,
         mockDiscordEnv,
-        // @ts-expect-error
         mockInteraction,
         'test-key',
       ) as AutocompleteContext
