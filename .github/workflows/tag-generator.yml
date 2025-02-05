@@ -8,13 +8,13 @@ on:
         required: true
         type: choice
         options:
-        - major
-        - minor
         - patch
-        - premajor
-        - preminor
-        - prepatch
+        - minor
+        - major
         - prerelease
+        - prepatch
+        - preminor
+        - premajor
 
 jobs:
   create-tag:
