@@ -52,8 +52,8 @@ register(
 
 ## Health
 
-[![OpenSSF](https://img.shields.io/ossf-scorecard/github.com/luisfun/discord-hono
-)](https://scorecard.dev/viewer/?uri=github.com/luisfun/discord-hono) [![Codecov](https://img.shields.io/codecov/c/github/luisfun/discord-hono)](https://codecov.io/github/luisfun/discord-hono)
+[![CodeQL](https://github.com/luisfun/discord-hono/actions/workflows/codeql.yml/badge.svg)](https://github.com/luisfun/discord-hono/actions/workflows/codeql.yml) [![Codecov](https://codecov.io/github/luisfun/discord-hono/graph/badge.svg)](https://codecov.io/github/luisfun/discord-hono) [![OpenSSF](https://api.scorecard.dev/projects/github.com/luisfun/discord-hono/badge
+)](https://scorecard.dev/viewer/?uri=github.com/luisfun/discord-hono)
 
 ## References
 
