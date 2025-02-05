@@ -25,7 +25,7 @@
   "scripts": {
     "fix": "biome check --write .",
     "fix:unsafe": "biome check --write --unsafe .",
-    "test": "tsc && vitest run --coverage",
+    "test": "biome check . && tsc && vitest run --coverage",
     "build": "tsup src/index.ts --format esm --dts --clean && attw -P . --ignore-rules cjs-resolves-to-esm"
   },
   "devDependencies": {
