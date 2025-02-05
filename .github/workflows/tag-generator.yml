@@ -1,0 +1,35 @@
+name: Generate Version Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version type to bump'
+        required: true
+        type: choice
+        options:
+        - major
+        - minor
+        - patch
+        - premajor
+        - preminor
+        - prepatch
+        - prerelease
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+
+      - name: Test
+      - run: npm run test
+      - run: npm run build
+
+      - name: Version upgrade
+      - run: npm version ${{ github.event.inputs.version_type }}
+      - run: git push --follow-tags
