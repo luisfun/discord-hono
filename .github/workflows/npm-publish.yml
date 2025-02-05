@@ -1,25 +1,51 @@
-name: Publish Package to npmjs
+name: 📦 NPM Publish
+
 on:
-  push:
-    tags:
-      - '*'
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version type to bump'
+        required: true
+        type: choice
+        options:
+        - patch
+        - minor
+        - major
+        - prerelease
+        - prepatch
+        - preminor
+        - premajor
 
 permissions: read-all
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: 'lts/*'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm run build
+      - run: |
+          npm ci
+          git config --global user.name "${GITHUB_ACTOR}"
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Test
+        run: |
+          npm run test
+          npm run build
+
+      - name: Version upgrade
+        run: npm version ${{ github.event.inputs.version_type }}
+
+      - name: Push tag
+        run: git push --follow-tags
+
       - run: npm publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

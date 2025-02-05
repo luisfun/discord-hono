@@ -26,9 +26,7 @@
     "fix": "biome check --write .",
     "fix:unsafe": "biome check --write --unsafe .",
     "test": "tsc && vitest run --coverage",
-    "build": "tsup src/index.ts --format esm --dts --clean && attw -P . --ignore-rules cjs-resolves-to-esm",
-    "patch": "npm run test && npm run build && npm version patch && git push --follow-tags",
-    "minor": "npm run test && npm run build && npm version minor && git push --follow-tags"
+    "build": "tsup src/index.ts --format esm --dts --clean && attw -P . --ignore-rules cjs-resolves-to-esm"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.3",
