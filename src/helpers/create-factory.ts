@@ -11,7 +11,7 @@ import type {
   InitOptions,
   ModalHandler,
 } from '../types'
-import { CUSTOM_ID_SEPARATOR } from '../utils'
+import { CUSTOM_ID_SEPARATOR, newError } from '../utils'
 
 class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
   loader = (handlers: Handler<E>[]) => {
@@ -24,7 +24,7 @@ class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
         if ('custom_id' in json) this.component(json.custom_id.split(CUSTOM_ID_SEPARATOR)[0], elem.handler)
       } else if ('modal' in elem) this.modal(elem.modal.toJSON().custom_id.split(CUSTOM_ID_SEPARATOR)[0], elem.handler)
       else if ('cron' in elem) this.cron(elem.cron, elem.handler)
-      else throw Error('Interaction Loader Unknown Object')
+      else throw newError('.loader()', 'unknown object')
     }
     return this
   }

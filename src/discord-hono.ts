@@ -14,7 +14,7 @@ import type {
   ModalHandler,
   Verify,
 } from './types'
-import { CUSTOM_ID_SEPARATOR, ResponseObject, errorDev } from './utils'
+import { CUSTOM_ID_SEPARATOR, ResponseObject, newError } from './utils'
 import { verify } from './verify'
 
 type DiscordEnvBindings = {
@@ -46,7 +46,7 @@ export class DiscordHono<E extends Env = Env> {
     this.#map.get(`${num}${key}`) ??
     this.#map.get(`${num}`) ??
     (() => {
-      throw errorDev('Handler')
+      throw newError('DiscordHono', 'handler')
     })()
   /**
    * [Documentation](https://discord-hono.luis.fun/interactions/discord-hono/)
@@ -111,7 +111,7 @@ export class DiscordHono<E extends Env = Env> {
         return new Response('Operational🔥')
       case 'POST': {
         const discord = this.#discord(env)
-        if (!discord.PUBLIC_KEY) throw errorDev('DISCORD_PUBLIC_KEY')
+        if (!discord.PUBLIC_KEY) throw newError('DiscordHono', 'DISCORD_PUBLIC_KEY')
         const body = await request.text()
         if (
           !(await this.#verify(

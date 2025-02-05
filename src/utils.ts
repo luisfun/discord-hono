@@ -33,5 +33,4 @@ export const formData = <T extends CustomCallbackBase>(data?: CustomCallbackData
   return body
 }
 
-export const errorSys = (e: string) => new Error(`sys: ${e} not found`) // system
-export const errorDev = (e: string) => new Error(`dev: ${e} is missing`) // developer
+export const newError = (locate: string, text: string) => new Error(`discord-hono(${locate}): ${text}`)

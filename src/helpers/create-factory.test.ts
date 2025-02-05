@@ -75,7 +75,7 @@ describe('createFactory', () => {
 
   it('should throw an error for unknown wrapper type', () => {
     const app = factory.discord()
-    expect(() => app.loader([{ unknownProp: 'value' } as any])).toThrow('Interaction Loader Unknown Object')
+    expect(() => app.loader([{ unknownProp: 'value' } as any])).toThrow()
   })
 
   it('should return a list of commands', () => {

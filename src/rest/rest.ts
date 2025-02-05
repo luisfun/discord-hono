@@ -1,5 +1,5 @@
 import type { FileData } from '../types'
-import { errorDev, formData } from '../utils'
+import { formData, newError } from '../utils'
 import type {
   DeletePath,
   GetMethod,
@@ -33,7 +33,7 @@ export class Rest {
       data?: object,
       file?: FileData,
     ) => {
-      if (!token) throw errorDev('DISCORD_TOKEN')
+      if (!token) throw newError('Rest', 'DISCORD_TOKEN')
       const Authorization = `Bot ${token}`
       return fetch(
         `https://discord.com/api/${

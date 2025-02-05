@@ -1,5 +1,5 @@
 import { Components, Embed } from '.'
-import { ResponseObject, errorDev, errorSys, formData, prepareData, toJSON } from './utils'
+import { ResponseObject, formData, newError, prepareData, toJSON } from './utils'
 
 describe('ResponseObject', () => {
   it('should create a JSON response when given an object', () => {
@@ -158,18 +158,8 @@ describe('formData function', () => {
   })
 })
 
-describe('Error function', () => {
-  it('errorSys function', () => {
-    const errorMessage = 'Sys'
-    const error = errorSys(errorMessage)
-    expect(error).toBeInstanceOf(Error)
-    expect(error.message).toBe('sys: Sys not found')
-  })
-
-  it('errorDev function', () => {
-    const errorMessage = 'Dev'
-    const error = errorDev(errorMessage)
-    expect(error).toBeInstanceOf(Error)
-    expect(error.message).toBe('dev: Dev is missing')
-  })
+test('newError function', () => {
+  const e = newError('locate', 'text')
+  expect(e).toBeInstanceOf(Error)
+  expect(e.message).toBe('discord-hono(locate): text')
 })

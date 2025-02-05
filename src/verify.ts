@@ -2,7 +2,7 @@
 // https://gist.github.com/devsnek/77275f6e3f810a9545440931ed314dc1
 // https://github.com/discord/discord-interactions-js/blob/main/src/util.ts
 
-import { errorSys } from './utils'
+import { newError } from './utils'
 
 const hex2bin = (hex: string) => {
   const len = hex.length
@@ -18,7 +18,7 @@ export const verify = async (body: string, signature: string | null, timestamp: 
     (typeof globalThis !== 'undefined' && globalThis.crypto) ||
     (typeof crypto !== 'undefined' && crypto) ||
     {}
-  if (subtle === undefined) throw errorSys('Crypto API')
+  if (subtle === undefined) throw newError('verify', 'crypto')
   return await subtle.verify(
     { name: 'Ed25519' },
     await subtle.importKey('raw', hex2bin(publicKey), { name: 'Ed25519' }, false, ['verify']),

@@ -3,7 +3,7 @@ import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v
 import type { Command } from '../builders/command'
 import { Rest } from '../rest/rest'
 import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest/rest-path'
-import { errorDev, toJSON } from '../utils'
+import { newError, toJSON } from '../utils'
 
 /**
  * [Docs](https://discord-hono.luis.fun/rest-api/register/)
@@ -18,8 +18,8 @@ export const register = async (
   token: string | undefined,
   guild_id?: string | undefined,
 ) => {
-  if (!token) throw errorDev('DISCORD_TOKEN')
-  if (!application_id) throw errorDev('DISCORD_APPLICATION_ID')
+  if (!token) throw newError('register', 'DISCORD_TOKEN')
+  if (!application_id) throw newError('register', 'DISCORD_APPLICATION_ID')
 
   const rest = new Rest(token)
   const json = commands.map(toJSON)

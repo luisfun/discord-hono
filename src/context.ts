@@ -21,7 +21,7 @@ import type {
   FetchEventLike,
   FileData,
 } from './types'
-import { ResponseObject, errorDev, errorSys, formData, prepareData, toJSON } from './utils'
+import { ResponseObject, formData, newError, prepareData, toJSON } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -58,11 +58,11 @@ abstract class ContextAll<E extends Env> {
     return this.#env
   }
   get event(): FetchEventLike {
-    if (!(this.#executionCtx && 'respondWith' in this.#executionCtx)) throw errorSys('FetchEvent')
+    if (!(this.#executionCtx && 'respondWith' in this.#executionCtx)) throw newError('c.event', 'not found')
     return this.#executionCtx
   }
   get executionCtx(): ExecutionContext {
-    if (!this.#executionCtx) throw errorSys('ExecutionContext')
+    if (!this.#executionCtx) throw newError('c.executionCtx', 'not found')
     return this.#executionCtx
   }
   get waitUntil(): ExecutionContext['waitUntil'] /*| FetchEventLike["waitUntil"]*/ {
@@ -97,7 +97,7 @@ abstract class ContextAll<E extends Env> {
    * `c.rest` = `new Rest(c.env.DISCORD_TOKEN)`
    */
   get rest(): Rest {
-    if (!this.discord.TOKEN) throw errorDev('DISCORD_TOKEN')
+    if (!this.discord.TOKEN) throw newError('c.rest', 'DISCORD_TOKEN')
     this.#rest ??= new Rest(this.discord.TOKEN)
     return this.#rest
   }
@@ -235,7 +235,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    */
   followup = (data: CustomCallbackData<RESTPostAPIInteractionFollowupJSONBody> = {}, file?: FileData) => {
     this.#throwIfNotAllowType([2, 3, 5])
-    if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
+    if (!this.discord.APPLICATION_ID) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
     return this.rest.post(
       _webhooks_$_$,
       [this.discord.APPLICATION_ID, this.interaction.token],
@@ -253,8 +253,8 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    */
   followupDelete = () => {
     this.#throwIfNotAllowType([2, 3, 5])
-    if (!this.discord.APPLICATION_ID) throw errorDev('DISCORD_APPLICATION_ID')
-    if (!this.interaction.message?.id) throw errorSys('Message Id')
+    if (!this.discord.APPLICATION_ID) throw newError('c.followupDelete', 'DISCORD_APPLICATION_ID')
+    if (!this.interaction.message?.id) throw newError('c.followupDelete', 'message.id')
     return this.rest.delete(_webhooks_$_$_messages_$, [
       this.discord.APPLICATION_ID,
       this.interaction.token,
