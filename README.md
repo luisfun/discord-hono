@@ -1,4 +1,4 @@
-# 🔥 Discord Hono [![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/discord-hono?label=minzip)](https://bundlephobia.com/package/discord-hono) [![Codecov](https://img.shields.io/codecov/c/github/luisfun/discord-hono)](https://codecov.io/github/luisfun/discord-hono) [![Discord](https://img.shields.io/discord/1331893810501914694?label=Discord)](https://discord.gg/KFAgHFwBsr)
+# 🔥 Discord Hono [![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/discord-hono?label=minzip)](https://bundlephobia.com/package/discord-hono) [![Discord](https://img.shields.io/discord/1331893810501914694?label=Discord)](https://discord.gg/KFAgHFwBsr)
 
 **This library enables you to easily build Discord bots on Cloudflare Workers**
 
@@ -49,6 +49,11 @@ register(
   //process.env.DISCORD_TEST_GUILD_ID,
 )
 ```
+
+## Health
+
+[![OpenSSF](https://img.shields.io/ossf-scorecard/github.com/luisfun/discord-hono
+)](https://scorecard.dev/viewer/?uri=github.com/luisfun/discord-hono) [![Codecov](https://img.shields.io/codecov/c/github/luisfun/discord-hono)](https://codecov.io/github/luisfun/discord-hono)
 
 ## References
 
