@@ -44,3 +44,8 @@ export const _channels_$_messages_bulkdelete = '/channels/{channel.id}/messages/
 // https://discord.com/developers/docs/resources/channel
 
 export const _channels_$ = '/channels/{channel.id}' as const
+
+////////// Guild //////////
+// https://discord.com/developers/docs/resources/guild
+
+export const _guilds_$_channels = '/guilds/{guild.id}/channels' as const
