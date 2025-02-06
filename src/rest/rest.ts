@@ -19,6 +19,21 @@ import type {
 
 const API_VER = 'v10'
 
+export const createRest =
+  (token: string | undefined) =>
+  (method: string, path: string, variables: string[], data?: object, file?: FileData) => {
+    if (!token) throw newError('Rest', 'DISCORD_TOKEN')
+    const headers: HeadersInit = { Authorization: `Bot ${token}` }
+    if (!file) headers['content-type'] = 'application/json'
+    return fetch(
+      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => [...variables].shift() || '')}`,
+      { method, headers, body: file ? formData(data, file) : JSON.stringify(data) },
+    )
+  }
+
+//const rest = createRest('')
+//const res = await rest('GET', '/channels/{channel.id}/messages/{message.id}', ['channel.id', 'message.id'])
+
 export class Rest {
   #fetch
   /**

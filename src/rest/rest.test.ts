@@ -28,10 +28,12 @@ describe('Rest', () => {
   it('should make a GET request', async () => {
     const mockResponse = { json: vi.fn().mockResolvedValue({ data: 'mock_data' }) }
     mockFetch.mockResolvedValue(mockResponse)
-    // @ts-expect-error
-    const result = await rest.get('/users/{user.id}', ['123'], { query: 'param' }).then(r => r.json())
+    const result = await rest
+      // @ts-expect-error
+      .get('/users/{user.id}/emoji/{emoji.id}', ['123', '45678'], { query: 'param' })
+      .then(r => r.json())
 
-    expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/users/123', {
+    expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/users/123/emoji/45678', {
       method: 'GET',
       headers: {
         Authorization: `Bot ${mockToken}`,
