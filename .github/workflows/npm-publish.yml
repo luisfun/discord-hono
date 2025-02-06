@@ -23,6 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
       id-token: write
     steps:
       - uses: actions/checkout@v4
@@ -35,6 +36,9 @@ jobs:
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
+      - name: Create release branch
+        run: git checkout -b release
+
       - name: Test
         run: |
           npm run test
@@ -43,9 +47,15 @@ jobs:
       - name: Version upgrade
         run: npm version ${{ github.event.inputs.version_type }}
 
-      - name: Push tag
-        run: git push --follow-tags
+      - name: Push changes and create pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push --set-upstream origin release
+          git push origin --tags
+          gh pr create --base main --head release --title "Release ${{ github.event.inputs.version_type }}" --body "Automated release PR"
 
-      - run: npm publish --provenance
+      - name: Publish to npm
+        run: npm publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
