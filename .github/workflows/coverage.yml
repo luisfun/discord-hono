@@ -4,10 +4,6 @@ on:
     branches: [main]
     paths:
       - 'src/**'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'src/**'
 
 permissions: read-all
 
@@ -22,4 +18,3 @@ jobs:
       - run: npm ci
       - run: npm run test
       - uses: codecov/codecov-action@v5
-        if: github.event_name == 'push'
