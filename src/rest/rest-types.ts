@@ -22,6 +22,7 @@ import type {
   RESTPostAPIApplicationGuildCommandsJSONBody,
   RESTPostAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessagesBulkDeleteJSONBody,
+  RESTPostAPIGuildChannelJSONBody,
   RESTPostAPIInteractionFollowupJSONBody,
   RESTPutAPIApplicationCommandPermissionsJSONBody,
   RESTPutAPIApplicationCommandsJSONBody,
@@ -47,6 +48,7 @@ import type {
   _channels_$_messages_$_reactions_$_$,
   _channels_$_messages_$_reactions_$_me,
   _channels_$_messages_bulkdelete,
+  _guilds_$_channels,
   _webhooks_$_$,
   _webhooks_$_$_messages_$,
 } from './rest-path'
@@ -181,6 +183,8 @@ type PostPathWithDataNonFile =
   | typeof _applications_$_guilds_$_commands
   // Messages
   | typeof _channels_$_messages_bulkdelete
+  // Guild
+  | typeof _guilds_$_channels
 
 type PostPathWithDataWithFile =
   // Receiving and Responding
@@ -200,6 +204,8 @@ export type PostData<P extends PostPath> =
   // Messages
   P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
   P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
+  // Guild
+  P extends typeof _guilds_$_channels ? RESTPostAPIGuildChannelJSONBody :
   undefined
 
 export type PostMethod = {
@@ -292,6 +298,7 @@ export type Variables<P extends GetPath | PutPath | PostPath | PatchPath | Delet
   | typeof _channels_$_messages
   | typeof _channels_$_messages_bulkdelete
   | typeof _channels_$
+  | typeof _guilds_$_channels
   ? [string]
   : P extends
         | typeof _webhooks_$_$
