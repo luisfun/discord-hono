@@ -38,6 +38,12 @@ export const _applications_$_roleconnections_metadata =
 // ✅ 25/02/07
 export const _guilds_$_auditlogs = '/guilds/{guild.id}/audit-logs' as const
 
+////////// Auto Moderation //////////
+// https://discord.com/developers/docs/resources/auto-moderation
+// ✅ 25/02/07
+export const _guilds_$_automoderation_rules = '/guilds/{guild.id}/auto-moderation/rules' as const
+export const _guilds_$_automoderation_rules_$ = '/guilds/{guild.id}/auto-moderation/rules/{auto_moderation_rule.id}' as const
+
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message
 

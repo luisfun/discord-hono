@@ -52,6 +52,12 @@ import type {
   RESTPutAPIGuildApplicationCommandsPermissionsResult,
   RESTGetAPIAuditLogQuery,
   RESTGetAPIAuditLogResult,
+  RESTGetAPIAutoModerationRulesResult,
+  RESTGetAPIAutoModerationRuleResult,
+  RESTPostAPIAutoModerationRuleJSONBody,
+  RESTPostAPIAutoModerationRuleResult,
+  RESTPatchAPIAutoModerationRuleJSONBody,
+  RESTPatchAPIAutoModerationRuleResult,
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import type {
@@ -79,6 +85,8 @@ import type {
   _webhooks_$_$_messages_$,
   _webhooks_$_$_messages_original,
   _guilds_$_auditlogs,
+  _guilds_$_automoderation_rules,
+  _guilds_$_automoderation_rules_$,
 } from './rest-path'
 
 type CouldNotFind = unknown
@@ -106,6 +114,9 @@ type RestPathNonData<M extends RestMethod> =
     | typeof _applications_$_activityinstances_$
     // Application Role Connection Metadata
     | typeof _applications_$_roleconnections_metadata
+    // Auto Moderation
+    | typeof _guilds_$_automoderation_rules
+    | typeof _guilds_$_automoderation_rules_$
     // Messages
     | typeof _channels_$_messages_$_reactions_$
   : M extends 'PUT' ?
@@ -124,6 +135,8 @@ type RestPathNonData<M extends RestMethod> =
     // Application Commands
     | typeof _applications_$_commands_$
     | typeof _applications_$_guilds_$_commands_$
+    // Auto Moderation
+    | typeof _guilds_$_automoderation_rules_$
     // Messages
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_reactions
@@ -158,6 +171,8 @@ type RestPathWithData<M extends RestMethod> =
     // Application Commands
     | typeof _applications_$_commands
     | typeof _applications_$_guilds_$_commands
+    // Auto Moderation
+    | typeof _guilds_$_automoderation_rules
     // Messages
     | typeof _channels_$_messages_bulkdelete
     // Guild
@@ -168,6 +183,8 @@ type RestPathWithData<M extends RestMethod> =
     | typeof _applications_$_guilds_$_commands_$
     // Application
     | typeof _applications_me
+    // Auto Moderation
+    | typeof _guilds_$_automoderation_rules_$
     // Channel
     | typeof _channels_$
   : undefined
@@ -202,6 +219,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _applications_$_commands
     | typeof _applications_$_roleconnections_metadata
     | typeof _guilds_$_auditlogs
+    | typeof _guilds_$_automoderation_rules
     | typeof _channels_$_messages
     | typeof _channels_$_messages_bulkdelete
     | typeof _channels_$
@@ -214,6 +232,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _applications_$_commands_$
     | typeof _applications_$_guilds_$_commands
     | typeof _applications_$_guilds_$_commands_permissions
+    | typeof _guilds_$_automoderation_rules_$
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_crosspost
     | typeof _channels_$_messages_$_reactions
@@ -267,6 +286,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Application Commands
     P extends typeof _applications_$_commands ? RESTPostAPIApplicationCommandsJSONBody :
     P extends typeof _applications_$_guilds_$_commands ? RESTPostAPIApplicationGuildCommandsJSONBody :
+    // Auto Moderation
+    P extends typeof _guilds_$_automoderation_rules ? RESTPostAPIAutoModerationRuleJSONBody :
     // Messages
     P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
@@ -281,6 +302,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_guilds_$_commands_$ ? RESTPatchAPIApplicationGuildCommandJSONBody :
     // Application
     P extends typeof _applications_me ? RESTPatchCurrentApplicationJSONBody :
+    // Auto Moderation
+    P extends typeof _guilds_$_automoderation_rules_$ ? RESTPatchAPIAutoModerationRuleJSONBody :
     // Messages
     P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
     // Channel
@@ -340,6 +363,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_roleconnections_metadata ? RESTGetAPIApplicationRoleConnectionMetadataResult :
     // Audit Log
     P extends typeof _guilds_$_auditlogs ? RESTGetAPIAuditLogResult :
+    // Auto Moderation
+    P extends typeof _guilds_$_automoderation_rules ? RESTGetAPIAutoModerationRulesResult :
+    P extends typeof _guilds_$_automoderation_rules_$ ? RESTGetAPIAutoModerationRuleResult :
     // Messages
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
@@ -362,6 +388,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Application Commands
     P extends typeof _applications_$_commands ? RESTPostAPIApplicationCommandsResult :
     P extends typeof _applications_$_guilds_$_commands ? RESTPostAPIApplicationGuildCommandsResult :
+    // Auto Moderation
+    P extends typeof _guilds_$_automoderation_rules ? RESTPostAPIAutoModerationRuleResult :
     undefined
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -371,6 +399,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_guilds_$_commands_$ ? RESTPatchAPIApplicationGuildCommandResult :
     // Application
     P extends typeof _applications_me ? RESTPatchCurrentApplicationResult :
+    // Auto Moderation
+    P extends typeof _guilds_$_automoderation_rules_$ ? RESTPatchAPIAutoModerationRuleResult :
     undefined
   : any
 
