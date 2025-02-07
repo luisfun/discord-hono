@@ -9,7 +9,7 @@ export const _webhooks_$_$_messages_$ = '/webhooks/{application.id}/{interaction
 
 ////////// Application Commands //////////
 // https://discord.com/developers/docs/interactions/application-commands
-
+// ✅
 export const _applications_$_commands = '/applications/{application.id}/commands' as const
 export const _applications_$_commands_$ = '/applications/{application.id}/commands/{command.id}' as const
 export const _applications_$_guilds_$_commands = '/applications/{application.id}/guilds/{guild.id}/commands' as const

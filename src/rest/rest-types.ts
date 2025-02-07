@@ -17,7 +17,9 @@ import type {
   RESTGetAPIWebhookWithTokenMessageQuery,
   RESTGetCurrentApplicationResult,
   RESTPatchAPIApplicationCommandJSONBody,
+  RESTPatchAPIApplicationCommandResult,
   RESTPatchAPIApplicationGuildCommandJSONBody,
+  RESTPatchAPIApplicationGuildCommandResult,
   RESTPatchAPIChannelJSONBody,
   RESTPatchAPIChannelMessageJSONBody,
   RESTPatchAPIInteractionFollowupJSONBody,
@@ -26,7 +28,9 @@ import type {
   RESTPatchAPIInteractionOriginalResponseResult,
   RESTPatchCurrentApplicationJSONBody,
   RESTPostAPIApplicationCommandsJSONBody,
+  RESTPostAPIApplicationCommandsResult,
   RESTPostAPIApplicationGuildCommandsJSONBody,
+  RESTPostAPIApplicationGuildCommandsResult,
   RESTPostAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessagesBulkDeleteJSONBody,
   RESTPostAPIGuildChannelJSONBody,
@@ -35,9 +39,13 @@ import type {
   RESTPostAPIInteractionFollowupJSONBody,
   RESTPostAPIInteractionFollowupResult,
   RESTPutAPIApplicationCommandPermissionsJSONBody,
+  RESTPutAPIApplicationCommandPermissionsResult,
   RESTPutAPIApplicationCommandsJSONBody,
+  RESTPutAPIApplicationCommandsResult,
   RESTPutAPIApplicationGuildCommandsJSONBody,
+  RESTPutAPIApplicationGuildCommandsResult,
   RESTPutAPIGuildApplicationCommandsPermissionsJSONBody,
+  RESTPutAPIGuildApplicationCommandsPermissionsResult,
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import type {
@@ -309,15 +317,27 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
     P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersResult :
     undefined
+  : M extends 'PUT' ?
+    P extends typeof _applications_$_commands ? RESTPutAPIApplicationCommandsResult :
+    P extends typeof _applications_$_guilds_$_commands ? RESTPutAPIApplicationGuildCommandsResult :
+    P extends typeof _applications_$_guilds_$_commands_$_permissions ? RESTPutAPIApplicationCommandPermissionsResult :
+    P extends typeof _applications_$_guilds_$_commands_permissions ? RESTPutAPIGuildApplicationCommandsPermissionsResult :
+    undefined
   : M extends 'POST' ?
     // Receiving and Responding
     P extends typeof _interactions_$_$_callback ? RESTPostAPIInteractionCallbackResult :
     P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseResult :
     P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupResult :
+    // Application Commands
+    P extends typeof _applications_$_commands ? RESTPostAPIApplicationCommandsResult :
+    P extends typeof _applications_$_guilds_$_commands ? RESTPostAPIApplicationGuildCommandsResult :
     undefined
   : M extends 'PATCH' ?
     // Receiving and Responding
     P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIInteractionFollowupResult :
+    // Application Commands
+    P extends typeof _applications_$_commands_$ ? RESTPatchAPIApplicationCommandResult :
+    P extends typeof _applications_$_guilds_$_commands_$ ? RESTPatchAPIApplicationGuildCommandResult :
     undefined
   : any
 
