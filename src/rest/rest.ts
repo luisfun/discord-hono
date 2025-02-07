@@ -19,8 +19,21 @@ import type {
 
 const API_VER = 'v10'
 
+/**
+ * [Documentation](https://discord-hono.luis.fun/interactions/rest/)
+ * @param {string} token
+ */
 export const createRest =
   (token: string | undefined) =>
+  /**
+   * [Documentation](https://discord-hono.luis.fun/interactions/rest/)
+   * @param {string} method
+   * @param {string} path Official document path
+   * @param {string[]} variables Variable part of official document path
+   * @param data
+   * @param {FileData} file
+   * @returns {Promise<Response>}
+   */
   (method: string, path: string, variables: string[], data?: object, file?: FileData) => {
     if (!token) throw newError('Rest', 'DISCORD_TOKEN')
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
