@@ -87,6 +87,21 @@ import type {
   _guilds_$_auditlogs,
   _guilds_$_automoderation_rules,
   _guilds_$_automoderation_rules_$,
+  _channels_$_permissions_$,
+  _channels_$_invites,
+  _channels_$_followers,
+  _channels_$_typing,
+  _channels_$_pins,
+  _channels_$_pins_$,
+  _channels_$_recipients_$,
+  _channels_$_messages_$_threads,
+  _channels_$_threads,
+  _channels_$_threadmembers_me,
+  _channels_$_threadmembers_$,
+  _channels_$_threadmembers,
+  _channels_$_threads_archived_public,
+  _channels_$_threads_archived_private,
+  _channels_$_users_me_threads_archived_private,
 } from './rest-path'
 
 type CouldNotFind = unknown
@@ -220,6 +235,16 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _applications_$_roleconnections_metadata
     | typeof _guilds_$_auditlogs
     | typeof _guilds_$_automoderation_rules
+    | typeof _channels_$_invites
+    | typeof _channels_$_followers
+    | typeof _channels_$_typing
+    | typeof _channels_$_pins
+    | typeof _channels_$_threads
+    | typeof _channels_$_threadmembers_me
+    | typeof _channels_$_threadmembers
+    | typeof _channels_$_threads_archived_public
+    | typeof _channels_$_threads_archived_private
+    | typeof _channels_$_users_me_threads_archived_private
     | typeof _channels_$_messages
     | typeof _channels_$_messages_bulkdelete
     | typeof _channels_$
@@ -233,6 +258,11 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _applications_$_guilds_$_commands
     | typeof _applications_$_guilds_$_commands_permissions
     | typeof _guilds_$_automoderation_rules_$
+    | typeof _channels_$_permissions_$
+    | typeof _channels_$_pins_$
+    | typeof _channels_$_recipients_$
+    | typeof _channels_$_messages_$_threads
+    | typeof _channels_$_threadmembers_$
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_crosspost
     | typeof _channels_$_messages_$_reactions
