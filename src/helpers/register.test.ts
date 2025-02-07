@@ -2,22 +2,18 @@
 import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest/rest-path'
 import { register } from './register'
 
+const mockPut = vi.fn()
 const mockToken = vi.fn(() => 'mock-token')()
 
-vi.mock('../rest/rest')
+vi.mock('../rest/rest', () => ({ put: mockPut }))
 vi.mock('../utils')
 
 describe('register function', () => {
-  const mockPut = vi.fn()
   const mockCommands = [{ name: 'test', description: 'A test command' }]
   const mockApplicationId = '123456789'
 
   beforeEach(() => {
     vi.clearAllMocks()
-    // @ts-expect-erro
-    //;(Rest as jest.Mock).mockImplementation(() => ({
-    //  put: mockPut,
-    //}))
   })
 
   afterEach(() => {

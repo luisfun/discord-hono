@@ -37,10 +37,12 @@ export const createRest =
    */
   (method: string, path: string, variables: string[], data?: object, file?: FileData) => {
     if (!token) throw newError('Rest', 'DISCORD_TOKEN')
+    const vars = [...variables]
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
     if (!file) headers['content-type'] = 'application/json'
+    // biome-ignore format: test width
     return fetch(
-      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => [...variables].shift() || '')}`,
+      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() || '')}`,
       { method, headers, body: file ? formData(data, file) : JSON.stringify(data) },
     )
   }
