@@ -11,7 +11,7 @@ import type {
   RESTPostAPIInteractionFollowupJSONBody,
 } from 'discord-api-types/v10'
 import type { Autocomplete, Modal } from './builders'
-import { _webhooks_$_$, _webhooks_$_$_messages_$, createRest } from './rest'
+import { _webhooks_$_$, _webhooks_$_$_messages_original, createRest } from './rest'
 import type {
   CronEvent,
   CustomCallbackData,
@@ -116,6 +116,9 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   #focused: AutocompleteOption | undefined // 4
   #throwIfNotAllowType = (allowType: APIInteraction['type'][]) => {
     if (!allowType.includes(this.#interaction.type)) throw new Error('dev: Invalid method')
+  }
+  #throwIfNonApplicationId = () => {
+    if (!this.discord.APPLICATION_ID) throw newError('c.followupXXX', 'DISCORD_APPLICATION_ID')
   }
   #res47 = (type: 4 | 7, data: CustomCallbackData<APIInteractionResponseCallbackData>, file: FileData | undefined) => {
     let body: APIInteractionResponse | FormData = { data: { ...this.#flags, ...prepareData(data) }, type }
@@ -235,11 +238,11 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    */
   followup = (data: CustomCallbackData<RESTPostAPIInteractionFollowupJSONBody> = {}, file?: FileData) => {
     this.#throwIfNotAllowType([2, 3, 5])
-    if (!this.discord.APPLICATION_ID) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
+    this.#throwIfNonApplicationId()
     return this.rest(
       'POST',
       _webhooks_$_$,
-      [this.discord.APPLICATION_ID, this.interaction.token],
+      [this.discord.APPLICATION_ID!, this.interaction.token],
       { ...this.#flags, ...prepareData(data) },
       file,
     )
@@ -254,13 +257,8 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    */
   followupDelete = () => {
     this.#throwIfNotAllowType([2, 3, 5])
-    if (!this.discord.APPLICATION_ID) throw newError('c.followupDelete', 'DISCORD_APPLICATION_ID')
-    if (!this.interaction.message?.id) throw newError('c.followupDelete', 'message.id')
-    return this.rest('DELETE', _webhooks_$_$_messages_$, [
-      this.discord.APPLICATION_ID,
-      this.interaction.token,
-      this.interaction.message.id,
-    ])
+    this.#throwIfNonApplicationId()
+    return this.rest('DELETE', _webhooks_$_$_messages_original, [this.discord.APPLICATION_ID!, this.interaction.token])
   }
 
   /**
