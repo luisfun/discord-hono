@@ -1,4 +1,4 @@
-import { Rest } from '../rest/rest'
+//import { Rest } from '../rest/rest'
 import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest/rest-path'
 import { register } from './register'
 
@@ -14,10 +14,10 @@ describe('register function', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    // @ts-expect-error
-    ;(Rest as jest.Mock).mockImplementation(() => ({
-      put: mockPut,
-    }))
+    // @ts-expect-erro
+    //;(Rest as jest.Mock).mockImplementation(() => ({
+    //  put: mockPut,
+    //}))
   })
 
   afterEach(() => {

@@ -48,7 +48,7 @@ export const createRest =
 //const rest = createRest('')
 //const res = await rest('GET', '/channels/{channel.id}/messages', ['channel.id'], {}) //.then((res) => res.json())
 
-export class Rest {
+export class Rest2 {
   #fetch
   /**
    * [Documentation](https://discord-hono.luis.fun/interactions/rest/)
