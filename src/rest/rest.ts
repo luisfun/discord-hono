@@ -31,4 +31,10 @@ export const createRest =
     )
   }
 
-//const res = await createRest('')('GET', '/channels/{channel.id}/messages', ['channel.id'], {}) //.then((res) => res.json())
+// Usage
+const rest = createRest('')
+// @ts-expect-error
+const res = await rest('POST', '/applications/{application.id}/commands', ['application.id'], {
+  name: '',
+  description: '',
+}).then(r => r.json())

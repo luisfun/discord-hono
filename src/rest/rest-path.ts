@@ -33,6 +33,11 @@ export const _applications_$_activityinstances_$ =
 export const _applications_$_roleconnections_metadata =
   '/applications/{application.id}/role-connections/metadata' as const
 
+////////// Audit Log //////////
+// https://discord.com/developers/docs/resources/audit-log
+// ✅ 25/02/07
+export const _guilds_$_auditlogs = '/guilds/{guild.id}/audit-logs' as const
+
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message
 

@@ -50,6 +50,8 @@ import type {
   RESTPutAPIApplicationRoleConnectionMetadataResult,
   RESTPutAPIGuildApplicationCommandsPermissionsJSONBody,
   RESTPutAPIGuildApplicationCommandsPermissionsResult,
+  RESTGetAPIAuditLogQuery,
+  RESTGetAPIAuditLogResult,
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import type {
@@ -76,6 +78,7 @@ import type {
   _webhooks_$_$,
   _webhooks_$_$_messages_$,
   _webhooks_$_$_messages_original,
+  _guilds_$_auditlogs,
 } from './rest-path'
 
 type CouldNotFind = unknown
@@ -138,6 +141,8 @@ type RestPathWithData<M extends RestMethod> =
     // Application Commands
     | typeof _applications_$_commands
     | typeof _applications_$_guilds_$_commands
+    // Audit Log
+    | typeof _guilds_$_auditlogs
     // Messages
     | typeof _channels_$_messages
     | typeof _channels_$_messages_$
@@ -196,6 +201,7 @@ export type RestVariables<P extends RestPath<any>> =
   P extends
     | typeof _applications_$_commands
     | typeof _applications_$_roleconnections_metadata
+    | typeof _guilds_$_auditlogs
     | typeof _channels_$_messages
     | typeof _channels_$_messages_bulkdelete
     | typeof _channels_$
@@ -238,6 +244,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Application Commands
     P extends typeof _applications_$_commands ? RESTGetAPIApplicationCommandsQuery :
     P extends typeof _applications_$_guilds_$_commands ? RESTGetAPIApplicationGuildCommandsQuery :
+    // Audit Log
+    P extends typeof _guilds_$_auditlogs ? RESTGetAPIAuditLogQuery :
     // Messages
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesQuery :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
@@ -330,6 +338,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_activityinstances_$ ? CouldNotFind :
     // Application Role Connection Metadata
     P extends typeof _applications_$_roleconnections_metadata ? RESTGetAPIApplicationRoleConnectionMetadataResult :
+    // Audit Log
+    P extends typeof _guilds_$_auditlogs ? RESTGetAPIAuditLogResult :
     // Messages
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
