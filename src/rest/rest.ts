@@ -31,10 +31,11 @@ export const createRest =
     )
   }
 
-// Usage
+/*
 const rest = createRest('')
 // @ts-expect-error
 const res = await rest('POST', '/applications/{application.id}/commands', ['application.id'], {
   name: '',
   description: '',
 }).then(r => r.json())
+*/
