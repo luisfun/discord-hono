@@ -2,11 +2,13 @@
 import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest/rest-path'
 import { register } from './register'
 
-const mockPut = vi.fn()
+const mockRest = vi.fn()
 const mockToken = vi.fn(() => 'mock-token')()
 
-vi.mock('../rest/rest', () => ({ put: mockPut }))
 vi.mock('../utils')
+vi.mock('../rest/rest', () => ({
+  createRest: vi.fn(() => mockRest),
+}))
 
 describe('register function', () => {
   const mockCommands = [{ name: 'test', description: 'A test command' }]
@@ -28,11 +30,12 @@ describe('register function', () => {
   it('should register commands for a specific guild', async () => {
     const mockGuildId = '987654321'
     const mockResponse = { ok: true, status: 200, statusText: 'OK' }
-    mockPut.mockResolvedValue(mockResponse)
+    mockRest.mockResolvedValue(mockResponse)
 
     const result = await register(mockCommands, mockApplicationId, mockToken, mockGuildId)
 
-    expect(mockPut).toHaveBeenCalledWith(
+    expect(mockRest).toHaveBeenCalledWith(
+      'PUT',
       _applications_$_guilds_$_commands,
       [mockApplicationId, mockGuildId],
       expect.any(Array),
@@ -42,11 +45,11 @@ describe('register function', () => {
 
   it('should register global commands when guild_id is not provided', async () => {
     const mockResponse = { ok: true, status: 200, statusText: 'OK' }
-    mockPut.mockResolvedValue(mockResponse)
+    mockRest.mockResolvedValue(mockResponse)
 
     const result = await register(mockCommands, mockApplicationId, mockToken)
 
-    expect(mockPut).toHaveBeenCalledWith(_applications_$_commands, [mockApplicationId], expect.any(Array))
+    expect(mockRest).toHaveBeenCalledWith('PUT', _applications_$_commands, [mockApplicationId], expect.any(Array))
     expect(result).toContain('✅ Success')
   })
 
@@ -58,7 +61,7 @@ describe('register function', () => {
       url: 'https://discord.com/api/v10/applications/123456789/commands',
       text: vi.fn().mockResolvedValue('Invalid command structure'),
     }
-    mockPut.mockResolvedValue(mockErrorResponse)
+    mockRest.mockResolvedValue(mockErrorResponse)
 
     const result = await register(mockCommands, mockApplicationId, mockToken)
 
@@ -75,7 +78,7 @@ describe('register function', () => {
       url: 'https://discord.com/api/v10/applications/123456789/commands',
       text: vi.fn().mockRejectedValue(new Error('Failed to read body')),
     }
-    mockPut.mockResolvedValue(mockErrorResponse)
+    mockRest.mockResolvedValue(mockErrorResponse)
 
     const result = await register(mockCommands, mockApplicationId, mockToken)
 

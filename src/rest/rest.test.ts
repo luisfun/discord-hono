@@ -19,12 +19,11 @@ describe('Rest', () => {
     global.fetch = mockFetch
     rest = createRest(mockToken)
   })
-  /*
+
   it('should throw an error if token is not provided', () => {
-    expect(() => new Rest(undefined)).toThrow('DISCORD_TOKEN');
-    expect(errorDev).toHaveBeenCalledWith('DISCORD_TOKEN');
-  });
-*/
+    expect(() => createRest(undefined)('GET', '/applications/@me', [])).toThrow()
+  })
+
   it('should make a GET request', async () => {
     const mockResponse = { json: vi.fn().mockResolvedValue({ data: 'mock_data' }) }
     mockFetch.mockResolvedValue(mockResponse)
