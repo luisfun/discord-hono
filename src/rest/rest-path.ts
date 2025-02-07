@@ -24,7 +24,14 @@ export const _applications_$_guilds_$_commands_$_permissions =
 // https://discord.com/developers/docs/resources/application
 // ✅ 25/02/07
 export const _applications_me = '/applications/@me' as const
-export const _applications_$_activityinstances_$ = '/applications/{application.id}/activity-instances/{instance_id}' as const
+export const _applications_$_activityinstances_$ =
+  '/applications/{application.id}/activity-instances/{instance_id}' as const
+
+////////// Application Role Connection Metadata //////////
+// https://discord.com/developers/docs/resources/application-role-connection-metadata
+// ✅ 25/02/07
+export const _applications_$_roleconnections_metadata =
+  '/applications/{application.id}/role-connections/metadata' as const
 
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message

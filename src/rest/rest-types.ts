@@ -6,6 +6,7 @@ import type {
   RESTGetAPIApplicationGuildCommandResult,
   RESTGetAPIApplicationGuildCommandsQuery,
   RESTGetAPIApplicationGuildCommandsResult,
+  RESTGetAPIApplicationRoleConnectionMetadataResult,
   RESTGetAPIChannelMessageReactionUsersQuery,
   RESTGetAPIChannelMessageReactionUsersResult,
   RESTGetAPIChannelMessageResult,
@@ -27,6 +28,7 @@ import type {
   RESTPatchAPIInteractionOriginalResponseJSONBody,
   RESTPatchAPIInteractionOriginalResponseResult,
   RESTPatchCurrentApplicationJSONBody,
+  RESTPatchCurrentApplicationResult,
   RESTPostAPIApplicationCommandsJSONBody,
   RESTPostAPIApplicationCommandsResult,
   RESTPostAPIApplicationGuildCommandsJSONBody,
@@ -44,9 +46,10 @@ import type {
   RESTPutAPIApplicationCommandsResult,
   RESTPutAPIApplicationGuildCommandsJSONBody,
   RESTPutAPIApplicationGuildCommandsResult,
+  RESTPutAPIApplicationRoleConnectionMetadataJSONBody,
+  RESTPutAPIApplicationRoleConnectionMetadataResult,
   RESTPutAPIGuildApplicationCommandsPermissionsJSONBody,
   RESTPutAPIGuildApplicationCommandsPermissionsResult,
-  RESTPatchCurrentApplicationResult,
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import type {
@@ -57,6 +60,7 @@ import type {
   _applications_$_guilds_$_commands_$,
   _applications_$_guilds_$_commands_$_permissions,
   _applications_$_guilds_$_commands_permissions,
+  _applications_$_roleconnections_metadata,
   _applications_me,
   _channels_$,
   _channels_$_messages,
@@ -97,6 +101,8 @@ type RestPathNonData<M extends RestMethod> =
     // Application
     | typeof _applications_me
     | typeof _applications_$_activityinstances_$
+    // Application Role Connection Metadata
+    | typeof _applications_$_roleconnections_metadata
     // Messages
     | typeof _channels_$_messages_$_reactions_$
   : M extends 'PUT' ?
@@ -141,6 +147,8 @@ type RestPathWithData<M extends RestMethod> =
     | typeof _applications_$_guilds_$_commands
     | typeof _applications_$_guilds_$_commands_$_permissions
     | typeof _applications_$_guilds_$_commands_permissions
+    // Application Role Connection Metadata
+    | typeof _applications_$_roleconnections_metadata
   : M extends 'POST' ?
     // Application Commands
     | typeof _applications_$_commands
@@ -187,6 +195,7 @@ export type RestPath<M extends RestMethod> = RestPathNonData<M> | RestPathWithDa
 export type RestVariables<P extends RestPath<any>> =
   P extends
     | typeof _applications_$_commands
+    | typeof _applications_$_roleconnections_metadata
     | typeof _channels_$_messages
     | typeof _channels_$_messages_bulkdelete
     | typeof _channels_$
@@ -239,6 +248,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_guilds_$_commands ? RESTPutAPIApplicationGuildCommandsJSONBody :
     P extends typeof _applications_$_guilds_$_commands_$_permissions ? RESTPutAPIApplicationCommandPermissionsJSONBody :
     P extends typeof _applications_$_guilds_$_commands_permissions ? RESTPutAPIGuildApplicationCommandsPermissionsJSONBody :
+    // Application Role Connection Metadata
+    P extends typeof _applications_$_roleconnections_metadata ? RESTPutAPIApplicationRoleConnectionMetadataJSONBody :
     undefined
   : M extends 'POST' ?
     // Receiving and Responding
@@ -317,16 +328,21 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Application
     P extends typeof _applications_me ? RESTGetCurrentApplicationResult :
     P extends typeof _applications_$_activityinstances_$ ? CouldNotFind :
+    // Application Role Connection Metadata
+    P extends typeof _applications_$_roleconnections_metadata ? RESTGetAPIApplicationRoleConnectionMetadataResult :
     // Messages
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
     P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersResult :
     undefined
   : M extends 'PUT' ?
+    // Application Commands
     P extends typeof _applications_$_commands ? RESTPutAPIApplicationCommandsResult :
     P extends typeof _applications_$_guilds_$_commands ? RESTPutAPIApplicationGuildCommandsResult :
     P extends typeof _applications_$_guilds_$_commands_$_permissions ? RESTPutAPIApplicationCommandPermissionsResult :
     P extends typeof _applications_$_guilds_$_commands_permissions ? RESTPutAPIGuildApplicationCommandsPermissionsResult :
+    // Application Role Connection Metadata
+    P extends typeof _applications_$_roleconnections_metadata ? RESTPutAPIApplicationRoleConnectionMetadataResult :
     undefined
   : M extends 'POST' ?
     // Receiving and Responding
