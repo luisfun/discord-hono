@@ -44,6 +44,26 @@ export const _guilds_$_auditlogs = '/guilds/{guild.id}/audit-logs' as const
 export const _guilds_$_automoderation_rules = '/guilds/{guild.id}/auto-moderation/rules' as const
 export const _guilds_$_automoderation_rules_$ = '/guilds/{guild.id}/auto-moderation/rules/{auto_moderation_rule.id}' as const
 
+////////// Channel //////////
+// https://discord.com/developers/docs/resources/channel
+
+export const _channels_$ = '/channels/{channel.id}' as const
+export const _channels_$_permissions_$ = '/channels/{channel.id}/permissions/{overwrite.id}' as const
+export const _channels_$_invites = '/channels/{channel.id}/invites' as const
+export const _channels_$_followers = "/channels/{channel.id}/followers" as const
+export const _channels_$_typing = '/channels/{channel.id}/typing' as const
+export const _channels_$_pins = '/channels/{channel.id}/pins' as const
+export const _channels_$_pins_$ = '/channels/{channel.id}/pins/{message.id}' as const
+export const _channels_$_recipients_$ = '/channels/{channel.id}/recipients/{user.id}' as const
+export const _channels_$_messages_$_threads = '/channels/{channel.id}/messages/{message.id}/threads' as const
+export const _channels_$_threads = '/channels/{channel.id}/threads' as const
+export const _channels_$_threadmembers_me = '/channels/{channel.id}/thread-members/@me' as const
+export const _channels_$_threadmembers_$ = '/channels/{channel.id}/thread-members/{user.id}' as const
+export const _channels_$_threadmembers = '/channels/{channel.id}/thread-members' as const
+export const _channels_$_threads_archived_public = '/channels/{channel.id}/threads/archived/public' as const
+export const _channels_$_threads_archived_private = '/channels/{channel.id}/threads/archived/private' as const
+export const _channels_$_users_me_threads_archived_private = '/channels/{channel.id}/users/@me/threads/archived/private' as const
+
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message
 
@@ -58,11 +78,6 @@ export const _channels_$_messages_$_reactions_$ =
   '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}' as const
 export const _channels_$_messages_$_reactions = '/channels/{channel.id}/messages/{message.id}/reactions' as const
 export const _channels_$_messages_bulkdelete = '/channels/{channel.id}/messages/bulk-delete' as const
-
-////////// Channel //////////
-// https://discord.com/developers/docs/resources/channel
-
-export const _channels_$ = '/channels/{channel.id}' as const
 
 ////////// Guild //////////
 // https://discord.com/developers/docs/resources/guild
