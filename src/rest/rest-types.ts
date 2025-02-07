@@ -46,10 +46,11 @@ import type {
   RESTPutAPIApplicationGuildCommandsResult,
   RESTPutAPIGuildApplicationCommandsPermissionsJSONBody,
   RESTPutAPIGuildApplicationCommandsPermissionsResult,
+  RESTPatchCurrentApplicationResult,
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import type {
-  //_applications_$_activityinstances_$,
+  _applications_$_activityinstances_$,
   _applications_$_commands,
   _applications_$_commands_$,
   _applications_$_guilds_$_commands,
@@ -73,6 +74,8 @@ import type {
   _webhooks_$_$_messages_original,
 } from './rest-path'
 
+type CouldNotFind = unknown
+
 export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 
 ////////////////////////////////////////
@@ -93,6 +96,7 @@ type RestPathNonData<M extends RestMethod> =
     | typeof _applications_$_guilds_$_commands_$_permissions
     // Application
     | typeof _applications_me
+    | typeof _applications_$_activityinstances_$
     // Messages
     | typeof _channels_$_messages_$_reactions_$
   : M extends 'PUT' ?
@@ -312,6 +316,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_guilds_$_commands_$_permissions ? RESTGetAPIApplicationCommandPermissionsResult :
     // Application
     P extends typeof _applications_me ? RESTGetCurrentApplicationResult :
+    P extends typeof _applications_$_activityinstances_$ ? CouldNotFind :
     // Messages
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
@@ -338,6 +343,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Application Commands
     P extends typeof _applications_$_commands_$ ? RESTPatchAPIApplicationCommandResult :
     P extends typeof _applications_$_guilds_$_commands_$ ? RESTPatchAPIApplicationGuildCommandResult :
+    // Application
+    P extends typeof _applications_me ? RESTPatchCurrentApplicationResult :
     undefined
   : any
 

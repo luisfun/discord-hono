@@ -1,6 +1,6 @@
 ////////// Receiving and Responding //////////
 // https://discord.com/developers/docs/interactions/receiving-and-responding
-// ✅
+// ✅ 25/02/07
 export const _interactions_$_$_callback = '/interactions/{interaction.id}/{interaction.token}/callback' as const
 export const _webhooks_$_$_messages_original =
   '/webhooks/{application.id}/{interaction.token}/messages/@original' as const
@@ -9,7 +9,7 @@ export const _webhooks_$_$_messages_$ = '/webhooks/{application.id}/{interaction
 
 ////////// Application Commands //////////
 // https://discord.com/developers/docs/interactions/application-commands
-// ✅
+// ✅ 25/02/07
 export const _applications_$_commands = '/applications/{application.id}/commands' as const
 export const _applications_$_commands_$ = '/applications/{application.id}/commands/{command.id}' as const
 export const _applications_$_guilds_$_commands = '/applications/{application.id}/guilds/{guild.id}/commands' as const
@@ -22,9 +22,9 @@ export const _applications_$_guilds_$_commands_$_permissions =
 
 ////////// Application //////////
 // https://discord.com/developers/docs/resources/application
-
+// ✅ 25/02/07
 export const _applications_me = '/applications/@me' as const
-//export const _applications_$_activityinstances_$ = '/applications/{application.id}/activity-instances/{instance_id}' as const
+export const _applications_$_activityinstances_$ = '/applications/{application.id}/activity-instances/{instance_id}' as const
 
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message
