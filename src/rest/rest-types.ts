@@ -53,7 +53,250 @@ import type {
   _webhooks_$_$_messages_$,
 } from './rest-path'
 
+export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
+
+////////////////////////////////////////
+//////                            //////
+//////            Path            //////
+//////                            //////
+////////////////////////////////////////
+
+// biome-ignore format: ternary operator
+type RestPathNonData<M extends RestMethod> =
+  M extends 'GET' ?
+    // Receiving and Responding
+    | typeof _webhooks_$_$_messages_$
+    // Application Commands
+    | typeof _applications_$_commands_$
+    | typeof _applications_$_guilds_$_commands_$
+    | typeof _applications_$_guilds_$_commands_permissions
+    | typeof _applications_$_guilds_$_commands_$_permissions
+    // Application
+    | typeof _applications_me
+    // Messages
+    | typeof _channels_$_messages_$_reactions_$
+  : M extends 'PUT' ?
+    // Messages
+    | typeof _channels_$_messages_$_reactions_$_me
+  : M extends 'POST' ?
+    // Messages
+    | typeof _channels_$_messages_$_crosspost
+  : M extends 'PATCH' ?
+    // Receiving and Responding
+    | typeof _webhooks_$_$_messages_$
+  : M extends 'DELETE' ?
+    // Receiving and Responding
+    | typeof _webhooks_$_$_messages_$
+    // Application Commands
+    | typeof _applications_$_commands_$
+    | typeof _applications_$_guilds_$_commands_$
+    // Messages
+    | typeof _channels_$_messages_$
+    | typeof _channels_$_messages_$_reactions
+    | typeof _channels_$_messages_$_reactions_$
+    | typeof _channels_$_messages_$_reactions_$_me
+    | typeof _channels_$_messages_$_reactions_$_$  
+  : undefined
+
+// biome-ignore format: ternary operator
+type RestPathWithData<M extends RestMethod> =
+  M extends 'GET' ?
+    // Application Commands
+    | typeof _applications_$_commands
+    | typeof _applications_$_guilds_$_commands
+    // Messages
+    | typeof _channels_$_messages
+    | typeof _channels_$_messages_$
+  : M extends 'PUT' ?
+    // Application Commands
+    | typeof _applications_$_commands
+    | typeof _applications_$_guilds_$_commands
+    | typeof _applications_$_guilds_$_commands_$_permissions
+    | typeof _applications_$_guilds_$_commands_permissions
+  : M extends 'POST' ?
+    // Application Commands
+    | typeof _applications_$_commands
+    | typeof _applications_$_guilds_$_commands
+    // Messages
+    | typeof _channels_$_messages_bulkdelete
+    // Guild
+    | typeof _guilds_$_channels
+  : M extends 'PATCH' ?
+    // Application Commands
+    | typeof _applications_$_commands_$
+    | typeof _applications_$_guilds_$_commands_$
+    // Application
+    | typeof _applications_me
+    // Channel
+    | typeof _channels_$
+  : undefined
+
+// biome-ignore format: ternary operator
+type RestPathWithFile<M extends RestMethod> =
+  M extends 'POST' ?
+    // Receiving and Responding
+    | typeof _webhooks_$_$
+    // Messages
+    | typeof _channels_$_messages
+  : M extends 'PATCH' ?
+    // Messages
+    | typeof _channels_$_messages_$
+  : undefined
+
+export type RestPath<M extends RestMethod> = RestPathNonData<M> | RestPathWithData<M> | RestPathWithFile<M>
+
+////////////////////////////////////////
+//////                            //////
+//////         Variables          //////
+//////                            //////
+////////////////////////////////////////
+
+// biome-ignore format: ternary operator
+export type RestVariables<P extends RestPath<any>> =
+  P extends
+    | typeof _applications_$_commands
+    | typeof _channels_$_messages
+    | typeof _channels_$_messages_bulkdelete
+    | typeof _channels_$
+    | typeof _guilds_$_channels
+  ? [string] :
+  P extends
+    | typeof _webhooks_$_$
+    | typeof _applications_$_commands_$
+    | typeof _applications_$_guilds_$_commands
+    | typeof _applications_$_guilds_$_commands_permissions
+    | typeof _channels_$_messages_$
+    | typeof _channels_$_messages_$_crosspost
+    | typeof _channels_$_messages_$_reactions
+  ? [string, string] :
+  P extends
+    | typeof _webhooks_$_$_messages_$
+    | typeof _applications_$_guilds_$_commands_$
+    | typeof _applications_$_guilds_$_commands_$_permissions
+    | typeof _channels_$_messages_$_reactions_$_me
+    | typeof _channels_$_messages_$_reactions_$
+  ? [string, string, string] :
+  P extends
+    | typeof _channels_$_messages_$_reactions_$_$
+  ? [string, string, string, string] : []
+
+////////////////////////////////////////
+//////                            //////
+//////            Data            //////
+//////                            //////
+////////////////////////////////////////
+
+// biome-ignore format: ternary operator
+export type RestData<M extends RestMethod, P extends RestPath<M>> =
+  M extends 'GET' ?
+    // Application Commands
+    P extends typeof _applications_$_commands ? RESTGetAPIApplicationCommandsQuery :
+    P extends typeof _applications_$_guilds_$_commands ? RESTGetAPIApplicationGuildCommandsQuery :
+    // Messages
+    P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesQuery :
+    P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
+    undefined
+  : M extends 'PUT' ?
+    // Application Commands
+    P extends typeof _applications_$_commands ? RESTPutAPIApplicationCommandsJSONBody :
+    P extends typeof _applications_$_guilds_$_commands ? RESTPutAPIApplicationGuildCommandsJSONBody :
+    P extends typeof _applications_$_guilds_$_commands_$_permissions ? RESTPutAPIApplicationCommandPermissionsJSONBody :
+    P extends typeof _applications_$_guilds_$_commands_permissions ? RESTPutAPIGuildApplicationCommandsPermissionsJSONBody :
+    undefined
+  : M extends 'POST' ?
+    // Receiving and Responding
+    P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupJSONBody :
+    // Application Commands
+    P extends typeof _applications_$_commands ? RESTPostAPIApplicationCommandsJSONBody :
+    P extends typeof _applications_$_guilds_$_commands ? RESTPostAPIApplicationGuildCommandsJSONBody :
+    // Messages
+    P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
+    P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
+    // Guild
+    P extends typeof _guilds_$_channels ? RESTPostAPIGuildChannelJSONBody :
+    undefined  
+  : M extends 'PATCH' ?
+    // Application Commands
+    P extends typeof _applications_$_commands_$ ? RESTPatchAPIApplicationCommandJSONBody :
+    P extends typeof _applications_$_guilds_$_commands_$ ? RESTPatchAPIApplicationGuildCommandJSONBody :
+    // Application
+    P extends typeof _applications_me ? RESTPatchCurrentApplicationJSONBody :
+    // Messages
+    P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
+    // Channel
+    P extends typeof _channels_$ ? RESTPatchAPIChannelJSONBody :
+    undefined  
+  : undefined
+
+////////////////////////////////////////
+//////                            //////
+//////            File            //////
+//////                            //////
+////////////////////////////////////////
+
+// biome-ignore format: ternary operator
+export type RestFile<M extends RestMethod, P extends RestPath<M>> =
+  M extends 'POST' ?
+    P extends
+      // Receiving and Responding
+      | typeof _webhooks_$_$
+      // Messages
+      | typeof _channels_$_messages
+    ? FileData : undefined
+  : M extends 'PATCH' ?
+    P extends
+      // Messages
+      | typeof _channels_$_messages_$
+    ? FileData : undefined
+  : undefined
+
+////////////////////////////////////////
+//////                            //////
+//////           Result           //////
+//////                            //////
+////////////////////////////////////////
+
+// biome-ignore format: ternary operator
+export type RestResult<M extends RestMethod, P extends RestPath<M>> =
+  M extends 'GET' ?
+    // Application Commands
+    P extends typeof _applications_$_commands ? RESTGetAPIApplicationCommandsResult :
+    P extends typeof _applications_$_commands_$ ? RESTGetAPIApplicationCommandResult :
+    P extends typeof _applications_$_guilds_$_commands ? RESTGetAPIApplicationGuildCommandsResult :
+    P extends typeof _applications_$_guilds_$_commands_$ ? RESTGetAPIApplicationGuildCommandResult :
+    P extends typeof _applications_$_guilds_$_commands_permissions ? RESTGetAPIGuildApplicationCommandsPermissionsResult :
+    P extends typeof _applications_$_guilds_$_commands_$_permissions ? RESTGetAPIApplicationCommandPermissionsResult :
+    // Application
+    P extends typeof _applications_me ? RESTGetCurrentApplicationResult :
+    // Messages
+    P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
+    P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
+    P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersResult :
+    undefined
+  : any
+
 type TypedResponse<T> = Omit<Response, 'json'> & { json(): Promise<T> }
+
+export type ReturnCreateRest = {
+  <M extends RestMethod, P extends RestPathNonData<M>>(
+    method: M,
+    path: P,
+    variables: RestVariables<P>,
+  ): Promise<TypedResponse<RestResult<M, P>>>
+  <M extends RestMethod, P extends RestPathWithData<M>>(
+    method: M,
+    path: P,
+    variables: RestVariables<P>,
+    data: RestData<M, P>,
+  ): Promise<TypedResponse<RestResult<M, P>>>
+  <M extends RestMethod, P extends RestPathWithFile<M>>(
+    method: M,
+    path: P,
+    variables: RestVariables<P>,
+    data: RestData<M, P>,
+    file?: RestFile<M, P>,
+  ): Promise<TypedResponse<RestResult<M, P>>>
+}
 
 ////////////////////////////////////////
 //////                            //////

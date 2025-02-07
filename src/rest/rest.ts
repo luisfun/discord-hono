@@ -14,6 +14,7 @@ import type {
   PutData,
   PutMethod,
   PutPath,
+  ReturnCreateRest,
   Variables,
 } from './rest-types'
 
@@ -24,7 +25,7 @@ const API_VER = 'v10'
  * @param {string} token
  */
 export const createRest =
-  (token: string | undefined) =>
+  (token: string | undefined): ReturnCreateRest =>
   /**
    * [Documentation](https://discord-hono.luis.fun/interactions/rest/)
    * @param {string} method
@@ -45,7 +46,7 @@ export const createRest =
   }
 
 //const rest = createRest('')
-//const res = await rest('GET', '/channels/{channel.id}/messages/{message.id}', ['channel.id', 'message.id'])
+//const res = await rest('GET', '/channels/{channel.id}/messages', ['channel.id'], {}) //.then((res) => res.json())
 
 export class Rest {
   #fetch
@@ -120,3 +121,5 @@ export class Rest {
    */
   delete = <P extends DeletePath>(path: P, variables: Variables<P>) => this.#fetch(path, variables, 'DELETE')
 }
+
+//const rest = new Rest('').get("/applications/@me", [])
