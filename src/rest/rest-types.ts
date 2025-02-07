@@ -12,18 +12,28 @@ import type {
   RESTGetAPIChannelMessagesQuery,
   RESTGetAPIChannelMessagesResult,
   RESTGetAPIGuildApplicationCommandsPermissionsResult,
+  RESTGetAPIInteractionFollowupResult,
+  RESTGetAPIInteractionOriginalResponseResult,
+  RESTGetAPIWebhookWithTokenMessageQuery,
   RESTGetCurrentApplicationResult,
   RESTPatchAPIApplicationCommandJSONBody,
   RESTPatchAPIApplicationGuildCommandJSONBody,
   RESTPatchAPIChannelJSONBody,
   RESTPatchAPIChannelMessageJSONBody,
+  RESTPatchAPIInteractionFollowupJSONBody,
+  RESTPatchAPIInteractionFollowupResult,
+  RESTPatchAPIInteractionOriginalResponseJSONBody,
+  RESTPatchAPIInteractionOriginalResponseResult,
   RESTPatchCurrentApplicationJSONBody,
   RESTPostAPIApplicationCommandsJSONBody,
   RESTPostAPIApplicationGuildCommandsJSONBody,
   RESTPostAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessagesBulkDeleteJSONBody,
   RESTPostAPIGuildChannelJSONBody,
+  RESTPostAPIInteractionCallbackQuery,
+  RESTPostAPIInteractionCallbackResult,
   RESTPostAPIInteractionFollowupJSONBody,
+  RESTPostAPIInteractionFollowupResult,
   RESTPutAPIApplicationCommandPermissionsJSONBody,
   RESTPutAPIApplicationCommandsJSONBody,
   RESTPutAPIApplicationGuildCommandsJSONBody,
@@ -49,8 +59,10 @@ import type {
   _channels_$_messages_$_reactions_$_me,
   _channels_$_messages_bulkdelete,
   _guilds_$_channels,
+  _interactions_$_$_callback,
   _webhooks_$_$,
   _webhooks_$_$_messages_$,
+  _webhooks_$_$_messages_original,
 } from './rest-path'
 
 export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
@@ -86,6 +98,7 @@ type RestPathNonData<M extends RestMethod> =
     | typeof _webhooks_$_$_messages_$
   : M extends 'DELETE' ?
     // Receiving and Responding
+    | typeof _webhooks_$_$_messages_original
     | typeof _webhooks_$_$_messages_$
     // Application Commands
     | typeof _applications_$_commands_$
@@ -101,6 +114,9 @@ type RestPathNonData<M extends RestMethod> =
 // biome-ignore format: ternary operator
 type RestPathWithData<M extends RestMethod> =
   M extends 'GET' ?
+    // Receiving and Responding
+    | typeof _webhooks_$_$_messages_original
+    | typeof _webhooks_$_$_messages_$
     // Application Commands
     | typeof _applications_$_commands
     | typeof _applications_$_guilds_$_commands
@@ -135,10 +151,14 @@ type RestPathWithData<M extends RestMethod> =
 type RestPathWithFile<M extends RestMethod> =
   M extends 'POST' ?
     // Receiving and Responding
+    | typeof _interactions_$_$_callback
+    | typeof _webhooks_$_$_messages_original
     | typeof _webhooks_$_$
     // Messages
     | typeof _channels_$_messages
   : M extends 'PATCH' ?
+    // Receiving and Responding
+    | typeof _webhooks_$_$_messages_$
     // Messages
     | typeof _channels_$_messages_$
   : undefined
@@ -161,6 +181,8 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_$_channels
   ? [string] :
   P extends
+    | typeof _interactions_$_$_callback
+    | typeof _webhooks_$_$_messages_original
     | typeof _webhooks_$_$
     | typeof _applications_$_commands_$
     | typeof _applications_$_guilds_$_commands
@@ -189,6 +211,9 @@ export type RestVariables<P extends RestPath<any>> =
 // biome-ignore format: ternary operator
 export type RestData<M extends RestMethod, P extends RestPath<M>> =
   M extends 'GET' ?
+    // Receiving and Responding
+    P extends typeof _webhooks_$_$_messages_original ? RESTGetAPIWebhookWithTokenMessageQuery :
+    P extends typeof _webhooks_$_$_messages_$ ? RESTGetAPIWebhookWithTokenMessageQuery :
     // Application Commands
     P extends typeof _applications_$_commands ? RESTGetAPIApplicationCommandsQuery :
     P extends typeof _applications_$_guilds_$_commands ? RESTGetAPIApplicationGuildCommandsQuery :
@@ -205,6 +230,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     undefined
   : M extends 'POST' ?
     // Receiving and Responding
+    P extends typeof _interactions_$_$_callback ? RESTPostAPIInteractionCallbackQuery :
+    P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseJSONBody :
     P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupJSONBody :
     // Application Commands
     P extends typeof _applications_$_commands ? RESTPostAPIApplicationCommandsJSONBody :
@@ -216,6 +243,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_channels ? RESTPostAPIGuildChannelJSONBody :
     undefined  
   : M extends 'PATCH' ?
+    // Receiving and Responding
+    P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIInteractionFollowupJSONBody :
     // Application Commands
     P extends typeof _applications_$_commands_$ ? RESTPatchAPIApplicationCommandJSONBody :
     P extends typeof _applications_$_guilds_$_commands_$ ? RESTPatchAPIApplicationGuildCommandJSONBody :
@@ -239,12 +268,16 @@ export type RestFile<M extends RestMethod, P extends RestPath<M>> =
   M extends 'POST' ?
     P extends
       // Receiving and Responding
+      | typeof _interactions_$_$_callback
+      | typeof _webhooks_$_$_messages_original
       | typeof _webhooks_$_$
       // Messages
       | typeof _channels_$_messages
     ? FileData : undefined
   : M extends 'PATCH' ?
     P extends
+      // Receiving and Responding
+      | typeof _webhooks_$_$_messages_$
       // Messages
       | typeof _channels_$_messages_$
     ? FileData : undefined
@@ -259,6 +292,9 @@ export type RestFile<M extends RestMethod, P extends RestPath<M>> =
 // biome-ignore format: ternary operator
 export type RestResult<M extends RestMethod, P extends RestPath<M>> =
   M extends 'GET' ?
+    // Receiving and Responding
+    P extends typeof _webhooks_$_$_messages_original ? RESTGetAPIInteractionOriginalResponseResult :
+    P extends typeof _webhooks_$_$_messages_$ ? RESTGetAPIInteractionFollowupResult :
     // Application Commands
     P extends typeof _applications_$_commands ? RESTGetAPIApplicationCommandsResult :
     P extends typeof _applications_$_commands_$ ? RESTGetAPIApplicationCommandResult :
@@ -272,6 +308,16 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
     P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersResult :
+    undefined
+  : M extends 'POST' ?
+    // Receiving and Responding
+    P extends typeof _interactions_$_$_callback ? RESTPostAPIInteractionCallbackResult :
+    P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseResult :
+    P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupResult :
+    undefined
+  : M extends 'PATCH' ?
+    // Receiving and Responding
+    P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIInteractionFollowupResult :
     undefined
   : any
 
