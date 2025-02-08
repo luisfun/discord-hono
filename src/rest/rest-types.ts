@@ -5,6 +5,7 @@ import type {
   RESTDeleteAPIChannelRecipientResult,
   RESTDeleteAPIChannelResult,
   RESTDeleteAPIChannelThreadMembersResult,
+  RESTDeleteAPIEntitlementResult,
   RESTDeleteAPIGuildEmojiResult,
   RESTGetAPIApplicationCommandPermissionsResult,
   RESTGetAPIApplicationCommandResult,
@@ -34,6 +35,9 @@ import type {
   RESTGetAPIChannelThreadMembersResult,
   RESTGetAPIChannelThreadsArchivedPrivateResult,
   RESTGetAPIChannelThreadsArchivedPublicResult,
+  RESTGetAPIEntitlementResult,
+  RESTGetAPIEntitlementsQuery,
+  RESTGetAPIEntitlementsResult,
   RESTGetAPIGuildApplicationCommandsPermissionsResult,
   RESTGetAPIGuildEmojiResult,
   RESTGetAPIGuildEmojisResult,
@@ -79,6 +83,9 @@ import type {
   RESTPostAPIChannelThreadsJSONBody,
   RESTPostAPIChannelThreadsResult,
   RESTPostAPIChannelTypingResult,
+  RESTPostAPIEntitlementConsumeResult,
+  RESTPostAPIEntitlementJSONBody,
+  RESTPostAPIEntitlementResult,
   RESTPostAPIGuildChannelJSONBody,
   RESTPostAPIGuildEmojiJSONBody,
   RESTPostAPIGuildEmojiResult,
@@ -205,6 +212,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_$_emojis_$
     | typeof _applications_$_emojis
     | typeof _applications_$_emojis_$
+    // Entitlement
+    | typeof _applications_$_entitlements_$
     // Message
     | typeof _channels_$_messages_$_reactions_$
   : M extends 'PUT' ?
@@ -217,6 +226,8 @@ type RestPathVars<M extends RestMethod> =
   : M extends 'POST' ?
     // Channel
     | typeof _channels_$_typing
+    // Entitlement
+    | typeof _applications_$_entitlements_$_consume
     // Message
     | typeof _channels_$_messages_$_crosspost
   : M extends 'PATCH' ?
@@ -241,6 +252,8 @@ type RestPathVars<M extends RestMethod> =
     // Emoji
     | typeof _guilds_$_emojis_$
     | typeof _applications_$_emojis_$
+    // Entitlement
+    | typeof _applications_$_entitlements_$
     // Message
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_reactions
@@ -266,6 +279,8 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _channels_$_threads_archived_public
     | typeof _channels_$_threads_archived_private
     | typeof _channels_$_users_me_threads_archived_private
+    // Entitlement
+    | typeof _applications_$_entitlements
     // Message
     | typeof _channels_$_messages
     | typeof _channels_$_messages_$
@@ -294,6 +309,8 @@ type RestPathVarsData<M extends RestMethod> =
     // Emoji
     | typeof _guilds_$_emojis
     | typeof _applications_$_emojis
+    // Entitlement
+    | typeof _applications_$_entitlements
     // Message
     | typeof _channels_$_messages_bulkdelete
     // Guild
@@ -427,6 +444,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_threads_archived_public ? CouldNotFind :
     P extends typeof _channels_$_threads_archived_private ? CouldNotFind :
     P extends typeof _channels_$_users_me_threads_archived_private ? CouldNotFind :
+    // Entitlement
+    P extends typeof _applications_$_entitlements ? RESTGetAPIEntitlementsQuery :
     // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesQuery :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
@@ -461,6 +480,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Emoji
     P extends typeof _guilds_$_emojis ? RESTPostAPIGuildEmojiJSONBody :
     P extends typeof _applications_$_emojis ? RESTPostAPIApplicationEmojiJSONBody :
+    // Entitlement
+    P extends typeof _applications_$_entitlements ? RESTPostAPIEntitlementJSONBody :
     // Message
     P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
@@ -558,6 +579,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_emojis_$ ? RESTGetAPIGuildEmojiResult :
     P extends typeof _applications_$_emojis ? RESTGetAPIApplicationEmojisResult :
     P extends typeof _applications_$_emojis_$ ? RESTGetAPIApplicationEmojiResult :
+    // Entitlement
+    P extends typeof _applications_$_entitlements ? RESTGetAPIEntitlementsResult :
+    P extends typeof _applications_$_entitlements_$ ? RESTGetAPIEntitlementResult :
     // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
@@ -597,6 +621,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Emoji
     P extends typeof _guilds_$_emojis ? RESTPostAPIGuildEmojiResult :
     P extends typeof _applications_$_emojis ? RESTPostAPIApplicationEmojiResult :
+    // Entitlement
+    P extends typeof _applications_$_entitlements_$_consume ? RESTPostAPIEntitlementConsumeResult :
+    P extends typeof _applications_$_entitlements ? RESTPostAPIEntitlementResult :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -625,6 +652,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Emoji
     P extends typeof _guilds_$_emojis_$ ? RESTDeleteAPIGuildEmojiResult :
     P extends typeof _applications_$_emojis_$ ? RESTDeleteAPIApplicationEmojiResult :
+    // Entitlement
+    P extends typeof _applications_$_entitlements_$ ? RESTDeleteAPIEntitlementResult :
     never
   : never
 

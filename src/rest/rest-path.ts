@@ -76,7 +76,7 @@ export const _applications_$_emojis_$ = '/applications/{application.id}/emojis/{
 
 ////////// Entitlement //////////
 // https://discord.com/developers/docs/resources/entitlement
-
+// ✅ 25/02/08
 export const _applications_$_entitlements = '/applications/{application.id}/entitlements' as const
 export const _applications_$_entitlements_$ = '/applications/{application.id}/entitlements/{entitlement.id}' as const
 export const _applications_$_entitlements_$_consume =
