@@ -104,7 +104,7 @@ import type {
   _webhooks_$_$_messages_original,
 } from './rest-path'
 
-type CouldNotFind = unknown
+type CouldNotFind = "Please redefine the type using 'as unknown'"
 
 export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 
@@ -257,6 +257,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _applications_$_commands_$
     | typeof _applications_$_guilds_$_commands
     | typeof _applications_$_guilds_$_commands_permissions
+    | typeof _applications_$_activityinstances_$
     | typeof _guilds_$_automoderation_rules_$
     | typeof _channels_$_permissions_$
     | typeof _channels_$_pins_$

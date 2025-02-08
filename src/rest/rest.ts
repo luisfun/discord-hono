@@ -37,4 +37,5 @@ const res = await rest('POST', '/applications/{application.id}/commands', ['appl
   name: '',
   //description: '',
 }).then(r => r.json())
+const res = await rest("GET", "/applications/{application.id}/activity-instances/{instance_id}", ["application.id", "instance_id"]).then(r => r.json())
 */
