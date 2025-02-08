@@ -212,7 +212,7 @@ type RestPathNonData<M extends RestMethod> =
     | typeof _channels_$_messages_$_reactions_$
     | typeof _channels_$_messages_$_reactions_$_me
     | typeof _channels_$_messages_$_reactions_$_$  
-  : undefined
+  : never
 
 // biome-ignore format: ternary operator
 type RestPathWithData<M extends RestMethod> =
@@ -270,7 +270,7 @@ type RestPathWithData<M extends RestMethod> =
     | typeof _guilds_$_automoderation_rules_$
     // Channel
     | typeof _channels_$
-  : undefined
+  : never
 
 // biome-ignore format: ternary operator
 type RestPathWithFile<M extends RestMethod> =
@@ -288,7 +288,7 @@ type RestPathWithFile<M extends RestMethod> =
     | typeof _webhooks_$_$_messages_$
     // Message
     | typeof _channels_$_messages_$
-  : undefined
+  : never
 
 export type RestPath<M extends RestMethod> = RestPathNonData<M> | RestPathWithData<M> | RestPathWithFile<M>
 
@@ -375,7 +375,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesQuery :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
-    undefined
+    never
   : M extends 'PUT' ?
     // Application Commands
     P extends typeof _applications_$_commands ? RESTPutAPIApplicationCommandsJSONBody :
@@ -387,7 +387,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Channel
     P extends typeof _channels_$_permissions_$ ? RESTPutAPIChannelPermissionJSONBody :
     P extends typeof _channels_$_recipients_$ ? RESTPutAPIChannelRecipientJSONBody :
-    undefined
+    never
   : M extends 'POST' ?
     // Receiving and Responding
     P extends typeof _interactions_$_$_callback ? RESTPostAPIInteractionCallbackQuery :
@@ -408,7 +408,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
     // Guild
     P extends typeof _guilds_$_channels ? RESTPostAPIGuildChannelJSONBody :
-    undefined  
+    never  
   : M extends 'PATCH' ?
     // Receiving and Responding
     P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIInteractionFollowupJSONBody :
@@ -423,8 +423,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
     // Channel
     P extends typeof _channels_$ ? RESTPatchAPIChannelJSONBody :
-    undefined  
-  : undefined
+    never  
+  : never
 
 ////////////////////////////////////////
 //////                            //////
@@ -444,15 +444,15 @@ export type RestFile<M extends RestMethod, P extends RestPath<M>> =
       | typeof _channels_$_threads
       // Message
       | typeof _channels_$_messages
-    ? FileData : undefined
+    ? FileData : never
   : M extends 'PATCH' ?
     P extends
       // Receiving and Responding
       | typeof _webhooks_$_$_messages_$
       // Message
       | typeof _channels_$_messages_$
-    ? FileData : undefined
-  : undefined
+    ? FileData : never
+  : never
 
 ////////////////////////////////////////
 //////                            //////
@@ -496,7 +496,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
     P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersResult :
-    undefined
+    never
   : M extends 'PUT' ?
     // Application Commands
     P extends typeof _applications_$_commands ? RESTPutAPIApplicationCommandsResult :
@@ -511,7 +511,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_recipients_$ ? RESTPutAPIChannelRecipientResult :
     P extends typeof _channels_$_threadmembers_me ? RESTPutAPIChannelThreadMembersResult :
     P extends typeof _channels_$_threadmembers_$ ? RESTPutAPIChannelThreadMembersResult :
-    undefined
+    never
   : M extends 'POST' ?
     // Receiving and Responding
     P extends typeof _interactions_$_$_callback ? RESTPostAPIInteractionCallbackResult :
@@ -528,7 +528,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_typing ? RESTPostAPIChannelTypingResult :
     P extends typeof _channels_$_messages_$_threads ? RESTPostAPIChannelMessagesThreadsResult :
     P extends typeof _channels_$_threads ? RESTPostAPIChannelThreadsResult | CouldNotFind :
-    undefined
+    never
   : M extends 'PATCH' ?
     // Receiving and Responding
     P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIInteractionFollowupResult :
@@ -541,7 +541,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_automoderation_rules_$ ? RESTPatchAPIAutoModerationRuleResult :
     // Channel
     P extends typeof _channels_$ ? RESTPatchAPIChannelResult :
-    undefined
+    never
   : M extends 'DELETE' ?
     // Channel
     P extends typeof _channels_$ ? RESTDeleteAPIChannelResult :
@@ -550,8 +550,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_recipients_$ ? RESTDeleteAPIChannelRecipientResult :
     P extends typeof _channels_$_threadmembers_me ? RESTDeleteAPIChannelThreadMembersResult :
     P extends typeof _channels_$_threadmembers_$ ? RESTDeleteAPIChannelThreadMembersResult :
-    undefined
-  : any
+    never
+  : never
 
 type TypedResponse<T> = Omit<Response, 'json'> & { json(): Promise<T> }
 
@@ -574,12 +574,4 @@ export type Rest = {
     data: RestData<M, P>,
     file?: RestFile<M, P>,
   ): Promise<TypedResponse<RestResult<M, P>>>
-  // Unknown paths
-  <P extends string>(
-    method: RestMethod,
-    path: Exclude<P, RestPathNonData<any> | RestPathWithData<any> | RestPathWithFile<any>>,
-    variables: string[],
-    data?: unknown,
-    file?: FileData,
-  ): Promise<TypedResponse<unknown>>
 }
