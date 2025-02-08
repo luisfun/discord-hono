@@ -123,6 +123,13 @@ export const _guilds_$_scheduledevents_$ = '/guilds/{guild.id}/scheduled-events/
 export const _guilds_$_scheduledevents_$_users =
   '/guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}/users' as const
 
+////////// Guild Template //////////
+// https://discord.com/developers/docs/resources/guild-template
+// ✅ 25/02/08
+export const _guilds_templates_$ = '/guilds/templates/{template.code}' as const
+export const _guilds_$_templates = '/guilds/{guild.id}/templates' as const
+export const _guilds_$_templates_$ = '/guilds/{guild.id}/templates/{template.code}' as const
+
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message
 
