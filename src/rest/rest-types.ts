@@ -13,6 +13,7 @@ import type {
   RESTDeleteAPIGuildMemberRoleResult,
   RESTDeleteAPIGuildResult,
   RESTDeleteAPIGuildRoleResult,
+  RESTDeleteAPIGuildScheduledEventResult,
   RESTGetAPIApplicationCommandPermissionsResult,
   RESTGetAPIApplicationCommandResult,
   RESTGetAPIApplicationCommandsQuery,
@@ -66,6 +67,12 @@ import type {
   RESTGetAPIGuildResult,
   RESTGetAPIGuildRoleResult,
   RESTGetAPIGuildRolesResult,
+  RESTGetAPIGuildScheduledEventQuery,
+  RESTGetAPIGuildScheduledEventResult,
+  RESTGetAPIGuildScheduledEventUsersQuery,
+  RESTGetAPIGuildScheduledEventUsersResult,
+  RESTGetAPIGuildScheduledEventsQuery,
+  RESTGetAPIGuildScheduledEventsResult,
   RESTGetAPIGuildThreadsResult,
   RESTGetAPIGuildVanityUrlResult,
   RESTGetAPIGuildVoiceRegionsResult,
@@ -104,6 +111,8 @@ import type {
   RESTPatchAPIGuildRolePositionsJSONBody,
   RESTPatchAPIGuildRolePositionsResult,
   RESTPatchAPIGuildRoleResult,
+  RESTPatchAPIGuildScheduledEventJSONBody,
+  RESTPatchAPIGuildScheduledEventResult,
   RESTPatchAPIGuildWelcomeScreenJSONBody,
   RESTPatchAPIGuildWelcomeScreenResult,
   RESTPatchAPIGuildWidgetSettingsJSONBody,
@@ -146,6 +155,8 @@ import type {
   RESTPostAPIGuildPruneResult,
   RESTPostAPIGuildRoleJSONBody,
   RESTPostAPIGuildRoleResult,
+  RESTPostAPIGuildScheduledEventJSONBody,
+  RESTPostAPIGuildScheduledEventResult,
   RESTPostAPIGuildsJSONBody,
   RESTPostAPIGuildsMFAJSONBody,
   RESTPostAPIGuildsMFAResult,
@@ -247,6 +258,9 @@ import type {
   _guilds_$_regions,
   _guilds_$_roles,
   _guilds_$_roles_$,
+  _guilds_$_scheduledevents,
+  _guilds_$_scheduledevents_$,
+  _guilds_$_scheduledevents_$_users,
   _guilds_$_threads_active,
   _guilds_$_vanityurl,
   _guilds_$_welcomescreen,
@@ -379,6 +393,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_$_bans_$
     | typeof _guilds_$_roles_$
     | typeof _guilds_$_integrations_$
+    // Guild Schedule Event
+    | typeof _guilds_$_scheduledevents_$
     // Message
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_reactions
@@ -413,6 +429,10 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds_$_bans
     | typeof _guilds_$_prune
     | typeof _guilds_$_widgetpng
+    // Guild Schedule Event
+    | typeof _guilds_$_scheduledevents
+    | typeof _guilds_$_scheduledevents_$
+    | typeof _guilds_$_scheduledevents_$_users
     // Message
     | typeof _channels_$_messages
     | typeof _channels_$_messages_$
@@ -456,6 +476,8 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds_$_roles_$
     | typeof _guilds_$_mfa
     | typeof _guilds_$_prune
+    // Guild Schedule Event
+    | typeof _guilds_$_scheduledevents
     // Message
     | typeof _channels_$_messages_bulkdelete
   : M extends 'PATCH' ?
@@ -480,6 +502,8 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds_$_roles
     | typeof _guilds_$_widget
     | typeof _guilds_$_welcomescreen
+    // Guild Schedule Event
+    | typeof _guilds_$_scheduledevents_$
   : never
 
 // biome-ignore format: ternary operator
@@ -562,6 +586,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_$_welcomescreen
     | typeof _guilds_$_onboarding
     | typeof _guilds_$_incidentactions
+    | typeof _guilds_$_scheduledevents
   ? [string] :
   P extends
     | typeof _interactions_$_$_callback
@@ -588,6 +613,8 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_$_bans_$
     | typeof _guilds_$_roles_$
     | typeof _guilds_$_integrations_$
+    | typeof _guilds_$_scheduledevents_$
+    | typeof _guilds_$_scheduledevents_$_users
   ? [string, string] :
   P extends
     | typeof _webhooks_$_$_messages_$
@@ -633,6 +660,10 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_bans ? RESTGetAPIGuildBansQuery :
     P extends typeof _guilds_$_prune ? RESTGetAPIGuildPruneCountQuery :
     P extends typeof _guilds_$_widgetpng ? RESTGetAPIGuildWidgetImageQuery :
+    // Guild Schedule Event
+    P extends typeof _guilds_$_scheduledevents ? RESTGetAPIGuildScheduledEventsQuery :
+    P extends typeof _guilds_$_scheduledevents_$ ? RESTGetAPIGuildScheduledEventQuery :
+    P extends typeof _guilds_$_scheduledevents_$_users ? RESTGetAPIGuildScheduledEventUsersQuery :
     // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesQuery :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
@@ -681,6 +712,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_roles ? RESTPostAPIGuildRoleJSONBody :
     P extends typeof _guilds_$_mfa ? RESTPostAPIGuildsMFAJSONBody :
     P extends typeof _guilds_$_prune ? RESTPostAPIGuildPruneJSONBody :
+    // Guild Schedule Event
+    P extends typeof _guilds_$_scheduledevents ? RESTPostAPIGuildScheduledEventJSONBody :
     // Message
     P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
@@ -712,6 +745,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_roles_$ ? RESTPatchAPIGuildRoleJSONBody :
     P extends typeof _guilds_$_widget ? RESTPatchAPIGuildWidgetSettingsJSONBody :
     P extends typeof _guilds_$_welcomescreen ? RESTPatchAPIGuildWelcomeScreenJSONBody :
+    // Guild Schedule Event
+    P extends typeof _guilds_$_scheduledevents_$ ? RESTPatchAPIGuildScheduledEventJSONBody :
     never
   : never
 
@@ -811,6 +846,10 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_widgetpng ? RESTGetAPIGuildWidgetImageResult :
     P extends typeof _guilds_$_welcomescreen ? RESTGetAPIGuildWelcomeScreenResult :
     P extends typeof _guilds_$_onboarding ? RESTGetAPIGuildOnboardingResult :
+    // Guild Schedule Event
+    P extends typeof _guilds_$_scheduledevents ? RESTGetAPIGuildScheduledEventsResult :
+    P extends typeof _guilds_$_scheduledevents_$ ? RESTGetAPIGuildScheduledEventResult :
+    P extends typeof _guilds_$_scheduledevents_$_users ? RESTGetAPIGuildScheduledEventUsersResult :
     // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
@@ -866,6 +905,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_roles ? RESTPostAPIGuildRoleResult :
     P extends typeof _guilds_$_mfa ? RESTPostAPIGuildsMFAResult :
     P extends typeof _guilds_$_prune ? RESTPostAPIGuildPruneResult :
+    // Guild Schedule Event
+    P extends typeof _guilds_$_scheduledevents ? RESTPostAPIGuildScheduledEventResult :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -892,6 +933,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_roles_$ ? RESTPatchAPIGuildRoleResult :
     P extends typeof _guilds_$_widget ? RESTPatchAPIGuildWidgetSettingsResult :
     P extends typeof _guilds_$_welcomescreen ? RESTPatchAPIGuildWelcomeScreenResult :
+    // Guild Schedule Event
+    P extends typeof _guilds_$_scheduledevents_$ ? RESTPatchAPIGuildScheduledEventResult :
     never
   : M extends 'DELETE' ?
     // Channel
@@ -913,6 +956,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_bans_$ ? RESTDeleteAPIGuildBanResult :
     P extends typeof _guilds_$_roles_$ ? RESTDeleteAPIGuildRoleResult :
     P extends typeof _guilds_$_integrations_$ ? RESTDeleteAPIGuildIntegrationResult :
+    // Guild Schedule Event
+    P extends typeof _guilds_$_scheduledevents_$ ? RESTDeleteAPIGuildScheduledEventResult :
     never
   : never
 

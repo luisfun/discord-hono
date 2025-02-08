@@ -115,6 +115,14 @@ export const _guilds_$_welcomescreen = '/guilds/{guild.id}/welcome-screen' as co
 export const _guilds_$_onboarding = '/guilds/{guild.id}/onboarding' as const
 export const _guilds_$_incidentactions = '/guilds/{guild.id}/incident-actions' as const
 
+////////// Guild Scheduled Event //////////
+// https://discord.com/developers/docs/resources/guild-scheduled-event
+// ✅ 25/02/08
+export const _guilds_$_scheduledevents = '/guilds/{guild.id}/scheduled-events' as const
+export const _guilds_$_scheduledevents_$ = '/guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}' as const
+export const _guilds_$_scheduledevents_$_users =
+  '/guilds/{guild.id}/scheduled-events/{guild_scheduled_event.id}/users' as const
+
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message
 
