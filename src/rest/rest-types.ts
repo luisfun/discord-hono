@@ -150,12 +150,40 @@ import type {
   _channels_$_threads_archived_public,
   _channels_$_typing,
   _channels_$_users_me_threads_archived_private,
+  _guilds,
+  _guilds_$,
   _guilds_$_auditlogs,
   _guilds_$_automoderation_rules,
   _guilds_$_automoderation_rules_$,
+  _guilds_$_bans,
+  _guilds_$_bans_$,
+  _guilds_$_bulkban,
   _guilds_$_channels,
   _guilds_$_emojis,
   _guilds_$_emojis_$,
+  _guilds_$_incidentactions,
+  _guilds_$_integrations,
+  _guilds_$_integrations_$,
+  _guilds_$_invites,
+  _guilds_$_members,
+  _guilds_$_members_$,
+  _guilds_$_members_$_roles_$,
+  _guilds_$_members_me,
+  _guilds_$_members_me_nick,
+  _guilds_$_members_search,
+  _guilds_$_mfa,
+  _guilds_$_onboarding,
+  _guilds_$_preview,
+  _guilds_$_prune,
+  _guilds_$_regions,
+  _guilds_$_roles,
+  _guilds_$_roles_$,
+  _guilds_$_threads_active,
+  _guilds_$_vanityurl,
+  _guilds_$_welcomescreen,
+  _guilds_$_widget,
+  _guilds_$_widgetjson,
+  _guilds_$_widgetpng,
   _interactions_$_$_callback,
   _webhooks_$_$,
   _webhooks_$_$_messages_$,
@@ -364,6 +392,7 @@ export type RestPath<M extends RestMethod> =
 export type RestVariables<P extends RestPath<any>> =
   P extends
     | typeof _applications_me
+    | typeof _guilds
   ? [] :
   P extends
     | typeof _applications_$_commands
@@ -386,7 +415,29 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_$_emojis
     | typeof _applications_$_emojis
     | typeof _applications_$_entitlements
+    | typeof _guilds_$
+    | typeof _guilds_$_preview
     | typeof _guilds_$_channels
+    | typeof _guilds_$_threads_active
+    | typeof _guilds_$_members
+    | typeof _guilds_$_members_search
+    | typeof _guilds_$_members_me
+    | typeof _guilds_$_members_me_nick
+    | typeof _guilds_$_bans
+    | typeof _guilds_$_bulkban
+    | typeof _guilds_$_roles
+    | typeof _guilds_$_mfa
+    | typeof _guilds_$_prune
+    | typeof _guilds_$_regions
+    | typeof _guilds_$_invites
+    | typeof _guilds_$_integrations
+    | typeof _guilds_$_widget
+    | typeof _guilds_$_widgetjson
+    | typeof _guilds_$_vanityurl
+    | typeof _guilds_$_widgetpng
+    | typeof _guilds_$_welcomescreen
+    | typeof _guilds_$_onboarding
+    | typeof _guilds_$_incidentactions
   ? [string] :
   P extends
     | typeof _interactions_$_$_callback
@@ -409,11 +460,16 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _applications_$_emojis_$
     | typeof _applications_$_entitlements_$
     | typeof _applications_$_entitlements_$_consume
+    | typeof _guilds_$_members_$
+    | typeof _guilds_$_bans_$
+    | typeof _guilds_$_roles_$
+    | typeof _guilds_$_integrations_$
   ? [string, string] :
   P extends
     | typeof _webhooks_$_$_messages_$
     | typeof _applications_$_guilds_$_commands_$
     | typeof _applications_$_guilds_$_commands_$_permissions
+    | typeof _guilds_$_members_$_roles_$
     | typeof _channels_$_messages_$_reactions_$_me
     | typeof _channels_$_messages_$_reactions_$
   ? [string, string, string] :

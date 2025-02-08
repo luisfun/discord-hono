@@ -82,6 +82,39 @@ export const _applications_$_entitlements_$ = '/applications/{application.id}/en
 export const _applications_$_entitlements_$_consume =
   '/applications/{application.id}/entitlements/{entitlement.id}/consume' as const
 
+////////// Guild //////////
+// https://discord.com/developers/docs/resources/guild
+
+export const _guilds = '/guilds' as const
+export const _guilds_$ = '/guilds/{guild.id}' as const
+export const _guilds_$_preview = '/guilds/{guild.id}/preview' as const
+export const _guilds_$_channels = '/guilds/{guild.id}/channels' as const
+export const _guilds_$_threads_active = '/guilds/{guild.id}/threads/active' as const
+export const _guilds_$_members_$ = '/guilds/{guild.id}/members/{user.id}' as const
+export const _guilds_$_members = '/guilds/{guild.id}/members' as const
+export const _guilds_$_members_search = '/guilds/{guild.id}/members/search' as const
+export const _guilds_$_members_me = '/guilds/{guild.id}/members/@me' as const
+export const _guilds_$_members_me_nick = '/guilds/{guild.id}/members/@me/nick' as const
+export const _guilds_$_members_$_roles_$ = '/guilds/{guild.id}/members/{user.id}/roles/{role.id}' as const
+export const _guilds_$_bans = '/guilds/{guild.id}/bans' as const
+export const _guilds_$_bans_$ = '/guilds/{guild.id}/bans/{user.id}' as const
+export const _guilds_$_bulkban = '/guilds/{guild.id}/bulk-ban' as const
+export const _guilds_$_roles = '/guilds/{guild.id}/roles' as const
+export const _guilds_$_roles_$ = '/guilds/{guild.id}/roles/{role.id}' as const
+export const _guilds_$_mfa = '/guilds/{guild.id}/mfa' as const
+export const _guilds_$_prune = '/guilds/{guild.id}/prune' as const
+export const _guilds_$_regions = '/guilds/{guild.id}/regions' as const
+export const _guilds_$_invites = '/guilds/{guild.id}/invites' as const
+export const _guilds_$_integrations = '/guilds/{guild.id}/integrations' as const
+export const _guilds_$_integrations_$ = '/guilds/{guild.id}/integrations/{integration.id}' as const
+export const _guilds_$_widget = '/guilds/{guild.id}/widget' as const
+export const _guilds_$_widgetjson = '/guilds/{guild.id}/widget.json' as const
+export const _guilds_$_vanityurl = '/guilds/{guild.id}/vanity-url' as const
+export const _guilds_$_widgetpng = '/guilds/{guild.id}/widget.png' as const
+export const _guilds_$_welcomescreen = '/guilds/{guild.id}/welcome-screen' as const
+export const _guilds_$_onboarding = '/guilds/{guild.id}/onboarding' as const
+export const _guilds_$_incidentactions = '/guilds/{guild.id}/incident-actions' as const
+
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message
 
@@ -96,8 +129,3 @@ export const _channels_$_messages_$_reactions_$ =
   '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}' as const
 export const _channels_$_messages_$_reactions = '/channels/{channel.id}/messages/{message.id}/reactions' as const
 export const _channels_$_messages_bulkdelete = '/channels/{channel.id}/messages/bulk-delete' as const
-
-////////// Guild //////////
-// https://discord.com/developers/docs/resources/guild
-
-export const _guilds_$_channels = '/guilds/{guild.id}/channels' as const
