@@ -1,6 +1,6 @@
 import type { FileData } from '../types'
 import { formData, newError } from '../utils'
-import type { ReturnCreateRest } from './rest-types'
+import type { Rest } from './rest-types'
 
 const API_VER = 'v10'
 
@@ -9,7 +9,7 @@ const API_VER = 'v10'
  * @param {string} token
  */
 export const createRest =
-  (token: string | undefined): ReturnCreateRest =>
+  (token: string | undefined): Rest =>
   /**
    * [Documentation](https://discord-hono.luis.fun/interactions/rest/)
    * @param {'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'} method
@@ -33,9 +33,8 @@ export const createRest =
 
 /*
 const rest = createRest('')
-// @ts-expect-error
 const res = await rest('POST', '/applications/{application.id}/commands', ['application.id'], {
   name: '',
-  description: '',
+  //description: '',
 }).then(r => r.json())
 */

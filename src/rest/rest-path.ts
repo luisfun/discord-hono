@@ -42,7 +42,8 @@ export const _guilds_$_auditlogs = '/guilds/{guild.id}/audit-logs' as const
 // https://discord.com/developers/docs/resources/auto-moderation
 // ✅ 25/02/07
 export const _guilds_$_automoderation_rules = '/guilds/{guild.id}/auto-moderation/rules' as const
-export const _guilds_$_automoderation_rules_$ = '/guilds/{guild.id}/auto-moderation/rules/{auto_moderation_rule.id}' as const
+export const _guilds_$_automoderation_rules_$ =
+  '/guilds/{guild.id}/auto-moderation/rules/{auto_moderation_rule.id}' as const
 
 ////////// Channel //////////
 // https://discord.com/developers/docs/resources/channel
@@ -50,7 +51,7 @@ export const _guilds_$_automoderation_rules_$ = '/guilds/{guild.id}/auto-moderat
 export const _channels_$ = '/channels/{channel.id}' as const
 export const _channels_$_permissions_$ = '/channels/{channel.id}/permissions/{overwrite.id}' as const
 export const _channels_$_invites = '/channels/{channel.id}/invites' as const
-export const _channels_$_followers = "/channels/{channel.id}/followers" as const
+export const _channels_$_followers = '/channels/{channel.id}/followers' as const
 export const _channels_$_typing = '/channels/{channel.id}/typing' as const
 export const _channels_$_pins = '/channels/{channel.id}/pins' as const
 export const _channels_$_pins_$ = '/channels/{channel.id}/pins/{message.id}' as const
@@ -62,7 +63,8 @@ export const _channels_$_threadmembers_$ = '/channels/{channel.id}/thread-member
 export const _channels_$_threadmembers = '/channels/{channel.id}/thread-members' as const
 export const _channels_$_threads_archived_public = '/channels/{channel.id}/threads/archived/public' as const
 export const _channels_$_threads_archived_private = '/channels/{channel.id}/threads/archived/private' as const
-export const _channels_$_users_me_threads_archived_private = '/channels/{channel.id}/users/@me/threads/archived/private' as const
+export const _channels_$_users_me_threads_archived_private =
+  '/channels/{channel.id}/users/@me/threads/archived/private' as const
 
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message
