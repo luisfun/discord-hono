@@ -19,7 +19,7 @@ export const createRest =
    * @param {FileData} file
    * @returns {Promise<Response>}
    */
-  (method: string, path: string, variables: string[], data?: object, file?: FileData) => {
+  (method: string, path: string, variables: string[], data?: any, file?: FileData) => {
     if (!token) throw newError('Rest', 'DISCORD_TOKEN')
     const vars = [...variables]
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
@@ -33,9 +33,9 @@ export const createRest =
 
 /*
 const rest = createRest('')
-const res = await rest('POST', '/applications/{application.id}/commands', ['application.id'], {
+const res1 = await rest('POST', '/applications/{application.id}/commands', ['application.id'], {
   name: '',
   //description: '',
 }).then(r => r.json())
-const res = await rest("GET", "/applications/{application.id}/activity-instances/{instance_id}", ["application.id", "instance_id"]).then(r => r.json())
+const res2 = await rest("GET", "/applications/{application.id}/activity-instances/{instance_id}", ["application.id", "instance_id"]).then(r => r.json())
 */

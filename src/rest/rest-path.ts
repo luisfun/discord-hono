@@ -47,7 +47,7 @@ export const _guilds_$_automoderation_rules_$ =
 
 ////////// Channel //////////
 // https://discord.com/developers/docs/resources/channel
-// TODO: path, data, file, result // OK: Variables
+// ✅ 25/02/08
 export const _channels_$ = '/channels/{channel.id}' as const
 export const _channels_$_permissions_$ = '/channels/{channel.id}/permissions/{overwrite.id}' as const
 export const _channels_$_invites = '/channels/{channel.id}/invites' as const

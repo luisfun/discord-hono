@@ -1,7 +1,9 @@
 import type {
   RESTDeleteAPIChannelPermissionResult,
   RESTDeleteAPIChannelPinResult,
+  RESTDeleteAPIChannelRecipientResult,
   RESTDeleteAPIChannelResult,
+  RESTDeleteAPIChannelThreadMembersResult,
   RESTGetAPIApplicationCommandPermissionsResult,
   RESTGetAPIApplicationCommandResult,
   RESTGetAPIApplicationCommandsQuery,
@@ -22,6 +24,12 @@ import type {
   RESTGetAPIChannelMessagesResult,
   RESTGetAPIChannelPinsResult,
   RESTGetAPIChannelResult,
+  RESTGetAPIChannelThreadMemberQuery,
+  RESTGetAPIChannelThreadMemberResult,
+  RESTGetAPIChannelThreadMembersQuery,
+  RESTGetAPIChannelThreadMembersResult,
+  RESTGetAPIChannelThreadsArchivedPrivateResult,
+  RESTGetAPIChannelThreadsArchivedPublicResult,
   RESTGetAPIGuildApplicationCommandsPermissionsResult,
   RESTGetAPIInteractionFollowupResult,
   RESTGetAPIInteractionOriginalResponseResult,
@@ -54,6 +62,10 @@ import type {
   RESTPostAPIChannelInviteResult,
   RESTPostAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessagesBulkDeleteJSONBody,
+  RESTPostAPIChannelMessagesThreadsJSONBody,
+  RESTPostAPIChannelMessagesThreadsResult,
+  RESTPostAPIChannelThreadsJSONBody,
+  RESTPostAPIChannelThreadsResult,
   RESTPostAPIChannelTypingResult,
   RESTPostAPIGuildChannelJSONBody,
   RESTPostAPIInteractionCallbackQuery,
@@ -71,6 +83,9 @@ import type {
   RESTPutAPIChannelPermissionJSONBody,
   RESTPutAPIChannelPermissionResult,
   RESTPutAPIChannelPinResult,
+  RESTPutAPIChannelRecipientJSONBody,
+  RESTPutAPIChannelRecipientResult,
+  RESTPutAPIChannelThreadMembersResult,
   RESTPutAPIGuildApplicationCommandsPermissionsJSONBody,
   RESTPutAPIGuildApplicationCommandsPermissionsResult,
 } from 'discord-api-types/v10'
@@ -119,6 +134,13 @@ import type {
   _webhooks_$_$_messages_original,
 } from './rest-path'
 
+///// Unknowns /////
+// [Get Application Activity Instance](https://discord.com/developers/docs/resources/application#get-application-activity-instance)
+// [Start Thread in Forum or Media Channel](https://discord.com/developers/docs/resources/channel#start-thread-in-forum-or-media-channel)
+// [List Public Archived Threads](https://discord.com/developers/docs/resources/channel#list-public-archived-threads)
+// [List Private Archived Threads](https://discord.com/developers/docs/resources/channel#list-private-archived-threads)
+// [List Joined Private Archived Threads](https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads)
+
 type CouldNotFind = "Please redefine the type using 'as unknown'"
 
 export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
@@ -156,6 +178,8 @@ type RestPathNonData<M extends RestMethod> =
   : M extends 'PUT' ?
     // Channel
     | typeof _channels_$_pins_$
+    | typeof _channels_$_threadmembers_me
+    | typeof _channels_$_threadmembers_$
     // Messages
     | typeof _channels_$_messages_$_reactions_$_me
   : M extends 'POST' ?
@@ -179,6 +203,9 @@ type RestPathNonData<M extends RestMethod> =
     | typeof _channels_$
     | typeof _channels_$_permissions_$
     | typeof _channels_$_pins_$
+    | typeof _channels_$_recipients_$
+    | typeof _channels_$_threadmembers_me
+    | typeof _channels_$_threadmembers_$
     // Messages
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_reactions
@@ -198,6 +225,12 @@ type RestPathWithData<M extends RestMethod> =
     | typeof _applications_$_guilds_$_commands
     // Audit Log
     | typeof _guilds_$_auditlogs
+    // Channel
+    | typeof _channels_$_threadmembers_$
+    | typeof _channels_$_threadmembers
+    | typeof _channels_$_threads_archived_public
+    | typeof _channels_$_threads_archived_private
+    | typeof _channels_$_users_me_threads_archived_private
     // Messages
     | typeof _channels_$_messages
     | typeof _channels_$_messages_$
@@ -211,6 +244,7 @@ type RestPathWithData<M extends RestMethod> =
     | typeof _applications_$_roleconnections_metadata
     // Channel
     | typeof _channels_$_permissions_$
+    | typeof _channels_$_recipients_$
   : M extends 'POST' ?
     // Application Commands
     | typeof _applications_$_commands
@@ -220,6 +254,8 @@ type RestPathWithData<M extends RestMethod> =
     // Channel
     | typeof _channels_$_invites
     | typeof _channels_$_followers
+    | typeof _channels_$_messages_$_threads
+    | typeof _channels_$_threads
     // Messages
     | typeof _channels_$_messages_bulkdelete
     // Guild
@@ -243,6 +279,8 @@ type RestPathWithFile<M extends RestMethod> =
     | typeof _interactions_$_$_callback
     | typeof _webhooks_$_$_messages_original
     | typeof _webhooks_$_$
+    // Channel
+    | typeof _channels_$_threads
     // Messages
     | typeof _channels_$_messages
   : M extends 'PATCH' ?
@@ -328,6 +366,12 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_guilds_$_commands ? RESTGetAPIApplicationGuildCommandsQuery :
     // Audit Log
     P extends typeof _guilds_$_auditlogs ? RESTGetAPIAuditLogQuery :
+    // Channel
+    P extends typeof _channels_$_threadmembers_$ ? RESTGetAPIChannelThreadMemberQuery :
+    P extends typeof _channels_$_threadmembers ? RESTGetAPIChannelThreadMembersQuery :
+    P extends typeof _channels_$_threads_archived_public ? CouldNotFind :
+    P extends typeof _channels_$_threads_archived_private ? CouldNotFind :
+    P extends typeof _channels_$_users_me_threads_archived_private ? CouldNotFind :
     // Messages
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesQuery :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
@@ -342,6 +386,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_roleconnections_metadata ? RESTPutAPIApplicationRoleConnectionMetadataJSONBody :
     // Channel
     P extends typeof _channels_$_permissions_$ ? RESTPutAPIChannelPermissionJSONBody :
+    P extends typeof _channels_$_recipients_$ ? RESTPutAPIChannelRecipientJSONBody :
     undefined
   : M extends 'POST' ?
     // Receiving and Responding
@@ -356,6 +401,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Channel
     P extends typeof _channels_$_invites ? RESTPostAPIChannelInviteJSONBody :
     P extends typeof _channels_$_followers ? RESTPostAPIChannelFollowersJSONBody :
+    P extends typeof _channels_$_messages_$_threads ? RESTPostAPIChannelMessagesThreadsJSONBody :
+    P extends typeof _channels_$_threads ? RESTPostAPIChannelThreadsJSONBody | CouldNotFind :
     // Messages
     P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
@@ -393,6 +440,8 @@ export type RestFile<M extends RestMethod, P extends RestPath<M>> =
       | typeof _interactions_$_$_callback
       | typeof _webhooks_$_$_messages_original
       | typeof _webhooks_$_$
+      // Channel
+      | typeof _channels_$_threads
       // Messages
       | typeof _channels_$_messages
     ? FileData : undefined
@@ -438,6 +487,11 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$ ? RESTGetAPIChannelResult :
     P extends typeof _channels_$_invites ? RESTGetAPIChannelInvitesResult :
     P extends typeof _channels_$_pins ? RESTGetAPIChannelPinsResult :
+    P extends typeof _channels_$_threadmembers_$ ? RESTGetAPIChannelThreadMemberResult :
+    P extends typeof _channels_$_threadmembers ? RESTGetAPIChannelThreadMembersResult :
+    P extends typeof _channels_$_threads_archived_public ? RESTGetAPIChannelThreadsArchivedPublicResult :
+    P extends typeof _channels_$_threads_archived_private ? RESTGetAPIChannelThreadsArchivedPrivateResult :
+    P extends typeof _channels_$_users_me_threads_archived_private ? CouldNotFind :
     // Messages
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
@@ -454,6 +508,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Channel
     P extends typeof _channels_$_permissions_$ ? RESTPutAPIChannelPermissionResult :
     P extends typeof _channels_$_pins_$ ? RESTPutAPIChannelPinResult :
+    P extends typeof _channels_$_recipients_$ ? RESTPutAPIChannelRecipientResult :
+    P extends typeof _channels_$_threadmembers_me ? RESTPutAPIChannelThreadMembersResult :
+    P extends typeof _channels_$_threadmembers_$ ? RESTPutAPIChannelThreadMembersResult :
     undefined
   : M extends 'POST' ?
     // Receiving and Responding
@@ -469,6 +526,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_invites ? RESTPostAPIChannelInviteResult :
     P extends typeof _channels_$_followers ? RESTPostAPIChannelFollowersResult :
     P extends typeof _channels_$_typing ? RESTPostAPIChannelTypingResult :
+    P extends typeof _channels_$_messages_$_threads ? RESTPostAPIChannelMessagesThreadsResult :
+    P extends typeof _channels_$_threads ? RESTPostAPIChannelThreadsResult | CouldNotFind :
     undefined
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -488,6 +547,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$ ? RESTDeleteAPIChannelResult :
     P extends typeof _channels_$_permissions_$ ? RESTDeleteAPIChannelPermissionResult :
     P extends typeof _channels_$_pins_$ ? RESTDeleteAPIChannelPinResult :
+    P extends typeof _channels_$_recipients_$ ? RESTDeleteAPIChannelRecipientResult :
+    P extends typeof _channels_$_threadmembers_me ? RESTDeleteAPIChannelThreadMembersResult :
+    P extends typeof _channels_$_threadmembers_$ ? RESTDeleteAPIChannelThreadMembersResult :
     undefined
   : any
 
