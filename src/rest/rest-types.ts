@@ -94,6 +94,8 @@ import type {
   _applications_$_activityinstances_$,
   _applications_$_commands,
   _applications_$_commands_$,
+  _applications_$_emojis,
+  _applications_$_emojis_$,
   _applications_$_guilds_$_commands,
   _applications_$_guilds_$_commands_$,
   _applications_$_guilds_$_commands_$_permissions,
@@ -128,6 +130,8 @@ import type {
   _guilds_$_automoderation_rules,
   _guilds_$_automoderation_rules_$,
   _guilds_$_channels,
+  _guilds_$_emojis,
+  _guilds_$_emojis_$,
   _interactions_$_$_callback,
   _webhooks_$_$,
   _webhooks_$_$_messages_$,
@@ -305,6 +309,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _applications_$_roleconnections_metadata
     | typeof _guilds_$_auditlogs
     | typeof _guilds_$_automoderation_rules
+    | typeof _channels_$
     | typeof _channels_$_invites
     | typeof _channels_$_followers
     | typeof _channels_$_typing
@@ -317,7 +322,8 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _channels_$_users_me_threads_archived_private
     | typeof _channels_$_messages
     | typeof _channels_$_messages_bulkdelete
-    | typeof _channels_$
+    | typeof _guilds_$_emojis
+    | typeof _applications_$_emojis
     | typeof _guilds_$_channels
   ? [string] :
   P extends
@@ -337,6 +343,8 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_crosspost
     | typeof _channels_$_messages_$_reactions
+    | typeof _guilds_$_emojis_$
+    | typeof _applications_$_emojis_$
   ? [string, string] :
   P extends
     | typeof _webhooks_$_$_messages_$

@@ -66,6 +66,14 @@ export const _channels_$_threads_archived_private = '/channels/{channel.id}/thre
 export const _channels_$_users_me_threads_archived_private =
   '/channels/{channel.id}/users/@me/threads/archived/private' as const
 
+////////// Emoji //////////
+// https://discord.com/developers/docs/resources/emoji
+
+export const _guilds_$_emojis = '/guilds/{guild.id}/emojis' as const
+export const _guilds_$_emojis_$ = '/guilds/{guild.id}/emojis/{emoji.id}' as const
+export const _applications_$_emojis = '/applications/{application.id}/emojis' as const
+export const _applications_$_emojis_$ = '/applications/{application.id}/emojis/{emoji.id}' as const
+
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message
 
