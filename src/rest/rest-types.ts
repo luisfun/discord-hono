@@ -7,6 +7,8 @@ import type {
   RESTDeleteAPIChannelThreadMembersResult,
   RESTDeleteAPIEntitlementResult,
   RESTDeleteAPIGuildEmojiResult,
+  RESTDeleteAPIGuildMemberResult,
+  RESTDeleteAPIGuildMemberRoleResult,
   RESTDeleteAPIGuildResult,
   RESTGetAPIApplicationCommandPermissionsResult,
   RESTGetAPIApplicationCommandResult,
@@ -67,11 +69,16 @@ import type {
   RESTPatchAPIChannelJSONBody,
   RESTPatchAPIChannelMessageJSONBody,
   RESTPatchAPIChannelResult,
+  RESTPatchAPICurrentGuildMemberJSONBody,
+  RESTPatchAPICurrentGuildMemberNicknameJSONBody,
+  RESTPatchAPICurrentGuildMemberNicknameResult,
   RESTPatchAPIGuildChannelPositionsJSONBody,
   RESTPatchAPIGuildChannelPositionsResult,
   RESTPatchAPIGuildEmojiJSONBody,
   RESTPatchAPIGuildEmojiResult,
   RESTPatchAPIGuildJSONBody,
+  RESTPatchAPIGuildMemberJSONBody,
+  RESTPatchAPIGuildMemberResult,
   RESTPatchAPIGuildResult,
   RESTPatchAPIInteractionFollowupJSONBody,
   RESTPatchAPIInteractionFollowupResult,
@@ -127,6 +134,9 @@ import type {
   RESTPutAPIChannelThreadMembersResult,
   RESTPutAPIGuildApplicationCommandsPermissionsJSONBody,
   RESTPutAPIGuildApplicationCommandsPermissionsResult,
+  RESTPutAPIGuildMemberJSONBody,
+  RESTPutAPIGuildMemberResult,
+  RESTPutAPIGuildMemberRoleResult,
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import type {
@@ -214,6 +224,7 @@ import type {
 // [List Public Archived Threads](https://discord.com/developers/docs/resources/channel#list-public-archived-threads)
 // [List Private Archived Threads](https://discord.com/developers/docs/resources/channel#list-private-archived-threads)
 // [List Joined Private Archived Threads](https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads)
+// [Modify Current Member](https://discord.com/developers/docs/resources/guild#modify-current-member)
 
 type CouldNotFind = unknown
 
@@ -272,6 +283,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _channels_$_pins_$
     | typeof _channels_$_threadmembers_me
     | typeof _channels_$_threadmembers_$
+    // Guild
+    | typeof _guilds_$_members_$_roles_$
     // Message
     | typeof _channels_$_messages_$_reactions_$_me
   : M extends 'POST' ?
@@ -307,6 +320,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _applications_$_entitlements_$
     // Guild
     | typeof _guilds_$
+    | typeof _guilds_$_members_$_roles_$
+    | typeof _guilds_$_members_$
     // Message
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_reactions
@@ -352,6 +367,8 @@ type RestPathVarsData<M extends RestMethod> =
     // Channel
     | typeof _channels_$_permissions_$
     | typeof _channels_$_recipients_$
+    // Guild
+    | typeof _guilds_$_members_$
   : M extends 'POST' ?
     // Application Commands
     | typeof _applications_$_commands
@@ -389,6 +406,9 @@ type RestPathVarsData<M extends RestMethod> =
     // Guild
     | typeof _guilds_$
     | typeof _guilds_$_channels
+    | typeof _guilds_$_members_$
+    | typeof _guilds_$_members_me
+    | typeof _guilds_$_members_me_nick
   : never
 
 // biome-ignore format: ternary operator
@@ -554,6 +574,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Channel
     P extends typeof _channels_$_permissions_$ ? RESTPutAPIChannelPermissionJSONBody :
     P extends typeof _channels_$_recipients_$ ? RESTPutAPIChannelRecipientJSONBody :
+    // Guild
+    P extends typeof _guilds_$_members_$ ? RESTPutAPIGuildMemberJSONBody :
     never
   : M extends 'POST' ?
     // Receiving and Responding
@@ -602,6 +624,9 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Guild
     P extends typeof _guilds_$ ? RESTPatchAPIGuildJSONBody :
     P extends typeof _guilds_$_channels ? RESTPatchAPIGuildChannelPositionsJSONBody :
+    P extends typeof _guilds_$_members_$ ? RESTPatchAPIGuildMemberJSONBody :
+    P extends typeof _guilds_$_members_me ? RESTPatchAPICurrentGuildMemberJSONBody :
+    P extends typeof _guilds_$_members_me_nick ? RESTPatchAPICurrentGuildMemberNicknameJSONBody :
     never  
   : never
 
@@ -706,6 +731,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_recipients_$ ? RESTPutAPIChannelRecipientResult :
     P extends typeof _channels_$_threadmembers_me ? RESTPutAPIChannelThreadMembersResult :
     P extends typeof _channels_$_threadmembers_$ ? RESTPutAPIChannelThreadMembersResult :
+    // Guild
+    P extends typeof _guilds_$_members_$ ? RESTPutAPIGuildMemberResult :
+    P extends typeof _guilds_$_members_$_roles_$ ? RESTPutAPIGuildMemberRoleResult :
     never
   : M extends 'POST' ?
     // Receiving and Responding
@@ -751,6 +779,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Guild
     P extends typeof _guilds_$ ? RESTPatchAPIGuildResult :
     P extends typeof _guilds_$_channels ? RESTPatchAPIGuildChannelPositionsResult :
+    P extends typeof _guilds_$_members_$ ? RESTPatchAPIGuildMemberResult :
+    P extends typeof _guilds_$_members_me ? CouldNotFind :
+    P extends typeof _guilds_$_members_me_nick ? RESTPatchAPICurrentGuildMemberNicknameResult :
     never
   : M extends 'DELETE' ?
     // Channel
@@ -767,6 +798,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_entitlements_$ ? RESTDeleteAPIEntitlementResult :
     // Guild
     P extends typeof _guilds_$ ? RESTDeleteAPIGuildResult :
+    P extends typeof _guilds_$_members_$_roles_$ ? RESTDeleteAPIGuildMemberRoleResult :
+    P extends typeof _guilds_$_members_$ ? RESTDeleteAPIGuildMemberResult :
     never
   : never
 
