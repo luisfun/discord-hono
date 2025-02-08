@@ -173,7 +173,14 @@ export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 ////////////////////////////////////////
 
 // biome-ignore format: ternary operator
-type RestPathNonData<M extends RestMethod> =
+type RestPathNV<M extends RestMethod> =
+  M extends 'GET' ?
+    // Application
+    | typeof _applications_me
+  : never
+
+// biome-ignore format: ternary operator
+type RestPathVars<M extends RestMethod> =
   M extends 'GET' ?
     // Receiving and Responding
     | typeof _webhooks_$_$_messages_$
@@ -183,7 +190,6 @@ type RestPathNonData<M extends RestMethod> =
     | typeof _applications_$_guilds_$_commands_permissions
     | typeof _applications_$_guilds_$_commands_$_permissions
     // Application
-    | typeof _applications_me
     | typeof _applications_$_activityinstances_$
     // Application Role Connection Metadata
     | typeof _applications_$_roleconnections_metadata
@@ -244,7 +250,7 @@ type RestPathNonData<M extends RestMethod> =
   : never
 
 // biome-ignore format: ternary operator
-type RestPathWithData<M extends RestMethod> =
+type RestPathVarsData<M extends RestMethod> =
   M extends 'GET' ?
     // Receiving and Responding
     | typeof _webhooks_$_$_messages_original
@@ -308,7 +314,7 @@ type RestPathWithData<M extends RestMethod> =
   : never
 
 // biome-ignore format: ternary operator
-type RestPathWithFile<M extends RestMethod> =
+type RestPathVarsDataFile<M extends RestMethod> =
   M extends 'POST' ?
     // Receiving and Responding
     | typeof _interactions_$_$_callback
@@ -325,7 +331,11 @@ type RestPathWithFile<M extends RestMethod> =
     | typeof _channels_$_messages_$
   : never
 
-export type RestPath<M extends RestMethod> = RestPathNonData<M> | RestPathWithData<M> | RestPathWithFile<M>
+export type RestPath<M extends RestMethod> =
+  | RestPathNV<M>
+  | RestPathVars<M>
+  | RestPathVarsData<M>
+  | RestPathVarsDataFile<M>
 
 ////////////////////////////////////////
 //////                            //////
@@ -621,18 +631,19 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
 type TypedResponse<T> = Omit<Response, 'json'> & { json(): Promise<T> }
 
 export type Rest = {
-  <M extends RestMethod, P extends RestPathNonData<M>>(
+  <M extends RestMethod, P extends RestPathNV<M>>(method: M, path: P): Promise<TypedResponse<RestResult<M, P>>>
+  <M extends RestMethod, P extends RestPathVars<M>>(
     method: M,
     path: P,
     variables: RestVariables<P>,
   ): Promise<TypedResponse<RestResult<M, P>>>
-  <M extends RestMethod, P extends RestPathWithData<M>>(
+  <M extends RestMethod, P extends RestPathVarsData<M>>(
     method: M,
     path: P,
     variables: RestVariables<P>,
     data: RestData<M, P>,
   ): Promise<TypedResponse<RestResult<M, P>>>
-  <M extends RestMethod, P extends RestPathWithFile<M>>(
+  <M extends RestMethod, P extends RestPathVarsDataFile<M>>(
     method: M,
     path: P,
     variables: RestVariables<P>,

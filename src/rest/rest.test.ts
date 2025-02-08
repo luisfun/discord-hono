@@ -21,7 +21,7 @@ describe('Rest', () => {
   })
 
   it('should throw an error if token is not provided', () => {
-    expect(() => createRest(undefined)('GET', '/applications/@me', [])).toThrow()
+    expect(() => createRest(undefined)('GET', '/applications/@me')).toThrow()
   })
 
   it('should make a GET request', async () => {

@@ -19,14 +19,14 @@ export const createRest =
    * @param {FileData} file
    * @returns {Promise<Response>}
    */
-  (method: string, path: string, variables: string[], data?: any, file?: FileData) => {
+  (method: string, path: string, variables?: string[], data?: any, file?: FileData) => {
     if (!token) throw newError('Rest', 'DISCORD_TOKEN')
-    const vars = [...variables]
+    const vars = [...(variables ?? [])]
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
     if (!file) headers['content-type'] = 'application/json'
     // biome-ignore format: test width
     return fetch(
-      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() || '')}`,
+      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '')}`,
       { method, headers, body: file ? formData(data, file) : JSON.stringify(data) },
     )
   }
@@ -43,5 +43,5 @@ const res2 = await rest('GET', '/applications/{application.id}/activity-instance
 ]).then(r => r.json())
 // @ts-expect-error
 const res3 = await rest('GET', '/unknown', [], { content: '' }).then(r => r.json())
-const res4 = await rest('GET', '/applications/@me', []).then(r => r.json())
+const res4 = await rest('GET', '/applications/@me').then(r => r.json())
 */
