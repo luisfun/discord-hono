@@ -155,3 +155,8 @@ export const _channels_$_messages_bulkdelete = '/channels/{channel.id}/messages/
 // ✅ 25/02/08
 export const _channels_$_polls_$_answers_$ = '/channels/{channel.id}/polls/{message.id}/answers/{answer_id}' as const
 export const _channels_$_polls_$_expire = '/channels/{channel.id}/polls/{message.id}/expire' as const
+
+////////// SKU //////////
+// https://discord.com/developers/docs/resources/sku
+// ✅ 25/02/08
+export const _applications_$_skus = '/applications/{application.id}/skus' as const

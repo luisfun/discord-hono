@@ -94,6 +94,7 @@ import type {
   RESTGetAPIInviteResult,
   RESTGetAPIPollAnswerVotersQuery,
   RESTGetAPIPollAnswerVotersResult,
+  RESTGetAPISKUsResult,
   RESTGetAPITemplateResult,
   RESTGetAPIWebhookWithTokenMessageQuery,
   RESTGetCurrentApplicationResult,
@@ -230,6 +231,7 @@ import type {
   _applications_$_guilds_$_commands_$_permissions,
   _applications_$_guilds_$_commands_permissions,
   _applications_$_roleconnections_metadata,
+  _applications_$_skus,
   _applications_me,
   _channels_$,
   _channels_$_followers,
@@ -380,6 +382,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_$_templates
     // Message
     | typeof _channels_$_messages_$
+    // SKU
+    | typeof _applications_$_skus
   : M extends 'PUT' ?
     // Channel
     | typeof _channels_$_pins_$
@@ -641,6 +645,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_templates_$
     | typeof _guilds_$_templates
     | typeof _invites_$
+    | typeof _applications_$_skus
   ? [string] :
   P extends
     | typeof _interactions_$_$_callback
@@ -927,6 +932,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersResult :
     // Poll
     P extends typeof _channels_$_polls_$_answers_$ ? RESTGetAPIPollAnswerVotersResult :
+    // SKU
+    P extends typeof _applications_$_skus ? RESTGetAPISKUsResult :
     never
   : M extends 'PUT' ?
     // Application Commands
