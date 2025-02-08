@@ -260,12 +260,14 @@ import type {
 } from './rest-path'
 
 ///// Unknowns /////
+// _interactions_$_$_callback ??
 // [Get Application Activity Instance](https://discord.com/developers/docs/resources/application#get-application-activity-instance)
 // [Start Thread in Forum or Media Channel](https://discord.com/developers/docs/resources/channel#start-thread-in-forum-or-media-channel)
 // [List Public Archived Threads](https://discord.com/developers/docs/resources/channel#list-public-archived-threads)
 // [List Private Archived Threads](https://discord.com/developers/docs/resources/channel#list-private-archived-threads)
 // [List Joined Private Archived Threads](https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads)
 // [Modify Current Member](https://discord.com/developers/docs/resources/guild#modify-current-member)
+// [Modify Guild Incident Actions](https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions)
 
 type CouldNotFind = unknown
 

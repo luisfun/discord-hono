@@ -19,9 +19,9 @@ export const createRest =
    * @param {FileData} file
    * @returns {Promise<Response>}
    */
-  (method: string, path: string, variables?: string[], data?: any, file?: FileData) => {
+  (method: string, path: string, variables: string[] = [], data?: any, file?: FileData) => {
     if (!token) throw newError('Rest', 'DISCORD_TOKEN')
-    const vars = [...(variables ?? [])]
+    const vars = [...variables]
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
     if (!file) headers['content-type'] = 'application/json'
     // biome-ignore format: test width

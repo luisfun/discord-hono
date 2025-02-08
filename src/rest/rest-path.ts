@@ -84,7 +84,7 @@ export const _applications_$_entitlements_$_consume =
 
 ////////// Guild //////////
 // https://discord.com/developers/docs/resources/guild
-
+// ✅ 25/02/08
 export const _guilds = '/guilds' as const
 export const _guilds_$ = '/guilds/{guild.id}' as const
 export const _guilds_$_preview = '/guilds/{guild.id}/preview' as const
