@@ -137,7 +137,7 @@ export const _invites_$ = '/invites/{invite.code}' as const
 
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message
-
+// ✅ 25/02/08
 export const _channels_$_messages = '/channels/{channel.id}/messages' as const
 export const _channels_$_messages_$ = '/channels/{channel.id}/messages/{message.id}' as const
 export const _channels_$_messages_$_crosspost = '/channels/{channel.id}/messages/{message.id}/crosspost' as const

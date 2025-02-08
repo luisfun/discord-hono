@@ -1,5 +1,9 @@
 import type {
   RESTDeleteAPIApplicationEmojiResult,
+  RESTDeleteAPIChannelMessageOwnReactionResult,
+  RESTDeleteAPIChannelMessageReactionResult,
+  RESTDeleteAPIChannelMessageResult,
+  RESTDeleteAPIChannelMessageUserReactionResult,
   RESTDeleteAPIChannelPermissionResult,
   RESTDeleteAPIChannelPinResult,
   RESTDeleteAPIChannelRecipientResult,
@@ -101,6 +105,7 @@ import type {
   RESTPatchAPIAutoModerationRuleResult,
   RESTPatchAPIChannelJSONBody,
   RESTPatchAPIChannelMessageJSONBody,
+  RESTPatchAPIChannelMessageResult,
   RESTPatchAPIChannelResult,
   RESTPatchAPICurrentGuildMemberJSONBody,
   RESTPatchAPICurrentGuildMemberNicknameJSONBody,
@@ -143,8 +148,11 @@ import type {
   RESTPostAPIChannelFollowersResult,
   RESTPostAPIChannelInviteJSONBody,
   RESTPostAPIChannelInviteResult,
+  RESTPostAPIChannelMessageCrosspostResult,
   RESTPostAPIChannelMessageJSONBody,
+  RESTPostAPIChannelMessageResult,
   RESTPostAPIChannelMessagesBulkDeleteJSONBody,
+  RESTPostAPIChannelMessagesBulkDeleteResult,
   RESTPostAPIChannelMessagesThreadsJSONBody,
   RESTPostAPIChannelMessagesThreadsResult,
   RESTPostAPIChannelThreadsJSONBody,
@@ -185,6 +193,7 @@ import type {
   RESTPutAPIApplicationGuildCommandsResult,
   RESTPutAPIApplicationRoleConnectionMetadataJSONBody,
   RESTPutAPIApplicationRoleConnectionMetadataResult,
+  RESTPutAPIChannelMessageReactionResult,
   RESTPutAPIChannelPermissionJSONBody,
   RESTPutAPIChannelPermissionResult,
   RESTPutAPIChannelPinResult,
@@ -365,7 +374,7 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_templates_$
     | typeof _guilds_$_templates
     // Message
-    | typeof _channels_$_messages_$_reactions_$
+    | typeof _channels_$_messages_$
   : M extends 'PUT' ?
     // Channel
     | typeof _channels_$_pins_$
@@ -422,11 +431,11 @@ type RestPathVars<M extends RestMethod> =
     // Invite
     | typeof _invites_$
     // Message
-    | typeof _channels_$_messages_$
-    | typeof _channels_$_messages_$_reactions
-    | typeof _channels_$_messages_$_reactions_$
     | typeof _channels_$_messages_$_reactions_$_me
     | typeof _channels_$_messages_$_reactions_$_$  
+    | typeof _channels_$_messages_$_reactions
+    | typeof _channels_$_messages_$_reactions_$
+    | typeof _channels_$_messages_$
   : never
 
 // biome-ignore format: ternary operator
@@ -463,7 +472,7 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _invites_$
     // Message
     | typeof _channels_$_messages
-    | typeof _channels_$_messages_$
+    | typeof _channels_$_messages_$_reactions_$
   : M extends 'PUT' ?
     // Application Commands
     | typeof _applications_$_commands
@@ -705,7 +714,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _invites_$ ? RESTGetAPIInviteQuery :
     // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesQuery :
-    P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
+    P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
     never
   : M extends 'PUT' ?
     // Application Commands
@@ -770,8 +779,6 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_me ? RESTPatchCurrentApplicationJSONBody :
     // Auto Moderation
     P extends typeof _guilds_$_automoderation_rules_$ ? RESTPatchAPIAutoModerationRuleJSONBody :
-    // Message
-    P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
     // Channel
     P extends typeof _channels_$ ? RESTPatchAPIChannelJSONBody :
     // Emoji
@@ -791,6 +798,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_scheduledevents_$ ? RESTPatchAPIGuildScheduledEventJSONBody :
     // Guild Template
     P extends typeof _guilds_$_templates_$ ? RESTPatchAPIGuildTemplateJSONBody :
+    // Message
+    P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
     never
   : never
 
@@ -926,6 +935,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_incidentactions ? CouldNotFind :
     // Guild Template
     P extends typeof _guilds_$_templates_$ ? RESTPutAPIGuildTemplateSyncResult :
+    // Message
+    P extends typeof _channels_$_messages_$_reactions_$_me ? RESTPutAPIChannelMessageReactionResult :
     never
   : M extends 'POST' ?
     // Receiving and Responding
@@ -961,6 +972,10 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Guild Template
     P extends typeof _guilds_templates_$ ? RESTPostAPITemplateCreateGuildResult :
     P extends typeof _guilds_$_templates ? RESTPostAPIGuildTemplatesResult :
+    // Message
+    P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageResult :
+    P extends typeof _channels_$_messages_$_crosspost ? RESTPostAPIChannelMessageCrosspostResult :
+    P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteResult :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -991,6 +1006,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_scheduledevents_$ ? RESTPatchAPIGuildScheduledEventResult :
     // Guild Template
     P extends typeof _guilds_$_templates_$ ? RESTPatchAPIGuildTemplateResult :
+    // Message
+    P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageResult :
     never
   : M extends 'DELETE' ?
     // Channel
@@ -1018,6 +1035,12 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_templates_$ ? RESTDeleteAPIGuildTemplateResult :
     // Invite
     P extends typeof _invites_$ ? RESTDeleteAPIInviteResult :
+    // Message
+    P extends typeof _channels_$_messages_$_reactions_$_me ? RESTDeleteAPIChannelMessageOwnReactionResult :
+    P extends typeof _channels_$_messages_$_reactions_$_$ ? RESTDeleteAPIChannelMessageUserReactionResult :
+    P extends typeof _channels_$_messages_$_reactions ? CouldNotFind :
+    P extends typeof _channels_$_messages_$_reactions_$ ? RESTDeleteAPIChannelMessageReactionResult :
+    P extends typeof _channels_$_messages_$ ? RESTDeleteAPIChannelMessageResult :
     never
   : never
 
