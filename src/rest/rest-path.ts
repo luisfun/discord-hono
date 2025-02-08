@@ -130,6 +130,11 @@ export const _guilds_templates_$ = '/guilds/templates/{template.code}' as const
 export const _guilds_$_templates = '/guilds/{guild.id}/templates' as const
 export const _guilds_$_templates_$ = '/guilds/{guild.id}/templates/{template.code}' as const
 
+////////// Invite //////////
+// https://discord.com/developers/docs/resources/invite
+// ✅ 25/02/08
+export const _invites_$ = '/invites/{invite.code}' as const
+
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message
 

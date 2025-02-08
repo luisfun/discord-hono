@@ -15,6 +15,7 @@ import type {
   RESTDeleteAPIGuildRoleResult,
   RESTDeleteAPIGuildScheduledEventResult,
   RESTDeleteAPIGuildTemplateResult,
+  RESTDeleteAPIInviteResult,
   RESTGetAPIApplicationCommandPermissionsResult,
   RESTGetAPIApplicationCommandResult,
   RESTGetAPIApplicationCommandsQuery,
@@ -85,6 +86,8 @@ import type {
   RESTGetAPIGuildWidgetSettingsResult,
   RESTGetAPIInteractionFollowupResult,
   RESTGetAPIInteractionOriginalResponseResult,
+  RESTGetAPIInviteQuery,
+  RESTGetAPIInviteResult,
   RESTGetAPITemplateResult,
   RESTGetAPIWebhookWithTokenMessageQuery,
   RESTGetCurrentApplicationResult,
@@ -281,6 +284,7 @@ import type {
   _guilds_$_widgetpng,
   _guilds_templates_$,
   _interactions_$_$_callback,
+  _invites_$,
   _webhooks_$_$,
   _webhooks_$_$_messages_$,
   _webhooks_$_$_messages_original,
@@ -415,6 +419,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_$_scheduledevents_$
     // Guild Template
     | typeof _guilds_$_templates_$
+    // Invite
+    | typeof _invites_$
     // Message
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_reactions
@@ -453,6 +459,8 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds_$_scheduledevents
     | typeof _guilds_$_scheduledevents_$
     | typeof _guilds_$_scheduledevents_$_users
+    // Invite
+    | typeof _invites_$
     // Message
     | typeof _channels_$_messages
     | typeof _channels_$_messages_$
@@ -614,6 +622,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_$_scheduledevents
     | typeof _guilds_templates_$
     | typeof _guilds_$_templates
+    | typeof _invites_$
   ? [string] :
   P extends
     | typeof _interactions_$_$_callback
@@ -692,6 +701,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_scheduledevents ? RESTGetAPIGuildScheduledEventsQuery :
     P extends typeof _guilds_$_scheduledevents_$ ? RESTGetAPIGuildScheduledEventQuery :
     P extends typeof _guilds_$_scheduledevents_$_users ? RESTGetAPIGuildScheduledEventUsersQuery :
+    // Invite
+    P extends typeof _invites_$ ? RESTGetAPIInviteQuery :
     // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesQuery :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
@@ -886,6 +897,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Guild Template
     P extends typeof _guilds_templates_$ ? RESTGetAPITemplateResult :
     P extends typeof _guilds_$_templates ? RESTGetAPIGuildTemplatesResult :
+    // Invite
+    P extends typeof _invites_$ ? RESTGetAPIInviteResult :
     // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
@@ -1003,6 +1016,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_scheduledevents_$ ? RESTDeleteAPIGuildScheduledEventResult :
     // Guild Template
     P extends typeof _guilds_$_templates_$ ? RESTDeleteAPIGuildTemplateResult :
+    // Invite
+    P extends typeof _invites_$ ? RESTDeleteAPIInviteResult :
     never
   : never
 
