@@ -43,4 +43,5 @@ const res2 = await rest('GET', '/applications/{application.id}/activity-instance
 ]).then(r => r.json())
 // @ts-expect-error
 const res3 = await rest('GET', '/unknown', [], { content: '' }).then(r => r.json())
+const res4 = await rest('GET', '/applications/@me', []).then(r => r.json())
 */

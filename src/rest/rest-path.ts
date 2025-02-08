@@ -68,11 +68,19 @@ export const _channels_$_users_me_threads_archived_private =
 
 ////////// Emoji //////////
 // https://discord.com/developers/docs/resources/emoji
-
+// ✅ 25/02/08
 export const _guilds_$_emojis = '/guilds/{guild.id}/emojis' as const
 export const _guilds_$_emojis_$ = '/guilds/{guild.id}/emojis/{emoji.id}' as const
 export const _applications_$_emojis = '/applications/{application.id}/emojis' as const
 export const _applications_$_emojis_$ = '/applications/{application.id}/emojis/{emoji.id}' as const
+
+////////// Entitlement //////////
+// https://discord.com/developers/docs/resources/entitlement
+
+export const _applications_$_entitlements = '/applications/{application.id}/entitlements' as const
+export const _applications_$_entitlements_$ = '/applications/{application.id}/entitlements/{entitlement.id}' as const
+export const _applications_$_entitlements_$_consume =
+  '/applications/{application.id}/entitlements/{entitlement.id}/consume' as const
 
 ////////// Message //////////
 // https://discord.com/developers/docs/resources/message

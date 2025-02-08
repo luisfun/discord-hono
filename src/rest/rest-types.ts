@@ -110,6 +110,9 @@ import type {
   _applications_$_commands_$,
   _applications_$_emojis,
   _applications_$_emojis_$,
+  _applications_$_entitlements,
+  _applications_$_entitlements_$,
+  _applications_$_entitlements_$_consume,
   _applications_$_guilds_$_commands,
   _applications_$_guilds_$_commands_$,
   _applications_$_guilds_$_commands_$_permissions,
@@ -333,6 +336,9 @@ export type RestPath<M extends RestMethod> = RestPathNonData<M> | RestPathWithDa
 // biome-ignore format: ternary operator
 export type RestVariables<P extends RestPath<any>> =
   P extends
+    | typeof _applications_me
+  ? [] :
+  P extends
     | typeof _applications_$_commands
     | typeof _applications_$_roleconnections_metadata
     | typeof _guilds_$_auditlogs
@@ -352,6 +358,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _channels_$_messages_bulkdelete
     | typeof _guilds_$_emojis
     | typeof _applications_$_emojis
+    | typeof _applications_$_entitlements
     | typeof _guilds_$_channels
   ? [string] :
   P extends
@@ -373,6 +380,8 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _channels_$_messages_$_reactions
     | typeof _guilds_$_emojis_$
     | typeof _applications_$_emojis_$
+    | typeof _applications_$_entitlements_$
+    | typeof _applications_$_entitlements_$_consume
   ? [string, string] :
   P extends
     | typeof _webhooks_$_$_messages_$
@@ -383,7 +392,7 @@ export type RestVariables<P extends RestPath<any>> =
   ? [string, string, string] :
   P extends
     | typeof _channels_$_messages_$_reactions_$_$
-  ? [string, string, string, string] : []
+  ? [string, string, string, string] : string[]
 
 ////////////////////////////////////////
 //////                            //////
