@@ -141,7 +141,7 @@ import type {
 // [List Private Archived Threads](https://discord.com/developers/docs/resources/channel#list-private-archived-threads)
 // [List Joined Private Archived Threads](https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads)
 
-type CouldNotFind = "Please redefine the type using 'as unknown'"
+type CouldNotFind = unknown
 
 export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 
@@ -574,4 +574,12 @@ export type Rest = {
     data: RestData<M, P>,
     file?: RestFile<M, P>,
   ): Promise<TypedResponse<RestResult<M, P>>>
+  // Unknown paths
+  <P extends string>(
+    method: RestMethod,
+    path: Exclude<P, RestPathNonData<any> | RestPathWithData<any> | RestPathWithFile<any>>,
+    variables: string[],
+    data?: unknown,
+    file?: FileData,
+  ): Promise<TypedResponse<unknown>>
 }

@@ -37,5 +37,9 @@ const res1 = await rest('POST', '/applications/{application.id}/commands', ['app
   name: '',
   //description: '',
 }).then(r => r.json())
-const res2 = await rest("GET", "/applications/{application.id}/activity-instances/{instance_id}", ["application.id", "instance_id"]).then(r => r.json())
+const res2 = await rest('GET', '/applications/{application.id}/activity-instances/{instance_id}', [
+  'application.id',
+  'instance_id',
+]).then(r => r.json())
+const res3 = await rest('GET', '/unknown', [], { content: '' }).then(r => r.json())
 */
