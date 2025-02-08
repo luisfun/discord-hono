@@ -160,3 +160,29 @@ export const _channels_$_polls_$_expire = '/channels/{channel.id}/polls/{message
 // https://discord.com/developers/docs/resources/sku
 // ✅ 25/02/08
 export const _applications_$_skus = '/applications/{application.id}/skus' as const
+
+////////// Soundboard //////////
+// https://discord.com/developers/docs/resources/soundboard
+// ✅ 25/02/08
+export const _channels_$_sendsoundboardsound = '/channels/{channel.id}/send-soundboard-sound' as const
+export const _soundboarddefaultsounds = '/soundboard-default-sounds' as const
+export const _guilds_$_soundboardsounds = '/guilds/{guild.id}/soundboard-sounds' as const
+export const _guilds_$_soundboardsounds_$ = '/guilds/{guild.id}/soundboard-sounds/{sound.id}' as const
+
+////////// Stage Instance //////////
+// https://discord.com/developers/docs/resources/stage-instance
+
+////////// Sticker //////////
+// https://discord.com/developers/docs/resources/sticker
+
+////////// Subscription //////////
+// https://discord.com/developers/docs/resources/subscription
+
+////////// User //////////
+// https://discord.com/developers/docs/resources/user
+
+////////// Voice //////////
+// https://discord.com/developers/docs/resources/voice
+
+////////// Webhook //////////
+// https://discord.com/developers/docs/resources/webhook

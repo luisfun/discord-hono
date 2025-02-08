@@ -18,6 +18,7 @@ import type {
   RESTDeleteAPIGuildResult,
   RESTDeleteAPIGuildRoleResult,
   RESTDeleteAPIGuildScheduledEventResult,
+  RESTDeleteAPIGuildSoundboardSoundResult,
   RESTDeleteAPIGuildTemplateResult,
   RESTDeleteAPIInviteResult,
   RESTGetAPIApplicationCommandPermissionsResult,
@@ -79,6 +80,8 @@ import type {
   RESTGetAPIGuildScheduledEventUsersResult,
   RESTGetAPIGuildScheduledEventsQuery,
   RESTGetAPIGuildScheduledEventsResult,
+  RESTGetAPIGuildSoundboardSoundResult,
+  RESTGetAPIGuildSoundboardSoundsResult,
   RESTGetAPIGuildTemplatesResult,
   RESTGetAPIGuildThreadsResult,
   RESTGetAPIGuildVanityUrlResult,
@@ -95,6 +98,7 @@ import type {
   RESTGetAPIPollAnswerVotersQuery,
   RESTGetAPIPollAnswerVotersResult,
   RESTGetAPISKUsResult,
+  RESTGetAPISoundboardDefaultSoundsResult,
   RESTGetAPITemplateResult,
   RESTGetAPIWebhookWithTokenMessageQuery,
   RESTGetCurrentApplicationResult,
@@ -127,6 +131,8 @@ import type {
   RESTPatchAPIGuildRoleResult,
   RESTPatchAPIGuildScheduledEventJSONBody,
   RESTPatchAPIGuildScheduledEventResult,
+  RESTPatchAPIGuildSoundboardSoundJSONBody,
+  RESTPatchAPIGuildSoundboardSoundResult,
   RESTPatchAPIGuildTemplateJSONBody,
   RESTPatchAPIGuildTemplateResult,
   RESTPatchAPIGuildWelcomeScreenJSONBody,
@@ -176,6 +182,8 @@ import type {
   RESTPostAPIGuildRoleResult,
   RESTPostAPIGuildScheduledEventJSONBody,
   RESTPostAPIGuildScheduledEventResult,
+  RESTPostAPIGuildSoundboardSoundJSONBody,
+  RESTPostAPIGuildSoundboardSoundResult,
   RESTPostAPIGuildTemplatesJSONBody,
   RESTPostAPIGuildTemplatesResult,
   RESTPostAPIGuildsJSONBody,
@@ -187,6 +195,7 @@ import type {
   RESTPostAPIInteractionFollowupJSONBody,
   RESTPostAPIInteractionFollowupResult,
   RESTPostAPIPollExpireResult,
+  RESTPostAPISoundboardSendSoundJSONBody,
   RESTPostAPITemplateCreateGuildJSONBody,
   RESTPostAPITemplateCreateGuildResult,
   RESTPutAPIApplicationCommandPermissionsJSONBody,
@@ -251,6 +260,7 @@ import type {
   _channels_$_polls_$_answers_$,
   _channels_$_polls_$_expire,
   _channels_$_recipients_$,
+  _channels_$_sendsoundboardsound,
   _channels_$_threadmembers,
   _channels_$_threadmembers_$,
   _channels_$_threadmembers_me,
@@ -290,6 +300,8 @@ import type {
   _guilds_$_scheduledevents,
   _guilds_$_scheduledevents_$,
   _guilds_$_scheduledevents_$_users,
+  _guilds_$_soundboardsounds,
+  _guilds_$_soundboardsounds_$,
   _guilds_$_templates,
   _guilds_$_templates_$,
   _guilds_$_threads_active,
@@ -301,6 +313,7 @@ import type {
   _guilds_templates_$,
   _interactions_$_$_callback,
   _invites_$,
+  _soundboarddefaultsounds,
   _webhooks_$_$,
   _webhooks_$_$_messages_$,
   _webhooks_$_$_messages_original,
@@ -331,6 +344,8 @@ type RestPathNV<M extends RestMethod> =
   M extends 'GET' ?
     // Application
     | typeof _applications_me
+    // Soundboard
+    | typeof _soundboarddefaultsounds
   : never
 
 // biome-ignore format: ternary operator
@@ -384,6 +399,9 @@ type RestPathVars<M extends RestMethod> =
     | typeof _channels_$_messages_$
     // SKU
     | typeof _applications_$_skus
+    // Soundboard
+    | typeof _guilds_$_soundboardsounds
+    | typeof _guilds_$_soundboardsounds_$
   : M extends 'PUT' ?
     // Channel
     | typeof _channels_$_pins_$
@@ -447,6 +465,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _channels_$_messages_$_reactions
     | typeof _channels_$_messages_$_reactions_$
     | typeof _channels_$_messages_$
+    // Soundboard
+    | typeof _guilds_$_soundboardsounds_$
   : never
 
 // biome-ignore format: ternary operator
@@ -533,6 +553,9 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds_$_templates
     // Message
     | typeof _channels_$_messages_bulkdelete
+    // Soundboard
+    | typeof _channels_$_sendsoundboardsound
+    | typeof _guilds_$_soundboardsounds
   : M extends 'PATCH' ?
     // Application Commands
     | typeof _applications_$_commands_$
@@ -559,6 +582,8 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds_$_scheduledevents_$
     // Guild Template
     | typeof _guilds_$_templates_$
+    // Soundboard
+    | typeof _guilds_$_soundboardsounds_$
   : never
 
 // biome-ignore format: ternary operator
@@ -596,6 +621,7 @@ export type RestVariables<P extends RestPath<any>> =
   P extends
     | typeof _applications_me
     | typeof _guilds
+    | typeof _soundboarddefaultsounds
   ? [] :
   P extends
     | typeof _applications_$_commands
@@ -646,6 +672,8 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_$_templates
     | typeof _invites_$
     | typeof _applications_$_skus
+    | typeof _channels_$_sendsoundboardsound
+    | typeof _guilds_$_soundboardsounds
   ? [string] :
   P extends
     | typeof _interactions_$_$_callback
@@ -676,6 +704,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_$_scheduledevents_$_users
     | typeof _guilds_$_templates_$
     | typeof _channels_$_polls_$_expire
+    | typeof _guilds_$_soundboardsounds_$
   ? [string, string] :
   P extends
     | typeof _webhooks_$_$_messages_$
@@ -786,6 +815,9 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Message
     P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
+    // Soundboard
+    P extends typeof _channels_$_sendsoundboardsound ? RESTPostAPISoundboardSendSoundJSONBody :
+    P extends typeof _guilds_$_soundboardsounds ? RESTPostAPIGuildSoundboardSoundJSONBody :
     never  
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -818,6 +850,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_templates_$ ? RESTPatchAPIGuildTemplateJSONBody :
     // Message
     P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
+    // Soundboard
+    P extends typeof _guilds_$_soundboardsounds_$ ? RESTPatchAPIGuildSoundboardSoundJSONBody :
     never
   : never
 
@@ -934,6 +968,10 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_polls_$_answers_$ ? RESTGetAPIPollAnswerVotersResult :
     // SKU
     P extends typeof _applications_$_skus ? RESTGetAPISKUsResult :
+    // Soundboard
+    P extends typeof _soundboarddefaultsounds ? RESTGetAPISoundboardDefaultSoundsResult :
+    P extends typeof _guilds_$_soundboardsounds ? RESTGetAPIGuildSoundboardSoundsResult :
+    P extends typeof _guilds_$_soundboardsounds_$ ? RESTGetAPIGuildSoundboardSoundResult :
     never
   : M extends 'PUT' ?
     // Application Commands
@@ -1000,6 +1038,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteResult :
     // Poll
     P extends typeof _channels_$_polls_$_expire ? RESTPostAPIPollExpireResult :
+    // Soundboard
+    P extends typeof _guilds_$_soundboardsounds ? RESTPostAPIGuildSoundboardSoundResult :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -1032,6 +1072,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_templates_$ ? RESTPatchAPIGuildTemplateResult :
     // Message
     P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageResult :
+    // Soundboard
+    P extends typeof _guilds_$_soundboardsounds_$ ? RESTPatchAPIGuildSoundboardSoundResult :
     never
   : M extends 'DELETE' ?
     // Channel
@@ -1065,6 +1107,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages_$_reactions ? CouldNotFind :
     P extends typeof _channels_$_messages_$_reactions_$ ? RESTDeleteAPIChannelMessageReactionResult :
     P extends typeof _channels_$_messages_$ ? RESTDeleteAPIChannelMessageResult :
+    // Soundboard
+    P extends typeof _guilds_$_soundboardsounds_$ ? RESTDeleteAPIGuildSoundboardSoundResult :
     never
   : never
 
