@@ -92,6 +92,8 @@ import type {
   RESTGetAPIInteractionOriginalResponseResult,
   RESTGetAPIInviteQuery,
   RESTGetAPIInviteResult,
+  RESTGetAPIPollAnswerVotersQuery,
+  RESTGetAPIPollAnswerVotersResult,
   RESTGetAPITemplateResult,
   RESTGetAPIWebhookWithTokenMessageQuery,
   RESTGetCurrentApplicationResult,
@@ -183,6 +185,7 @@ import type {
   RESTPostAPIInteractionCallbackResult,
   RESTPostAPIInteractionFollowupJSONBody,
   RESTPostAPIInteractionFollowupResult,
+  RESTPostAPIPollExpireResult,
   RESTPostAPITemplateCreateGuildJSONBody,
   RESTPostAPITemplateCreateGuildResult,
   RESTPutAPIApplicationCommandPermissionsJSONBody,
@@ -243,6 +246,8 @@ import type {
   _channels_$_permissions_$,
   _channels_$_pins,
   _channels_$_pins_$,
+  _channels_$_polls_$_answers_$,
+  _channels_$_polls_$_expire,
   _channels_$_recipients_$,
   _channels_$_threadmembers,
   _channels_$_threadmembers_$,
@@ -393,6 +398,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _applications_$_entitlements_$_consume
     // Message
     | typeof _channels_$_messages_$_crosspost
+    // Poll
+    | typeof _channels_$_polls_$_expire
   : M extends 'PATCH' ?
     // Receiving and Responding
     | typeof _webhooks_$_$_messages_$
@@ -473,6 +480,8 @@ type RestPathVarsData<M extends RestMethod> =
     // Message
     | typeof _channels_$_messages
     | typeof _channels_$_messages_$_reactions_$
+    // Poll
+    | typeof _channels_$_polls_$_answers_$
   : M extends 'PUT' ?
     // Application Commands
     | typeof _applications_$_commands
@@ -661,6 +670,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_$_scheduledevents_$
     | typeof _guilds_$_scheduledevents_$_users
     | typeof _guilds_$_templates_$
+    | typeof _channels_$_polls_$_expire
   ? [string, string] :
   P extends
     | typeof _webhooks_$_$_messages_$
@@ -669,6 +679,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_$_members_$_roles_$
     | typeof _channels_$_messages_$_reactions_$_me
     | typeof _channels_$_messages_$_reactions_$
+    | typeof _channels_$_polls_$_answers_$
   ? [string, string, string] :
   P extends
     | typeof _channels_$_messages_$_reactions_$_$
@@ -715,6 +726,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesQuery :
     P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
+    // Poll
+    P extends typeof _channels_$_polls_$_answers_$ ? RESTGetAPIPollAnswerVotersQuery :
     never
   : M extends 'PUT' ?
     // Application Commands
@@ -912,6 +925,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
     P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersResult :
+    // Poll
+    P extends typeof _channels_$_polls_$_answers_$ ? RESTGetAPIPollAnswerVotersResult :
     never
   : M extends 'PUT' ?
     // Application Commands
@@ -976,6 +991,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageResult :
     P extends typeof _channels_$_messages_$_crosspost ? RESTPostAPIChannelMessageCrosspostResult :
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteResult :
+    // Poll
+    P extends typeof _channels_$_polls_$_expire ? RESTPostAPIPollExpireResult :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding

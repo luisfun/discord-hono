@@ -149,3 +149,9 @@ export const _channels_$_messages_$_reactions_$ =
   '/channels/{channel.id}/messages/{message.id}/reactions/{emoji}' as const
 export const _channels_$_messages_$_reactions = '/channels/{channel.id}/messages/{message.id}/reactions' as const
 export const _channels_$_messages_bulkdelete = '/channels/{channel.id}/messages/bulk-delete' as const
+
+////////// Poll //////////
+// https://discord.com/developers/docs/resources/poll
+// ✅ 25/02/08
+export const _channels_$_polls_$_answers_$ = '/channels/{channel.id}/polls/{message.id}/answers/{answer_id}' as const
+export const _channels_$_polls_$_expire = '/channels/{channel.id}/polls/{message.id}/expire' as const
