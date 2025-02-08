@@ -11,6 +11,7 @@ import type {
   RESTDeleteAPIGuildMemberResult,
   RESTDeleteAPIGuildMemberRoleResult,
   RESTDeleteAPIGuildResult,
+  RESTDeleteAPIGuildRoleResult,
   RESTGetAPIApplicationCommandPermissionsResult,
   RESTGetAPIApplicationCommandResult,
   RESTGetAPIApplicationCommandsQuery,
@@ -57,6 +58,8 @@ import type {
   RESTGetAPIGuildPreviewResult,
   RESTGetAPIGuildQuery,
   RESTGetAPIGuildResult,
+  RESTGetAPIGuildRoleResult,
+  RESTGetAPIGuildRolesResult,
   RESTGetAPIGuildThreadsResult,
   RESTGetAPIInteractionFollowupResult,
   RESTGetAPIInteractionOriginalResponseResult,
@@ -84,6 +87,10 @@ import type {
   RESTPatchAPIGuildMemberJSONBody,
   RESTPatchAPIGuildMemberResult,
   RESTPatchAPIGuildResult,
+  RESTPatchAPIGuildRoleJSONBody,
+  RESTPatchAPIGuildRolePositionsJSONBody,
+  RESTPatchAPIGuildRolePositionsResult,
+  RESTPatchAPIGuildRoleResult,
   RESTPatchAPIInteractionFollowupJSONBody,
   RESTPatchAPIInteractionFollowupResult,
   RESTPatchAPIInteractionOriginalResponseJSONBody,
@@ -118,7 +125,11 @@ import type {
   RESTPostAPIGuildChannelResult,
   RESTPostAPIGuildEmojiJSONBody,
   RESTPostAPIGuildEmojiResult,
+  RESTPostAPIGuildRoleJSONBody,
+  RESTPostAPIGuildRoleResult,
   RESTPostAPIGuildsJSONBody,
+  RESTPostAPIGuildsMFAJSONBody,
+  RESTPostAPIGuildsMFAResult,
   RESTPostAPIGuildsResult,
   RESTPostAPIInteractionCallbackQuery,
   RESTPostAPIInteractionCallbackResult,
@@ -285,6 +296,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_$_threads_active
     | typeof _guilds_$_members_$
     | typeof _guilds_$_bans_$
+    | typeof _guilds_$_roles
+    | typeof _guilds_$_roles_$
     // Message
     | typeof _channels_$_messages_$_reactions_$
   : M extends 'PUT' ?
@@ -332,6 +345,7 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_$_members_$_roles_$
     | typeof _guilds_$_members_$
     | typeof _guilds_$_bans_$
+    | typeof _guilds_$_roles_$
     // Message
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_reactions
@@ -401,6 +415,9 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds
     | typeof _guilds_$_channels
     | typeof _guilds_$_bulkban
+    | typeof _guilds_$_roles
+    | typeof _guilds_$_roles_$
+    | typeof _guilds_$_mfa
     // Message
     | typeof _channels_$_messages_bulkdelete
   : M extends 'PATCH' ?
@@ -422,6 +439,7 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds_$_members_$
     | typeof _guilds_$_members_me
     | typeof _guilds_$_members_me_nick
+    | typeof _guilds_$_roles
   : never
 
 // biome-ignore format: ternary operator
@@ -616,6 +634,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds ? RESTPostAPIGuildsJSONBody :
     P extends typeof _guilds_$_channels ? RESTPostAPIGuildChannelJSONBody :
     P extends typeof _guilds_$_bulkban ? RESTPostAPIGuildBulkBanJSONBody :
+    P extends typeof _guilds_$_roles ? RESTPostAPIGuildRoleJSONBody :
+    P extends typeof _guilds_$_mfa ? RESTPostAPIGuildsMFAJSONBody :
     // Message
     P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
@@ -643,7 +663,9 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_members_$ ? RESTPatchAPIGuildMemberJSONBody :
     P extends typeof _guilds_$_members_me ? RESTPatchAPICurrentGuildMemberJSONBody :
     P extends typeof _guilds_$_members_me_nick ? RESTPatchAPICurrentGuildMemberNicknameJSONBody :
-    never  
+    P extends typeof _guilds_$_roles ? RESTPatchAPIGuildRolePositionsJSONBody :
+    P extends typeof _guilds_$_roles_$ ? RESTPatchAPIGuildRoleJSONBody :
+    never
   : never
 
 ////////////////////////////////////////
@@ -730,6 +752,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_members_search ? RESTGetAPIGuildMembersSearchResult :
     P extends typeof _guilds_$_bans ? RESTGetAPIGuildBansResult :
     P extends typeof _guilds_$_bans_$ ? RESTGetAPIGuildBanResult :
+    P extends typeof _guilds_$_roles ? RESTGetAPIGuildRolesResult :
+    P extends typeof _guilds_$_roles_$ ? RESTGetAPIGuildRoleResult :
     // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
@@ -780,6 +804,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds ? RESTPostAPIGuildsResult :
     P extends typeof _guilds_$_channels ? RESTPostAPIGuildChannelResult :
     P extends typeof _guilds_$_bulkban ? RESTPostAPIGuildBulkBanResult :
+    P extends typeof _guilds_$_roles ? RESTPostAPIGuildRoleResult :
+    P extends typeof _guilds_$_mfa ? RESTPostAPIGuildsMFAResult :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -802,6 +828,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_members_$ ? RESTPatchAPIGuildMemberResult :
     P extends typeof _guilds_$_members_me ? CouldNotFind :
     P extends typeof _guilds_$_members_me_nick ? RESTPatchAPICurrentGuildMemberNicknameResult :
+    P extends typeof _guilds_$_roles ? RESTPatchAPIGuildRolePositionsResult :
+    P extends typeof _guilds_$_roles_$ ? RESTPatchAPIGuildRoleResult :
     never
   : M extends 'DELETE' ?
     // Channel
@@ -821,6 +849,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_members_$_roles_$ ? RESTDeleteAPIGuildMemberRoleResult :
     P extends typeof _guilds_$_members_$ ? RESTDeleteAPIGuildMemberResult :
     P extends typeof _guilds_$_bans_$ ? RESTDeleteAPIGuildBanResult :
+    P extends typeof _guilds_$_roles_$ ? RESTDeleteAPIGuildRoleResult :
     never
   : never
 
