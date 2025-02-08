@@ -173,19 +173,19 @@ type RestPathNonData<M extends RestMethod> =
     | typeof _channels_$
     | typeof _channels_$_invites
     | typeof _channels_$_pins
-    // Messages
+    // Message
     | typeof _channels_$_messages_$_reactions_$
   : M extends 'PUT' ?
     // Channel
     | typeof _channels_$_pins_$
     | typeof _channels_$_threadmembers_me
     | typeof _channels_$_threadmembers_$
-    // Messages
+    // Message
     | typeof _channels_$_messages_$_reactions_$_me
   : M extends 'POST' ?
     // Channel
     | typeof _channels_$_typing
-    // Messages
+    // Message
     | typeof _channels_$_messages_$_crosspost
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -206,7 +206,7 @@ type RestPathNonData<M extends RestMethod> =
     | typeof _channels_$_recipients_$
     | typeof _channels_$_threadmembers_me
     | typeof _channels_$_threadmembers_$
-    // Messages
+    // Message
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_reactions
     | typeof _channels_$_messages_$_reactions_$
@@ -231,7 +231,7 @@ type RestPathWithData<M extends RestMethod> =
     | typeof _channels_$_threads_archived_public
     | typeof _channels_$_threads_archived_private
     | typeof _channels_$_users_me_threads_archived_private
-    // Messages
+    // Message
     | typeof _channels_$_messages
     | typeof _channels_$_messages_$
   : M extends 'PUT' ?
@@ -256,7 +256,7 @@ type RestPathWithData<M extends RestMethod> =
     | typeof _channels_$_followers
     | typeof _channels_$_messages_$_threads
     | typeof _channels_$_threads
-    // Messages
+    // Message
     | typeof _channels_$_messages_bulkdelete
     // Guild
     | typeof _guilds_$_channels
@@ -281,12 +281,12 @@ type RestPathWithFile<M extends RestMethod> =
     | typeof _webhooks_$_$
     // Channel
     | typeof _channels_$_threads
-    // Messages
+    // Message
     | typeof _channels_$_messages
   : M extends 'PATCH' ?
     // Receiving and Responding
     | typeof _webhooks_$_$_messages_$
-    // Messages
+    // Message
     | typeof _channels_$_messages_$
   : undefined
 
@@ -372,7 +372,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_threads_archived_public ? CouldNotFind :
     P extends typeof _channels_$_threads_archived_private ? CouldNotFind :
     P extends typeof _channels_$_users_me_threads_archived_private ? CouldNotFind :
-    // Messages
+    // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesQuery :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
     undefined
@@ -403,7 +403,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_followers ? RESTPostAPIChannelFollowersJSONBody :
     P extends typeof _channels_$_messages_$_threads ? RESTPostAPIChannelMessagesThreadsJSONBody :
     P extends typeof _channels_$_threads ? RESTPostAPIChannelThreadsJSONBody | CouldNotFind :
-    // Messages
+    // Message
     P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
     // Guild
@@ -419,7 +419,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_me ? RESTPatchCurrentApplicationJSONBody :
     // Auto Moderation
     P extends typeof _guilds_$_automoderation_rules_$ ? RESTPatchAPIAutoModerationRuleJSONBody :
-    // Messages
+    // Message
     P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
     // Channel
     P extends typeof _channels_$ ? RESTPatchAPIChannelJSONBody :
@@ -442,14 +442,14 @@ export type RestFile<M extends RestMethod, P extends RestPath<M>> =
       | typeof _webhooks_$_$
       // Channel
       | typeof _channels_$_threads
-      // Messages
+      // Message
       | typeof _channels_$_messages
     ? FileData : undefined
   : M extends 'PATCH' ?
     P extends
       // Receiving and Responding
       | typeof _webhooks_$_$_messages_$
-      // Messages
+      // Message
       | typeof _channels_$_messages_$
     ? FileData : undefined
   : undefined
@@ -492,7 +492,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_threads_archived_public ? RESTGetAPIChannelThreadsArchivedPublicResult :
     P extends typeof _channels_$_threads_archived_private ? RESTGetAPIChannelThreadsArchivedPrivateResult :
     P extends typeof _channels_$_users_me_threads_archived_private ? CouldNotFind :
-    // Messages
+    // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
     P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersResult :
