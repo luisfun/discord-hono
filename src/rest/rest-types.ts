@@ -1,4 +1,7 @@
 import type {
+  RESTDeleteAPIChannelPermissionResult,
+  RESTDeleteAPIChannelPinResult,
+  RESTDeleteAPIChannelResult,
   RESTGetAPIApplicationCommandPermissionsResult,
   RESTGetAPIApplicationCommandResult,
   RESTGetAPIApplicationCommandsQuery,
@@ -11,11 +14,14 @@ import type {
   RESTGetAPIAuditLogResult,
   RESTGetAPIAutoModerationRuleResult,
   RESTGetAPIAutoModerationRulesResult,
+  RESTGetAPIChannelInvitesResult,
   RESTGetAPIChannelMessageReactionUsersQuery,
   RESTGetAPIChannelMessageReactionUsersResult,
   RESTGetAPIChannelMessageResult,
   RESTGetAPIChannelMessagesQuery,
   RESTGetAPIChannelMessagesResult,
+  RESTGetAPIChannelPinsResult,
+  RESTGetAPIChannelResult,
   RESTGetAPIGuildApplicationCommandsPermissionsResult,
   RESTGetAPIInteractionFollowupResult,
   RESTGetAPIInteractionOriginalResponseResult,
@@ -29,6 +35,7 @@ import type {
   RESTPatchAPIAutoModerationRuleResult,
   RESTPatchAPIChannelJSONBody,
   RESTPatchAPIChannelMessageJSONBody,
+  RESTPatchAPIChannelResult,
   RESTPatchAPIInteractionFollowupJSONBody,
   RESTPatchAPIInteractionFollowupResult,
   RESTPatchAPIInteractionOriginalResponseJSONBody,
@@ -41,8 +48,13 @@ import type {
   RESTPostAPIApplicationGuildCommandsResult,
   RESTPostAPIAutoModerationRuleJSONBody,
   RESTPostAPIAutoModerationRuleResult,
+  RESTPostAPIChannelFollowersJSONBody,
+  RESTPostAPIChannelFollowersResult,
+  RESTPostAPIChannelInviteJSONBody,
+  RESTPostAPIChannelInviteResult,
   RESTPostAPIChannelMessageJSONBody,
   RESTPostAPIChannelMessagesBulkDeleteJSONBody,
+  RESTPostAPIChannelTypingResult,
   RESTPostAPIGuildChannelJSONBody,
   RESTPostAPIInteractionCallbackQuery,
   RESTPostAPIInteractionCallbackResult,
@@ -56,6 +68,9 @@ import type {
   RESTPutAPIApplicationGuildCommandsResult,
   RESTPutAPIApplicationRoleConnectionMetadataJSONBody,
   RESTPutAPIApplicationRoleConnectionMetadataResult,
+  RESTPutAPIChannelPermissionJSONBody,
+  RESTPutAPIChannelPermissionResult,
+  RESTPutAPIChannelPinResult,
   RESTPutAPIGuildApplicationCommandsPermissionsJSONBody,
   RESTPutAPIGuildApplicationCommandsPermissionsResult,
 } from 'discord-api-types/v10'
@@ -132,12 +147,20 @@ type RestPathNonData<M extends RestMethod> =
     // Auto Moderation
     | typeof _guilds_$_automoderation_rules
     | typeof _guilds_$_automoderation_rules_$
+    // Channel
+    | typeof _channels_$
+    | typeof _channels_$_invites
+    | typeof _channels_$_pins
     // Messages
     | typeof _channels_$_messages_$_reactions_$
   : M extends 'PUT' ?
+    // Channel
+    | typeof _channels_$_pins_$
     // Messages
     | typeof _channels_$_messages_$_reactions_$_me
   : M extends 'POST' ?
+    // Channel
+    | typeof _channels_$_typing
     // Messages
     | typeof _channels_$_messages_$_crosspost
   : M extends 'PATCH' ?
@@ -152,6 +175,10 @@ type RestPathNonData<M extends RestMethod> =
     | typeof _applications_$_guilds_$_commands_$
     // Auto Moderation
     | typeof _guilds_$_automoderation_rules_$
+    // Channel
+    | typeof _channels_$
+    | typeof _channels_$_permissions_$
+    | typeof _channels_$_pins_$
     // Messages
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_reactions
@@ -182,12 +209,17 @@ type RestPathWithData<M extends RestMethod> =
     | typeof _applications_$_guilds_$_commands_permissions
     // Application Role Connection Metadata
     | typeof _applications_$_roleconnections_metadata
+    // Channel
+    | typeof _channels_$_permissions_$
   : M extends 'POST' ?
     // Application Commands
     | typeof _applications_$_commands
     | typeof _applications_$_guilds_$_commands
     // Auto Moderation
     | typeof _guilds_$_automoderation_rules
+    // Channel
+    | typeof _channels_$_invites
+    | typeof _channels_$_followers
     // Messages
     | typeof _channels_$_messages_bulkdelete
     // Guild
@@ -308,6 +340,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_guilds_$_commands_permissions ? RESTPutAPIGuildApplicationCommandsPermissionsJSONBody :
     // Application Role Connection Metadata
     P extends typeof _applications_$_roleconnections_metadata ? RESTPutAPIApplicationRoleConnectionMetadataJSONBody :
+    // Channel
+    P extends typeof _channels_$_permissions_$ ? RESTPutAPIChannelPermissionJSONBody :
     undefined
   : M extends 'POST' ?
     // Receiving and Responding
@@ -319,6 +353,9 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_guilds_$_commands ? RESTPostAPIApplicationGuildCommandsJSONBody :
     // Auto Moderation
     P extends typeof _guilds_$_automoderation_rules ? RESTPostAPIAutoModerationRuleJSONBody :
+    // Channel
+    P extends typeof _channels_$_invites ? RESTPostAPIChannelInviteJSONBody :
+    P extends typeof _channels_$_followers ? RESTPostAPIChannelFollowersJSONBody :
     // Messages
     P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
@@ -397,6 +434,10 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Auto Moderation
     P extends typeof _guilds_$_automoderation_rules ? RESTGetAPIAutoModerationRulesResult :
     P extends typeof _guilds_$_automoderation_rules_$ ? RESTGetAPIAutoModerationRuleResult :
+    // Channel
+    P extends typeof _channels_$ ? RESTGetAPIChannelResult :
+    P extends typeof _channels_$_invites ? RESTGetAPIChannelInvitesResult :
+    P extends typeof _channels_$_pins ? RESTGetAPIChannelPinsResult :
     // Messages
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
@@ -410,6 +451,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_guilds_$_commands_permissions ? RESTPutAPIGuildApplicationCommandsPermissionsResult :
     // Application Role Connection Metadata
     P extends typeof _applications_$_roleconnections_metadata ? RESTPutAPIApplicationRoleConnectionMetadataResult :
+    // Channel
+    P extends typeof _channels_$_permissions_$ ? RESTPutAPIChannelPermissionResult :
+    P extends typeof _channels_$_pins_$ ? RESTPutAPIChannelPinResult :
     undefined
   : M extends 'POST' ?
     // Receiving and Responding
@@ -421,6 +465,10 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_$_guilds_$_commands ? RESTPostAPIApplicationGuildCommandsResult :
     // Auto Moderation
     P extends typeof _guilds_$_automoderation_rules ? RESTPostAPIAutoModerationRuleResult :
+    // Channel
+    P extends typeof _channels_$_invites ? RESTPostAPIChannelInviteResult :
+    P extends typeof _channels_$_followers ? RESTPostAPIChannelFollowersResult :
+    P extends typeof _channels_$_typing ? RESTPostAPIChannelTypingResult :
     undefined
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -432,6 +480,14 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _applications_me ? RESTPatchCurrentApplicationResult :
     // Auto Moderation
     P extends typeof _guilds_$_automoderation_rules_$ ? RESTPatchAPIAutoModerationRuleResult :
+    // Channel
+    P extends typeof _channels_$ ? RESTPatchAPIChannelResult :
+    undefined
+  : M extends 'DELETE' ?
+    // Channel
+    P extends typeof _channels_$ ? RESTDeleteAPIChannelResult :
+    P extends typeof _channels_$_permissions_$ ? RESTDeleteAPIChannelPermissionResult :
+    P extends typeof _channels_$_pins_$ ? RESTDeleteAPIChannelPinResult :
     undefined
   : any
 

@@ -94,7 +94,6 @@ describe('Rest', () => {
 
   it('should make a DELETE request', async () => {
     mockFetch.mockResolvedValue({})
-    // @ts-expect-error
     await rest('DELETE', '/channels/{channel.id}', ['202'])
 
     expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/channels/202', {
