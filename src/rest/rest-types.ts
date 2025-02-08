@@ -1,13 +1,17 @@
 import type {
+  RESTDeleteAPIApplicationEmojiResult,
   RESTDeleteAPIChannelPermissionResult,
   RESTDeleteAPIChannelPinResult,
   RESTDeleteAPIChannelRecipientResult,
   RESTDeleteAPIChannelResult,
   RESTDeleteAPIChannelThreadMembersResult,
+  RESTDeleteAPIGuildEmojiResult,
   RESTGetAPIApplicationCommandPermissionsResult,
   RESTGetAPIApplicationCommandResult,
   RESTGetAPIApplicationCommandsQuery,
   RESTGetAPIApplicationCommandsResult,
+  RESTGetAPIApplicationEmojiResult,
+  RESTGetAPIApplicationEmojisResult,
   RESTGetAPIApplicationGuildCommandResult,
   RESTGetAPIApplicationGuildCommandsQuery,
   RESTGetAPIApplicationGuildCommandsResult,
@@ -31,12 +35,16 @@ import type {
   RESTGetAPIChannelThreadsArchivedPrivateResult,
   RESTGetAPIChannelThreadsArchivedPublicResult,
   RESTGetAPIGuildApplicationCommandsPermissionsResult,
+  RESTGetAPIGuildEmojiResult,
+  RESTGetAPIGuildEmojisResult,
   RESTGetAPIInteractionFollowupResult,
   RESTGetAPIInteractionOriginalResponseResult,
   RESTGetAPIWebhookWithTokenMessageQuery,
   RESTGetCurrentApplicationResult,
   RESTPatchAPIApplicationCommandJSONBody,
   RESTPatchAPIApplicationCommandResult,
+  RESTPatchAPIApplicationEmojiJSONBody,
+  RESTPatchAPIApplicationEmojiResult,
   RESTPatchAPIApplicationGuildCommandJSONBody,
   RESTPatchAPIApplicationGuildCommandResult,
   RESTPatchAPIAutoModerationRuleJSONBody,
@@ -44,6 +52,8 @@ import type {
   RESTPatchAPIChannelJSONBody,
   RESTPatchAPIChannelMessageJSONBody,
   RESTPatchAPIChannelResult,
+  RESTPatchAPIGuildEmojiJSONBody,
+  RESTPatchAPIGuildEmojiResult,
   RESTPatchAPIInteractionFollowupJSONBody,
   RESTPatchAPIInteractionFollowupResult,
   RESTPatchAPIInteractionOriginalResponseJSONBody,
@@ -52,6 +62,8 @@ import type {
   RESTPatchCurrentApplicationResult,
   RESTPostAPIApplicationCommandsJSONBody,
   RESTPostAPIApplicationCommandsResult,
+  RESTPostAPIApplicationEmojiJSONBody,
+  RESTPostAPIApplicationEmojiResult,
   RESTPostAPIApplicationGuildCommandsJSONBody,
   RESTPostAPIApplicationGuildCommandsResult,
   RESTPostAPIAutoModerationRuleJSONBody,
@@ -68,6 +80,8 @@ import type {
   RESTPostAPIChannelThreadsResult,
   RESTPostAPIChannelTypingResult,
   RESTPostAPIGuildChannelJSONBody,
+  RESTPostAPIGuildEmojiJSONBody,
+  RESTPostAPIGuildEmojiResult,
   RESTPostAPIInteractionCallbackQuery,
   RESTPostAPIInteractionCallbackResult,
   RESTPostAPIInteractionFollowupJSONBody,
@@ -177,6 +191,11 @@ type RestPathNonData<M extends RestMethod> =
     | typeof _channels_$
     | typeof _channels_$_invites
     | typeof _channels_$_pins
+    // Emoji
+    | typeof _guilds_$_emojis
+    | typeof _guilds_$_emojis_$
+    | typeof _applications_$_emojis
+    | typeof _applications_$_emojis_$
     // Message
     | typeof _channels_$_messages_$_reactions_$
   : M extends 'PUT' ?
@@ -210,6 +229,9 @@ type RestPathNonData<M extends RestMethod> =
     | typeof _channels_$_recipients_$
     | typeof _channels_$_threadmembers_me
     | typeof _channels_$_threadmembers_$
+    // Emoji
+    | typeof _guilds_$_emojis_$
+    | typeof _applications_$_emojis_$
     // Message
     | typeof _channels_$_messages_$
     | typeof _channels_$_messages_$_reactions
@@ -260,6 +282,9 @@ type RestPathWithData<M extends RestMethod> =
     | typeof _channels_$_followers
     | typeof _channels_$_messages_$_threads
     | typeof _channels_$_threads
+    // Emoji
+    | typeof _guilds_$_emojis
+    | typeof _applications_$_emojis
     // Message
     | typeof _channels_$_messages_bulkdelete
     // Guild
@@ -274,6 +299,9 @@ type RestPathWithData<M extends RestMethod> =
     | typeof _guilds_$_automoderation_rules_$
     // Channel
     | typeof _channels_$
+    // Emoji
+    | typeof _guilds_$_emojis_$
+    | typeof _applications_$_emojis_$
   : never
 
 // biome-ignore format: ternary operator
@@ -411,6 +439,9 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_followers ? RESTPostAPIChannelFollowersJSONBody :
     P extends typeof _channels_$_messages_$_threads ? RESTPostAPIChannelMessagesThreadsJSONBody :
     P extends typeof _channels_$_threads ? RESTPostAPIChannelThreadsJSONBody | CouldNotFind :
+    // Emoji
+    P extends typeof _guilds_$_emojis ? RESTPostAPIGuildEmojiJSONBody :
+    P extends typeof _applications_$_emojis ? RESTPostAPIApplicationEmojiJSONBody :
     // Message
     P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
@@ -431,6 +462,9 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
     // Channel
     P extends typeof _channels_$ ? RESTPatchAPIChannelJSONBody :
+    // Emoji
+    P extends typeof _guilds_$_emojis_$ ? RESTPatchAPIGuildEmojiJSONBody :
+    P extends typeof _applications_$_emojis_$ ? RESTPatchAPIApplicationEmojiJSONBody :
     never  
   : never
 
@@ -500,6 +534,11 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_threads_archived_public ? RESTGetAPIChannelThreadsArchivedPublicResult :
     P extends typeof _channels_$_threads_archived_private ? RESTGetAPIChannelThreadsArchivedPrivateResult :
     P extends typeof _channels_$_users_me_threads_archived_private ? CouldNotFind :
+    // Emoji
+    P extends typeof _guilds_$_emojis ? RESTGetAPIGuildEmojisResult :
+    P extends typeof _guilds_$_emojis_$ ? RESTGetAPIGuildEmojiResult :
+    P extends typeof _applications_$_emojis ? RESTGetAPIApplicationEmojisResult :
+    P extends typeof _applications_$_emojis_$ ? RESTGetAPIApplicationEmojiResult :
     // Message
     P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
     P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
@@ -536,6 +575,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_typing ? RESTPostAPIChannelTypingResult :
     P extends typeof _channels_$_messages_$_threads ? RESTPostAPIChannelMessagesThreadsResult :
     P extends typeof _channels_$_threads ? RESTPostAPIChannelThreadsResult | CouldNotFind :
+    // Emoji
+    P extends typeof _guilds_$_emojis ? RESTPostAPIGuildEmojiResult :
+    P extends typeof _applications_$_emojis ? RESTPostAPIApplicationEmojiResult :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -549,6 +591,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_automoderation_rules_$ ? RESTPatchAPIAutoModerationRuleResult :
     // Channel
     P extends typeof _channels_$ ? RESTPatchAPIChannelResult :
+    // Emoji
+    P extends typeof _guilds_$_emojis_$ ? RESTPatchAPIGuildEmojiResult :
+    P extends typeof _applications_$_emojis_$ ? RESTPatchAPIApplicationEmojiResult :
     never
   : M extends 'DELETE' ?
     // Channel
@@ -558,6 +603,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_recipients_$ ? RESTDeleteAPIChannelRecipientResult :
     P extends typeof _channels_$_threadmembers_me ? RESTDeleteAPIChannelThreadMembersResult :
     P extends typeof _channels_$_threadmembers_$ ? RESTDeleteAPIChannelThreadMembersResult :
+    // Emoji
+    P extends typeof _guilds_$_emojis_$ ? RESTDeleteAPIGuildEmojiResult :
+    P extends typeof _applications_$_emojis_$ ? RESTDeleteAPIApplicationEmojiResult :
     never
   : never
 
