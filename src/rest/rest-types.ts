@@ -19,6 +19,7 @@ import type {
   RESTDeleteAPIGuildRoleResult,
   RESTDeleteAPIGuildScheduledEventResult,
   RESTDeleteAPIGuildSoundboardSoundResult,
+  RESTDeleteAPIGuildStickerResult,
   RESTDeleteAPIGuildTemplateResult,
   RESTDeleteAPIInviteResult,
   RESTDeleteAPIStageInstanceResult,
@@ -83,6 +84,8 @@ import type {
   RESTGetAPIGuildScheduledEventsResult,
   RESTGetAPIGuildSoundboardSoundResult,
   RESTGetAPIGuildSoundboardSoundsResult,
+  RESTGetAPIGuildStickerResult,
+  RESTGetAPIGuildStickersResult,
   RESTGetAPIGuildTemplatesResult,
   RESTGetAPIGuildThreadsResult,
   RESTGetAPIGuildVanityUrlResult,
@@ -101,9 +104,12 @@ import type {
   RESTGetAPISKUsResult,
   RESTGetAPISoundboardDefaultSoundsResult,
   RESTGetAPIStageInstanceResult,
+  RESTGetAPIStickerPackResult,
+  RESTGetAPIStickerResult,
   RESTGetAPITemplateResult,
   RESTGetAPIWebhookWithTokenMessageQuery,
   RESTGetCurrentApplicationResult,
+  RESTGetStickerPacksResult,
   RESTPatchAPIApplicationCommandJSONBody,
   RESTPatchAPIApplicationCommandResult,
   RESTPatchAPIApplicationEmojiJSONBody,
@@ -135,6 +141,8 @@ import type {
   RESTPatchAPIGuildScheduledEventResult,
   RESTPatchAPIGuildSoundboardSoundJSONBody,
   RESTPatchAPIGuildSoundboardSoundResult,
+  RESTPatchAPIGuildStickerJSONBody,
+  RESTPatchAPIGuildStickerResult,
   RESTPatchAPIGuildTemplateJSONBody,
   RESTPatchAPIGuildTemplateResult,
   RESTPatchAPIGuildWelcomeScreenJSONBody,
@@ -308,6 +316,8 @@ import type {
   _guilds_$_scheduledevents_$_users,
   _guilds_$_soundboardsounds,
   _guilds_$_soundboardsounds_$,
+  _guilds_$_stickers,
+  _guilds_$_stickers_$,
   _guilds_$_templates,
   _guilds_$_templates_$,
   _guilds_$_threads_active,
@@ -322,6 +332,9 @@ import type {
   _soundboarddefaultsounds,
   _stageinstances,
   _stageinstances_$,
+  _stickerpacks,
+  _stickerpacks_$,
+  _stickers_$,
   _webhooks_$_$,
   _webhooks_$_$_messages_$,
   _webhooks_$_$_messages_original,
@@ -354,6 +367,8 @@ type RestPathNV<M extends RestMethod> =
     | typeof _applications_me
     // Soundboard
     | typeof _soundboarddefaultsounds
+    // Sticker
+    | typeof _stickerpacks
   : never
 
 // biome-ignore format: ternary operator
@@ -412,6 +427,11 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_$_soundboardsounds_$
     // Stage Instance
     | typeof _stageinstances_$
+    // Sticker
+    | typeof _stickers_$
+    | typeof _stickerpacks_$
+    | typeof _guilds_$_stickers
+    | typeof _guilds_$_stickers_$
   : M extends 'PUT' ?
     // Channel
     | typeof _channels_$_pins_$
@@ -479,6 +499,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_$_soundboardsounds_$
     // Stage Instance
     | typeof _stageinstances_$
+    // Sticker
+    | typeof _guilds_$_stickers_$
   : never
 
 // biome-ignore format: ternary operator
@@ -600,6 +622,8 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds_$_soundboardsounds_$
     // Stage Instance
     | typeof _stageinstances_$
+    // Sticker
+    | typeof _guilds_$_stickers_$
   : never
 
 // biome-ignore format: ternary operator
@@ -639,6 +663,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds
     | typeof _soundboarddefaultsounds
     | typeof _stageinstances
+    | typeof _stickerpacks
   ? [] :
   P extends
     | typeof _applications_$_commands
@@ -692,6 +717,9 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _channels_$_sendsoundboardsound
     | typeof _guilds_$_soundboardsounds
     | typeof _stageinstances_$
+    | typeof _stickers_$
+    | typeof _stickerpacks_$
+    | typeof _guilds_$_stickers
   ? [string] :
   P extends
     | typeof _interactions_$_$_callback
@@ -723,6 +751,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_$_templates_$
     | typeof _channels_$_polls_$_expire
     | typeof _guilds_$_soundboardsounds_$
+    | typeof _guilds_$_stickers_$
   ? [string, string] :
   P extends
     | typeof _webhooks_$_$_messages_$
@@ -874,6 +903,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_soundboardsounds_$ ? RESTPatchAPIGuildSoundboardSoundJSONBody :
     // Stage Instance
     P extends typeof _stageinstances_$ ? RESTPatchAPIStageInstanceJSONBody :
+    // Sticker
+    P extends typeof _guilds_$_stickers_$ ? RESTPatchAPIGuildStickerJSONBody :
     never
   : never
 
@@ -996,6 +1027,12 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_soundboardsounds_$ ? RESTGetAPIGuildSoundboardSoundResult :
     // Stage Instance
     P extends typeof _stageinstances_$ ? RESTGetAPIStageInstanceResult :
+    // Sticker
+    P extends typeof _stickers_$ ? RESTGetAPIStickerResult :
+    P extends typeof _stickerpacks ? RESTGetStickerPacksResult :
+    P extends typeof _stickerpacks_$ ? RESTGetAPIStickerPackResult :
+    P extends typeof _guilds_$_stickers ? RESTGetAPIGuildStickersResult :
+    P extends typeof _guilds_$_stickers_$ ? RESTGetAPIGuildStickerResult :
     never
   : M extends 'PUT' ?
     // Application Commands
@@ -1102,6 +1139,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_soundboardsounds_$ ? RESTPatchAPIGuildSoundboardSoundResult :
     // Stage Instance
     P extends typeof _stageinstances_$ ? RESTPatchAPIStageInstanceResult :
+    // Sticker
+    P extends typeof _guilds_$_stickers_$ ? RESTPatchAPIGuildStickerResult :
     never
   : M extends 'DELETE' ?
     // Channel
@@ -1139,6 +1178,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_soundboardsounds_$ ? RESTDeleteAPIGuildSoundboardSoundResult :
     // Stage Instance
     P extends typeof _stageinstances_$ ? RESTDeleteAPIStageInstanceResult :
+    // Sticker
+    P extends typeof _guilds_$_stickers_$ ? RESTDeleteAPIGuildStickerResult :
     never
   : never
 

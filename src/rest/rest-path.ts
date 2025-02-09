@@ -177,6 +177,16 @@ export const _stageinstances_$ = '/stage-instances/{channel.id}' as const
 
 ////////// Sticker //////////
 // https://discord.com/developers/docs/resources/sticker
+// ✅ 25/02/09
+export const _stickers_$ = '/stickers/{sticker.id}' as const
+export const _stickerpacks = '/sticker-packs' as const
+export const _stickerpacks_$ = '/sticker-packs/{pack.id}' as const
+export const _guilds_$_stickers = '/guilds/{guild.id}/stickers' as const
+export const _guilds_$_stickers_$ = '/guilds/{guild.id}/stickers/{sticker.id}' as const
+
+// 想定外パターン
+// https://discord.com/developers/docs/resources/sticker#create-guild-sticker
+// https://discord-api-types.dev/search?q=RESTPostAPIGuildSticker
 
 ////////// Subscription //////////
 // https://discord.com/developers/docs/resources/subscription
