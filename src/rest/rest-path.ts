@@ -171,6 +171,9 @@ export const _guilds_$_soundboardsounds_$ = '/guilds/{guild.id}/soundboard-sound
 
 ////////// Stage Instance //////////
 // https://discord.com/developers/docs/resources/stage-instance
+// ✅ 25/02/09
+export const _stageinstances = '/stage-instances' as const
+export const _stageinstances_$ = '/stage-instances/{channel.id}' as const
 
 ////////// Sticker //////////
 // https://discord.com/developers/docs/resources/sticker

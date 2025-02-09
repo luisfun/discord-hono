@@ -21,6 +21,7 @@ import type {
   RESTDeleteAPIGuildSoundboardSoundResult,
   RESTDeleteAPIGuildTemplateResult,
   RESTDeleteAPIInviteResult,
+  RESTDeleteAPIStageInstanceResult,
   RESTGetAPIApplicationCommandPermissionsResult,
   RESTGetAPIApplicationCommandResult,
   RESTGetAPIApplicationCommandsQuery,
@@ -99,6 +100,7 @@ import type {
   RESTGetAPIPollAnswerVotersResult,
   RESTGetAPISKUsResult,
   RESTGetAPISoundboardDefaultSoundsResult,
+  RESTGetAPIStageInstanceResult,
   RESTGetAPITemplateResult,
   RESTGetAPIWebhookWithTokenMessageQuery,
   RESTGetCurrentApplicationResult,
@@ -143,6 +145,8 @@ import type {
   RESTPatchAPIInteractionFollowupResult,
   RESTPatchAPIInteractionOriginalResponseJSONBody,
   RESTPatchAPIInteractionOriginalResponseResult,
+  RESTPatchAPIStageInstanceJSONBody,
+  RESTPatchAPIStageInstanceResult,
   RESTPatchCurrentApplicationJSONBody,
   RESTPatchCurrentApplicationResult,
   RESTPostAPIApplicationCommandsJSONBody,
@@ -196,6 +200,8 @@ import type {
   RESTPostAPIInteractionFollowupResult,
   RESTPostAPIPollExpireResult,
   RESTPostAPISoundboardSendSoundJSONBody,
+  RESTPostAPIStageInstanceJSONBody,
+  RESTPostAPIStageInstanceResult,
   RESTPostAPITemplateCreateGuildJSONBody,
   RESTPostAPITemplateCreateGuildResult,
   RESTPutAPIApplicationCommandPermissionsJSONBody,
@@ -314,6 +320,8 @@ import type {
   _interactions_$_$_callback,
   _invites_$,
   _soundboarddefaultsounds,
+  _stageinstances,
+  _stageinstances_$,
   _webhooks_$_$,
   _webhooks_$_$_messages_$,
   _webhooks_$_$_messages_original,
@@ -402,6 +410,8 @@ type RestPathVars<M extends RestMethod> =
     // Soundboard
     | typeof _guilds_$_soundboardsounds
     | typeof _guilds_$_soundboardsounds_$
+    // Stage Instance
+    | typeof _stageinstances_$
   : M extends 'PUT' ?
     // Channel
     | typeof _channels_$_pins_$
@@ -467,6 +477,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _channels_$_messages_$
     // Soundboard
     | typeof _guilds_$_soundboardsounds_$
+    // Stage Instance
+    | typeof _stageinstances_$
   : never
 
 // biome-ignore format: ternary operator
@@ -556,6 +568,8 @@ type RestPathVarsData<M extends RestMethod> =
     // Soundboard
     | typeof _channels_$_sendsoundboardsound
     | typeof _guilds_$_soundboardsounds
+    // Stage Instance
+    | typeof _stageinstances
   : M extends 'PATCH' ?
     // Application Commands
     | typeof _applications_$_commands_$
@@ -584,6 +598,8 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds_$_templates_$
     // Soundboard
     | typeof _guilds_$_soundboardsounds_$
+    // Stage Instance
+    | typeof _stageinstances_$
   : never
 
 // biome-ignore format: ternary operator
@@ -622,6 +638,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _applications_me
     | typeof _guilds
     | typeof _soundboarddefaultsounds
+    | typeof _stageinstances
   ? [] :
   P extends
     | typeof _applications_$_commands
@@ -674,6 +691,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _applications_$_skus
     | typeof _channels_$_sendsoundboardsound
     | typeof _guilds_$_soundboardsounds
+    | typeof _stageinstances_$
   ? [string] :
   P extends
     | typeof _interactions_$_$_callback
@@ -818,6 +836,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Soundboard
     P extends typeof _channels_$_sendsoundboardsound ? RESTPostAPISoundboardSendSoundJSONBody :
     P extends typeof _guilds_$_soundboardsounds ? RESTPostAPIGuildSoundboardSoundJSONBody :
+    // Stage Instance
+    P extends typeof _stageinstances ? RESTPostAPIStageInstanceJSONBody :
     never  
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -852,6 +872,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
     // Soundboard
     P extends typeof _guilds_$_soundboardsounds_$ ? RESTPatchAPIGuildSoundboardSoundJSONBody :
+    // Stage Instance
+    P extends typeof _stageinstances_$ ? RESTPatchAPIStageInstanceJSONBody :
     never
   : never
 
@@ -972,6 +994,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _soundboarddefaultsounds ? RESTGetAPISoundboardDefaultSoundsResult :
     P extends typeof _guilds_$_soundboardsounds ? RESTGetAPIGuildSoundboardSoundsResult :
     P extends typeof _guilds_$_soundboardsounds_$ ? RESTGetAPIGuildSoundboardSoundResult :
+    // Stage Instance
+    P extends typeof _stageinstances_$ ? RESTGetAPIStageInstanceResult :
     never
   : M extends 'PUT' ?
     // Application Commands
@@ -1040,6 +1064,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_polls_$_expire ? RESTPostAPIPollExpireResult :
     // Soundboard
     P extends typeof _guilds_$_soundboardsounds ? RESTPostAPIGuildSoundboardSoundResult :
+    // Stage Instance
+    P extends typeof _stageinstances ? RESTPostAPIStageInstanceResult :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -1074,6 +1100,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageResult :
     // Soundboard
     P extends typeof _guilds_$_soundboardsounds_$ ? RESTPatchAPIGuildSoundboardSoundResult :
+    // Stage Instance
+    P extends typeof _stageinstances_$ ? RESTPatchAPIStageInstanceResult :
     never
   : M extends 'DELETE' ?
     // Channel
@@ -1109,6 +1137,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages_$ ? RESTDeleteAPIChannelMessageResult :
     // Soundboard
     P extends typeof _guilds_$_soundboardsounds_$ ? RESTDeleteAPIGuildSoundboardSoundResult :
+    // Stage Instance
+    P extends typeof _stageinstances_$ ? RESTDeleteAPIStageInstanceResult :
     never
   : never
 
