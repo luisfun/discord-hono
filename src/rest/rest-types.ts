@@ -426,6 +426,8 @@ import type {
 
 type CouldNotFind = unknown
 
+type Query<T> = { query?: T }
+
 export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 
 ////////////////////////////////////////
@@ -975,7 +977,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     never
   : M extends 'POST' ?
     // Receiving and Responding
-    P extends typeof _interactions_$_$_callback ? APIInteractionResponse & { query_params?: RESTPostAPIInteractionCallbackQuery } :
+    P extends typeof _interactions_$_$_callback ? APIInteractionResponse & Query<RESTPostAPIInteractionCallbackQuery> :
     P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseJSONBody :
     P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupJSONBody :
     // Application Commands
@@ -1017,9 +1019,9 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _users_me_channels ? RESTPostAPICurrentUserCreateDMChannelJSONBody | CouldNotFind :
     // Webhook
     P extends typeof _channels_$_webhooks ? RESTPostAPIChannelWebhookJSONBody :
-    P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenJSONBody & { query_params?: RESTPostAPIWebhookWithTokenQuery } :
-    P extends typeof _webhooks_$_$_slack ? { query_params?: RESTPostAPIWebhookWithTokenSlackQuery } :
-    P extends typeof _webhooks_$_$_github ? { query_params?: RESTPostAPIWebhookWithTokenGitHubQuery } :
+    P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenJSONBody & Query<RESTPostAPIWebhookWithTokenQuery> :
+    P extends typeof _webhooks_$_$_slack ? Query<RESTPostAPIWebhookWithTokenSlackQuery> :
+    P extends typeof _webhooks_$_$_github ? Query<RESTPostAPIWebhookWithTokenGitHubQuery> :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding

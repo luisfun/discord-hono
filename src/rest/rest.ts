@@ -22,7 +22,7 @@ export const createRest =
   (method: string, path: string, variables: string[] = [], data?: any, file?: FileData) => {
     if (!token) throw newError('Rest', 'DISCORD_TOKEN')
     const vars = [...variables]
-    const query: Record<string, string> | undefined = method === 'GET' ? data : data?.query_params
+    const query: Record<string, string> | undefined = method === 'GET' ? data : data?.query
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
     if (!file) headers['content-type'] = 'application/json'
     return fetch(
@@ -44,4 +44,5 @@ const res2 = await rest('GET', '/applications/{application.id}/activity-instance
 // @ts-expect-error
 const res3 = await rest('GET', '/unknown', [], { content: '' }).then(r => r.json())
 const res4 = await rest('GET', '/applications/@me').then(r => r.json())
+const res5 = await rest('POST', "/interactions/{interaction.id}/{interaction.token}/callback", ["", ""], {type: 1}).then(r => r.json())
 */
