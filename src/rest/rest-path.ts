@@ -1,11 +1,16 @@
+////////// Duplication //////////
+
+export const _webhooks_$_$ = '/webhooks/{}/{}' as '/webhooks/{application.id}/{interaction.token}' | '/webhooks/{webhook.id}/{webhook.token}'
+export const _webhooks_$_$_messages_$ = '/webhooks/{}/{}/messages/{}' as '/webhooks/{application.id}/{interaction.token}/messages/{message.id}' | '/webhooks/{webhook.id}/{webhook.token}/messages/{message.id}'
+
 ////////// Receiving and Responding //////////
 // https://discord.com/developers/docs/interactions/receiving-and-responding
 // ✅ 25/02/07
 export const _interactions_$_$_callback = '/interactions/{interaction.id}/{interaction.token}/callback' as const
 export const _webhooks_$_$_messages_original =
   '/webhooks/{application.id}/{interaction.token}/messages/@original' as const
-export const _webhooks_$_$ = '/webhooks/{application.id}/{interaction.token}' as const
-export const _webhooks_$_$_messages_$ = '/webhooks/{application.id}/{interaction.token}/messages/{message.id}' as const
+//export const _webhooks_$_$ = '/webhooks/{application.id}/{interaction.token}' as const
+//export const _webhooks_$_$_messages_$ = '/webhooks/{application.id}/{interaction.token}/messages/{message.id}' as const
 
 ////////// Application Commands //////////
 // https://discord.com/developers/docs/interactions/application-commands
@@ -216,3 +221,11 @@ export const _guilds_$_voicestates_$ = '/guilds/{guild.id}/voice-states/{user.id
 
 ////////// Webhook //////////
 // https://discord.com/developers/docs/resources/webhook
+// ✅ 25/02/09
+export const _channels_$_webhooks = '/channels/{channel.id}/webhooks' as const
+export const _guilds_$_webhooks = '/guilds/{guild.id}/webhooks' as const
+export const _webhooks_$ = '/webhooks/{webhook.id}' as const
+//export const _webhooks_$_$ = '/webhooks/{webhook.id}/{webhook.token}' as const
+export const _webhooks_$_$_slack = '/webhooks/{webhook.id}/{webhook.token}/slack' as const
+export const _webhooks_$_$_github = '/webhooks/{webhook.id}/{webhook.token}/github' as const
+//export const _webhooks_$_$_messages_$ = '/webhooks/{webhook.id}/{webhook.token}/messages/{message.id}' as const

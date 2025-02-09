@@ -262,6 +262,25 @@ import type {
   RESTPutAPIGuildOnboardingJSONBody,
   RESTPutAPIGuildOnboardingResult,
   RESTPutAPIGuildTemplateSyncResult,
+  RESTPostAPIChannelWebhookJSONBody,
+  RESTPostAPIChannelWebhookResult,
+  RESTGetAPIChannelWebhooksResult,
+  RESTGetAPIGuildWebhooksResult,
+  RESTGetAPIWebhookResult,
+  RESTGetAPIWebhookWithTokenResult,
+  RESTPatchAPIWebhookJSONBody,
+  RESTPatchAPIWebhookResult,
+  RESTPatchAPIWebhookWithTokenJSONBody,
+  RESTPatchAPIWebhookWithTokenResult,
+  RESTDeleteAPIWebhookResult,
+  RESTDeleteAPIWebhookWithTokenResult,
+  //RESTPostAPIWebhookWithTokenQuery,
+  RESTPostAPIWebhookWithTokenJSONBody,
+  RESTPostAPIWebhookWithTokenResult,
+  RESTPostAPIWebhookWithTokenWaitResult,
+  //RESTPostAPIWebhookWithTokenSlackQuery,
+  //RESTPostAPIWebhookWithTokenSlackResult,
+  //RESTPostAPIWebhookWithTokenSlackWaitResult,
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import type {
@@ -375,7 +394,14 @@ import type {
   _webhooks_$_$,
   _webhooks_$_$_messages_$,
   _webhooks_$_$_messages_original,
+  _channels_$_webhooks,
+  _guilds_$_webhooks,
+  _webhooks_$,
+  _webhooks_$_$_github,
+  _webhooks_$_$_slack,
 } from './rest-path'
+
+// Queryの扱い間違ってるかも
 
 ///// Unknowns /////
 // _interactions_$_$_callback ??
@@ -484,6 +510,11 @@ type RestPathVars<M extends RestMethod> =
     // Voice
     | typeof _guilds_$_voicestates_me
     | typeof _guilds_$_voicestates_$
+    // Webhook
+    | typeof _channels_$_webhooks
+    | typeof _guilds_$_webhooks
+    | typeof _webhooks_$
+    | typeof _webhooks_$_$
   : M extends 'PUT' ?
     // Channel
     | typeof _channels_$_pins_$
@@ -555,6 +586,9 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_$_stickers_$
     // User
     | typeof _users_me_guilds_$
+    // Webhook
+    | typeof _webhooks_$
+    | typeof _webhooks_$_$
   : never
 
 // biome-ignore format: ternary operator
@@ -654,6 +688,9 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _stageinstances
     // User
     | typeof _users_me_channels
+    // Webhook
+    | typeof _channels_$_webhooks
+    | typeof _webhooks_$_$
   : M extends 'PATCH' ?
     // Application Commands
     | typeof _applications_$_commands_$
@@ -691,6 +728,9 @@ type RestPathVarsData<M extends RestMethod> =
     // Voice
     | typeof _guilds_$_voicestates_me
     | typeof _guilds_$_voicestates_$
+    // Webhook
+    | typeof _webhooks_$
+    | typeof _webhooks_$_$
   : never
 
 // biome-ignore format: ternary operator
@@ -798,6 +838,9 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _users_me_guilds_$
     | typeof _users_me_applications_$_roleconnection
     | typeof _guilds_$_voicestates_me
+    | typeof _channels_$_webhooks
+    | typeof _guilds_$_webhooks
+    | typeof _webhooks_$
   ? [string] :
   P extends
     | typeof _interactions_$_$_callback
@@ -832,6 +875,8 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_$_stickers_$
     | typeof _skus_$_subscriptions_$
     | typeof _guilds_$_voicestates_$
+    | typeof _webhooks_$_$_slack
+    | typeof _webhooks_$_$_github
   ? [string, string] :
   P extends
     | typeof _webhooks_$_$_messages_$
@@ -955,6 +1000,9 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _stageinstances ? RESTPostAPIStageInstanceJSONBody :
     // User
     P extends typeof _users_me_channels ? RESTPostAPICurrentUserCreateDMChannelJSONBody | CouldNotFind :
+    // Webhook
+    P extends typeof _channels_$_webhooks ? RESTPostAPIChannelWebhookJSONBody :
+    P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenJSONBody :
     never  
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -998,6 +1046,9 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Voice
     P extends typeof _guilds_$_voicestates_me ? RESTPatchAPIGuildVoiceStateCurrentMemberJSONBody :
     P extends typeof _guilds_$_voicestates_$ ? RESTPatchAPIGuildVoiceStateUserJSONBody :
+    // Webhook
+    P extends typeof _webhooks_$ ? RESTPatchAPIWebhookJSONBody :
+    P extends typeof _webhooks_$_$ ? RESTPatchAPIWebhookWithTokenJSONBody :
     never
   : never
 
@@ -1140,6 +1191,11 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _voice_regions ? RESTGetAPIVoiceRegionsResult :
     P extends typeof _guilds_$_voicestates_me ? RESTGetAPIGuildVoiceStateCurrentMemberResult :
     P extends typeof _guilds_$_voicestates_$ ? RESTGetAPIGuildVoiceStateUserResult :
+    // Webhook
+    P extends typeof _channels_$_webhooks ? RESTGetAPIChannelWebhooksResult :
+    P extends typeof _guilds_$_webhooks ? RESTGetAPIGuildWebhooksResult :
+    P extends typeof _webhooks_$ ? RESTGetAPIWebhookResult :
+    P extends typeof _webhooks_$_$ ? RESTGetAPIWebhookWithTokenResult :
     never
   : M extends 'PUT' ?
     // Application Commands
@@ -1214,6 +1270,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _stageinstances ? RESTPostAPIStageInstanceResult :
     // User
     P extends typeof _users_me_channels ? RESTPostAPICurrentUserCreateDMChannelResult | CouldNotFind :
+    // Webhook
+    P extends typeof _channels_$_webhooks ? RESTPostAPIChannelWebhookResult :
+    P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenResult | RESTPostAPIWebhookWithTokenWaitResult :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -1257,6 +1316,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Voice
     P extends typeof _guilds_$_voicestates_me ? RESTPatchAPIGuildVoiceStateCurrentMemberResult :
     P extends typeof _guilds_$_voicestates_$ ? RESTPatchAPIGuildVoiceStateUserResult :
+    // Webhook
+    P extends typeof _webhooks_$ ? RESTPatchAPIWebhookResult :
+    P extends typeof _webhooks_$_$ ? RESTPatchAPIWebhookWithTokenResult :
     never
   : M extends 'DELETE' ?
     // Channel
@@ -1298,6 +1360,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_stickers_$ ? RESTDeleteAPIGuildStickerResult :
     // User
     P extends typeof _users_me_guilds_$ ? RESTDeleteAPICurrentUserGuildResult :
+    // Webhook
+    P extends typeof _webhooks_$ ? RESTDeleteAPIWebhookResult :
+    P extends typeof _webhooks_$_$ ? RESTDeleteAPIWebhookWithTokenResult :
     never
   : never
 
