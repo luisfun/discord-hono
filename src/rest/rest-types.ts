@@ -96,6 +96,8 @@ import type {
   RESTGetAPIGuildThreadsResult,
   RESTGetAPIGuildVanityUrlResult,
   RESTGetAPIGuildVoiceRegionsResult,
+  RESTGetAPIGuildVoiceStateCurrentMemberResult,
+  RESTGetAPIGuildVoiceStateUserResult,
   RESTGetAPIGuildWelcomeScreenResult,
   RESTGetAPIGuildWidgetImageQuery,
   RESTGetAPIGuildWidgetImageResult,
@@ -117,6 +119,7 @@ import type {
   RESTGetAPIStickerResult,
   RESTGetAPITemplateResult,
   RESTGetAPIUserResult,
+  RESTGetAPIVoiceRegionsResult,
   RESTGetAPIWebhookWithTokenMessageQuery,
   RESTGetCurrentApplicationResult,
   RESTGetCurrentUserGuildMemberResult,
@@ -158,6 +161,10 @@ import type {
   RESTPatchAPIGuildStickerResult,
   RESTPatchAPIGuildTemplateJSONBody,
   RESTPatchAPIGuildTemplateResult,
+  RESTPatchAPIGuildVoiceStateCurrentMemberJSONBody,
+  RESTPatchAPIGuildVoiceStateCurrentMemberResult,
+  RESTPatchAPIGuildVoiceStateUserJSONBody,
+  RESTPatchAPIGuildVoiceStateUserResult,
   RESTPatchAPIGuildWelcomeScreenJSONBody,
   RESTPatchAPIGuildWelcomeScreenResult,
   RESTPatchAPIGuildWidgetSettingsJSONBody,
@@ -339,6 +346,8 @@ import type {
   _guilds_$_templates_$,
   _guilds_$_threads_active,
   _guilds_$_vanityurl,
+  _guilds_$_voicestates_$,
+  _guilds_$_voicestates_me,
   _guilds_$_welcomescreen,
   _guilds_$_widget,
   _guilds_$_widgetjson,
@@ -362,6 +371,7 @@ import type {
   _users_me_guilds,
   _users_me_guilds_$,
   _users_me_guilds_$_member,
+  _voice_regions,
   _webhooks_$_$,
   _webhooks_$_$_messages_$,
   _webhooks_$_$_messages_original,
@@ -400,6 +410,8 @@ type RestPathNV<M extends RestMethod> =
     // User
     | typeof _users_me
     | typeof _users_me_connections
+    // Voice
+    | typeof _voice_regions
   : never
 
 // biome-ignore format: ternary operator
@@ -469,6 +481,9 @@ type RestPathVars<M extends RestMethod> =
     | typeof _users_$
     | typeof _users_me_guilds_$_member
     | typeof _users_me_applications_$_roleconnection
+    // Voice
+    | typeof _guilds_$_voicestates_me
+    | typeof _guilds_$_voicestates_$
   : M extends 'PUT' ?
     // Channel
     | typeof _channels_$_pins_$
@@ -673,6 +688,9 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds_$_stickers_$
     // User
     | typeof _users_me
+    // Voice
+    | typeof _guilds_$_voicestates_me
+    | typeof _guilds_$_voicestates_$
   : never
 
 // biome-ignore format: ternary operator
@@ -717,6 +735,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _users_me_guilds
     | typeof _users_me_channels
     | typeof _users_me_connections
+    | typeof _voice_regions
   ? [] :
   P extends
     | typeof _applications_$_commands
@@ -778,6 +797,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _users_me_guilds_$_member
     | typeof _users_me_guilds_$
     | typeof _users_me_applications_$_roleconnection
+    | typeof _guilds_$_voicestates_me
   ? [string] :
   P extends
     | typeof _interactions_$_$_callback
@@ -811,6 +831,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _guilds_$_soundboardsounds_$
     | typeof _guilds_$_stickers_$
     | typeof _skus_$_subscriptions_$
+    | typeof _guilds_$_voicestates_$
   ? [string, string] :
   P extends
     | typeof _webhooks_$_$_messages_$
@@ -974,6 +995,9 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_stickers_$ ? RESTPatchAPIGuildStickerJSONBody :
     // User
     P extends typeof _users_me ? RESTPatchAPICurrentUserJSONBody :
+    // Voice
+    P extends typeof _guilds_$_voicestates_me ? RESTPatchAPIGuildVoiceStateCurrentMemberJSONBody :
+    P extends typeof _guilds_$_voicestates_$ ? RESTPatchAPIGuildVoiceStateUserJSONBody :
     never
   : never
 
@@ -1112,6 +1136,10 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _users_me_guilds_$_member ? RESTGetCurrentUserGuildMemberResult :
     P extends typeof _users_me_connections ? RESTGetAPICurrentUserConnectionsResult :
     P extends typeof _users_me_applications_$_roleconnection ? RESTGetAPICurrentUserApplicationRoleConnectionResult :
+    // Voice
+    P extends typeof _voice_regions ? RESTGetAPIVoiceRegionsResult :
+    P extends typeof _guilds_$_voicestates_me ? RESTGetAPIGuildVoiceStateCurrentMemberResult :
+    P extends typeof _guilds_$_voicestates_$ ? RESTGetAPIGuildVoiceStateUserResult :
     never
   : M extends 'PUT' ?
     // Application Commands
@@ -1226,6 +1254,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_stickers_$ ? RESTPatchAPIGuildStickerResult :
     // User
     P extends typeof _users_me ? RESTPatchAPICurrentUserResult :
+    // Voice
+    P extends typeof _guilds_$_voicestates_me ? RESTPatchAPIGuildVoiceStateCurrentMemberResult :
+    P extends typeof _guilds_$_voicestates_$ ? RESTPatchAPIGuildVoiceStateUserResult :
     never
   : M extends 'DELETE' ?
     // Channel

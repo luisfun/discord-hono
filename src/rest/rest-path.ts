@@ -209,6 +209,10 @@ export const _users_me_applications_$_roleconnection =
 
 ////////// Voice //////////
 // https://discord.com/developers/docs/resources/voice
+// ✅ 25/02/09
+export const _voice_regions = '/voice/regions' as const
+export const _guilds_$_voicestates_me = '/guilds/{guild.id}/voice-states/@me' as const
+export const _guilds_$_voicestates_$ = '/guilds/{guild.id}/voice-states/{user.id}' as const
 
 ////////// Webhook //////////
 // https://discord.com/developers/docs/resources/webhook
