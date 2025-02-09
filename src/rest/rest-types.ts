@@ -289,6 +289,8 @@ import type {
   RESTPutAPIGuildOnboardingJSONBody,
   RESTPutAPIGuildOnboardingResult,
   RESTPutAPIGuildTemplateSyncResult,
+  //RESTPostAPIGuildStickerFormDataBody,
+  //RESTPostAPIGuildStickerResult,
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import type {
@@ -409,8 +411,6 @@ import type {
   _webhooks_$_$_slack,
 } from './rest-path'
 
-// Queryの扱い間違ってるかも
-
 ///// Unknowns /////
 // [Get Application Activity Instance](https://discord.com/developers/docs/resources/application#get-application-activity-instance)
 // [Start Thread in Forum or Media Channel](https://discord.com/developers/docs/resources/channel#start-thread-in-forum-or-media-channel)
@@ -420,6 +420,9 @@ import type {
 // [Modify Current Member](https://discord.com/developers/docs/resources/guild#modify-current-member)
 // [Modify Guild Incident Actions](https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions)
 // [Create Group DM](https://discord.com/developers/docs/resources/user#create-group-dm)
+
+///// Not supported yet /////
+// [Create Guild Sticker](https://discord.com/developers/docs/resources/sticker#create-guild-sticker) // https://discord-api-types.dev/search?q=RESTPostAPIGuildSticker
 
 type CouldNotFind = unknown
 

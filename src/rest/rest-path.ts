@@ -193,9 +193,8 @@ export const _stickerpacks_$ = '/sticker-packs/{pack.id}' as const
 export const _guilds_$_stickers = '/guilds/{guild.id}/stickers' as const
 export const _guilds_$_stickers_$ = '/guilds/{guild.id}/stickers/{sticker.id}' as const
 
-// 想定外パターン
-// https://discord.com/developers/docs/resources/sticker#create-guild-sticker
-// https://discord-api-types.dev/search?q=RESTPostAPIGuildSticker
+///// Not supported yet /////
+// [Create Guild Sticker](https://discord.com/developers/docs/resources/sticker#create-guild-sticker) // https://discord-api-types.dev/search?q=RESTPostAPIGuildSticker
 
 ////////// Subscription //////////
 // https://discord.com/developers/docs/resources/subscription
