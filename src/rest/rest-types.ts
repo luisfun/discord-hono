@@ -26,6 +26,7 @@ import type {
   RESTDeleteAPIInviteResult,
   RESTDeleteAPIStageInstanceResult,
   RESTDeleteAPIWebhookResult,
+  RESTDeleteAPIWebhookWithTokenMessageResult,
   RESTDeleteAPIWebhookWithTokenResult,
   RESTGetAPIApplicationCommandPermissionsResult,
   RESTGetAPIApplicationCommandResult,
@@ -127,6 +128,7 @@ import type {
   RESTGetAPIVoiceRegionsResult,
   RESTGetAPIWebhookResult,
   RESTGetAPIWebhookWithTokenMessageQuery,
+  RESTGetAPIWebhookWithTokenMessageResult,
   RESTGetAPIWebhookWithTokenResult,
   RESTGetCurrentApplicationResult,
   RESTGetCurrentUserGuildMemberResult,
@@ -185,6 +187,8 @@ import type {
   RESTPatchAPIWebhookJSONBody,
   RESTPatchAPIWebhookResult,
   RESTPatchAPIWebhookWithTokenJSONBody,
+  RESTPatchAPIWebhookWithTokenMessageJSONBody,
+  RESTPatchAPIWebhookWithTokenMessageResult,
   RESTPatchAPIWebhookWithTokenResult,
   RESTPatchCurrentApplicationJSONBody,
   RESTPatchCurrentApplicationResult,
@@ -247,6 +251,9 @@ import type {
   RESTPostAPIStageInstanceResult,
   RESTPostAPITemplateCreateGuildJSONBody,
   RESTPostAPITemplateCreateGuildResult,
+  RESTPostAPIWebhookWithTokenGitHubQuery,
+  RESTPostAPIWebhookWithTokenGitHubResult,
+  RESTPostAPIWebhookWithTokenGitHubWaitResult,
   RESTPostAPIWebhookWithTokenJSONBody,
   RESTPostAPIWebhookWithTokenQuery,
   RESTPostAPIWebhookWithTokenResult,
@@ -589,6 +596,7 @@ type RestPathVars<M extends RestMethod> =
     // Webhook
     | typeof _webhooks_$
     | typeof _webhooks_$_$
+    | typeof _webhooks_$_$_messages_$
   : never
 
 // biome-ignore format: ternary operator
@@ -692,6 +700,7 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _channels_$_webhooks
     | typeof _webhooks_$_$
     | typeof _webhooks_$_$_slack
+    | typeof _webhooks_$_$_github
   : M extends 'PATCH' ?
     // Application Commands
     | typeof _applications_$_commands_$
@@ -750,6 +759,8 @@ type RestPathVarsDataFile<M extends RestMethod> =
     | typeof _webhooks_$_$_messages_$
     // Message
     | typeof _channels_$_messages_$
+    // Webhook
+    | typeof _webhooks_$_$_messages_$
   : never
 
 export type RestPath<M extends RestMethod> =
@@ -1005,6 +1016,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_webhooks ? RESTPostAPIChannelWebhookJSONBody :
     P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenJSONBody & { query_params?: RESTPostAPIWebhookWithTokenQuery } :
     P extends typeof _webhooks_$_$_slack ? { query_params?: RESTPostAPIWebhookWithTokenSlackQuery } :
+    P extends typeof _webhooks_$_$_github ? { query_params?: RESTPostAPIWebhookWithTokenGitHubQuery } :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -1051,6 +1063,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Webhook
     P extends typeof _webhooks_$ ? RESTPatchAPIWebhookJSONBody :
     P extends typeof _webhooks_$_$ ? RESTPatchAPIWebhookWithTokenJSONBody :
+    P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIWebhookWithTokenMessageJSONBody :
     never
   : never
 
@@ -1093,7 +1106,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
   M extends 'GET' ?
     // Receiving and Responding
     P extends typeof _webhooks_$_$_messages_original ? RESTGetAPIInteractionOriginalResponseResult :
-    P extends typeof _webhooks_$_$_messages_$ ? RESTGetAPIInteractionFollowupResult :
+    P extends typeof _webhooks_$_$_messages_$ ? RESTGetAPIInteractionFollowupResult | RESTGetAPIWebhookWithTokenMessageResult :
     // Application Commands
     P extends typeof _applications_$_commands ? RESTGetAPIApplicationCommandsResult :
     P extends typeof _applications_$_commands_$ ? RESTGetAPIApplicationCommandResult :
@@ -1276,6 +1289,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_webhooks ? RESTPostAPIChannelWebhookResult :
     P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenResult | RESTPostAPIWebhookWithTokenWaitResult :
     P extends typeof _webhooks_$_$_slack ? RESTPostAPIWebhookWithTokenSlackResult | RESTPostAPIWebhookWithTokenSlackWaitResult :
+    P extends typeof _webhooks_$_$_github ? RESTPostAPIWebhookWithTokenGitHubResult | RESTPostAPIWebhookWithTokenGitHubWaitResult :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -1322,6 +1336,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Webhook
     P extends typeof _webhooks_$ ? RESTPatchAPIWebhookResult :
     P extends typeof _webhooks_$_$ ? RESTPatchAPIWebhookWithTokenResult :
+    P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIWebhookWithTokenMessageResult :
     never
   : M extends 'DELETE' ?
     // Channel
@@ -1366,6 +1381,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Webhook
     P extends typeof _webhooks_$ ? RESTDeleteAPIWebhookResult :
     P extends typeof _webhooks_$_$ ? RESTDeleteAPIWebhookWithTokenResult :
+    P extends typeof _webhooks_$_$_messages_$ ? RESTDeleteAPIWebhookWithTokenMessageResult :
     never
   : never
 
