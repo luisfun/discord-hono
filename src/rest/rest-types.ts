@@ -9,6 +9,7 @@ import type {
   RESTDeleteAPIChannelRecipientResult,
   RESTDeleteAPIChannelResult,
   RESTDeleteAPIChannelThreadMembersResult,
+  RESTDeleteAPICurrentUserGuildResult,
   RESTDeleteAPIEntitlementResult,
   RESTDeleteAPIGuildBanResult,
   RESTDeleteAPIGuildEmojiResult,
@@ -51,6 +52,11 @@ import type {
   RESTGetAPIChannelThreadMembersResult,
   RESTGetAPIChannelThreadsArchivedPrivateResult,
   RESTGetAPIChannelThreadsArchivedPublicResult,
+  RESTGetAPICurrentUserApplicationRoleConnectionResult,
+  RESTGetAPICurrentUserConnectionsResult,
+  RESTGetAPICurrentUserGuildsQuery,
+  RESTGetAPICurrentUserGuildsResult,
+  RESTGetAPICurrentUserResult,
   RESTGetAPIEntitlementResult,
   RESTGetAPIEntitlementsQuery,
   RESTGetAPIEntitlementsResult,
@@ -110,8 +116,10 @@ import type {
   RESTGetAPIStickerPackResult,
   RESTGetAPIStickerResult,
   RESTGetAPITemplateResult,
+  RESTGetAPIUserResult,
   RESTGetAPIWebhookWithTokenMessageQuery,
   RESTGetCurrentApplicationResult,
+  RESTGetCurrentUserGuildMemberResult,
   RESTGetStickerPacksResult,
   RESTPatchAPIApplicationCommandJSONBody,
   RESTPatchAPIApplicationCommandResult,
@@ -128,6 +136,8 @@ import type {
   RESTPatchAPICurrentGuildMemberJSONBody,
   RESTPatchAPICurrentGuildMemberNicknameJSONBody,
   RESTPatchAPICurrentGuildMemberNicknameResult,
+  RESTPatchAPICurrentUserJSONBody,
+  RESTPatchAPICurrentUserResult,
   RESTPatchAPIGuildChannelPositionsJSONBody,
   RESTPatchAPIGuildChannelPositionsResult,
   RESTPatchAPIGuildEmojiJSONBody,
@@ -182,6 +192,8 @@ import type {
   RESTPostAPIChannelThreadsJSONBody,
   RESTPostAPIChannelThreadsResult,
   RESTPostAPIChannelTypingResult,
+  RESTPostAPICurrentUserCreateDMChannelJSONBody,
+  RESTPostAPICurrentUserCreateDMChannelResult,
   RESTPostAPIEntitlementConsumeResult,
   RESTPostAPIEntitlementJSONBody,
   RESTPostAPIEntitlementResult,
@@ -230,6 +242,8 @@ import type {
   RESTPutAPIChannelRecipientJSONBody,
   RESTPutAPIChannelRecipientResult,
   RESTPutAPIChannelThreadMembersResult,
+  RESTPutAPICurrentUserApplicationRoleConnectionJSONBody,
+  RESTPutAPICurrentUserApplicationRoleConnectionResult,
   RESTPutAPIGuildApplicationCommandsPermissionsJSONBody,
   RESTPutAPIGuildApplicationCommandsPermissionsResult,
   RESTPutAPIGuildBanJSONBody,
@@ -340,6 +354,14 @@ import type {
   _stickerpacks,
   _stickerpacks_$,
   _stickers_$,
+  _users_$,
+  _users_me,
+  _users_me_applications_$_roleconnection,
+  _users_me_channels,
+  _users_me_connections,
+  _users_me_guilds,
+  _users_me_guilds_$,
+  _users_me_guilds_$_member,
   _webhooks_$_$,
   _webhooks_$_$_messages_$,
   _webhooks_$_$_messages_original,
@@ -354,6 +376,7 @@ import type {
 // [List Joined Private Archived Threads](https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads)
 // [Modify Current Member](https://discord.com/developers/docs/resources/guild#modify-current-member)
 // [Modify Guild Incident Actions](https://discord.com/developers/docs/resources/guild#modify-guild-incident-actions)
+// [Create Group DM](https://discord.com/developers/docs/resources/user#create-group-dm)
 
 type CouldNotFind = unknown
 
@@ -374,6 +397,9 @@ type RestPathNV<M extends RestMethod> =
     | typeof _soundboarddefaultsounds
     // Sticker
     | typeof _stickerpacks
+    // User
+    | typeof _users_me
+    | typeof _users_me_connections
   : never
 
 // biome-ignore format: ternary operator
@@ -439,6 +465,10 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_$_stickers_$
     // Subscription
     | typeof _skus_$_subscriptions_$
+    // User
+    | typeof _users_$
+    | typeof _users_me_guilds_$_member
+    | typeof _users_me_applications_$_roleconnection
   : M extends 'PUT' ?
     // Channel
     | typeof _channels_$_pins_$
@@ -508,6 +538,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _stageinstances_$
     // Sticker
     | typeof _guilds_$_stickers_$
+    // User
+    | typeof _users_me_guilds_$
   : never
 
 // biome-ignore format: ternary operator
@@ -549,6 +581,8 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _channels_$_polls_$_answers_$
     // Subscription
     | typeof _skus_$_subscriptions
+    // User
+    | typeof _users_me_guilds
   : M extends 'PUT' ?
     // Application Commands
     | typeof _applications_$_commands
@@ -565,6 +599,8 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds_$_bans_$
     | typeof _guilds_$_onboarding
     | typeof _guilds_$_incidentactions
+    // User
+    | typeof _users_me_applications_$_roleconnection
   : M extends 'POST' ?
     // Application Commands
     | typeof _applications_$_commands
@@ -601,6 +637,8 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _guilds_$_soundboardsounds
     // Stage Instance
     | typeof _stageinstances
+    // User
+    | typeof _users_me_channels
   : M extends 'PATCH' ?
     // Application Commands
     | typeof _applications_$_commands_$
@@ -633,6 +671,8 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _stageinstances_$
     // Sticker
     | typeof _guilds_$_stickers_$
+    // User
+    | typeof _users_me
   : never
 
 // biome-ignore format: ternary operator
@@ -673,6 +713,10 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _soundboarddefaultsounds
     | typeof _stageinstances
     | typeof _stickerpacks
+    | typeof _users_me
+    | typeof _users_me_guilds
+    | typeof _users_me_channels
+    | typeof _users_me_connections
   ? [] :
   P extends
     | typeof _applications_$_commands
@@ -730,6 +774,10 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _stickerpacks_$
     | typeof _guilds_$_stickers
     | typeof _skus_$_subscriptions
+    | typeof _users_$
+    | typeof _users_me_guilds_$_member
+    | typeof _users_me_guilds_$
+    | typeof _users_me_applications_$_roleconnection
   ? [string] :
   P extends
     | typeof _interactions_$_$_callback
@@ -822,6 +870,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_polls_$_answers_$ ? RESTGetAPIPollAnswerVotersQuery :
     // Subscription
     P extends typeof _skus_$_subscriptions ? RESTGetAPISKUSubscriptionsQuery :
+    // User
+    P extends typeof _users_me_guilds ? RESTGetAPICurrentUserGuildsQuery :
     never
   : M extends 'PUT' ?
     // Application Commands
@@ -839,6 +889,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_bans_$ ? RESTPutAPIGuildBanJSONBody :
     P extends typeof _guilds_$_onboarding ? RESTPutAPIGuildOnboardingJSONBody :
     P extends typeof _guilds_$_incidentactions ? RESTPutAPIGuildIncidentActionsJSONBody :
+    // User
+    P extends typeof _users_me_applications_$_roleconnection ? RESTPutAPICurrentUserApplicationRoleConnectionJSONBody :
     never
   : M extends 'POST' ?
     // Receiving and Responding
@@ -880,6 +932,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_soundboardsounds ? RESTPostAPIGuildSoundboardSoundJSONBody :
     // Stage Instance
     P extends typeof _stageinstances ? RESTPostAPIStageInstanceJSONBody :
+    // User
+    P extends typeof _users_me_channels ? RESTPostAPICurrentUserCreateDMChannelJSONBody | CouldNotFind :
     never  
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -918,6 +972,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _stageinstances_$ ? RESTPatchAPIStageInstanceJSONBody :
     // Sticker
     P extends typeof _guilds_$_stickers_$ ? RESTPatchAPIGuildStickerJSONBody :
+    // User
+    P extends typeof _users_me ? RESTPatchAPICurrentUserJSONBody :
     never
   : never
 
@@ -1049,6 +1105,13 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Subscription
     P extends typeof _skus_$_subscriptions ? RESTGetAPISKUSubscriptionsResult :
     P extends typeof _skus_$_subscriptions_$ ? RESTGetAPISKUSubscriptionResult :
+    // User
+    P extends typeof _users_me ? RESTGetAPICurrentUserResult :
+    P extends typeof _users_$ ? RESTGetAPIUserResult :
+    P extends typeof _users_me_guilds ? RESTGetAPICurrentUserGuildsResult :
+    P extends typeof _users_me_guilds_$_member ? RESTGetCurrentUserGuildMemberResult :
+    P extends typeof _users_me_connections ? RESTGetAPICurrentUserConnectionsResult :
+    P extends typeof _users_me_applications_$_roleconnection ? RESTGetAPICurrentUserApplicationRoleConnectionResult :
     never
   : M extends 'PUT' ?
     // Application Commands
@@ -1074,6 +1137,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_templates_$ ? RESTPutAPIGuildTemplateSyncResult :
     // Message
     P extends typeof _channels_$_messages_$_reactions_$_me ? RESTPutAPIChannelMessageReactionResult :
+    // User
+    P extends typeof _users_me_applications_$_roleconnection ? RESTPutAPICurrentUserApplicationRoleConnectionResult :
     never
   : M extends 'POST' ?
     // Receiving and Responding
@@ -1119,6 +1184,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_$_soundboardsounds ? RESTPostAPIGuildSoundboardSoundResult :
     // Stage Instance
     P extends typeof _stageinstances ? RESTPostAPIStageInstanceResult :
+    // User
+    P extends typeof _users_me_channels ? RESTPostAPICurrentUserCreateDMChannelResult | CouldNotFind :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
@@ -1157,6 +1224,8 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _stageinstances_$ ? RESTPatchAPIStageInstanceResult :
     // Sticker
     P extends typeof _guilds_$_stickers_$ ? RESTPatchAPIGuildStickerResult :
+    // User
+    P extends typeof _users_me ? RESTPatchAPICurrentUserResult :
     never
   : M extends 'DELETE' ?
     // Channel
@@ -1196,13 +1265,19 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _stageinstances_$ ? RESTDeleteAPIStageInstanceResult :
     // Sticker
     P extends typeof _guilds_$_stickers_$ ? RESTDeleteAPIGuildStickerResult :
+    // User
+    P extends typeof _users_me_guilds_$ ? RESTDeleteAPICurrentUserGuildResult :
     never
   : never
 
 type TypedResponse<T> = Omit<Response, 'json'> & { json(): Promise<T> }
 
 export type Rest = {
-  <M extends RestMethod, P extends RestPathNV<M>>(method: M, path: P): Promise<TypedResponse<RestResult<M, P>>>
+  <M extends RestMethod, P extends RestPathNV<M>>(
+    method: M,
+    path: P,
+    variables?: RestVariables<P>,
+  ): Promise<TypedResponse<RestResult<M, P>>>
   <M extends RestMethod, P extends RestPathVars<M>>(
     method: M,
     path: P,

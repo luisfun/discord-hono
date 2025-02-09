@@ -196,6 +196,16 @@ export const _skus_$_subscriptions_$ = '/skus/{sku.id}/subscriptions/{subscripti
 
 ////////// User //////////
 // https://discord.com/developers/docs/resources/user
+// ✅ 25/02/09
+export const _users_me = '/users/@me' as const
+export const _users_$ = '/users/{user.id}' as const
+export const _users_me_guilds = '/users/@me/guilds' as const
+export const _users_me_guilds_$_member = '/users/@me/guilds/{guild.id}/member' as const
+export const _users_me_guilds_$ = '/users/@me/guilds/{guild.id}' as const
+export const _users_me_channels = '/users/@me/channels' as const
+export const _users_me_connections = '/users/@me/connections' as const
+export const _users_me_applications_$_roleconnection =
+  '/users/@me/applications/{application.id}/role-connection' as const
 
 ////////// Voice //////////
 // https://discord.com/developers/docs/resources/voice
