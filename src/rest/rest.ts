@@ -1,94 +1,48 @@
 import type { FileData } from '../types'
 import { formData, newError } from '../utils'
-import type {
-  DeletePath,
-  GetMethod,
-  GetPath,
-  GetQuery,
-  PatchData,
-  PatchMethod,
-  PatchPath,
-  PostData,
-  PostMethod,
-  PostPath,
-  PutData,
-  PutMethod,
-  PutPath,
-  Variables,
-} from './rest-types'
+import type { Rest } from './rest-types'
 
 const API_VER = 'v10'
 
-export class Rest {
-  #fetch
+/**
+ * [Documentation](https://discord-hono.luis.fun/interactions/rest/)
+ * @param {string} token
+ */
+export const createRest =
+  (token: string | undefined): Rest =>
   /**
    * [Documentation](https://discord-hono.luis.fun/interactions/rest/)
-   * @param {string} token
+   * @param {'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'} method
+   * @param {string} path Official document path
+   * @param {string[]} variables Variable part of official document path
+   * @param {object} data
+   * @param {FileData} file
+   * @returns {Promise<Response>}
    */
-  constructor(token: string | undefined) {
-    this.#fetch = (
-      path: string,
-      variables: string[],
-      method: 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE',
-      data?: object,
-      file?: FileData,
-    ) => {
-      if (!token) throw newError('Rest', 'DISCORD_TOKEN')
-      const Authorization = `Bot ${token}`
-      return fetch(
-        `https://discord.com/api/${
-          API_VER +
-          path
-            .split(/[{}]/)
-            .map((str, i) => (i & 1 ? variables[i >> 1] : str))
-            .join('')
-        }`,
-        {
-          method,
-          body: file ? formData(data, file) : JSON.stringify(data),
-          headers: file ? { Authorization } : { Authorization, 'content-type': 'application/json' },
-        },
-      )
-    }
+  (method: string, path: string, variables: string[] = [], data?: any, file?: FileData) => {
+    if (!token) throw newError('Rest', 'DISCORD_TOKEN')
+    const vars = [...variables]
+    const query: Record<string, string> | undefined = method === 'GET' ? data : data?.query
+    const headers: HeadersInit = { Authorization: `Bot ${token}` }
+    if (!file) headers['content-type'] = 'application/json'
+    return fetch(
+      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + (query ? `/?${new URLSearchParams(query).toString()}` : '')}`,
+      { method, headers, body: file ? formData(data, file) : JSON.stringify(data) },
+    )
   }
-  /**
-   * @param {string} path Official document path
-   * @param {string[]} variables Variable part of official document path
-   * @param query
-   * @returns {Promise<Response>}
-   */
-  get: GetMethod = async <P extends GetPath>(path: P, variables: Variables<P>, query?: GetQuery<P>) =>
-    this.#fetch(path, variables, 'GET', query)
-  /**
-   * @param {string} path Official document path
-   * @param {string[]} variables Variable part of official document path
-   * @param data
-   * @returns {Promise<Response>}
-   */
-  put: PutMethod = <P extends PutPath>(path: P, variables: Variables<P>, data?: PutData<P>) =>
-    this.#fetch(path, variables, 'PUT', data)
-  /**
-   * @param {string} path Official document path
-   * @param {string[]} variables Variable part of official document path
-   * @param data
-   * @param {FileData} file
-   * @returns {Promise<Response>}
-   */
-  post: PostMethod = <P extends PostPath>(path: P, variables: Variables<P>, data?: PostData<P>, file?: FileData) =>
-    this.#fetch(path, variables, 'POST', data, file)
-  /**
-   * @param {string} path Official document path
-   * @param {string[]} variables Variable part of official document path
-   * @param data
-   * @param {FileData} file
-   * @returns {Promise<Response>}
-   */
-  patch: PatchMethod = <P extends PatchPath>(path: P, variables: Variables<P>, data?: PatchData<P>, file?: FileData) =>
-    this.#fetch(path, variables, 'PATCH', data, file)
-  /**
-   * @param {string} path Official document path
-   * @param {string[]} variables Variable part of official document path
-   * @returns {Promise<Response>}
-   */
-  delete = <P extends DeletePath>(path: P, variables: Variables<P>) => this.#fetch(path, variables, 'DELETE')
-}
+
+/*
+const rest = createRest('')
+const res1 = await rest('POST', '/applications/{application.id}/commands', ['application.id'], {
+  name: '',
+  //description: '',
+}).then(r => r.json())
+const res2 = await rest('GET', '/applications/{application.id}/activity-instances/{instance_id}', [
+  'application.id',
+  'instance_id',
+]).then(r => r.json())
+// @ts-expect-error
+const res3 = await rest('GET', '/unknown', [], { content: '' }).then(r => r.json())
+const res4 = await rest('GET', '/applications/@me').then(r => r.json())
+const res5 = await rest('POST', "/interactions/{interaction.id}/{interaction.token}/callback", ["", ""], {type: 1}).then(r => r.json())
+*/

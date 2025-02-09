@@ -33,7 +33,7 @@ class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
 // biome-ignore lint: Null Variables
 type Var = {}
 
-type CreateReturn<E extends Env> = {
+type Factory<E extends Env> = {
   discord: (init?: InitOptions<E>) => DiscordHonoExtends<E>
   command: <V extends Var>(
     command: Command,
@@ -60,13 +60,13 @@ type CreateReturn<E extends Env> = {
 }
 
 type Handler<E extends Env> =
-  | ReturnType<CreateReturn<E>['command']>
-  | ReturnType<CreateReturn<E>['component']>
-  | ReturnType<CreateReturn<E>['autocomplete']>
-  | ReturnType<CreateReturn<E>['modal']>
-  | ReturnType<CreateReturn<E>['cron']>
+  | ReturnType<Factory<E>['command']>
+  | ReturnType<Factory<E>['component']>
+  | ReturnType<Factory<E>['autocomplete']>
+  | ReturnType<Factory<E>['modal']>
+  | ReturnType<Factory<E>['cron']>
 
-export const createFactory = <E extends Env = Env>(): CreateReturn<E> => ({
+export const createFactory = <E extends Env = Env>(): Factory<E> => ({
   discord: init => new DiscordHonoExtends<E>(init),
   command: (command, handler) => ({ command, handler: handler as CommandHandler<E> }),
   component: (component, handler) => ({ component, handler: handler as ComponentHandler<E, any> }),

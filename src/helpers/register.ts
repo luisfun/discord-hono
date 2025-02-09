@@ -1,7 +1,7 @@
 import type { SlashCommandBuilder } from '@discordjs/builders'
 import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
 import type { Command } from '../builders/command'
-import { Rest } from '../rest/rest'
+import { createRest } from '../rest/rest'
 import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest/rest-path'
 import { newError, toJSON } from '../utils'
 
@@ -21,11 +21,11 @@ export const register = async (
   if (!token) throw newError('register', 'DISCORD_TOKEN')
   if (!application_id) throw newError('register', 'DISCORD_APPLICATION_ID')
 
-  const rest = new Rest(token)
+  const rest = createRest(token)
   const json = commands.map(toJSON)
   let res: Response
-  if (guild_id) res = await rest.put(_applications_$_guilds_$_commands, [application_id, guild_id], json)
-  else res = await rest.put(_applications_$_commands, [application_id], json)
+  if (guild_id) res = await rest('PUT', _applications_$_guilds_$_commands, [application_id, guild_id], json)
+  else res = await rest('PUT', _applications_$_commands, [application_id], json)
 
   let logText = ''
   if (res.ok) {

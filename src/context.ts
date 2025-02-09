@@ -11,7 +11,7 @@ import type {
   RESTPostAPIInteractionFollowupJSONBody,
 } from 'discord-api-types/v10'
 import type { Autocomplete, Modal } from './builders'
-import { Rest, _webhooks_$_$, _webhooks_$_$_messages_$ } from './rest'
+import { _webhooks_$_$, _webhooks_$_$_messages_original, createRest } from './rest'
 import type {
   CronEvent,
   CustomCallbackData,
@@ -43,7 +43,7 @@ abstract class ContextAll<E extends Env> {
   protected discord: DiscordEnv
   #key: string
   #var = new Map()
-  #rest: Rest | undefined = undefined
+  #rest: ReturnType<typeof createRest> | undefined = undefined
   constructor(env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv, key: string) {
     this.#env = env
     this.#executionCtx = executionCtx
@@ -96,9 +96,9 @@ abstract class ContextAll<E extends Env> {
   /**
    * `c.rest` = `new Rest(c.env.DISCORD_TOKEN)`
    */
-  get rest(): Rest {
+  get rest(): ReturnType<typeof createRest> {
     if (!this.discord.TOKEN) throw newError('c.rest', 'DISCORD_TOKEN')
-    this.#rest ??= new Rest(this.discord.TOKEN)
+    this.#rest ??= createRest(this.discord.TOKEN)
     return this.#rest
   }
 }
@@ -116,6 +116,9 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   #focused: AutocompleteOption | undefined // 4
   #throwIfNotAllowType = (allowType: APIInteraction['type'][]) => {
     if (!allowType.includes(this.#interaction.type)) throw new Error('dev: Invalid method')
+  }
+  #throwIfNonApplicationId = () => {
+    if (!this.discord.APPLICATION_ID) throw newError('c.followupXXX', 'DISCORD_APPLICATION_ID')
   }
   #res47 = (type: 4 | 7, data: CustomCallbackData<APIInteractionResponseCallbackData>, file: FileData | undefined) => {
     let body: APIInteractionResponse | FormData = { data: { ...this.#flags, ...prepareData(data) }, type }
@@ -235,10 +238,11 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    */
   followup = (data: CustomCallbackData<RESTPostAPIInteractionFollowupJSONBody> = {}, file?: FileData) => {
     this.#throwIfNotAllowType([2, 3, 5])
-    if (!this.discord.APPLICATION_ID) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
-    return this.rest.post(
+    this.#throwIfNonApplicationId()
+    return this.rest(
+      'POST',
       _webhooks_$_$,
-      [this.discord.APPLICATION_ID, this.interaction.token],
+      [this.discord.APPLICATION_ID!, this.interaction.token],
       { ...this.#flags, ...prepareData(data) },
       file,
     )
@@ -253,13 +257,8 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    */
   followupDelete = () => {
     this.#throwIfNotAllowType([2, 3, 5])
-    if (!this.discord.APPLICATION_ID) throw newError('c.followupDelete', 'DISCORD_APPLICATION_ID')
-    if (!this.interaction.message?.id) throw newError('c.followupDelete', 'message.id')
-    return this.rest.delete(_webhooks_$_$_messages_$, [
-      this.discord.APPLICATION_ID,
-      this.interaction.token,
-      this.interaction.message.id,
-    ])
+    this.#throwIfNonApplicationId()
+    return this.rest('DELETE', _webhooks_$_$_messages_original, [this.discord.APPLICATION_ID!, this.interaction.token])
   }
 
   /**

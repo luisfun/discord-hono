@@ -53,7 +53,7 @@ register(
 ## Health
 
 [![CodeQL](https://github.com/luisfun/discord-hono/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/luisfun/discord-hono/actions/workflows/github-code-scanning/codeql) [![Codecov](https://codecov.io/github/luisfun/discord-hono/graph/badge.svg)](https://codecov.io/github/luisfun/discord-hono) [![OpenSSF](https://api.scorecard.dev/projects/github.com/luisfun/discord-hono/badge
-)](https://scorecard.dev/viewer/?uri=github.com/luisfun/discord-hono)
+)](https://scorecard.dev/viewer/?uri=github.com/luisfun/discord-hono) [![OpenSSF](https://www.bestpractices.dev/projects/9989/badge)](https://www.bestpractices.dev/projects/9989)
 
 ## References
 

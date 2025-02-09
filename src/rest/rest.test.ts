@@ -1,5 +1,5 @@
 import { formData } from '../utils'
-import { Rest } from './rest'
+import { createRest } from './rest'
 
 const mockToken = vi.fn(() => 'mock-token')()
 
@@ -10,28 +10,29 @@ vi.mock('../utils', () => ({
 }))
 
 describe('Rest', () => {
-  let rest: Rest
+  let rest: ReturnType<typeof createRest>
   const mockFetch = vi.fn()
 
   beforeEach(() => {
     vi.resetAllMocks()
     // @ts-expect-error
     global.fetch = mockFetch
-    rest = new Rest(mockToken)
+    rest = createRest(mockToken)
   })
-  /*
+
   it('should throw an error if token is not provided', () => {
-    expect(() => new Rest(undefined)).toThrow('DISCORD_TOKEN');
-    expect(errorDev).toHaveBeenCalledWith('DISCORD_TOKEN');
-  });
-*/
+    expect(() => createRest(undefined)('GET', '/applications/@me')).toThrow()
+  })
+
   it('should make a GET request', async () => {
     const mockResponse = { json: vi.fn().mockResolvedValue({ data: 'mock_data' }) }
     mockFetch.mockResolvedValue(mockResponse)
     // @ts-expect-error
-    const result = await rest.get('/users/{user.id}', ['123'], { query: 'param' }).then(r => r.json())
+    const result = await rest('GET', '/users/{user.id}/emoji/{emoji.id}', ['123', '45678'], { query: 'param' }).then(
+      r => r.json(),
+    )
 
-    expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/users/123', {
+    expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/users/123/emoji/45678/?query=param', {
       method: 'GET',
       headers: {
         Authorization: `Bot ${mockToken}`,
@@ -45,7 +46,7 @@ describe('Rest', () => {
   it('should make a PUT request', async () => {
     mockFetch.mockResolvedValue({})
     // @ts-expect-error
-    await rest.put('/guilds/{guild.id}', ['456'], { name: 'New Guild Name' })
+    await rest('PUT', '/guilds/{guild.id}', ['456'], { name: 'New Guild Name' })
 
     expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/guilds/456', {
       method: 'PUT',
@@ -64,7 +65,7 @@ describe('Rest', () => {
     formData.mockReturnValue(mockFormData)
 
     const fileData = { name: 'test.png', blob: new Blob(['test']) }
-    await rest.post('/channels/{channel.id}/messages', ['789'], { content: 'Hello' }, fileData)
+    await rest('POST', '/channels/{channel.id}/messages', ['789'], { content: 'Hello' }, fileData)
 
     expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/channels/789/messages', {
       method: 'POST',
@@ -79,7 +80,7 @@ describe('Rest', () => {
   it('should make a PATCH request', async () => {
     mockFetch.mockResolvedValue({})
 
-    await rest.patch('/channels/{channel.id}', ['101'], { name: 'Updated Channel' })
+    await rest('PATCH', '/channels/{channel.id}', ['101'], { name: 'Updated Channel' })
 
     expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/channels/101', {
       method: 'PATCH',
@@ -93,8 +94,7 @@ describe('Rest', () => {
 
   it('should make a DELETE request', async () => {
     mockFetch.mockResolvedValue({})
-    // @ts-expect-error
-    await rest.delete('/channels/{channel.id}', ['202'])
+    await rest('DELETE', '/channels/{channel.id}', ['202'])
 
     expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/channels/202', {
       method: 'DELETE',
