@@ -1,4 +1,5 @@
 import type {
+  APIInteractionResponse,
   RESTDeleteAPIApplicationEmojiResult,
   RESTDeleteAPIChannelMessageOwnReactionResult,
   RESTDeleteAPIChannelMessageReactionResult,
@@ -24,6 +25,8 @@ import type {
   RESTDeleteAPIGuildTemplateResult,
   RESTDeleteAPIInviteResult,
   RESTDeleteAPIStageInstanceResult,
+  RESTDeleteAPIWebhookResult,
+  RESTDeleteAPIWebhookWithTokenResult,
   RESTGetAPIApplicationCommandPermissionsResult,
   RESTGetAPIApplicationCommandResult,
   RESTGetAPIApplicationCommandsQuery,
@@ -52,6 +55,7 @@ import type {
   RESTGetAPIChannelThreadMembersResult,
   RESTGetAPIChannelThreadsArchivedPrivateResult,
   RESTGetAPIChannelThreadsArchivedPublicResult,
+  RESTGetAPIChannelWebhooksResult,
   RESTGetAPICurrentUserApplicationRoleConnectionResult,
   RESTGetAPICurrentUserConnectionsResult,
   RESTGetAPICurrentUserGuildsQuery,
@@ -98,6 +102,7 @@ import type {
   RESTGetAPIGuildVoiceRegionsResult,
   RESTGetAPIGuildVoiceStateCurrentMemberResult,
   RESTGetAPIGuildVoiceStateUserResult,
+  RESTGetAPIGuildWebhooksResult,
   RESTGetAPIGuildWelcomeScreenResult,
   RESTGetAPIGuildWidgetImageQuery,
   RESTGetAPIGuildWidgetImageResult,
@@ -120,7 +125,9 @@ import type {
   RESTGetAPITemplateResult,
   RESTGetAPIUserResult,
   RESTGetAPIVoiceRegionsResult,
+  RESTGetAPIWebhookResult,
   RESTGetAPIWebhookWithTokenMessageQuery,
+  RESTGetAPIWebhookWithTokenResult,
   RESTGetCurrentApplicationResult,
   RESTGetCurrentUserGuildMemberResult,
   RESTGetStickerPacksResult,
@@ -175,6 +182,10 @@ import type {
   RESTPatchAPIInteractionOriginalResponseResult,
   RESTPatchAPIStageInstanceJSONBody,
   RESTPatchAPIStageInstanceResult,
+  RESTPatchAPIWebhookJSONBody,
+  RESTPatchAPIWebhookResult,
+  RESTPatchAPIWebhookWithTokenJSONBody,
+  RESTPatchAPIWebhookWithTokenResult,
   RESTPatchCurrentApplicationJSONBody,
   RESTPatchCurrentApplicationResult,
   RESTPostAPIApplicationCommandsJSONBody,
@@ -199,6 +210,8 @@ import type {
   RESTPostAPIChannelThreadsJSONBody,
   RESTPostAPIChannelThreadsResult,
   RESTPostAPIChannelTypingResult,
+  RESTPostAPIChannelWebhookJSONBody,
+  RESTPostAPIChannelWebhookResult,
   RESTPostAPICurrentUserCreateDMChannelJSONBody,
   RESTPostAPICurrentUserCreateDMChannelResult,
   RESTPostAPIEntitlementConsumeResult,
@@ -234,6 +247,13 @@ import type {
   RESTPostAPIStageInstanceResult,
   RESTPostAPITemplateCreateGuildJSONBody,
   RESTPostAPITemplateCreateGuildResult,
+  RESTPostAPIWebhookWithTokenJSONBody,
+  RESTPostAPIWebhookWithTokenQuery,
+  RESTPostAPIWebhookWithTokenResult,
+  RESTPostAPIWebhookWithTokenSlackQuery,
+  RESTPostAPIWebhookWithTokenSlackResult,
+  RESTPostAPIWebhookWithTokenSlackWaitResult,
+  RESTPostAPIWebhookWithTokenWaitResult,
   RESTPutAPIApplicationCommandPermissionsJSONBody,
   RESTPutAPIApplicationCommandPermissionsResult,
   RESTPutAPIApplicationCommandsJSONBody,
@@ -262,25 +282,6 @@ import type {
   RESTPutAPIGuildOnboardingJSONBody,
   RESTPutAPIGuildOnboardingResult,
   RESTPutAPIGuildTemplateSyncResult,
-  RESTPostAPIChannelWebhookJSONBody,
-  RESTPostAPIChannelWebhookResult,
-  RESTGetAPIChannelWebhooksResult,
-  RESTGetAPIGuildWebhooksResult,
-  RESTGetAPIWebhookResult,
-  RESTGetAPIWebhookWithTokenResult,
-  RESTPatchAPIWebhookJSONBody,
-  RESTPatchAPIWebhookResult,
-  RESTPatchAPIWebhookWithTokenJSONBody,
-  RESTPatchAPIWebhookWithTokenResult,
-  RESTDeleteAPIWebhookResult,
-  RESTDeleteAPIWebhookWithTokenResult,
-  //RESTPostAPIWebhookWithTokenQuery,
-  RESTPostAPIWebhookWithTokenJSONBody,
-  RESTPostAPIWebhookWithTokenResult,
-  RESTPostAPIWebhookWithTokenWaitResult,
-  //RESTPostAPIWebhookWithTokenSlackQuery,
-  //RESTPostAPIWebhookWithTokenSlackResult,
-  //RESTPostAPIWebhookWithTokenSlackWaitResult,
 } from 'discord-api-types/v10'
 import type { FileData } from '../types'
 import type {
@@ -326,6 +327,7 @@ import type {
   _channels_$_threads_archived_public,
   _channels_$_typing,
   _channels_$_users_me_threads_archived_private,
+  _channels_$_webhooks,
   _guilds,
   _guilds_$,
   _guilds_$_auditlogs,
@@ -367,6 +369,7 @@ import type {
   _guilds_$_vanityurl,
   _guilds_$_voicestates_$,
   _guilds_$_voicestates_me,
+  _guilds_$_webhooks,
   _guilds_$_welcomescreen,
   _guilds_$_widget,
   _guilds_$_widgetjson,
@@ -391,20 +394,17 @@ import type {
   _users_me_guilds_$,
   _users_me_guilds_$_member,
   _voice_regions,
+  _webhooks_$,
   _webhooks_$_$,
+  _webhooks_$_$_github,
   _webhooks_$_$_messages_$,
   _webhooks_$_$_messages_original,
-  _channels_$_webhooks,
-  _guilds_$_webhooks,
-  _webhooks_$,
-  _webhooks_$_$_github,
   _webhooks_$_$_slack,
 } from './rest-path'
 
 // Queryの扱い間違ってるかも
 
 ///// Unknowns /////
-// _interactions_$_$_callback ??
 // [Get Application Activity Instance](https://discord.com/developers/docs/resources/application#get-application-activity-instance)
 // [Start Thread in Forum or Media Channel](https://discord.com/developers/docs/resources/channel#start-thread-in-forum-or-media-channel)
 // [List Public Archived Threads](https://discord.com/developers/docs/resources/channel#list-public-archived-threads)
@@ -691,6 +691,7 @@ type RestPathVarsData<M extends RestMethod> =
     // Webhook
     | typeof _channels_$_webhooks
     | typeof _webhooks_$_$
+    | typeof _webhooks_$_$_slack
   : M extends 'PATCH' ?
     // Application Commands
     | typeof _applications_$_commands_$
@@ -960,7 +961,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     never
   : M extends 'POST' ?
     // Receiving and Responding
-    P extends typeof _interactions_$_$_callback ? RESTPostAPIInteractionCallbackQuery :
+    P extends typeof _interactions_$_$_callback ? APIInteractionResponse & { query_params?: RESTPostAPIInteractionCallbackQuery } :
     P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseJSONBody :
     P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupJSONBody :
     // Application Commands
@@ -1002,8 +1003,9 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _users_me_channels ? RESTPostAPICurrentUserCreateDMChannelJSONBody | CouldNotFind :
     // Webhook
     P extends typeof _channels_$_webhooks ? RESTPostAPIChannelWebhookJSONBody :
-    P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenJSONBody :
-    never  
+    P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenJSONBody & { query_params?: RESTPostAPIWebhookWithTokenQuery } :
+    P extends typeof _webhooks_$_$_slack ? { query_params?: RESTPostAPIWebhookWithTokenSlackQuery } :
+    never
   : M extends 'PATCH' ?
     // Receiving and Responding
     P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIInteractionFollowupJSONBody :
@@ -1273,6 +1275,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     // Webhook
     P extends typeof _channels_$_webhooks ? RESTPostAPIChannelWebhookResult :
     P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenResult | RESTPostAPIWebhookWithTokenWaitResult :
+    P extends typeof _webhooks_$_$_slack ? RESTPostAPIWebhookWithTokenSlackResult | RESTPostAPIWebhookWithTokenSlackWaitResult :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding

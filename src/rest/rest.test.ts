@@ -32,7 +32,7 @@ describe('Rest', () => {
       r => r.json(),
     )
 
-    expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/users/123/emoji/45678', {
+    expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/users/123/emoji/45678/?query=param', {
       method: 'GET',
       headers: {
         Authorization: `Bot ${mockToken}`,

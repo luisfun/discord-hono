@@ -22,11 +22,11 @@ export const createRest =
   (method: string, path: string, variables: string[] = [], data?: any, file?: FileData) => {
     if (!token) throw newError('Rest', 'DISCORD_TOKEN')
     const vars = [...variables]
+    const query: Record<string, string> | undefined = method === 'GET' ? data : data?.query_params
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
     if (!file) headers['content-type'] = 'application/json'
-    // biome-ignore format: test width
     return fetch(
-      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '')}`,
+      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + (query ? `/?${new URLSearchParams(query).toString()}` : '')}`,
       { method, headers, body: file ? formData(data, file) : JSON.stringify(data) },
     )
   }

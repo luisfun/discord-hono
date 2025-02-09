@@ -1,7 +1,11 @@
 ////////// Duplication //////////
 
-export const _webhooks_$_$ = '/webhooks/{}/{}' as '/webhooks/{application.id}/{interaction.token}' | '/webhooks/{webhook.id}/{webhook.token}'
-export const _webhooks_$_$_messages_$ = '/webhooks/{}/{}/messages/{}' as '/webhooks/{application.id}/{interaction.token}/messages/{message.id}' | '/webhooks/{webhook.id}/{webhook.token}/messages/{message.id}'
+export const _webhooks_$_$ = '/webhooks/{}/{}' as
+  | '/webhooks/{application.id}/{interaction.token}'
+  | '/webhooks/{webhook.id}/{webhook.token}'
+export const _webhooks_$_$_messages_$ = '/webhooks/{}/{}/messages/{}' as
+  | '/webhooks/{application.id}/{interaction.token}/messages/{message.id}'
+  | '/webhooks/{webhook.id}/{webhook.token}/messages/{message.id}'
 
 ////////// Receiving and Responding //////////
 // https://discord.com/developers/docs/interactions/receiving-and-responding
