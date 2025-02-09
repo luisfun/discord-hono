@@ -190,6 +190,9 @@ export const _guilds_$_stickers_$ = '/guilds/{guild.id}/stickers/{sticker.id}' a
 
 ////////// Subscription //////////
 // https://discord.com/developers/docs/resources/subscription
+// ✅ 25/02/09
+export const _skus_$_subscriptions = '/skus/{sku.id}/subscriptions' as const
+export const _skus_$_subscriptions_$ = '/skus/{sku.id}/subscriptions/{subscription.id}' as const
 
 ////////// User //////////
 // https://discord.com/developers/docs/resources/user

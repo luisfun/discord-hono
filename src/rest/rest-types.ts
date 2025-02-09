@@ -101,6 +101,9 @@ import type {
   RESTGetAPIInviteResult,
   RESTGetAPIPollAnswerVotersQuery,
   RESTGetAPIPollAnswerVotersResult,
+  RESTGetAPISKUSubscriptionResult,
+  RESTGetAPISKUSubscriptionsQuery,
+  RESTGetAPISKUSubscriptionsResult,
   RESTGetAPISKUsResult,
   RESTGetAPISoundboardDefaultSoundsResult,
   RESTGetAPIStageInstanceResult,
@@ -329,6 +332,8 @@ import type {
   _guilds_templates_$,
   _interactions_$_$_callback,
   _invites_$,
+  _skus_$_subscriptions,
+  _skus_$_subscriptions_$,
   _soundboarddefaultsounds,
   _stageinstances,
   _stageinstances_$,
@@ -432,6 +437,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _stickerpacks_$
     | typeof _guilds_$_stickers
     | typeof _guilds_$_stickers_$
+    // Subscription
+    | typeof _skus_$_subscriptions_$
   : M extends 'PUT' ?
     // Channel
     | typeof _channels_$_pins_$
@@ -540,6 +547,8 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _channels_$_messages_$_reactions_$
     // Poll
     | typeof _channels_$_polls_$_answers_$
+    // Subscription
+    | typeof _skus_$_subscriptions
   : M extends 'PUT' ?
     // Application Commands
     | typeof _applications_$_commands
@@ -720,6 +729,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _stickers_$
     | typeof _stickerpacks_$
     | typeof _guilds_$_stickers
+    | typeof _skus_$_subscriptions
   ? [string] :
   P extends
     | typeof _interactions_$_$_callback
@@ -752,6 +762,7 @@ export type RestVariables<P extends RestPath<any>> =
     | typeof _channels_$_polls_$_expire
     | typeof _guilds_$_soundboardsounds_$
     | typeof _guilds_$_stickers_$
+    | typeof _skus_$_subscriptions_$
   ? [string, string] :
   P extends
     | typeof _webhooks_$_$_messages_$
@@ -809,6 +820,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
     // Poll
     P extends typeof _channels_$_polls_$_answers_$ ? RESTGetAPIPollAnswerVotersQuery :
+    // Subscription
+    P extends typeof _skus_$_subscriptions ? RESTGetAPISKUSubscriptionsQuery :
     never
   : M extends 'PUT' ?
     // Application Commands
@@ -1033,6 +1046,9 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _stickerpacks_$ ? RESTGetAPIStickerPackResult :
     P extends typeof _guilds_$_stickers ? RESTGetAPIGuildStickersResult :
     P extends typeof _guilds_$_stickers_$ ? RESTGetAPIGuildStickerResult :
+    // Subscription
+    P extends typeof _skus_$_subscriptions ? RESTGetAPISKUSubscriptionsResult :
+    P extends typeof _skus_$_subscriptions_$ ? RESTGetAPISKUSubscriptionResult :
     never
   : M extends 'PUT' ?
     // Application Commands
