@@ -15,11 +15,17 @@ export const createRest =
    * @param {'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'} method
    * @param {string} path Official document path
    * @param {string[]} variables Variable part of official document path
-   * @param {object} data
+   * @param {Record<string, any>} data
    * @param {FileData} file
    * @returns {Promise<Response>}
    */
-  (method: string, path: string, variables: string[] = [], data?: any, file?: FileData) => {
+  (
+    method: string,
+    path: string,
+    variables: string[] = [],
+    data?: Record<string, any> & { query?: any },
+    file?: FileData,
+  ) => {
     if (!token) throw newError('Rest', 'DISCORD_TOKEN')
     const vars = [...variables]
     const query: Record<string, string> | undefined = method === 'GET' ? data : data?.query
