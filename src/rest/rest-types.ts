@@ -424,7 +424,7 @@ import type {
 ///// Not supported yet /////
 // [Create Guild Sticker](https://discord.com/developers/docs/resources/sticker#create-guild-sticker) // https://discord-api-types.dev/search?q=RESTPostAPIGuildSticker
 
-type CouldNotFind = unknown
+type CouldNotFind = Record<string, unknown>
 
 type Query<T> = { query?: T }
 
