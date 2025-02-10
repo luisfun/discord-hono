@@ -139,7 +139,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
     switch (interaction.type) {
       case 2:
       case 4: {
-        let options: APIApplicationCommandInteractionDataOption[] | undefined = undefined
+        let options: APIApplicationCommandInteractionDataOption[] | undefined
         if ('options' in interaction.data) {
           options = interaction.data.options
           if (options?.[0].type === 2) {

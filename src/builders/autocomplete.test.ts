@@ -38,7 +38,7 @@ describe('Autocomplete', () => {
 
   it('should limit choices to 25', () => {
     const autocomplete = new Autocomplete('a')
-    const choices: APICommandAutocompleteInteractionResponseCallbackData['choices'] = Array(30)
+    const choices: APICommandAutocompleteInteractionResponseCallbackData['choices'] = new Array(30)
       .fill(null)
       .map((_, i) => ({ name: `a${i}`, value: `${i}` }))
 

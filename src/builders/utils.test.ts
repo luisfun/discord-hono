@@ -34,6 +34,7 @@ describe('Builder', () => {
 
 describe('warnBuilder', () => {
   it('should log a warning message', () => {
+    // biome-ignore lint: empty block
     const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     warnBuilder('TestClass', 'TestType', 'testMethod')
     expect(consoleSpy).toHaveBeenCalledWith('⚠️ TestClass(TestType).testMethod is not available')

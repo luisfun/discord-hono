@@ -17,6 +17,7 @@ describe('Components', () => {
   })
 
   it('should warn when adding more than 5 rows', () => {
+    // biome-ignore lint: empty block
     const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     for (let i = 0; i < 6; i++) {
       components.row(new Button('test', 'Click me'))
