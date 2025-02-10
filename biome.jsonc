@@ -11,7 +11,7 @@
       "jsxQuoteStyle": "double",
       "semicolons": "asNeeded"
     },
-    "globals": ["vi", "test", "describe", "it", "beforeEach", "afterEach", "expect"]
+    "globals": ["vi", "test", "describe", "it", "beforeEach", "afterEach", "expect"] // vitest globals
   },
   "organizeImports": { "enabled": true },
   "linter": {
