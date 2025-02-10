@@ -115,7 +115,7 @@ export abstract class FetchEventLike {
 
 ////////// InteractionData //////////
 
-export type CustomCallbackBase = object & {
+export type CustomCallbackBase = Record<string, any> & {
   components?: APIActionRowComponent<APIMessageActionRowComponent>[] | null
   embeds?: APIEmbed[] | null
 }

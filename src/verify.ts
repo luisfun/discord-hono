@@ -12,6 +12,7 @@ const hex2bin = (hex: string) => {
 }
 
 export const verify = async (body: string, signature: string | null, timestamp: string | null, publicKey: string) => {
+  // biome-ignore lint: not complicated
   if (!body || !signature || !timestamp) return false
   const { subtle } =
     (typeof window !== 'undefined' && window.crypto) ||

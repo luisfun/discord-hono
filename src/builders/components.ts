@@ -25,6 +25,7 @@ export class Components {
    * @returns {this}
    */
   row = (...e: (Button<any> | Select<any> | APIMessageActionRowComponent)[]) => {
+    // biome-ignore lint: console
     if (this.#components.length >= 5) console.warn('You can have up to 5 Action Rows per message')
     this.#components.push({
       type: 1,

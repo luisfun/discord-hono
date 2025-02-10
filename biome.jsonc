@@ -10,15 +10,27 @@
       "quoteStyle": "single",
       "jsxQuoteStyle": "double",
       "semicolons": "asNeeded"
-    }
+    },
+    "globals": ["vi", "test", "describe", "it", "beforeEach", "afterEach", "expect"]
   },
   "organizeImports": { "enabled": true },
   "linter": {
     "rules": {
-      "recommended": true,
+      "all": true,
+      "correctness": {
+        "useImportExtensions": "off" // For simple coding purposes
+      },
+      "performance": {
+        "noBarrelFile": "off", // For simple coding purposes
+        "noReExportAll": "off" // For consistency in file separation
+      },
       "style": {
-        "noParameterAssign": "off", // To reuse the arguments
-        "noNonNullAssertion": "off" // Allow Non Null
+        "noDefaultExport": "off", // using default export
+        "noNonNullAssertion": "off", // Allow Non Null
+        "useBlockStatements": "off", // For simple coding purposes
+        "useDefaultSwitchClause": "off", // For simple coding purposes
+        "useNamingConvention": "off", // To accommodate the special naming conventions
+        "useSingleCaseStatement": "off" // For simple coding purposes
       },
       "suspicious": {
         "noExplicitAny": "off" // Allow type any
