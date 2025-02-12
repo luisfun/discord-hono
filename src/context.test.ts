@@ -20,12 +20,9 @@ describe('Context', () => {
   describe('ContextAll', () => {
     it('should store getters', async () => {
       const c = new InteractionContext(
+        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'key'],
         mockRequest,
-        mockEnv,
-        mockExecutionCtx,
-        mockDiscordEnv,
         {} as APIInteraction,
-        'key',
       )
       expect(c.env).toBe(mockEnv)
       expect(() => c.event).toThrow()
@@ -35,28 +32,22 @@ describe('Context', () => {
       expect(c.key).toBe('key')
 
       const c2 = new InteractionContext(
+        [mockEnv, mockFetchEvent, mockDiscordEnv, 'key'],
         mockRequest,
-        mockEnv,
-        mockFetchEvent,
-        mockDiscordEnv,
         {} as APIInteraction,
-        'key',
       )
       expect(c2.event).toBe(mockFetchEvent)
 
-      const c3 = new CronContext(mockCronEvent, mockEnv, undefined, mockDiscordEnv, 'key')
+      const c3 = new CronContext([mockEnv, undefined, mockDiscordEnv, 'key'], mockCronEvent)
       expect(() => c3.executionCtx).toThrow()
     })
   })
 
   it('var method', () => {
     const c = new InteractionContext<{ Variables: { key: string } }>(
+      [mockEnv, mockExecutionCtx, mockDiscordEnv, 'key'],
       mockRequest,
-      mockEnv,
-      mockExecutionCtx,
-      mockDiscordEnv,
       {} as APIInteraction,
-      'key',
     )
     c.set('key', 'value')
     expect(c.get('key')).toBe('value')
@@ -66,7 +57,7 @@ describe('Context', () => {
   describe('InteractionContext', () => {
     it('should store request, interaction', () => {
       const mockInteraction = { type: 2, data: { name: 'test' } } as APIInteraction
-      const c = new InteractionContext(mockRequest, mockEnv, mockExecutionCtx, mockDiscordEnv, mockInteraction, 'key')
+      const c = new InteractionContext([mockEnv, mockExecutionCtx, mockDiscordEnv, 'key'], mockRequest, mockInteraction)
       expect(c.req).toBe(mockRequest)
       expect(c.interaction).toBe(mockInteraction)
     })
@@ -78,12 +69,9 @@ describe('Context', () => {
         token: 'mock-token',
       } as APIInteraction
       const context = new InteractionContext(
+        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
         mockRequest,
-        mockEnv,
-        mockExecutionCtx,
-        mockDiscordEnv,
         mockInteraction,
-        'test-key',
       )
       const response = context.ephemeral().res({ content: 'Ephemeral response' })
       expect(response).toBeInstanceOf(ResponseObject)
@@ -97,12 +85,9 @@ describe('Context', () => {
         token: 'mock-token',
       } as APIInteraction
       const context = new InteractionContext(
+        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
         mockRequest,
-        mockEnv,
-        mockExecutionCtx,
-        mockDiscordEnv,
         mockInteraction,
-        'test-key',
       )
       const response = await context.followup({ content: 'Followup response' })
       expect(response).toBeInstanceOf(Response)
@@ -115,12 +100,9 @@ describe('Context', () => {
         token: 'mock-token',
       } as APIInteraction
       const context = new InteractionContext(
+        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
         mockRequest,
-        mockEnv,
-        mockExecutionCtx,
-        mockDiscordEnv,
         mockInteraction,
-        'test-key',
       )
       const modalData = { custom_id: 'modal-id', title: 'Modal Title', components: [] }
       const response = context.resModal(modalData)
@@ -145,12 +127,9 @@ describe('Context', () => {
         token: 'mock-token',
       } as APIInteraction
       context = new InteractionContext(
+        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
         mockRequest,
-        mockEnv,
-        mockExecutionCtx,
-        mockDiscordEnv,
         mockInteraction,
-        'test-key',
       ) as CommandContext
     })
 
@@ -175,12 +154,9 @@ describe('Context', () => {
         token: 'mock-token',
       } as APIInteraction
       const subContext = new InteractionContext(
+        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
         mockRequest,
-        mockEnv,
-        mockExecutionCtx,
-        mockDiscordEnv,
         subCommandInteraction,
-        'test-key',
       ) as CommandContext
       expect(subContext.sub).toEqual({ group: '', command: 'subcommand', string: 'subcommand' })
       expect(subContext.get('suboption')).toBe('subvalue')
@@ -195,12 +171,9 @@ describe('Context', () => {
         token: 'mock-token',
       } as APIInteraction
       const context = new InteractionContext(
+        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
         mockRequest,
-        mockEnv,
-        mockExecutionCtx,
-        mockDiscordEnv,
         mockInteraction,
-        'test-key',
       ) as ComponentContext
       expect(context.get('custom_id')).toBe('test-custom-id')
     })
@@ -224,12 +197,9 @@ describe('Context', () => {
         token: 'mock-token',
       } as APIInteraction
       const context = new InteractionContext(
+        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
         mockRequest,
-        mockEnv,
-        mockExecutionCtx,
-        mockDiscordEnv,
         mockInteraction,
-        'test-key',
       ) as ModalContext
       expect(context.get('custom_id')).toBe('test-modal')
       expect(context.get('input1')).toBe('value1')
@@ -251,12 +221,9 @@ describe('Context', () => {
         token: 'mock-token',
       } as APIInteraction
       const context = new InteractionContext(
+        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
         mockRequest,
-        mockEnv,
-        mockExecutionCtx,
-        mockDiscordEnv,
         mockInteraction,
-        'test-key',
       ) as AutocompleteContext
       expect(context.focused).toEqual({ name: 'option1', type: 3, value: 'value1', focused: true })
     })
@@ -265,7 +232,7 @@ describe('Context', () => {
   describe('CronContext', () => {
     it('should store cron event', () => {
       const mockCronEvent = { cron: '* * * * *', type: 'cron', scheduledTime: 0 }
-      const context = new CronContext(mockCronEvent, mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key')
+      const context = new CronContext([mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'], mockCronEvent)
       expect(context.cronEvent).toEqual(mockCronEvent)
     })
   })

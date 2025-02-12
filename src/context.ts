@@ -25,6 +25,8 @@ import { ResponseObject, formData, newError, prepareData, toJSON } from './utils
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
+type CoreConstructor<E extends Env> = [E['Bindings'], ExecutionCtx, DiscordEnv, string]
+
 // biome-ignore lint: Same definition as Hono
 type ContextVariableMap = {}
 interface SetVar<E extends Env> {
@@ -44,7 +46,7 @@ abstract class ContextAll<E extends Env> {
   #key: string
   #var = new Map()
   #rest: ReturnType<typeof createRest> | undefined = undefined
-  constructor(env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv, key: string) {
+  constructor([env, executionCtx, discord, key]: CoreConstructor<E>) {
     this.#env = env
     this.#executionCtx = executionCtx
     this.discord = discord
@@ -115,25 +117,18 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   #sub = { group: '', command: '', string: '' } // 24
   #focused: AutocompleteOption | undefined // 4
   #throwIfNotAllowType = (allowType: APIInteraction['type'][]) => {
-    if (!allowType.includes(this.#interaction.type)) throw new Error('dev: Invalid method')
+    if (!allowType.includes(this.#interaction.type)) throw newError('c.***', 'Invalid method')
   }
   #throwIfNonApplicationId = () => {
-    if (!this.discord.APPLICATION_ID) throw newError('c.followupXXX', 'DISCORD_APPLICATION_ID')
+    if (!this.discord.APPLICATION_ID) throw newError('c.followup***', 'DISCORD_APPLICATION_ID')
   }
   #res47 = (type: 4 | 7, data: CustomCallbackData<APIInteractionResponseCallbackData>, file: FileData | undefined) => {
     let body: APIInteractionResponse | FormData = { data: { ...this.#flags, ...prepareData(data) }, type }
     if (file) body = formData(body, file)
     return new ResponseObject(body)
   }
-  constructor(
-    req: Request,
-    env: E['Bindings'],
-    executionCtx: ExecutionCtx,
-    discord: DiscordEnv,
-    interaction: APIInteraction,
-    key: string,
-  ) {
-    super(env, executionCtx, discord, key)
+  constructor(core: CoreConstructor<E>, req: Request, interaction: APIInteraction) {
+    super(core)
     this.#req = req
     this.#interaction = interaction
     switch (interaction.type) {
@@ -337,8 +332,8 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
 
 export class CronContext<E extends Env = any> extends ContextAll<E> {
   #cronEvent: CronEvent
-  constructor(event: CronEvent, env: E['Bindings'], executionCtx: ExecutionCtx, discord: DiscordEnv, key: string) {
-    super(env, executionCtx, discord, key)
+  constructor(core: CoreConstructor<E>, event: CronEvent) {
+    super(core)
     this.#cronEvent = event
   }
 
