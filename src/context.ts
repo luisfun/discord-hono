@@ -115,10 +115,10 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   #sub = { group: '', command: '', string: '' } // 24
   #focused: AutocompleteOption | undefined // 4
   #throwIfNotAllowType = (allowType: APIInteraction['type'][]) => {
-    if (!allowType.includes(this.#interaction.type)) throw new Error('dev: Invalid method')
+    if (!allowType.includes(this.#interaction.type)) throw newError('c.***', 'Invalid method')
   }
   #throwIfNonApplicationId = () => {
-    if (!this.discord.APPLICATION_ID) throw newError('c.followupXXX', 'DISCORD_APPLICATION_ID')
+    if (!this.discord.APPLICATION_ID) throw newError('c.followup***', 'DISCORD_APPLICATION_ID')
   }
   #res47 = (type: 4 | 7, data: CustomCallbackData<APIInteractionResponseCallbackData>, file: FileData | undefined) => {
     let body: APIInteractionResponse | FormData = { data: { ...this.#flags, ...prepareData(data) }, type }
