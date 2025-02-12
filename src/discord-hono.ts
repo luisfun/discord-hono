@@ -149,7 +149,7 @@ export class DiscordHono<E extends Env = Env> {
               interaction.type,
               key,
               // @ts-expect-error
-            )(new InteractionContext(request, env, executionCtx, discord, interaction, key))
+            )(new InteractionContext([env, executionCtx, discord, key], request, interaction))
         }
         return new ResponseObject({ error: 'Unknown Type' }, 400)
       }
@@ -165,7 +165,7 @@ export class DiscordHono<E extends Env = Env> {
    */
   scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
     const handler = this.#get(0, event.cron)
-    const c = new CronContext(event, env, executionCtx, this.#discord(env), event.cron)
+    const c = new CronContext([env, executionCtx, this.#discord(env), event.cron], event)
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(c))
     else await handler(c)
   }
