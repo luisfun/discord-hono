@@ -32,10 +32,10 @@
     "@arethetypeswrong/cli": "^0.17.3",
     "@biomejs/biome": "1.9.4",
     "@discordjs/builders": "^1.10.1",
-    "@vitest/coverage-v8": "^3.0.5",
+    "@vitest/coverage-v8": "^3.0.6",
     "discord-api-types": "^0.37.119",
     "tsup": "^8.3.6",
     "typescript": "^5.7.3",
-    "vitest": "^3.0.5"
+    "vitest": "^3.0.6"
   }
 }
