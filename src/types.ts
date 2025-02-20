@@ -17,7 +17,7 @@ import type { CronContext, InteractionContext } from './context'
 ////////// Env //////////
 
 export type Env = {
-  Bindings?: Record<string, unknown>
+  Bindings?: object
   Variables?: Record<string, unknown>
 }
 
