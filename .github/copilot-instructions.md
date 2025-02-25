@@ -1,5 +1,5 @@
 ## Project Overview
-This library enables you to easily build Discord bots on Cloudflare Workers.
+A library for building Discord bots on Cloudflare Workers.
 
 ### Features
 - **Intuitive API** - Influenced by Hono, offering a familiar and easy-to-use interface
