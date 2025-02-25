@@ -18,6 +18,7 @@ Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors!
 ```shell
 npm i discord-hono
 npm i -D discord-api-types # When using TypeScript
+# npm i -D @types/node # As needed
 ```
 
 ## Example Code
@@ -28,7 +29,7 @@ index.ts
 import { DiscordHono } from 'discord-hono'
 
 const app = new DiscordHono()
-  .command('hello', c => c.res('world!'))
+  .command('hello', c => c.res('Hello, World!'))
 
 export default app
 ```
@@ -39,7 +40,7 @@ register.ts
 import { Command, register } from 'discord-hono'
 
 const commands = [
-  new Command('hello', 'response world'),
+  new Command('hello', 'Hello, World!'),
 ]
 
 register(
