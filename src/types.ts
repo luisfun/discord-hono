@@ -55,6 +55,7 @@ export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
   | 'suppressNotifications'
   | 'res'
   | 'resDefer'
+  | 'resActivity'
   | 'followup'
   | 'followupDelete'
   | 'resModal'

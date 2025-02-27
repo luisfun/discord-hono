@@ -1,4 +1,5 @@
 import type {
+  APIApplicationCommandAutocompleteResponse,
   APIApplicationCommandInteractionDataIntegerOption,
   APIApplicationCommandInteractionDataNumberOption,
   APIApplicationCommandInteractionDataOption,
@@ -7,6 +8,10 @@ import type {
   APIInteraction,
   APIInteractionResponse,
   APIInteractionResponseCallbackData,
+  APIInteractionResponseDeferredChannelMessageWithSource,
+  APIInteractionResponseDeferredMessageUpdate,
+  APIInteractionResponseLaunchActivity,
+  APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
   RESTPostAPIInteractionFollowupJSONBody,
 } from 'discord-api-types/v10'
@@ -242,7 +247,19 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   resDefer = (handler?: (c: this) => Promise<unknown>) => {
     this.#throwIfNotAllowType([2, 3, 5])
     if (handler) this.waitUntil(handler(this))
-    return new ResponseObject({ type: 5, data: this.#flags })
+    return new ResponseObject({
+      type: 5,
+      data: this.#flags,
+    } satisfies APIInteractionResponseDeferredChannelMessageWithSource)
+  }
+
+  /**
+   * Launch the Activity associated with the app. Only available for apps with Activities enabled
+   * @returns {Response}
+   */
+  resActivity = () => {
+    this.#throwIfNotAllowType([2, 3, 5])
+    return new ResponseObject({ type: 12 } satisfies APIInteractionResponseLaunchActivity)
   }
 
   /**
@@ -309,7 +326,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    */
   resModal = (data: Modal | APIModalInteractionResponseCallbackData) => {
     this.#throwIfNotAllowType([2, 3])
-    return new ResponseObject({ type: 9, data: toJSON(data) })
+    return new ResponseObject({ type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse)
   }
 
   /**
@@ -330,7 +347,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   resDeferUpdate = (handler?: (c: this) => Promise<unknown>) => {
     this.#throwIfNotAllowType([3])
     if (handler) this.waitUntil(handler(this))
-    return new ResponseObject({ type: 6 })
+    return new ResponseObject({ type: 6 } satisfies APIInteractionResponseDeferredMessageUpdate)
   }
 
   /**
@@ -349,7 +366,7 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    */
   resAutocomplete = (data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData) => {
     this.#throwIfNotAllowType([4])
-    return new ResponseObject({ data: toJSON(data), type: 8 })
+    return new ResponseObject({ type: 8, data: toJSON(data) } satisfies APIApplicationCommandAutocompleteResponse)
   }
 }
 
