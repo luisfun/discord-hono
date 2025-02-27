@@ -122,6 +122,13 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   #throwIfNonApplicationId = () => {
     if (!this.discord.APPLICATION_ID) throw newError('c.followup***', 'DISCORD_APPLICATION_ID')
   }
+  #setFlags = (num: number, bool: boolean) => {
+    this.#throwIfNotAllowType([2, 3, 5])
+    this.#flags.flags ??= 0
+    if (bool) this.#flags.flags |= num
+    else this.#flags.flags &= ~num
+    return this
+  }
   #res47 = (type: 4 | 7, data: CustomCallbackData<APIInteractionResponseCallbackData>, file: FileData | undefined) => {
     let body: APIInteractionResponse | FormData = { data: { ...this.#flags, ...prepareData(data) }, type }
     if (file) body = formData(body, file)
@@ -185,6 +192,16 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   }
 
   /**
+   * Don't include embeds in the message
+   * @param {boolean} [bool=true]
+   * @example
+   * ```ts
+   * return c.suppressEmbeds().res('[Docs](https://example.com)')
+   * ```
+   */
+  suppressEmbeds = (bool = true) => this.#setFlags(1 << 2, bool)
+
+  /**
    * Only visible to the user who invoked the Interaction
    * @param {boolean} [bool=true]
    * @example
@@ -192,11 +209,17 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
    * return c.ephemeral().res('Personalized Text')
    * ```
    */
-  ephemeral = (bool = true) => {
-    this.#throwIfNotAllowType([2, 3, 5])
-    this.#flags = bool ? { flags: 1 << 6 } : {}
-    return this
-  }
+  ephemeral = (bool = true) => this.#setFlags(1 << 6, bool)
+
+  /**
+   * Message won't trigger notifications
+   * @param {boolean} [bool=true]
+   * @example
+   * ```ts
+   * return c.suppressNotifications().res('silent message')
+   * ```
+   */
+  suppressNotifications = (bool = true) => this.#setFlags(1 << 12, bool)
 
   /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)

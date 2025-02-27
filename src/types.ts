@@ -50,7 +50,9 @@ export type ComponentContext<E extends Env = any, T extends ComponentType = any>
 > & { interaction: ComponentInteraction<T> }
 export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
   InteractionContext<E>,
+  | 'suppressEmbeds'
   | 'ephemeral'
+  | 'suppressNotifications'
   | 'res'
   | 'resDefer'
   | 'followup'
