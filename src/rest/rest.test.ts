@@ -38,7 +38,6 @@ describe('Rest', () => {
         Authorization: `Bot ${mockToken}`,
         'content-type': 'application/json',
       },
-      body: '{"query":"param"}',
     })
     expect(result).toEqual({ data: 'mock_data' })
   })

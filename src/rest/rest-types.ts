@@ -604,8 +604,9 @@ type RestPathVars<M extends RestMethod> =
     | typeof _webhooks_$_$_messages_$
   : never
 
+// Optional化のチェック GET のみ
 // biome-ignore format: ternary operator
-type RestPathVarsData<M extends RestMethod> =
+type RestPathVarsOptionalData<M extends RestMethod> =
   M extends 'GET' ?
     // Receiving and Responding
     | typeof _webhooks_$_$_messages_original
@@ -626,7 +627,6 @@ type RestPathVarsData<M extends RestMethod> =
     // Guild
     | typeof _guilds_$
     | typeof _guilds_$_members
-    | typeof _guilds_$_members_search
     | typeof _guilds_$_bans
     | typeof _guilds_$_prune
     | typeof _guilds_$_widgetpng
@@ -645,6 +645,13 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof _skus_$_subscriptions
     // User
     | typeof _users_me_guilds
+  : never
+
+// biome-ignore format: ternary operator
+type RestPathVarsData<M extends RestMethod> =
+  M extends 'GET' ?
+    // Guild
+    | typeof _guilds_$_members_search
   : M extends 'PUT' ?
     // Application Commands
     | typeof _applications_$_commands
@@ -771,6 +778,7 @@ type RestPathVarsDataFile<M extends RestMethod> =
 export type RestPath<M extends RestMethod> =
   | RestPathNV<M>
   | RestPathVars<M>
+  | RestPathVarsOptionalData<M>
   | RestPathVarsData<M>
   | RestPathVarsDataFile<M>
 
@@ -1402,6 +1410,12 @@ export type Rest = {
     method: M,
     path: P,
     variables: RestVariables<P>,
+  ): Promise<TypedResponse<RestResult<M, P>>>
+  <M extends RestMethod, P extends RestPathVarsOptionalData<M>>(
+    method: M,
+    path: P,
+    variables: RestVariables<P>,
+    data?: RestData<M, P>,
   ): Promise<TypedResponse<RestResult<M, P>>>
   <M extends RestMethod, P extends RestPathVarsData<M>>(
     method: M,

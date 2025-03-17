@@ -27,13 +27,16 @@ export const createRest =
     file?: FileData,
   ) => {
     if (!token) throw newError('Rest', 'DISCORD_TOKEN')
+    const isGet = method.toUpperCase() === 'GET'
     const vars = [...variables]
-    const query: Record<string, string> | undefined = method === 'GET' ? data : data?.query
+    const query: Record<string, string> | undefined = isGet ? data : data?.query
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
     if (!file) headers['content-type'] = 'application/json'
+    const requestData: RequestInit = { method, headers }
+    if (!isGet) requestData.body = file ? formData(data, file) : JSON.stringify(data)
     return fetch(
       `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + (query ? `/?${new URLSearchParams(query).toString()}` : '')}`,
-      { method, headers, body: file ? formData(data, file) : JSON.stringify(data) },
+      requestData,
     )
   }
 
