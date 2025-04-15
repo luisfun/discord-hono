@@ -41,15 +41,15 @@ type ComponentInteraction<T extends ComponentType> =
   APIMessageComponentInteraction
 
 export type CommandContext<E extends Env = any> = ExcludeMethods<
-  InteractionContext<E>,
+  InteractionContext<E, CommandContext<E>>,
   'resUpdate' | 'resDeferUpdate' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: APIApplicationCommandInteraction }
 export type ComponentContext<E extends Env = any, T extends ComponentType = any> = ExcludeMethods<
-  InteractionContext<E & { Variables: { custom_id?: string } }>,
+  InteractionContext<E & { Variables: { custom_id?: string } }, ComponentContext<E, T>>,
   'sub' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: ComponentInteraction<T> }
 export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
-  InteractionContext<E>,
+  InteractionContext<E, AutocompleteContext<E>>,
   | 'suppressEmbeds'
   | 'ephemeral'
   | 'suppressNotifications'
@@ -64,7 +64,7 @@ export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
   | 'interaction'
 > & { interaction: APIApplicationCommandAutocompleteInteraction }
 export type ModalContext<E extends Env = any> = ExcludeMethods<
-  InteractionContext<E & { Variables: { custom_id?: string } }>,
+  InteractionContext<E & { Variables: { custom_id?: string } }, ModalContext<E>>,
   'sub' | 'resModal' | 'resUpdate' | 'resDeferUpdate' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: APIModalSubmitInteraction }
 

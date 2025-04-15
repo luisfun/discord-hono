@@ -44,7 +44,7 @@ describe('Context', () => {
   })
 
   it('var method', () => {
-    const c = new InteractionContext<{ Variables: { key: string } }>(
+    const c = new InteractionContext<{ Variables: { key: string } }, any>(
       [mockEnv, mockExecutionCtx, mockDiscordEnv, 'key'],
       mockRequest,
       {} as APIInteraction,

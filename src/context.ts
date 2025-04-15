@@ -18,6 +18,9 @@ import type {
 import type { Autocomplete, Modal } from './builders'
 import { _webhooks_$_$, _webhooks_$_$_messages_original, createRest } from './rest'
 import type {
+  AutocompleteContext,
+  CommandContext,
+  ComponentContext,
   CronEvent,
   CustomCallbackData,
   DiscordEnv,
@@ -25,6 +28,7 @@ import type {
   ExecutionContext,
   FetchEventLike,
   FileData,
+  ModalContext,
 } from './types'
 import { ResponseObject, formData, newError, prepareData, toJSON } from './utils'
 
@@ -115,7 +119,10 @@ type AutocompleteOption =
   | APIApplicationCommandInteractionDataIntegerOption
   | APIApplicationCommandInteractionDataNumberOption
 
-export class InteractionContext<E extends Env> extends ContextAll<E> {
+export class InteractionContext<
+  E extends Env,
+  This extends CommandContext | ComponentContext | AutocompleteContext | ModalContext,
+> extends ContextAll<E> {
   #req: Request
   #interaction: APIInteraction
   #flags: { flags?: number } = {} // 235
@@ -237,16 +244,16 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   }
   /**
    * ACK an interaction and edit a response later, the user sees a loading state
-   * @param {(c: this) => Promise<unknown>} handler
+   * @param {(c: This) => Promise<unknown>} handler
    * @returns {Response}
    * @example
    * ```ts
    * return c.resDefer(c => c.followup('Delayed Message'))
    * ```
    */
-  resDefer = (handler?: (c: this) => Promise<unknown>) => {
+  resDefer = (handler?: (c: This) => Promise<unknown>) => {
     this.#throwIfNotAllowType([2, 3, 5])
-    if (handler) this.waitUntil(handler(this))
+    if (handler) this.waitUntil(handler(this as unknown as This))
     return new ResponseObject({
       type: 5,
       data: this.#flags,
@@ -341,12 +348,12 @@ export class InteractionContext<E extends Env> extends ContextAll<E> {
   }
   /**
    * for components, ACK an interaction and edit the original message later; the user does not see a loading state
-   * @param {((c: this) => Promise<unknown>)} handler
+   * @param {((c: This) => Promise<unknown>)} handler
    * @returns {Response}
    */
-  resDeferUpdate = (handler?: (c: this) => Promise<unknown>) => {
+  resDeferUpdate = (handler?: (c: This) => Promise<unknown>) => {
     this.#throwIfNotAllowType([3])
-    if (handler) this.waitUntil(handler(this))
+    if (handler) this.waitUntil(handler(this as unknown as This))
     return new ResponseObject({ type: 6 } satisfies APIInteractionResponseDeferredMessageUpdate)
   }
 
