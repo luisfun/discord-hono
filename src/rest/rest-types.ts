@@ -760,7 +760,6 @@ type RestPathVarsDataFile<M extends RestMethod> =
   M extends 'POST' ?
     // Receiving and Responding
     | typeof _interactions_$_$_callback
-    | typeof _webhooks_$_$_messages_original
     | typeof _webhooks_$_$
     // Channel
     | typeof _channels_$_threads
@@ -768,6 +767,7 @@ type RestPathVarsDataFile<M extends RestMethod> =
     | typeof _channels_$_messages
   : M extends 'PATCH' ?
     // Receiving and Responding
+    | typeof _webhooks_$_$_messages_original
     | typeof _webhooks_$_$_messages_$
     // Message
     | typeof _channels_$_messages_$
@@ -986,7 +986,6 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
   : M extends 'POST' ?
     // Receiving and Responding
     P extends typeof _interactions_$_$_callback ? APIInteractionResponse & Query<RESTPostAPIInteractionCallbackQuery> :
-    P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseJSONBody :
     P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupJSONBody :
     // Application Commands
     P extends typeof _applications_$_commands ? RESTPostAPIApplicationCommandsJSONBody :
@@ -1033,6 +1032,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
+    P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseJSONBody :
     P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIInteractionFollowupJSONBody :
     // Application Commands
     P extends typeof _applications_$_commands_$ ? RESTPatchAPIApplicationCommandJSONBody :
@@ -1092,7 +1092,6 @@ export type RestFile<M extends RestMethod, P extends RestPath<M>> =
     P extends
       // Receiving and Responding
       | typeof _interactions_$_$_callback
-      | typeof _webhooks_$_$_messages_original
       | typeof _webhooks_$_$
       // Channel
       | typeof _channels_$_threads
@@ -1102,6 +1101,7 @@ export type RestFile<M extends RestMethod, P extends RestPath<M>> =
   : M extends 'PATCH' ?
     P extends
       // Receiving and Responding
+      | typeof _webhooks_$_$_messages_original
       | typeof _webhooks_$_$_messages_$
       // Message
       | typeof _channels_$_messages_$
@@ -1255,7 +1255,6 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
   : M extends 'POST' ?
     // Receiving and Responding
     P extends typeof _interactions_$_$_callback ? RESTPostAPIInteractionCallbackResult :
-    P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseResult :
     P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupResult :
     // Application Commands
     P extends typeof _applications_$_commands ? RESTPostAPIApplicationCommandsResult :
@@ -1306,6 +1305,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
+    P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseResult :
     P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIInteractionFollowupResult :
     // Application Commands
     P extends typeof _applications_$_commands_$ ? RESTPatchAPIApplicationCommandResult :
