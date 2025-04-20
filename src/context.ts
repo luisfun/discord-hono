@@ -13,10 +13,10 @@ import type {
   APIInteractionResponseLaunchActivity,
   APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
-  RESTPostAPIInteractionFollowupJSONBody,
+  RESTPatchAPIInteractionOriginalResponseJSONBody,
 } from 'discord-api-types/v10'
 import type { Autocomplete, Modal } from './builders'
-import { _webhooks_$_$, _webhooks_$_$_messages_original, createRest } from './rest'
+import { _webhooks_$_$_messages_original, createRest } from './rest'
 import type {
   AutocompleteContext,
   CommandContext,
@@ -270,22 +270,22 @@ export class InteractionContext<
   }
 
   /**
-   * Used to send messages after resDefer
-   * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
+   * Used to send messages after resDefer or resDeferUpdate
+   * @param data [Data Structure](https://discord.com/developers/docs/resources/webhook#edit-webhook-message)
    * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
    * @example
    * ```ts
    * return c.resDefer(c => c.followup('Image file', { blob: Blob, name: 'image.png' }))
    * ```
    */
-  followup = (data: CustomCallbackData<RESTPostAPIInteractionFollowupJSONBody> = {}, file?: FileData) => {
+  followup = (data: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody> = {}, file?: FileData) => {
     this.#throwIfNotAllowType([2, 3, 5])
     this.#throwIfNonApplicationId()
     return this.rest(
-      'POST',
-      _webhooks_$_$,
+      'PATCH',
+      _webhooks_$_$_messages_original,
       [this.discord.APPLICATION_ID!, this.interaction.token],
-      { ...this.#flags, ...prepareData(data) },
+      prepareData(data),
       file,
     )
   }
