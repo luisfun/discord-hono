@@ -1,6 +1,6 @@
 {
   "name": "discord-hono",
-  "version": "0.16.7",
+  "version": "0.16.8",
   "description": "This library enables you to easily build Discord bots on Cloudflare Workers",
   "author": "Luis (https://github.com/luisfun)",
   "repository": {
