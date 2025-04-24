@@ -15,9 +15,12 @@ export class ResponseObject extends Response {
 // type any !!!!!!!!!
 export const toJSON = (obj: object) => ('toJSON' in obj && typeof obj.toJSON === 'function' ? obj.toJSON() : obj)
 
-export const prepareData = <T extends Record<string, unknown>>(data: CustomCallbackData<T> | undefined) => {
+export const prepareData = <T extends Record<string, unknown>>(
+  data: CustomCallbackData<T> | Record<string, unknown>[] | undefined,
+) => {
   if (!data) return undefined
   if (typeof data === 'string') return { content: data } as unknown as T
+  if (Array.isArray(data)) return data
   const { components, embeds, ...rest } = data
   // @ts-expect-error Finally, the type is adjusted using an 'as' clause.
   if (components) rest.components = toJSON(components)
@@ -26,7 +29,7 @@ export const prepareData = <T extends Record<string, unknown>>(data: CustomCallb
   return rest as T
 }
 
-export const formData = (data?: Record<string, unknown>, file?: FileData) => {
+export const formData = (data?: object, file?: FileData) => {
   const body = new FormData()
   if (data && Object.keys(data).length > 0) body.append('payload_json', JSON.stringify(data))
   if (Array.isArray(file))

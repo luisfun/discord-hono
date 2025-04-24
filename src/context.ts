@@ -285,7 +285,7 @@ export class InteractionContext<
       'PATCH',
       _webhooks_$_$_messages_original,
       [this.discord.APPLICATION_ID!, this.interaction.token],
-      prepareData(data),
+      data,
       file,
     )
   }

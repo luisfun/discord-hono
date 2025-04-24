@@ -15,7 +15,7 @@ export const createRest =
    * @param {'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'} method
    * @param {string} path Official document path
    * @param {string[]} variables Variable part of official document path
-   * @param {Record<string, any>} data
+   * @param {Record<string, any> | Record<string, any>[]} data
    * @param {FileData} file
    * @returns {Promise<Response>}
    */
@@ -23,7 +23,7 @@ export const createRest =
     method: string,
     path: string,
     variables: string[] = [],
-    data?: Record<string, any> & { query?: any },
+    data?: (Record<string, any> & { query?: any }) | Record<string, any>[] | string,
     file?: FileData,
   ) => {
     if (!token) throw newError('Rest', 'DISCORD_TOKEN')
@@ -32,10 +32,13 @@ export const createRest =
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
     if (!file) headers['content-type'] = 'application/json'
     const requestData: RequestInit = { method, headers }
-    const prepared: (Record<string, unknown> & { query?: Record<string, unknown> }) | undefined = prepareData(data)
+    const prepared:
+      | (Record<string, unknown> & { query?: Record<string, unknown> })
+      | Record<string, unknown>[]
+      | undefined = prepareData(data)
     if (!isGet) requestData.body = file ? formData(prepared, file) : JSON.stringify(prepared)
     return fetch(
-      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + queryStringify(isGet ? prepared : prepared?.query)}`,
+      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + queryStringify(Array.isArray(prepared) ? undefined : isGet ? prepared : prepared?.query)}`,
       requestData,
     )
   }
