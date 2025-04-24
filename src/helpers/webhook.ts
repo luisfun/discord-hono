@@ -19,7 +19,7 @@ export const webhook = (
   const headers: HeadersInit = {}
   if (!file) headers['content-type'] = 'application/json'
   const requestData: RequestInit = { method: 'POST', headers }
-  const prepared: (Record<string, unknown> & { query?: Record<string, unknown> }) | undefined = prepareData(data)
+  const prepared = prepareData(data) as (Record<string, unknown> & { query?: Record<string, unknown> }) | undefined
   requestData.body = file ? formData(prepared, file) : JSON.stringify(prepared)
-  return fetch(`${url + queryStringify(prepared?.query as Record<string, unknown> | undefined)}`, requestData)
+  return fetch(`${url + queryStringify(prepared?.query)}`, requestData)
 }

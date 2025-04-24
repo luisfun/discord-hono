@@ -292,7 +292,7 @@ import type {
   //RESTPostAPIGuildStickerFormDataBody,
   //RESTPostAPIGuildStickerResult,
 } from 'discord-api-types/v10'
-import type { FileData } from '../types'
+import type { CustomCallbackData, FileData } from '../types'
 import type {
   _applications_$_activityinstances_$,
   _applications_$_commands,
@@ -985,7 +985,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     never
   : M extends 'POST' ?
     // Duplication
-    P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupJSONBody | RESTPostAPIWebhookWithTokenJSONBody & Query<RESTPostAPIWebhookWithTokenQuery> | undefined :
+    // @ts-expect-error インデックス シグネチャがありません。ts(2344)
+    P extends typeof _webhooks_$_$ ? CustomCallbackData<RESTPostAPIInteractionFollowupJSONBody> | CustomCallbackData<RESTPostAPIWebhookWithTokenJSONBody & Query<RESTPostAPIWebhookWithTokenQuery>> | undefined :
     // Receiving and Responding
     P extends typeof _interactions_$_$_callback ? APIInteractionResponse & Query<RESTPostAPIInteractionCallbackQuery> | undefined :
     // Application Commands
@@ -1016,7 +1017,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_templates_$ ? RESTPostAPITemplateCreateGuildJSONBody :
     P extends typeof _guilds_$_templates ? RESTPostAPIGuildTemplatesJSONBody :
     // Message
-    P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody | undefined :
+    // @ts-expect-error インデックス シグネチャがありません。ts(2344)
+    P extends typeof _channels_$_messages ? CustomCallbackData<RESTPostAPIChannelMessageJSONBody> | undefined :
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
     // Soundboard
     P extends typeof _channels_$_sendsoundboardsound ? RESTPostAPISoundboardSendSoundJSONBody :
@@ -1032,9 +1034,9 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     never
   : M extends 'PATCH' ?
     // Duplication
-    P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIInteractionFollowupJSONBody | RESTPatchAPIWebhookWithTokenMessageJSONBody | undefined :
+    P extends typeof _webhooks_$_$_messages_$ ? CustomCallbackData<RESTPatchAPIInteractionFollowupJSONBody> | CustomCallbackData<RESTPatchAPIWebhookWithTokenMessageJSONBody> | undefined :
     // Receiving and Responding
-    P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseJSONBody | undefined :
+    P extends typeof _webhooks_$_$_messages_original ? CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody> | undefined :
     // Application Commands
     P extends typeof _applications_$_commands_$ ? RESTPatchAPIApplicationCommandJSONBody :
     P extends typeof _applications_$_guilds_$_commands_$ ? RESTPatchAPIApplicationGuildCommandJSONBody :
@@ -1062,7 +1064,8 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Guild Template
     P extends typeof _guilds_$_templates_$ ? RESTPatchAPIGuildTemplateJSONBody :
     // Message
-    P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody | undefined :
+    // @ts-expect-error インデックス シグネチャがありません。ts(2344)
+    P extends typeof _channels_$_messages_$ ? CustomCallbackData<RESTPatchAPIChannelMessageJSONBody> | undefined :
     // Soundboard
     P extends typeof _guilds_$_soundboardsounds_$ ? RESTPatchAPIGuildSoundboardSoundJSONBody :
     // Stage Instance
