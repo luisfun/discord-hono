@@ -5,8 +5,13 @@ const mockToken = vi.fn(() => 'mock-token')()
 
 // モックの作成
 vi.mock('../utils', () => ({
-  errorDev: vi.fn((message: string) => new Error(message)),
   formData: vi.fn(),
+  queryStringify: vi.fn(obj => {
+    if (!obj || Object.keys(obj).length === 0) return ''
+    return `?${Object.entries(obj)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&')}`
+  }),
 }))
 
 describe('Rest', () => {
@@ -32,7 +37,7 @@ describe('Rest', () => {
       r => r.json(),
     )
 
-    expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/users/123/emoji/45678/?query=param', {
+    expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/users/123/emoji/45678?query=param', {
       method: 'GET',
       headers: {
         Authorization: `Bot ${mockToken}`,
