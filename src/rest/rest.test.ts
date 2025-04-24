@@ -5,6 +5,7 @@ const mockToken = vi.fn(() => 'mock-token')()
 
 // モックの作成
 vi.mock('../utils', () => ({
+  prepareData: vi.fn(data => data),
   formData: vi.fn(),
   queryStringify: vi.fn(obj => {
     if (!obj || Object.keys(obj).length === 0) return ''

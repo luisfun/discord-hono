@@ -143,7 +143,7 @@ export class InteractionContext<
   }
   #res47 = (type: 4 | 7, data: CustomCallbackData<APIInteractionResponseCallbackData>, file: FileData | undefined) => {
     let body: APIInteractionResponse | FormData = { data: { ...this.#flags, ...prepareData(data) }, type }
-    if (file) body = formData(body, file)
+    if (file) body = formData(body as unknown as Record<string, unknown>, file)
     return new ResponseObject(body)
   }
   constructor(core: CoreConstructor<E>, req: Request, interaction: APIInteraction) {

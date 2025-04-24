@@ -1,5 +1,5 @@
 import type { FileData } from '../types'
-import { formData, newError, queryStringify } from '../utils'
+import { formData, newError, prepareData, queryStringify } from '../utils'
 import type { Rest } from './rest-types'
 
 const API_VER = 'v10'
@@ -32,9 +32,10 @@ export const createRest =
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
     if (!file) headers['content-type'] = 'application/json'
     const requestData: RequestInit = { method, headers }
-    if (!isGet) requestData.body = file ? formData(data, file) : JSON.stringify(data)
+    const prepared: (Record<string, unknown> & { query?: Record<string, unknown> }) | undefined = prepareData(data)
+    if (!isGet) requestData.body = file ? formData(prepared, file) : JSON.stringify(prepared)
     return fetch(
-      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + queryStringify(isGet ? data : data?.query)}`,
+      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + queryStringify(isGet ? prepared : prepared?.query)}`,
       requestData,
     )
   }
