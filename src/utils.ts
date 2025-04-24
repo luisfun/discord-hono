@@ -35,3 +35,13 @@ export const formData = <T extends CustomCallbackBase>(data?: CustomCallbackData
 }
 
 export const newError = (locate: string, text: string) => new Error(`discord-hono(${locate}): ${text}`)
+
+export const queryStringify = (query: Record<string, unknown> | undefined) => {
+  if (!query) return ''
+  const queryMap: Record<string, string> = {}
+  for (const [key, value] of Object.entries(query)) {
+    if (value === undefined) continue
+    queryMap[key] = String(value)
+  }
+  return `?${new URLSearchParams(queryMap).toString()}`
+}

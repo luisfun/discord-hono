@@ -426,7 +426,7 @@ import type {
 
 type CouldNotFind = Record<string, unknown>
 
-type Query<T> = { query?: T }
+export type Query<T> = { query?: T }
 
 export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 
