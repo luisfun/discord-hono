@@ -17,12 +17,12 @@ export const toJSON = (obj: object) => ('toJSON' in obj && typeof obj.toJSON ===
 
 export const prepareData = <T extends CustomCallbackBase>(data: CustomCallbackData<T>): T => {
   if (typeof data === 'string') return { content: data } as unknown as T
-  let prepared: CustomCallbackData<T> = { ...data }
-  const components = data?.components
-  const embeds = data?.embeds
-  if (components) prepared = { ...prepared, components: toJSON(components) }
-  if (embeds) prepared = { ...prepared, embeds: embeds.map(toJSON) }
-  return prepared as T
+  const { components, embeds, ...rest } = data
+  // @ts-expect-error Finally, the type is adjusted using an 'as' clause.
+  if (components) rest.components = toJSON(components)
+  // @ts-expect-error Finally, the type is adjusted using an 'as' clause.
+  if (embeds) rest.embeds = embeds.map(toJSON)
+  return rest as T
 }
 
 export const formData = <T extends CustomCallbackBase>(data?: CustomCallbackData<T>, file?: FileData) => {
