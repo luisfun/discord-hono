@@ -1,10 +1,7 @@
 import type { EmbedBuilder } from '@discordjs/builders'
 import type {
-  APIActionRowComponent,
   APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandInteraction,
-  APIEmbed,
-  APIMessageActionRowComponent,
   APIMessageComponentButtonInteraction,
   APIMessageComponentInteraction,
   APIMessageComponentSelectMenuInteraction,
@@ -118,11 +115,7 @@ export abstract class FetchEventLike {
 
 ////////// InteractionData //////////
 
-export type CustomCallbackBase = Record<string, any> & {
-  components?: APIActionRowComponent<APIMessageActionRowComponent>[] | null
-  embeds?: APIEmbed[] | null
-}
-export type CustomCallbackData<T extends CustomCallbackBase> =
+export type CustomCallbackData<T extends Record<string, unknown>> =
   | (Omit<T, 'components' | 'embeds'> & {
       components?: Components | T['components']
       embeds?: (Embed | EmbedBuilder)[] | T['embeds']

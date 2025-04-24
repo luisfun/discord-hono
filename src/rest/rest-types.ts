@@ -426,7 +426,7 @@ import type {
 
 type CouldNotFind = Record<string, unknown>
 
-type Query<T> = { query?: T }
+export type Query<T> = { query?: T }
 
 export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 
@@ -984,9 +984,10 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _users_me_applications_$_roleconnection ? RESTPutAPICurrentUserApplicationRoleConnectionJSONBody :
     never
   : M extends 'POST' ?
+    // Duplication
+    P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupJSONBody | RESTPostAPIWebhookWithTokenJSONBody & Query<RESTPostAPIWebhookWithTokenQuery> | undefined :
     // Receiving and Responding
-    P extends typeof _interactions_$_$_callback ? APIInteractionResponse & Query<RESTPostAPIInteractionCallbackQuery> :
-    P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupJSONBody :
+    P extends typeof _interactions_$_$_callback ? APIInteractionResponse & Query<RESTPostAPIInteractionCallbackQuery> | undefined :
     // Application Commands
     P extends typeof _applications_$_commands ? RESTPostAPIApplicationCommandsJSONBody :
     P extends typeof _applications_$_guilds_$_commands ? RESTPostAPIApplicationGuildCommandsJSONBody :
@@ -996,7 +997,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _channels_$_invites ? RESTPostAPIChannelInviteJSONBody :
     P extends typeof _channels_$_followers ? RESTPostAPIChannelFollowersJSONBody :
     P extends typeof _channels_$_messages_$_threads ? RESTPostAPIChannelMessagesThreadsJSONBody :
-    P extends typeof _channels_$_threads ? RESTPostAPIChannelThreadsJSONBody | CouldNotFind :
+    P extends typeof _channels_$_threads ? RESTPostAPIChannelThreadsJSONBody | undefined | CouldNotFind :
     // Emoji
     P extends typeof _guilds_$_emojis ? RESTPostAPIGuildEmojiJSONBody :
     P extends typeof _applications_$_emojis ? RESTPostAPIApplicationEmojiJSONBody :
@@ -1015,7 +1016,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _guilds_templates_$ ? RESTPostAPITemplateCreateGuildJSONBody :
     P extends typeof _guilds_$_templates ? RESTPostAPIGuildTemplatesJSONBody :
     // Message
-    P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody :
+    P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageJSONBody | undefined :
     P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
     // Soundboard
     P extends typeof _channels_$_sendsoundboardsound ? RESTPostAPISoundboardSendSoundJSONBody :
@@ -1026,14 +1027,14 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _users_me_channels ? RESTPostAPICurrentUserCreateDMChannelJSONBody | CouldNotFind :
     // Webhook
     P extends typeof _channels_$_webhooks ? RESTPostAPIChannelWebhookJSONBody :
-    P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenJSONBody & Query<RESTPostAPIWebhookWithTokenQuery> :
     P extends typeof _webhooks_$_$_slack ? Query<RESTPostAPIWebhookWithTokenSlackQuery> :
     P extends typeof _webhooks_$_$_github ? Query<RESTPostAPIWebhookWithTokenGitHubQuery> :
     never
   : M extends 'PATCH' ?
+    // Duplication
+    P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIInteractionFollowupJSONBody | RESTPatchAPIWebhookWithTokenMessageJSONBody | undefined :
     // Receiving and Responding
-    P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseJSONBody :
-    P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIInteractionFollowupJSONBody :
+    P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseJSONBody | undefined :
     // Application Commands
     P extends typeof _applications_$_commands_$ ? RESTPatchAPIApplicationCommandJSONBody :
     P extends typeof _applications_$_guilds_$_commands_$ ? RESTPatchAPIApplicationGuildCommandJSONBody :
@@ -1061,7 +1062,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Guild Template
     P extends typeof _guilds_$_templates_$ ? RESTPatchAPIGuildTemplateJSONBody :
     // Message
-    P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody :
+    P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageJSONBody | undefined :
     // Soundboard
     P extends typeof _guilds_$_soundboardsounds_$ ? RESTPatchAPIGuildSoundboardSoundJSONBody :
     // Stage Instance
@@ -1076,7 +1077,6 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // Webhook
     P extends typeof _webhooks_$ ? RESTPatchAPIWebhookJSONBody :
     P extends typeof _webhooks_$_$ ? RESTPatchAPIWebhookWithTokenJSONBody :
-    P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIWebhookWithTokenMessageJSONBody :
     never
   : never
 
