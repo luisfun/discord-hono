@@ -1,5 +1,5 @@
 import { Components, Embed } from '.'
-import { ResponseObject, formData, newError, prepareData, toJSON } from './utils'
+import { ResponseObject, formData, newError, prepareData, queryStringify, toJSON } from './utils'
 
 describe('ResponseObject', () => {
   it('should create a JSON response when given an object', () => {
@@ -162,4 +162,39 @@ test('newError function', () => {
   const e = newError('locate', 'text')
   expect(e).toBeInstanceOf(Error)
   expect(e.message).toBe('discord-hono(locate): text')
+})
+
+describe('queryStringify', () => {
+  it('should return empty string when query is undefined', () => {
+    expect(queryStringify(undefined)).toBe('')
+  })
+
+  it('should convert simple key-value pairs to query string', () => {
+    const query = { key1: 'value1', key2: 'value2' }
+    expect(queryStringify(query)).toBe('?key1=value1&key2=value2')
+  })
+
+  it('should handle numeric values', () => {
+    const query = { limit: 10, offset: 20 }
+    expect(queryStringify(query)).toBe('?limit=10&offset=20')
+  })
+
+  it('should handle boolean values', () => {
+    const query = { active: true, deleted: false }
+    expect(queryStringify(query)).toBe('?active=true&deleted=false')
+  })
+
+  it('should ignore undefined values', () => {
+    const query = { key1: 'value1', key2: undefined, key3: 'value3' }
+    expect(queryStringify(query)).toBe('?key1=value1&key3=value3')
+  })
+
+  it('should encode special characters properly', () => {
+    const query = { search: 'hello world', filter: 'category=books' }
+    expect(queryStringify(query)).toBe('?search=hello+world&filter=category%3Dbooks')
+  })
+
+  it('should handle empty object', () => {
+    expect(queryStringify({})).toBe('?')
+  })
 })
