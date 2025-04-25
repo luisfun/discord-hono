@@ -2,8 +2,8 @@ import type {
   APIActionRowComponent,
   APIButtonComponent,
   APIChannelSelectComponent,
+  APIComponentInMessageActionRow,
   APIMentionableSelectComponent,
-  APIMessageActionRowComponent,
   APIMessageComponentEmoji,
   APIRoleSelectComponent,
   APISelectMenuOption,
@@ -18,13 +18,13 @@ import { Builder, ifThrowHasSemicolon, warnBuilder } from './utils'
  * [Message Components](https://discord.com/developers/docs/interactions/message-components)
  */
 export class Components {
-  #components: APIActionRowComponent<APIMessageActionRowComponent>[] = []
+  #components: APIActionRowComponent<APIComponentInMessageActionRow>[] = []
   /**
    * push component
-   * @param {...(Button | Select | APIMessageActionRowComponent)} e
+   * @param {...(Button | Select | APIComponentInMessageActionRow)} e
    * @returns {this}
    */
-  row = (...e: (Button<any> | Select<any> | APIMessageActionRowComponent)[]) => {
+  row = (...e: (Button<any> | Select<any> | APIComponentInMessageActionRow)[]) => {
     // biome-ignore lint: console
     if (this.#components.length >= 5) console.warn('You can have up to 5 Action Rows per message')
     this.#components.push({
