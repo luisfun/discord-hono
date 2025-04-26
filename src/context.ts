@@ -76,9 +76,6 @@ abstract class ContextAll<E extends Env> {
     if (!this.#executionCtx) throw newError('c.executionCtx', 'not found')
     return this.#executionCtx
   }
-  get waitUntil(): ExecutionContext['waitUntil'] /*| FetchEventLike["waitUntil"]*/ {
-    return this.executionCtx.waitUntil.bind(this.executionCtx)
-  }
   /**
    * Handler triggered string
    */
@@ -245,7 +242,7 @@ export class InteractionContext<
    */
   resDefer = (handler?: (c: This) => Promise<unknown>) => {
     this.#throwIfNotAllowType([2, 3, 5])
-    if (handler) this.waitUntil(handler(this as unknown as This))
+    if (handler) this.executionCtx.waitUntil(handler(this as unknown as This))
     return new ResponseObject({
       type: 5,
       data: this.#flags,
@@ -345,7 +342,7 @@ export class InteractionContext<
    */
   resDeferUpdate = (handler?: (c: This) => Promise<unknown>) => {
     this.#throwIfNotAllowType([3])
-    if (handler) this.waitUntil(handler(this as unknown as This))
+    if (handler) this.executionCtx.waitUntil(handler(this as unknown as This))
     return new ResponseObject({ type: 6 } satisfies APIInteractionResponseDeferredMessageUpdate)
   }
 

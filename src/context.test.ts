@@ -23,7 +23,7 @@ describe('Context', () => {
       expect(c.env).toBe(mockEnv)
       expect(() => c.event).toThrow()
       expect(c.executionCtx).toBe(mockExecutionCtx)
-      await c.waitUntil(Promise.resolve())
+      await c.executionCtx.waitUntil(Promise.resolve())
       expect(mockWaitUntil).toHaveBeenCalledWith(expect.any(Promise))
       expect(c.key).toBe('key')
 
