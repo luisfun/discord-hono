@@ -23,7 +23,7 @@ export const prepareData = <T extends Record<string, unknown>>(
   if (Array.isArray(data)) return data
   const { components, embeds, ...rest } = data
   // @ts-expect-error Finally, the type is adjusted using an 'as' clause.
-  if (components) rest.components = toJSON(components)
+  if (components) rest.components = Array.isArray(components) ? components.map(toJSON) : toJSON(components)
   // @ts-expect-error Finally, the type is adjusted using an 'as' clause.
   if (embeds) rest.embeds = embeds.map(toJSON)
   return rest as T

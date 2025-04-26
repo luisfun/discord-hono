@@ -7,7 +7,7 @@ import type {
   APIMessageComponentSelectMenuInteraction,
   APIModalSubmitInteraction,
 } from 'discord-api-types/v10'
-import type { Button, Components, Select } from './builders/components'
+import type { Button, Components, Content, Layout, Select } from './builders/components'
 import type { Embed } from './builders/embed'
 import type { CronContext, InteractionContext } from './context'
 
@@ -109,7 +109,10 @@ export abstract class FetchEventLike {
 
 export type CustomCallbackData<T extends Record<string, unknown>> =
   | (Omit<T, 'components' | 'embeds'> & {
-      components?: Components | T['components']
+      components?:
+        | Components
+        | (Layout<any> | Content<'Text Display' | 'Media Gallery' | 'File'> | Button<any> | Select<any>)[]
+        | T['components']
       embeds?: (Embed | EmbedBuilder)[] | T['embeds']
     })
   | string

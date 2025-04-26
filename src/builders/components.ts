@@ -110,6 +110,11 @@ export class Layout<T extends LayoutStyle> extends Builder<LayoutComponent<T>> {
   spoiler = (e: T extends 'Container' ? boolean : never = true) => this.a({ spoiler: e })
 }
 
+const fixUrlAttachment = (str: string) => {
+  if (URL.canParse(str) || str.startsWith('attachment://')) return str
+  return `attachment://${str}`
+}
+
 type ContentStyle = 'Text Display' | 'Thumbnail' | 'Media Gallery' | 'File'
 // biome-ignore format: ternary operator
 type ContentJson<T extends ContentStyle> =
@@ -139,18 +144,18 @@ export class Content<T extends ContentStyle = 'Text Display'> extends Builder<Co
   constructor(data: ContentData<T>, style: T = 'Text Display' as T) {
     switch (style) {
       case 'Thumbnail':
-        super({ type: 11, media: typeof data === 'string' ? { url: data } : data } as ContentJson<T>)
+        super({ type: 11, media: typeof data === 'string' ? { url: fixUrlAttachment(data) } : data } as ContentJson<T>)
         break
       case 'Media Gallery': {
         const items = (Array.isArray(data) ? data : [data]) as (string | APIMediaGalleryComponent['items'][number])[]
         super({
           type: 12,
-          items: items.map(item => (typeof item === 'string' ? { media: { url: item } } : item)),
+          items: items.map(item => (typeof item === 'string' ? { media: { url: fixUrlAttachment(item) } } : item)),
         } as ContentJson<T>)
         break
       }
       case 'File':
-        super({ type: 13, file: typeof data === 'string' ? { url: data } : data } as ContentJson<T>)
+        super({ type: 13, file: typeof data === 'string' ? { url: fixUrlAttachment(data) } : data } as ContentJson<T>)
         break
       default: // Text Display
         super({ type: 10, content: data } as ContentJson<T>)
