@@ -123,6 +123,7 @@ export class InteractionContext<
   #interaction: APIInteraction
   #flags: { flags?: number } = {} // 235
   #sub = { group: '', command: '', string: '' } // 24
+  #update = false // 3
   #focused: AutocompleteOption | undefined // 4
   #throwIfNotAllowType = (allowType: APIInteraction['type'][]) => {
     if (!allowType.includes(this.#interaction.type)) throw newError('c.***', 'Invalid method')
@@ -136,11 +137,6 @@ export class InteractionContext<
     if (bool) this.#flags.flags |= num
     else this.#flags.flags &= ~num
     return this
-  }
-  #res47 = (type: 4 | 7, data: CustomCallbackData<APIInteractionResponseCallbackData>, file: FileData | undefined) => {
-    let body: APIInteractionResponse | FormData = { data: { ...this.#flags, ...prepareData(data) }, type }
-    if (file) body = formData(body as unknown as Record<string, unknown>, file)
-    return new ResponseObject(body)
   }
   constructor(core: CoreConstructor<E>, interaction: APIInteraction) {
     super(core)
@@ -195,6 +191,7 @@ export class InteractionContext<
   /**
    * Don't include embeds in the message
    * @param {boolean} [bool=true]
+   * @returns {this}
    * @example
    * ```ts
    * return c.suppressEmbeds().res('[Docs](https://example.com)')
@@ -205,6 +202,7 @@ export class InteractionContext<
   /**
    * Only visible to the user who invoked the Interaction
    * @param {boolean} [bool=true]
+   * @returns {this}
    * @example
    * ```ts
    * return c.ephemeral().res('Personalized Text')
@@ -215,6 +213,7 @@ export class InteractionContext<
   /**
    * Message won't trigger notifications
    * @param {boolean} [bool=true]
+   * @returns {this}
    * @example
    * ```ts
    * return c.suppressNotifications().res('silent message')
@@ -229,7 +228,12 @@ export class InteractionContext<
    */
   res = (data: CustomCallbackData<APIInteractionResponseCallbackData>, file?: FileData) => {
     this.#throwIfNotAllowType([2, 3, 5])
-    return this.#res47(4, data, file)
+    let body: APIInteractionResponse | FormData = {
+      data: { ...this.#flags, ...prepareData(data) },
+      type: this.#update ? 7 : 4,
+    }
+    if (file) body = formData(body as unknown as Record<string, unknown>, file)
+    return new ResponseObject(body)
   }
   /**
    * ACK an interaction and edit a response later, the user sees a loading state
@@ -243,10 +247,14 @@ export class InteractionContext<
   resDefer = (handler?: (c: This) => Promise<unknown>) => {
     this.#throwIfNotAllowType([2, 3, 5])
     if (handler) this.executionCtx.waitUntil(handler(this as unknown as This))
-    return new ResponseObject({
-      type: 5,
-      data: this.#flags,
-    } satisfies APIInteractionResponseDeferredChannelMessageWithSource)
+    return new ResponseObject(
+      this.#update
+        ? ({ type: 6 } satisfies APIInteractionResponseDeferredMessageUpdate)
+        : ({
+            type: 5,
+            data: this.#flags,
+          } satisfies APIInteractionResponseDeferredChannelMessageWithSource),
+    )
   }
 
   /**
@@ -326,24 +334,18 @@ export class InteractionContext<
   }
 
   /**
-   * for components, edit the message the component was attached to
-   * @param data
-   * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
-   * @returns {Response}
+   * for components, change `c.res()` and `c.resDefer()` to a [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) that edits the original message
+   * @param {boolean} [bool=true]
+   * @returns {this}
+   * @example
+   * ```ts
+   * return c.update().res('Edit the original message')
+   * ```
    */
-  resUpdate = (data: CustomCallbackData<APIInteractionResponseCallbackData>, file?: FileData) => {
+  update = (bool = true) => {
     this.#throwIfNotAllowType([3])
-    return this.#res47(7, data, file)
-  }
-  /**
-   * for components, ACK an interaction and edit the original message later; the user does not see a loading state
-   * @param {((c: This) => Promise<unknown>)} handler
-   * @returns {Response}
-   */
-  resDeferUpdate = (handler?: (c: This) => Promise<unknown>) => {
-    this.#throwIfNotAllowType([3])
-    if (handler) this.executionCtx.waitUntil(handler(this as unknown as This))
-    return new ResponseObject({ type: 6 } satisfies APIInteractionResponseDeferredMessageUpdate)
+    this.#update = bool
+    return this
   }
 
   /**

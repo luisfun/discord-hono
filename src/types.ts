@@ -39,7 +39,7 @@ type ComponentInteraction<T extends ComponentType> =
 
 export type CommandContext<E extends Env = any> = ExcludeMethods<
   InteractionContext<E, CommandContext<E>>,
-  'resUpdate' | 'resDeferUpdate' | 'focused' | 'resAutocomplete' | 'interaction'
+  'update' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: APIApplicationCommandInteraction }
 export type ComponentContext<E extends Env = any, T extends ComponentType = any> = ExcludeMethods<
   InteractionContext<E & { Variables: { custom_id?: string } }, ComponentContext<E, T>>,
@@ -56,13 +56,12 @@ export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
   | 'followup'
   | 'followupDelete'
   | 'resModal'
-  | 'resUpdate'
-  | 'resDeferUpdate'
+  | 'update'
   | 'interaction'
 > & { interaction: APIApplicationCommandAutocompleteInteraction }
 export type ModalContext<E extends Env = any> = ExcludeMethods<
   InteractionContext<E & { Variables: { custom_id?: string } }, ModalContext<E>>,
-  'sub' | 'resModal' | 'resUpdate' | 'resDeferUpdate' | 'focused' | 'resAutocomplete' | 'interaction'
+  'sub' | 'resModal' | 'update' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: APIModalSubmitInteraction }
 
 ////////// Handler //////////
