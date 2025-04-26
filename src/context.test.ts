@@ -59,7 +59,7 @@ describe('Context', () => {
         token: 'mock-token',
       } as APIInteraction
       const context = new InteractionContext([mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'], mockInteraction)
-      const response = context.ephemeral().res({ content: 'Ephemeral response' })
+      const response = context.flags('EPHEMERAL').res({ content: 'Ephemeral response' })
       expect(response).toBeInstanceOf(ResponseObject)
       expect((await response.json()).data.flags).toBe(1 << 6)
     })

@@ -32,7 +32,7 @@ type LayoutComponent<T extends LayoutStyle> =
 export class Layout<T extends LayoutStyle> extends Builder<LayoutComponent<T>> {
   /**
    * required: flags("IS_COMPONENTS_V2")
-   * 
+   *
    * [Layout Style Structure](https://discord.com/developers/docs/components/reference#component-object)
    * @param {"Action Row" | "Section" | "Separator" | "Container"} style
    */
@@ -131,7 +131,7 @@ type ContentData<T extends ContentStyle> =
 export class Content<T extends ContentStyle = 'Text Display'> extends Builder<ContentJson<T>> {
   /**
    * required: flags("IS_COMPONENTS_V2")
-   * 
+   *
    * [Content Style Structure](https://discord.com/developers/docs/components/reference#component-object)
    * @param data
    * @param {"Text Display" | "Thumbnail" | "Media Gallery" | "File"} style
@@ -332,7 +332,7 @@ export class Select<T extends SelectType = 'String'> extends Builder<SelectCompo
    * required: String
    *
    * [Select Option Structure](https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure)
-   * @param {...APISelectMenuOption} e
+   * @param {APISelectMenuOption} e
    * @returns {this}
    */
   options = (...e: T extends 'String' ? APISelectMenuOption[] : undefined[]) =>

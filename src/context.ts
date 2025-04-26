@@ -131,13 +131,6 @@ export class InteractionContext<
   #throwIfNonApplicationId = () => {
     if (!this.discord.APPLICATION_ID) throw newError('c.followup***', 'DISCORD_APPLICATION_ID')
   }
-  #setFlags = (num: number, bool: boolean) => {
-    this.#throwIfNotAllowType([2, 3, 5])
-    this.#flags.flags ??= 0
-    if (bool) this.#flags.flags |= num
-    else this.#flags.flags &= ~num
-    return this
-  }
   constructor(core: CoreConstructor<E>, interaction: APIInteraction) {
     super(core)
     this.#interaction = interaction
@@ -189,37 +182,26 @@ export class InteractionContext<
   }
 
   /**
-   * Don't include embeds in the message
-   * @param {boolean} [bool=true]
+   * [Message Flags](https://discord.com/developers/docs/resources/message#message-object-message-flags)
+   * @param {"SUPPRESS_EMBEDS" | "EPHEMERAL" | "SUPPRESS_NOTIFICATIONS" | "IS_COMPONENTS_V2"} flag
    * @returns {this}
    * @example
    * ```ts
-   * return c.suppressEmbeds().res('[Docs](https://example.com)')
+   * return c.flags('SUPPRESS_EMBEDS', 'EPHEMERAL').res('[Docs](https://example.com)')
    * ```
    */
-  suppressEmbeds = (bool = true) => this.#setFlags(1 << 2, bool)
-
-  /**
-   * Only visible to the user who invoked the Interaction
-   * @param {boolean} [bool=true]
-   * @returns {this}
-   * @example
-   * ```ts
-   * return c.ephemeral().res('Personalized Text')
-   * ```
-   */
-  ephemeral = (bool = true) => this.#setFlags(1 << 6, bool)
-
-  /**
-   * Message won't trigger notifications
-   * @param {boolean} [bool=true]
-   * @returns {this}
-   * @example
-   * ```ts
-   * return c.suppressNotifications().res('silent message')
-   * ```
-   */
-  suppressNotifications = (bool = true) => this.#setFlags(1 << 12, bool)
+  flags = (...flag: ('SUPPRESS_EMBEDS' | 'EPHEMERAL' | 'SUPPRESS_NOTIFICATIONS' | 'IS_COMPONENTS_V2')[]) => {
+    this.#throwIfNotAllowType([2, 3, 5])
+    const flagNum = {
+      SUPPRESS_EMBEDS: 1 << 2,
+      EPHEMERAL: 1 << 6,
+      SUPPRESS_NOTIFICATIONS: 1 << 12,
+      IS_COMPONENTS_V2: 1 << 15,
+    } as const
+    this.#flags.flags = 0
+    for (const f of flag) this.#flags.flags |= flagNum[f]
+    return this
+  }
 
   /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
