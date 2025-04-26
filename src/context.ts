@@ -123,7 +123,6 @@ export class InteractionContext<
   E extends Env,
   This extends CommandContext | ComponentContext | AutocompleteContext | ModalContext,
 > extends ContextAll<E> {
-  #req: Request
   #interaction: APIInteraction
   #flags: { flags?: number } = {} // 235
   #sub = { group: '', command: '', string: '' } // 24
@@ -146,9 +145,8 @@ export class InteractionContext<
     if (file) body = formData(body as unknown as Record<string, unknown>, file)
     return new ResponseObject(body)
   }
-  constructor(core: CoreConstructor<E>, req: Request, interaction: APIInteraction) {
+  constructor(core: CoreConstructor<E>, interaction: APIInteraction) {
     super(core)
-    this.#req = req
     this.#interaction = interaction
     switch (interaction.type) {
       case 2:
@@ -190,12 +188,6 @@ export class InteractionContext<
     }
   }
 
-  /**
-   * raw Request
-   */
-  get req() {
-    return this.#req
-  }
   /**
    * [Interaction Object](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
    */
