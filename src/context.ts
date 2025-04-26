@@ -102,7 +102,7 @@ abstract class ContextAll<E extends Env> {
   }
 
   /**
-   * `c.rest` = `new Rest(c.env.DISCORD_TOKEN)`
+   * `c.rest` = `createRestRest(c.env.DISCORD_TOKEN)`
    */
   get rest(): ReturnType<typeof createRest> {
     if (!this.discord.TOKEN) throw newError('c.rest', 'DISCORD_TOKEN')
