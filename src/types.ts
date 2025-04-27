@@ -109,10 +109,7 @@ export abstract class FetchEventLike {
 
 export type CustomCallbackData<T extends Record<string, unknown>> =
   | (Omit<T, 'components' | 'embeds'> & {
-      components?:
-        | Components
-        | (Layout<any> | Content<'Text Display' | 'Media Gallery' | 'File'> | Button<any> | Select<any>)[]
-        | T['components']
+      components?: Components | (Layout<any> | Content<'Text Display' | 'Media Gallery' | 'File'>)[] | T['components']
       embeds?: (Embed | EmbedBuilder)[] | T['embeds']
     })
   | string

@@ -321,9 +321,8 @@ export class Select<T extends SelectType = 'String'> extends Builder<SelectCompo
       Mentionable: 7,
       Channel: 8,
     } as const
-    const type = typeNum[select_type] || 3
     const custom_id = unique_id + CUSTOM_ID_SEPARATOR
-    super({ type, custom_id } as SelectComponent)
+    super({ type: typeNum[select_type], custom_id } as SelectComponent)
     this.#type = select_type
     this.#uniqueStr = custom_id
   }
