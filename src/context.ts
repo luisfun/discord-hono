@@ -210,12 +210,11 @@ export class InteractionContext<
    */
   res = (data: CustomCallbackData<APIInteractionResponseCallbackData>, file?: FileData) => {
     this.#throwIfNotAllowType([2, 3, 5])
-    let body: APIInteractionResponse | FormData = {
+    const body: APIInteractionResponse = {
       data: { ...this.#flags, ...prepareData(data) },
       type: this.#update ? 7 : 4,
     }
-    if (file) body = formData(body as unknown as Record<string, unknown>, file)
-    return new ResponseObject(body)
+    return new ResponseObject(file ? formData(body, file) : body)
   }
   /**
    * ACK an interaction and edit a response later, the user sees a loading state
