@@ -68,7 +68,7 @@ describe('DiscordHono', () => {
 
       it('should handle component interaction correctly', async () => {
         const req = postRequest({ type: 3, data: { custom_id: 'test' } })
-        verifiedApp.component('test', c => c.resUpdate('component'))
+        verifiedApp.component('test', c => c.update().res('component'))
         const res = await verifiedApp.fetch(req, env)
         expect(await res.json()).toEqual({ type: 7, data: { content: 'component' } })
       })

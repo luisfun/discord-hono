@@ -149,7 +149,7 @@ export class DiscordHono<E extends Env = Env> {
               interaction.type,
               key,
               // @ts-expect-error
-            )(new InteractionContext([env, executionCtx, discord, key], request, interaction))
+            )(new InteractionContext([env, executionCtx, discord, key], interaction))
         }
         return new ResponseObject({ error: 'Unknown Type' }, 400)
       }

@@ -7,7 +7,7 @@ import type {
   APIMessageComponentSelectMenuInteraction,
   APIModalSubmitInteraction,
 } from 'discord-api-types/v10'
-import type { Button, Components, Select } from './builders/components'
+import type { Button, Components, Content, Layout, Select } from './builders/components'
 import type { Embed } from './builders/embed'
 import type { CronContext, InteractionContext } from './context'
 
@@ -39,30 +39,22 @@ type ComponentInteraction<T extends ComponentType> =
 
 export type CommandContext<E extends Env = any> = ExcludeMethods<
   InteractionContext<E, CommandContext<E>>,
-  'resUpdate' | 'resDeferUpdate' | 'focused' | 'resAutocomplete' | 'interaction'
+  'update' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: APIApplicationCommandInteraction }
+
 export type ComponentContext<E extends Env = any, T extends ComponentType = any> = ExcludeMethods<
   InteractionContext<E & { Variables: { custom_id?: string } }, ComponentContext<E, T>>,
   'sub' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: ComponentInteraction<T> }
+
 export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
   InteractionContext<E, AutocompleteContext<E>>,
-  | 'suppressEmbeds'
-  | 'ephemeral'
-  | 'suppressNotifications'
-  | 'res'
-  | 'resDefer'
-  | 'resActivity'
-  | 'followup'
-  | 'followupDelete'
-  | 'resModal'
-  | 'resUpdate'
-  | 'resDeferUpdate'
-  | 'interaction'
+  'flags' | 'res' | 'resDefer' | 'resActivity' | 'followup' | 'followupDelete' | 'resModal' | 'update' | 'interaction'
 > & { interaction: APIApplicationCommandAutocompleteInteraction }
+
 export type ModalContext<E extends Env = any> = ExcludeMethods<
   InteractionContext<E & { Variables: { custom_id?: string } }, ModalContext<E>>,
-  'sub' | 'resModal' | 'resUpdate' | 'resDeferUpdate' | 'focused' | 'resAutocomplete' | 'interaction'
+  'sub' | 'resModal' | 'update' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: APIModalSubmitInteraction }
 
 ////////// Handler //////////
@@ -117,7 +109,7 @@ export abstract class FetchEventLike {
 
 export type CustomCallbackData<T extends Record<string, unknown>> =
   | (Omit<T, 'components' | 'embeds'> & {
-      components?: Components | T['components']
+      components?: Components | (Layout<any> | Content<'Text Display' | 'Media Gallery' | 'File'>)[] | T['components']
       embeds?: (Embed | EmbedBuilder)[] | T['embeds']
     })
   | string
