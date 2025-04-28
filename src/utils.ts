@@ -50,3 +50,6 @@ export const queryStringify = (query: Record<string, unknown> | undefined) => {
   }
   return `?${new URLSearchParams(queryMap).toString()}`
 }
+
+// export const isString = (value: unknown): value is string => typeof value === 'string' || value instanceof String
+// export const isArray = (value: unknown) => Array.isArray(value)
