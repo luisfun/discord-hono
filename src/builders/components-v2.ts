@@ -201,7 +201,10 @@ export type ContentFile = ExcludeMethods<ContentImpl<'File'>, 'description'>
 
 export const Content = ContentImpl as {
   new (data: string, style?: 'Text Display'): ContentTextDisplay
-  new (data: string, style: 'Thumbnail'): ContentThumbnail
-  new (data: string | APIMediaGalleryComponent['items'][number], style: 'Media Gallery'): ContentMediaGallery
-  new (data: string, style: 'File'): ContentFile
+  new (data: string | APIThumbnailComponent['media'], style: 'Thumbnail'): ContentThumbnail
+  new (
+    data: string | APIMediaGalleryComponent['items'][number] | (string | APIMediaGalleryComponent['items'][number])[],
+    style: 'Media Gallery',
+  ): ContentMediaGallery
+  new (data: string | APIFileComponent['file'], style: 'File'): ContentFile
 }
