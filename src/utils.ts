@@ -2,16 +2,6 @@ import type { CustomCallbackData, FileData } from './types'
 
 export const CUSTOM_ID_SEPARATOR = ';'
 
-export class ResponseObject extends Response {
-  constructor(obj: object | FormData, status?: number) {
-    const isForm = obj instanceof FormData
-    super(isForm ? obj : JSON.stringify(obj), {
-      status,
-      headers: isForm ? undefined : { 'content-type': 'application/json' },
-    })
-  }
-}
-
 // type any !!!!!!!!!
 export const toJSON = (obj: object) => ('toJSON' in obj && typeof obj.toJSON === 'function' ? obj.toJSON() : obj)
 
@@ -36,6 +26,9 @@ export const formData = (data?: object, file?: FileData) => {
   return body
 }
 
+/**
+ * new Error(\`discord-hono(${locate}): ${text}\`)
+ */
 export const newError = (locate: string, text: string) => new Error(`discord-hono(${locate}): ${text}`)
 
 export const queryStringify = (query: Record<string, unknown> | undefined) => {
@@ -47,3 +40,7 @@ export const queryStringify = (query: Record<string, unknown> | undefined) => {
   }
   return `?${new URLSearchParams(queryMap).toString()}`
 }
+
+// export const isString = (value: unknown): value is string => typeof value === 'string' || value instanceof String
+// export const isArray = (value: unknown) => Array.isArray(value)
+// export const toArray = <T>(value: T | T[]) => (isArray(value) ? value : [value])

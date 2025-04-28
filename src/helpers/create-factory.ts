@@ -24,7 +24,7 @@ class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
         if ('custom_id' in json) this.component(json.custom_id.split(CUSTOM_ID_SEPARATOR)[0], elem.handler)
       } else if ('modal' in elem) this.modal(elem.modal.toJSON().custom_id.split(CUSTOM_ID_SEPARATOR)[0], elem.handler)
       else if ('cron' in elem) this.cron(elem.cron, elem.handler)
-      else throw newError('.loader()', 'unknown object')
+      else throw newError('.loader(obj)', 'obj is Invalid')
     }
     return this
   }

@@ -30,7 +30,7 @@ import type {
   FileData,
   ModalContext,
 } from './types'
-import { ResponseObject, formData, newError, prepareData, toJSON } from './utils'
+import { formData, newError, prepareData, toJSON } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -51,14 +51,14 @@ type IsAny<T> = boolean extends (T extends never ? true : false) ? true : false
 abstract class ContextAll<E extends Env> {
   #env: E['Bindings'] = {}
   #executionCtx: ExecutionCtx
-  protected discord: DiscordEnv
+  #discordToken: string | undefined
   #key: string
   #var = new Map()
   #rest: ReturnType<typeof createRest> | undefined = undefined
   constructor([env, executionCtx, discord, key]: CoreConstructor<E>) {
     this.#env = env
     this.#executionCtx = executionCtx
-    this.discord = discord
+    this.#discordToken = discord.TOKEN
     this.#key = key
   }
 
@@ -102,11 +102,10 @@ abstract class ContextAll<E extends Env> {
   }
 
   /**
-   * `c.rest` = `createRestRest(c.env.DISCORD_TOKEN)`
+   * `c.rest` = `createRest(c.env.DISCORD_TOKEN)`
    */
   get rest(): ReturnType<typeof createRest> {
-    if (!this.discord.TOKEN) throw newError('c.rest', 'DISCORD_TOKEN')
-    this.#rest ??= createRest(this.discord.TOKEN)
+    this.#rest ??= createRest(this.#discordToken)
     return this.#rest
   }
 }
@@ -120,6 +119,7 @@ export class InteractionContext<
   E extends Env,
   This extends CommandContext | ComponentContext | AutocompleteContext | ModalContext,
 > extends ContextAll<E> {
+  #discordApplicationId: string | undefined
   #interaction: APIInteraction
   #flags: { flags?: number } = {} // 235
   #sub = { group: '', command: '', string: '' } // 24
@@ -128,11 +128,9 @@ export class InteractionContext<
   #throwIfNotAllowType = (allowType: APIInteraction['type'][]) => {
     if (!allowType.includes(this.#interaction.type)) throw newError('c.***', 'Invalid method')
   }
-  #throwIfNonApplicationId = () => {
-    if (!this.discord.APPLICATION_ID) throw newError('c.followup***', 'DISCORD_APPLICATION_ID')
-  }
   constructor(core: CoreConstructor<E>, interaction: APIInteraction) {
     super(core)
+    this.#discordApplicationId = core[2].APPLICATION_ID
     this.#interaction = interaction
     switch (interaction.type) {
       case 2:
@@ -214,7 +212,7 @@ export class InteractionContext<
       data: { ...this.#flags, ...prepareData(data) },
       type: this.#update ? 7 : 4,
     }
-    return new ResponseObject(file ? formData(body, file) : body)
+    return file ? new Response(formData(body, file)) : Response.json(body)
   }
   /**
    * ACK an interaction and edit a response later, the user sees a loading state
@@ -228,7 +226,7 @@ export class InteractionContext<
   resDefer = (handler?: (c: This) => Promise<unknown>) => {
     this.#throwIfNotAllowType([2, 3, 5])
     if (handler) this.executionCtx.waitUntil(handler(this as unknown as This))
-    return new ResponseObject(
+    return Response.json(
       this.#update
         ? ({ type: 6 } satisfies APIInteractionResponseDeferredMessageUpdate)
         : ({
@@ -244,41 +242,27 @@ export class InteractionContext<
    */
   resActivity = () => {
     this.#throwIfNotAllowType([2, 3, 5])
-    return new ResponseObject({ type: 12 } satisfies APIInteractionResponseLaunchActivity)
+    return Response.json({ type: 12 } satisfies APIInteractionResponseLaunchActivity)
   }
 
   /**
-   * Used to send messages after resDefer or resDeferUpdate
-   * @param data [Data Structure](https://discord.com/developers/docs/resources/webhook#edit-webhook-message)
+   * Used for sending messages after resDefer. Functions as a message deletion when called without arguments.
+   * @param data string or [Data Structure](https://discord.com/developers/docs/resources/webhook#edit-webhook-message)
    * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
    * @example
    * ```ts
+   * // followup message
    * return c.resDefer(c => c.followup('Image file', { blob: Blob, name: 'image.png' }))
+   * // delete message
+   * return c.update().resDefer(c => c.followup())
    * ```
    */
-  followup = (data: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody> = {}, file?: FileData) => {
+  followup = (data?: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>, file?: FileData) => {
     this.#throwIfNotAllowType([2, 3, 5])
-    this.#throwIfNonApplicationId()
-    return this.rest(
-      'PATCH',
-      _webhooks_$_$_messages_original,
-      [this.discord.APPLICATION_ID!, this.interaction.token],
-      data,
-      file,
-    )
-  }
-  /**
-   * Delete the self message
-   * @returns {Promise<Response>}
-   * @example
-   * ```ts
-   * return c.resDeferUpdate(c.followupDelete)
-   * ```
-   */
-  followupDelete = () => {
-    this.#throwIfNotAllowType([2, 3, 5])
-    this.#throwIfNonApplicationId()
-    return this.rest('DELETE', _webhooks_$_$_messages_original, [this.discord.APPLICATION_ID!, this.interaction.token])
+    if (!this.#discordApplicationId) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
+    const pathVars: [string, string] = [this.#discordApplicationId, this.interaction.token]
+    if (data || file) return this.rest('PATCH', _webhooks_$_$_messages_original, pathVars, data || {}, file)
+    return this.rest('DELETE', _webhooks_$_$_messages_original, pathVars)
   }
 
   /**
@@ -311,7 +295,7 @@ export class InteractionContext<
    */
   resModal = (data: Modal | APIModalInteractionResponseCallbackData) => {
     this.#throwIfNotAllowType([2, 3])
-    return new ResponseObject({ type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse)
+    return Response.json({ type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse)
   }
 
   /**
@@ -345,7 +329,7 @@ export class InteractionContext<
    */
   resAutocomplete = (data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData) => {
     this.#throwIfNotAllowType([4])
-    return new ResponseObject({ type: 8, data: toJSON(data) } satisfies APIApplicationCommandAutocompleteResponse)
+    return Response.json({ type: 8, data: toJSON(data) } satisfies APIApplicationCommandAutocompleteResponse)
   }
 }
 
