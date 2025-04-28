@@ -283,6 +283,28 @@ export class InteractionContext<
   }
 
   /**
+   * Used for sending messages after resDefer. Functions as a message deletion when called without arguments.
+   * @param data string or [Data Structure](https://discord.com/developers/docs/resources/webhook#edit-webhook-message)
+   * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
+   * @example
+   * ```ts
+   * // followup message
+   * return c.resDefer(c => c.followup('Image file', { blob: Blob, name: 'image.png' }))
+   * // delete message
+   * return c.update().resDefer(c => c.followup())
+   * ```
+   */
+  /*
+  followup = (data?: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>, file?: FileData) => {
+    this.#throwIfNotAllowType([2, 3, 5])
+    if (!this.#discordApplicationId) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
+    const pathVars = [this.#discordApplicationId, this.interaction.token] as [string, string]
+    if (data || file) return this.rest('PATCH', _webhooks_$_$_messages_original, pathVars, data || {}, file)
+    return this.rest('DELETE', _webhooks_$_$_messages_original, pathVars)
+  }
+  */
+
+  /**
    * This object is useful when using subcommands
    * @example
    * ```ts
