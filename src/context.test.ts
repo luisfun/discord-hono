@@ -9,6 +9,7 @@ import { Locale } from 'discord-api-types/v10'
 import { describe, expect, it, vi } from 'vitest'
 import { CronContext, InteractionContext } from './context'
 import { _webhooks_$_$_messages_original, createRest } from './rest'
+import type { CommandContext, ComponentContext } from './types'
 
 // Mock createRest to avoid actual API calls
 vi.mock('./rest', () => ({
@@ -295,7 +296,7 @@ describe('InteractionContext', () => {
   })
 
   it('should set flags correctly', async () => {
-    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    const ctx = new InteractionContext<any, CommandContext>([env, executionCtx, discordEnv, key], commandInteraction)
     const response = ctx.flags('EPHEMERAL').res('Test message')
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.data.flags).toEqual(64) // EPHEMERAL flag value
@@ -317,7 +318,10 @@ describe('InteractionContext', () => {
   })
 
   it('should create update response for components', async () => {
-    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], componentInteraction)
+    const ctx = new InteractionContext<any, ComponentContext>(
+      [env, executionCtx, discordEnv, key],
+      componentInteraction,
+    )
     const response = ctx.update().res('Updated message')
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.type).toEqual(7) // UPDATE_MESSAGE
