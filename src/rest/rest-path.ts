@@ -11,8 +11,9 @@ export const _webhooks_$_$_messages_$ = '/webhooks/{}/{}/messages/{}' as
 // https://discord.com/developers/docs/interactions/receiving-and-responding
 // ✅ 25/02/07
 export const _interactions_$_$_callback = '/interactions/{interaction.id}/{interaction.token}/callback' as const
+// Compressed because it's used in Context
 export const _webhooks_$_$_messages_original =
-  '/webhooks/{application.id}/{interaction.token}/messages/@original' as const
+  '/webhooks/{}/{}/messages/@original' as '/webhooks/{application.id}/{interaction.token}/messages/@original'
 //export const _webhooks_$_$ = '/webhooks/{application.id}/{interaction.token}' as const
 //export const _webhooks_$_$_messages_$ = '/webhooks/{application.id}/{interaction.token}/messages/{message.id}' as const
 
