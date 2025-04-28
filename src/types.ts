@@ -7,7 +7,16 @@ import type {
   APIMessageComponentSelectMenuInteraction,
   APIModalSubmitInteraction,
 } from 'discord-api-types/v10'
-import type { Button, Components, Content, Layout, Select } from './builders/components'
+import type { Button, Components, Select } from './builders/components'
+import type {
+  ContentFile,
+  ContentMediaGallery,
+  ContentTextDisplay,
+  LayoutActionRow,
+  LayoutContainer,
+  LayoutSection,
+  LayoutSeparator,
+} from './builders/components-v2'
 import type { Embed } from './builders/embed'
 import type { CronContext, InteractionContext } from './context'
 
@@ -28,7 +37,7 @@ export type DiscordEnv = {
 
 ////////// Context //////////
 
-type ExcludeMethods<T, K extends keyof T> = { [P in keyof T as P extends K ? never : P]: T[P] }
+export type ExcludeMethods<T, K extends keyof T> = { [P in keyof T as P extends K ? never : P]: T[P] }
 
 export type ComponentType = Button<any> | Select<any> //'Button' | 'Select'
 // biome-ignore format: ternary operator
@@ -109,7 +118,18 @@ export abstract class FetchEventLike {
 
 export type CustomCallbackData<T extends Record<string, unknown>> =
   | (Omit<T, 'components' | 'embeds'> & {
-      components?: Components | (Layout<any> | Content<'Text Display' | 'Media Gallery' | 'File'>)[] | T['components']
+      components?:
+        | Components
+        | (
+            | LayoutActionRow
+            | LayoutSection
+            | LayoutSeparator
+            | LayoutContainer
+            | ContentTextDisplay
+            | ContentMediaGallery
+            | ContentFile
+          )[]
+        | T['components']
       embeds?: (Embed | EmbedBuilder)[] | T['embeds']
     })
   | string

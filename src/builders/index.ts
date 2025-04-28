@@ -1,5 +1,6 @@
+export * from './autocomplete'
 export * from './command'
+export { Layout, Content } from './components-v2'
 export * from './components'
 export * from './modal'
 export * from './embed'
-export * from './autocomplete'
