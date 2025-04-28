@@ -49,7 +49,7 @@ export type ComponentContext<E extends Env = any, T extends ComponentType = any>
 
 export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
   InteractionContext<E, AutocompleteContext<E>>,
-  'flags' | 'res' | 'resDefer' | 'resActivity' | 'followup' | 'followupDelete' | 'resModal' | 'update' | 'interaction'
+  'flags' | 'res' | 'resDefer' | 'resActivity' | 'followup' | 'resModal' | 'update' | 'interaction'
 > & { interaction: APIApplicationCommandAutocompleteInteraction }
 
 export type ModalContext<E extends Env = any> = ExcludeMethods<

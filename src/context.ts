@@ -128,9 +128,6 @@ export class InteractionContext<
   #throwIfNotAllowType = (allowType: APIInteraction['type'][]) => {
     if (!allowType.includes(this.#interaction.type)) throw newError('c.***', 'Invalid method')
   }
-  #throwIfNonApplicationId = () => {
-    if (!this.#discordApplicationId) throw newError('c.followup***', 'DISCORD_APPLICATION_ID')
-  }
   constructor(core: CoreConstructor<E>, interaction: APIInteraction) {
     super(core)
     this.#discordApplicationId = core[2].APPLICATION_ID
@@ -249,40 +246,6 @@ export class InteractionContext<
   }
 
   /**
-   * Used to send messages after resDefer or resDeferUpdate
-   * @param data [Data Structure](https://discord.com/developers/docs/resources/webhook#edit-webhook-message)
-   * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
-   * @example
-   * ```ts
-   * return c.resDefer(c => c.followup('Image file', { blob: Blob, name: 'image.png' }))
-   * ```
-   */
-  followup = (data: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody> = {}, file?: FileData) => {
-    this.#throwIfNotAllowType([2, 3, 5])
-    this.#throwIfNonApplicationId()
-    return this.rest(
-      'PATCH',
-      _webhooks_$_$_messages_original,
-      [this.#discordApplicationId!, this.interaction.token],
-      data,
-      file,
-    )
-  }
-  /**
-   * Delete the self message
-   * @returns {Promise<Response>}
-   * @example
-   * ```ts
-   * return c.resDeferUpdate(c.followupDelete)
-   * ```
-   */
-  followupDelete = () => {
-    this.#throwIfNotAllowType([2, 3, 5])
-    this.#throwIfNonApplicationId()
-    return this.rest('DELETE', _webhooks_$_$_messages_original, [this.#discordApplicationId!, this.interaction.token])
-  }
-
-  /**
    * Used for sending messages after resDefer. Functions as a message deletion when called without arguments.
    * @param data string or [Data Structure](https://discord.com/developers/docs/resources/webhook#edit-webhook-message)
    * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
@@ -294,15 +257,13 @@ export class InteractionContext<
    * return c.update().resDefer(c => c.followup())
    * ```
    */
-  /*
   followup = (data?: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>, file?: FileData) => {
     this.#throwIfNotAllowType([2, 3, 5])
     if (!this.#discordApplicationId) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
-    const pathVars = [this.#discordApplicationId, this.interaction.token] as [string, string]
+    const pathVars: [string, string] = [this.#discordApplicationId, this.interaction.token]
     if (data || file) return this.rest('PATCH', _webhooks_$_$_messages_original, pathVars, data || {}, file)
     return this.rest('DELETE', _webhooks_$_$_messages_original, pathVars)
   }
-  */
 
   /**
    * This object is useful when using subcommands
