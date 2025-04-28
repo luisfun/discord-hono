@@ -198,7 +198,7 @@ export class InteractionContext<
     } as const
     this.#flags.flags = 0
     for (const f of flag) this.#flags.flags |= flagNum[f]
-    return this
+    return this as unknown as This
   }
 
   /**
@@ -310,7 +310,7 @@ export class InteractionContext<
   update = (bool = true) => {
     this.#throwIfNotAllowType([3])
     this.#update = bool
-    return this
+    return this as unknown as This
   }
 
   /**
