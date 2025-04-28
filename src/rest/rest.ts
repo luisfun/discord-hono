@@ -26,7 +26,7 @@ export const createRest =
     data?: (Record<string, any> & { query?: any }) | Record<string, any>[] | string,
     file?: FileData,
   ) => {
-    if (!token) throw newError('Rest', 'DISCORD_TOKEN')
+    if (!token) throw newError('REST', 'DISCORD_TOKEN')
     const isGet = method.toUpperCase() === 'GET'
     const vars = [...variables]
     const headers: HeadersInit = { Authorization: `Bot ${token}` }

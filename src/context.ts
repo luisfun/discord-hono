@@ -51,14 +51,14 @@ type IsAny<T> = boolean extends (T extends never ? true : false) ? true : false
 abstract class ContextAll<E extends Env> {
   #env: E['Bindings'] = {}
   #executionCtx: ExecutionCtx
-  protected discord: DiscordEnv
+  #discordToken: string | undefined
   #key: string
   #var = new Map()
   #rest: ReturnType<typeof createRest> | undefined = undefined
   constructor([env, executionCtx, discord, key]: CoreConstructor<E>) {
     this.#env = env
     this.#executionCtx = executionCtx
-    this.discord = discord
+    this.#discordToken = discord.TOKEN
     this.#key = key
   }
 
@@ -102,11 +102,10 @@ abstract class ContextAll<E extends Env> {
   }
 
   /**
-   * `c.rest` = `createRestRest(c.env.DISCORD_TOKEN)`
+   * `c.rest` = `createRest(c.env.DISCORD_TOKEN)`
    */
   get rest(): ReturnType<typeof createRest> {
-    if (!this.discord.TOKEN) throw newError('c.rest', 'DISCORD_TOKEN')
-    this.#rest ??= createRest(this.discord.TOKEN)
+    this.#rest ??= createRest(this.#discordToken)
     return this.#rest
   }
 }
@@ -120,6 +119,7 @@ export class InteractionContext<
   E extends Env,
   This extends CommandContext | ComponentContext | AutocompleteContext | ModalContext,
 > extends ContextAll<E> {
+  #discordApplicationId: string | undefined
   #interaction: APIInteraction
   #flags: { flags?: number } = {} // 235
   #sub = { group: '', command: '', string: '' } // 24
@@ -129,10 +129,11 @@ export class InteractionContext<
     if (!allowType.includes(this.#interaction.type)) throw newError('c.***', 'Invalid method')
   }
   #throwIfNonApplicationId = () => {
-    if (!this.discord.APPLICATION_ID) throw newError('c.followup***', 'DISCORD_APPLICATION_ID')
+    if (!this.#discordApplicationId) throw newError('c.followup***', 'DISCORD_APPLICATION_ID')
   }
   constructor(core: CoreConstructor<E>, interaction: APIInteraction) {
     super(core)
+    this.#discordApplicationId = core[2].APPLICATION_ID
     this.#interaction = interaction
     switch (interaction.type) {
       case 2:
@@ -262,7 +263,7 @@ export class InteractionContext<
     return this.rest(
       'PATCH',
       _webhooks_$_$_messages_original,
-      [this.discord.APPLICATION_ID!, this.interaction.token],
+      [this.#discordApplicationId!, this.interaction.token],
       data,
       file,
     )
@@ -278,7 +279,7 @@ export class InteractionContext<
   followupDelete = () => {
     this.#throwIfNotAllowType([2, 3, 5])
     this.#throwIfNonApplicationId()
-    return this.rest('DELETE', _webhooks_$_$_messages_original, [this.discord.APPLICATION_ID!, this.interaction.token])
+    return this.rest('DELETE', _webhooks_$_$_messages_original, [this.#discordApplicationId!, this.interaction.token])
   }
 
   /**
