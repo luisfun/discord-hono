@@ -2,7 +2,6 @@ import type { APIInteraction } from 'discord-api-types/v10'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CronContext, InteractionContext } from './context'
 import type { AutocompleteContext, CommandContext, ComponentContext, ModalContext } from './types'
-import { ResponseObject } from './utils'
 
 describe('Context', () => {
   const mockRequest = new Request('https://example.com')
@@ -60,7 +59,7 @@ describe('Context', () => {
       } as APIInteraction
       const context = new InteractionContext([mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'], mockInteraction)
       const response = context.flags('EPHEMERAL').res({ content: 'Ephemeral response' })
-      expect(response).toBeInstanceOf(ResponseObject)
+      expect(response).toBeInstanceOf(Response)
       expect((await response.json()).data.flags).toBe(1 << 6)
     })
 
@@ -84,7 +83,7 @@ describe('Context', () => {
       const context = new InteractionContext([mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'], mockInteraction)
       const modalData = { custom_id: 'modal-id', title: 'Modal Title', components: [] }
       const response = context.resModal(modalData)
-      expect(response).toBeInstanceOf(ResponseObject)
+      expect(response).toBeInstanceOf(Response)
       expect((await response.json()).data).toEqual(modalData)
     })
   })

@@ -1,47 +1,5 @@
 import { Components, Embed } from '.'
-import { ResponseObject, formData, newError, prepareData, queryStringify, toJSON } from './utils'
-
-describe('ResponseObject', () => {
-  it('should create a JSON response when given an object', () => {
-    const obj = { key: 'value' }
-    const response = new ResponseObject(obj)
-
-    expect(response.headers.get('content-type')).toBe('application/json')
-    expect(response.status).toBe(200) // default stats
-    return response.json().then(data => {
-      expect(data).toEqual(obj)
-    })
-  })
-
-  it('should create a FormData response when given FormData', () => {
-    const formData = new FormData()
-    formData.append('key', 'value')
-    const response = new ResponseObject(formData)
-
-    //expect(response.headers.get('content-type')).toBeNull()
-    expect(response.status).toBe(200)
-    return response.formData().then(data => {
-      expect(data.get('key')).toBe('value')
-    })
-  })
-
-  it('should set custom status code when provided', () => {
-    const obj = { message: '400' }
-    const response = new ResponseObject(obj, 400)
-
-    expect(response.status).toBe(400)
-  })
-
-  it('should handle empty objects', () => {
-    const obj = {}
-    const response = new ResponseObject(obj)
-
-    expect(response.headers.get('content-type')).toBe('application/json')
-    return response.json().then(data => {
-      expect(data).toEqual({})
-    })
-  })
-})
+import { formData, newError, prepareData, queryStringify, toJSON } from './utils'
 
 describe('toJSON function', () => {
   it('should return the result of toJSON method if it exists', () => {

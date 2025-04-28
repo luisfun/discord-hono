@@ -2,16 +2,6 @@ import type { CustomCallbackData, FileData } from './types'
 
 export const CUSTOM_ID_SEPARATOR = ';'
 
-export class ResponseObject extends Response {
-  constructor(obj: object | FormData, status?: number) {
-    const isForm = obj instanceof FormData
-    super(isForm ? obj : JSON.stringify(obj), {
-      status,
-      headers: isForm ? undefined : { 'content-type': 'application/json' },
-    })
-  }
-}
-
 // type any !!!!!!!!!
 export const toJSON = (obj: object) => ('toJSON' in obj && typeof obj.toJSON === 'function' ? obj.toJSON() : obj)
 

@@ -14,7 +14,7 @@ import type {
   ModalHandler,
   Verify,
 } from './types'
-import { CUSTOM_ID_SEPARATOR, ResponseObject, newError } from './utils'
+import { CUSTOM_ID_SEPARATOR, newError } from './utils'
 import { verify } from './verify'
 
 type DiscordEnvBindings = {
@@ -140,7 +140,7 @@ export class DiscordHono<E extends Env = Env> {
         })()
         switch (interaction.type) {
           case 1:
-            return new ResponseObject({ type: 1 } satisfies APIInteractionResponsePong)
+            return Response.json({ type: 1 } satisfies APIInteractionResponsePong)
           case 2:
           case 3:
           case 4:
@@ -151,7 +151,7 @@ export class DiscordHono<E extends Env = Env> {
               // @ts-expect-error
             )(new InteractionContext([env, executionCtx, discord, key], interaction))
         }
-        return new ResponseObject({ error: 'Unknown Type' }, 400)
+        return Response.json({ error: 'Unknown Type' }, { status: 400 })
       }
     }
     return new Response('Not Found', { status: 404 })

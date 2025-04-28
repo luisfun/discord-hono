@@ -30,7 +30,7 @@ import type {
   FileData,
   ModalContext,
 } from './types'
-import { ResponseObject, formData, newError, prepareData, toJSON } from './utils'
+import { formData, newError, prepareData, toJSON } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -212,7 +212,7 @@ export class InteractionContext<
       data: { ...this.#flags, ...prepareData(data) },
       type: this.#update ? 7 : 4,
     }
-    return new ResponseObject(file ? formData(body, file) : body)
+    return file ? new Response(formData(body, file)) : Response.json(body)
   }
   /**
    * ACK an interaction and edit a response later, the user sees a loading state
@@ -226,7 +226,7 @@ export class InteractionContext<
   resDefer = (handler?: (c: This) => Promise<unknown>) => {
     this.#throwIfNotAllowType([2, 3, 5])
     if (handler) this.executionCtx.waitUntil(handler(this as unknown as This))
-    return new ResponseObject(
+    return Response.json(
       this.#update
         ? ({ type: 6 } satisfies APIInteractionResponseDeferredMessageUpdate)
         : ({
@@ -242,7 +242,7 @@ export class InteractionContext<
    */
   resActivity = () => {
     this.#throwIfNotAllowType([2, 3, 5])
-    return new ResponseObject({ type: 12 } satisfies APIInteractionResponseLaunchActivity)
+    return Response.json({ type: 12 } satisfies APIInteractionResponseLaunchActivity)
   }
 
   /**
@@ -295,7 +295,7 @@ export class InteractionContext<
    */
   resModal = (data: Modal | APIModalInteractionResponseCallbackData) => {
     this.#throwIfNotAllowType([2, 3])
-    return new ResponseObject({ type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse)
+    return Response.json({ type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse)
   }
 
   /**
@@ -329,7 +329,7 @@ export class InteractionContext<
    */
   resAutocomplete = (data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData) => {
     this.#throwIfNotAllowType([4])
-    return new ResponseObject({ type: 8, data: toJSON(data) } satisfies APIApplicationCommandAutocompleteResponse)
+    return Response.json({ type: 8, data: toJSON(data) } satisfies APIApplicationCommandAutocompleteResponse)
   }
 }
 
