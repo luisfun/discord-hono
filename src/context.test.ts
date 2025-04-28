@@ -1,211 +1,366 @@
-import type { APIInteraction } from 'discord-api-types/v10'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type {
+  APIApplicationCommandAutocompleteInteraction,
+  APIApplicationCommandInteraction,
+  APIInteractionGuildMember,
+  APIMessageComponentInteraction,
+  APIModalSubmitInteraction,
+} from 'discord-api-types/v10'
+import { Locale } from 'discord-api-types/v10'
+import { describe, expect, it, vi } from 'vitest'
 import { CronContext, InteractionContext } from './context'
-import type { AutocompleteContext, CommandContext, ComponentContext, ModalContext } from './types'
+import { _webhooks_$_$_messages_original, createRest } from './rest'
 
-describe('Context', () => {
-  const mockRequest = new Request('https://example.com')
-  const mockEnv = { DISCORD_TOKEN: 'mock-token', DISCORD_APPLICATION_ID: 'mock-app-id' }
-  const mockWaitUntil = vi.fn()
-  const mockExecutionCtx = { waitUntil: mockWaitUntil, passThroughOnException: vi.fn() }
-  const mockDiscordEnv = { TOKEN: 'mock-token', APPLICATION_ID: 'mock-app-id' }
-  const mockCronEvent = { cron: '* * * * *', type: 'cron', scheduledTime: 0 }
-  const mockFetchEvent = {
-    request: mockRequest,
-    respondWith: vi.fn(),
-    ...mockExecutionCtx,
+// Mock createRest to avoid actual API calls
+vi.mock('./rest', () => ({
+  createRest: vi.fn().mockReturnValue(
+    vi.fn().mockImplementation((method, _endpoint, _pathVars, _data, _file) => {
+      if (method === 'PATCH') return Promise.resolve({})
+      if (method === 'DELETE') return Promise.resolve({})
+      return Promise.resolve({})
+    }),
+  ),
+  _webhooks_$_$_messages_original: '/webhooks/{}/{}/messages/@original',
+}))
+
+// Mock newError for testing error throwing
+vi.mock('./utils', async () => {
+  const actual = await vi.importActual('./utils')
+  return {
+    ...actual,
+    newError: (name: string, message: string) => new Error(`${name}: ${message}`),
+    prepareData: (data: any) => (typeof data === 'string' ? { content: data } : data),
+    formData: vi.fn().mockReturnValue(new FormData()),
+    toJSON: (data: any) => data,
+  }
+})
+
+describe('CronContext', () => {
+  const env = { TEST_ENV: 'test' }
+  const executionCtx = {
+    waitUntil: vi.fn(),
+    passThroughOnException: vi.fn(),
+  }
+  const discordEnv = { TOKEN: 'test-token' }
+  const cronEvent = { cron: '*/5 * * * *', scheduledTime: Date.now(), type: 'scheduled' }
+  const key = 'test-key'
+
+  it('should create a context with all properties', () => {
+    const ctx = new CronContext([env, executionCtx, discordEnv, key], cronEvent)
+    expect(ctx.env).toEqual(env)
+    expect(ctx.executionCtx).toEqual(executionCtx)
+    expect(ctx.key).toEqual(key)
+    expect(ctx.cronEvent).toEqual(cronEvent)
+  })
+
+  it('should handle variables', () => {
+    const ctx = new CronContext([env, executionCtx, discordEnv, key], cronEvent)
+    ctx.set('testVar', 'testValue')
+    expect(ctx.get('testVar')).toEqual('testValue')
+    expect(ctx.var).toEqual({ testVar: 'testValue' })
+  })
+
+  it('should provide access to rest client', () => {
+    const ctx = new CronContext([env, executionCtx, discordEnv, key], cronEvent)
+    expect(ctx.rest).toBeDefined()
+    expect(createRest).toHaveBeenCalledWith('test-token')
+  })
+})
+
+describe('InteractionContext', () => {
+  const env = { TEST_ENV: 'test' }
+  const executionCtx = {
+    waitUntil: vi.fn(),
+    passThroughOnException: vi.fn(),
+  }
+  const discordEnv = {
+    TOKEN: 'test-token',
+    APPLICATION_ID: 'app-id',
+  }
+  const key = 'test-key'
+
+  // @ts-expect-error
+  const member: APIInteractionGuildMember = {
+    user: {
+      id: 'user-id',
+      global_name: 'global-name',
+      username: 'username',
+      discriminator: '0000',
+      avatar: null,
+    },
+    roles: [],
+    joined_at: '',
+    deaf: false,
+    mute: false,
   }
 
-  describe('ContextAll', () => {
-    it('should store getters', async () => {
-      const c = new InteractionContext([mockEnv, mockExecutionCtx, mockDiscordEnv, 'key'], {} as APIInteraction)
-      expect(c.env).toBe(mockEnv)
-      expect(() => c.event).toThrow()
-      expect(c.executionCtx).toBe(mockExecutionCtx)
-      await c.executionCtx.waitUntil(Promise.resolve())
-      expect(mockWaitUntil).toHaveBeenCalledWith(expect.any(Promise))
-      expect(c.key).toBe('key')
-
-      const c2 = new InteractionContext([mockEnv, mockFetchEvent, mockDiscordEnv, 'key'], {} as APIInteraction)
-      expect(c2.event).toBe(mockFetchEvent)
-
-      const c3 = new CronContext([mockEnv, undefined, mockDiscordEnv, 'key'], mockCronEvent)
-      expect(() => c3.executionCtx).toThrow()
-    })
-  })
-
-  it('var method', () => {
-    const c = new InteractionContext<{ Variables: { key: string } }, any>(
-      [mockEnv, mockExecutionCtx, mockDiscordEnv, 'key'],
-      {} as APIInteraction,
-    )
-    c.set('key', 'value')
-    expect(c.get('key')).toBe('value')
-    expect(c.var.key).toBe('value')
-  })
-
-  describe('InteractionContext', () => {
-    it('should store request, interaction', () => {
-      const mockInteraction = { type: 2, data: { name: 'test' } } as APIInteraction
-      const c = new InteractionContext([mockEnv, mockExecutionCtx, mockDiscordEnv, 'key'], mockInteraction)
-      expect(c.interaction).toBe(mockInteraction)
-    })
-
-    it('should handle ephemeral responses', async () => {
-      const mockInteraction = {
-        type: 2,
-        data: { name: 'test-command' },
-        token: 'mock-token',
-      } as APIInteraction
-      const context = new InteractionContext([mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'], mockInteraction)
-      const response = context.flags('EPHEMERAL').res({ content: 'Ephemeral response' })
-      expect(response).toBeInstanceOf(Response)
-      expect((await response.json()).data.flags).toBe(1 << 6)
-    })
-
-    it('should handle followup responses', async () => {
-      const mockInteraction = {
-        type: 2,
-        data: { name: 'test-command' },
-        token: 'mock-token',
-      } as APIInteraction
-      const context = new InteractionContext([mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'], mockInteraction)
-      const response = await context.followup({ content: 'Followup response' })
-      expect(response).toBeInstanceOf(Response)
-    })
-
-    it('should handle modal responses', async () => {
-      const mockInteraction = {
-        type: 2,
-        data: { name: 'test-command' },
-        token: 'mock-token',
-      } as APIInteraction
-      const context = new InteractionContext([mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'], mockInteraction)
-      const modalData = { custom_id: 'modal-id', title: 'Modal Title', components: [] }
-      const response = context.resModal(modalData)
-      expect(response).toBeInstanceOf(Response)
-      expect((await response.json()).data).toEqual(modalData)
-    })
-  })
-
-  describe('CommandContext', () => {
-    let context: CommandContext
-
-    beforeEach(() => {
-      const mockInteraction = {
-        type: 2,
-        data: {
-          name: 'test-command',
-          options: [
-            { name: 'option1', type: 3, value: 'value1' },
-            { name: 'option2', type: 4, value: 42 },
-          ],
+  // Mock command interaction
+  // @ts-expect-error
+  const commandInteraction: APIApplicationCommandInteraction = {
+    id: 'interaction-id',
+    application_id: 'app-id',
+    type: 2, // APPLICATION_COMMAND
+    token: 'token',
+    version: 1,
+    data: {
+      id: 'command-id',
+      name: 'test-command',
+      type: 1,
+      options: [
+        {
+          name: 'option1',
+          type: 3, // STRING
+          value: 'value1',
         },
-        token: 'mock-token',
-      } as APIInteraction
-      context = new InteractionContext(
-        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
-        mockInteraction,
-      ) as CommandContext
-    })
+      ],
+    },
+    guild_id: 'guild-id',
+    channel_id: 'channel-id',
+    member: member,
+    app_permissions: '0',
+    locale: Locale.EnglishUS,
+    guild_locale: Locale.EnglishUS,
+  }
 
-    it('should set options as variables', () => {
-      expect(context.get('option1')).toBe('value1')
-      expect(context.get('option2')).toBe(42)
-    })
-
-    it('should handle subcommands correctly', () => {
-      const subCommandInteraction = {
-        type: 2,
-        data: {
-          name: 'parent',
+  // Mock subcommand interaction
+  const subCommandInteraction: APIApplicationCommandInteraction = {
+    ...commandInteraction,
+    data: {
+      ...commandInteraction.data,
+      // @ts-expect-error
+      options: [
+        {
+          name: 'group',
+          type: 2, // SUB_COMMAND_GROUP
           options: [
             {
-              type: 1,
-              name: 'subcommand',
-              options: [{ name: 'suboption', type: 3, value: 'subvalue' }],
-            },
-          ],
-        },
-        token: 'mock-token',
-      } as APIInteraction
-      const subContext = new InteractionContext(
-        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
-        subCommandInteraction,
-      ) as CommandContext
-      expect(subContext.sub).toEqual({ group: '', command: 'subcommand', string: 'subcommand' })
-      expect(subContext.get('suboption')).toBe('subvalue')
-    })
-  })
-
-  describe('ComponentContext', () => {
-    it('should set custom_id as a variable', () => {
-      const mockInteraction = {
-        type: 3,
-        data: { custom_id: 'test-custom-id' },
-        token: 'mock-token',
-      } as APIInteraction
-      const context = new InteractionContext(
-        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
-        mockInteraction,
-      ) as ComponentContext
-      expect(context.get('custom_id')).toBe('test-custom-id')
-    })
-  })
-
-  describe('ModalContext', () => {
-    it('should set modal input values as variables', () => {
-      const mockInteraction = {
-        type: 5,
-        data: {
-          custom_id: 'test-modal',
-          components: [
-            {
-              components: [
-                { custom_id: 'input1', value: 'value1' },
-                { custom_id: 'input2', value: 'value2' },
+              name: 'sub',
+              type: 1, // SUB_COMMAND
+              options: [
+                {
+                  name: 'option1',
+                  type: 3, // STRING
+                  value: 'value1',
+                },
               ],
             },
           ],
         },
-        token: 'mock-token',
-      } as APIInteraction
-      const context = new InteractionContext(
-        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
-        mockInteraction,
-      ) as ModalContext
-      expect(context.get('custom_id')).toBe('test-modal')
-      expect(context.get('input1')).toBe('value1')
-      expect(context.get('input2')).toBe('value2')
-    })
-  })
+      ],
+    },
+  }
 
-  describe('AutocompleteContext', () => {
-    it('should set focused option', () => {
-      const mockInteraction = {
-        type: 4,
-        data: {
-          name: 'test-command',
-          options: [
-            { name: 'option1', type: 3, value: 'value1', focused: true },
-            { name: 'option2', type: 4, value: 42 },
+  // Mock component interaction
+  const componentInteraction: APIMessageComponentInteraction = {
+    id: 'interaction-id',
+    application_id: 'app-id',
+    type: 3, // MESSAGE_COMPONENT
+    token: 'token',
+    version: 1,
+    data: {
+      custom_id: 'button-1',
+      component_type: 2, // BUTTON
+    },
+    guild_id: 'guild-id',
+    channel_id: 'channel-id',
+    member: member,
+    app_permissions: '0',
+    locale: Locale.EnglishUS,
+    guild_locale: Locale.EnglishUS,
+    // @ts-expect-error
+    message: {
+      id: 'message-id',
+      channel_id: 'channel-id',
+      content: 'message content',
+      author: {
+        id: 'bot-id',
+        global_name: 'global-bot-name',
+        username: 'bot',
+        discriminator: '0000',
+        avatar: null,
+      },
+      attachments: [],
+      embeds: [],
+      mentions: [],
+      mention_roles: [],
+      pinned: false,
+      mention_everyone: false,
+      tts: false,
+      timestamp: '',
+      edited_timestamp: null,
+      //flags: 0,
+      components: [],
+    },
+  }
+
+  // Mock autocomplete interaction
+  // @ts-expect-error
+  const autocompleteInteraction: APIApplicationCommandAutocompleteInteraction = {
+    id: 'interaction-id',
+    application_id: 'app-id',
+    type: 4, // APPLICATION_COMMAND_AUTOCOMPLETE
+    token: 'token',
+    version: 1,
+    data: {
+      id: 'command-id',
+      name: 'test-command',
+      type: 1,
+      options: [
+        {
+          name: 'option1',
+          type: 3, // STRING
+          value: 'val',
+          focused: true,
+        },
+      ],
+    },
+    guild_id: 'guild-id',
+    channel_id: 'channel-id',
+    member: member,
+    app_permissions: '0',
+    locale: Locale.EnglishUS,
+    guild_locale: Locale.EnglishUS,
+  }
+
+  // Mock modal interaction
+  // @ts-expect-error
+  const modalInteraction: APIModalSubmitInteraction = {
+    id: 'interaction-id',
+    application_id: 'app-id',
+    type: 5, // MODAL_SUBMIT
+    token: 'token',
+    version: 1,
+    data: {
+      custom_id: 'modal-1',
+      components: [
+        {
+          type: 1,
+          components: [
+            {
+              type: 4,
+              custom_id: 'input-1',
+              value: 'input value',
+            },
           ],
         },
-        token: 'mock-token',
-      } as APIInteraction
-      const context = new InteractionContext(
-        [mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'],
-        mockInteraction,
-      ) as AutocompleteContext
-      expect(context.focused).toEqual({ name: 'option1', type: 3, value: 'value1', focused: true })
+      ],
+    },
+    guild_id: 'guild-id',
+    channel_id: 'channel-id',
+    member: member,
+    app_permissions: '0',
+    locale: Locale.EnglishUS,
+    guild_locale: Locale.EnglishUS,
+  }
+
+  it('should handle command interactions', () => {
+    const ctx = new InteractionContext<{ Variables: { option1: string } }, any>(
+      [env, executionCtx, discordEnv, key],
+      commandInteraction,
+    )
+    expect(ctx.interaction).toEqual(commandInteraction)
+    expect(ctx.get('option1')).toEqual('value1')
+  })
+
+  it('should handle subcommand interactions', () => {
+    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], subCommandInteraction)
+    expect(ctx.sub).toEqual({
+      group: 'group',
+      command: 'sub',
+      string: 'group sub',
     })
   })
 
-  describe('CronContext', () => {
-    it('should store cron event', () => {
-      const mockCronEvent = { cron: '* * * * *', type: 'cron', scheduledTime: 0 }
-      const context = new CronContext([mockEnv, mockExecutionCtx, mockDiscordEnv, 'test-key'], mockCronEvent)
-      expect(context.cronEvent).toEqual(mockCronEvent)
-    })
+  it('should handle component interactions', () => {
+    const ctx = new InteractionContext<{ Variables: { custom_id: string } }, any>(
+      [env, executionCtx, discordEnv, key],
+      componentInteraction,
+    )
+    expect(ctx.get('custom_id')).toEqual('button-1')
+  })
+
+  it('should handle autocomplete interactions', () => {
+    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], autocompleteInteraction)
+    expect(ctx.focused).toBeDefined()
+    expect(ctx.focused?.name).toEqual('option1')
+    expect(ctx.focused?.value).toEqual('val')
+  })
+
+  it('should handle modal interactions', () => {
+    const ctx = new InteractionContext<{ Variables: { custom_id: string; 'input-1': string } }, any>(
+      [env, executionCtx, discordEnv, key],
+      modalInteraction,
+    )
+    expect(ctx.get('custom_id')).toEqual('modal-1')
+    expect(ctx.get('input-1')).toEqual('input value')
+  })
+
+  it('should set flags correctly', async () => {
+    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    const response = ctx.flags('EPHEMERAL').res('Test message')
+    const body = await response.json() //JSON.parse(response.body as string)
+    expect(body.data.flags).toEqual(64) // EPHEMERAL flag value
+  })
+
+  it('should create proper response', async () => {
+    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    const response = ctx.res('Test message')
+    const body = await response.json() //JSON.parse(response.body as string)
+    expect(body.type).toEqual(4) // CHANNEL_MESSAGE_WITH_SOURCE
+    expect(body.data.content).toEqual('Test message')
+  })
+
+  it('should create defer response', async () => {
+    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    const response = ctx.resDefer()
+    const body = await response.json() //JSON.parse(response.body as string)
+    expect(body.type).toEqual(5) // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+  })
+
+  it('should create update response for components', async () => {
+    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], componentInteraction)
+    const response = ctx.update().res('Updated message')
+    const body = await response.json() //JSON.parse(response.body as string)
+    expect(body.type).toEqual(7) // UPDATE_MESSAGE
+    expect(body.data.content).toEqual('Updated message')
+  })
+
+  it('should throw error for invalid method calls', () => {
+    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    expect(() => ctx.update()).toThrow('c.***')
+  })
+
+  it('should allow followup messages', async () => {
+    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    await ctx.followup('Followup message')
+    expect(ctx.rest).toHaveBeenCalledWith(
+      'PATCH',
+      _webhooks_$_$_messages_original,
+      ['app-id', 'token'],
+      'Followup message',
+      undefined,
+    )
+  })
+
+  it('should create modal response', async () => {
+    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    const response = ctx.resModal({ title: 'Test Modal', custom_id: 'modal-test', components: [] })
+    const body = await response.json() //JSON.parse(response.body as string)
+    expect(body.type).toEqual(9) // MODAL
+    expect(body.data.title).toEqual('Test Modal')
+  })
+
+  it('should create autocomplete response', async () => {
+    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], autocompleteInteraction)
+    const response = ctx.resAutocomplete({ choices: [{ name: 'Option 1', value: 'option1' }] })
+    const body = await response.json() //JSON.parse(response.body as string)
+    expect(body.type).toEqual(8) // APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
+    expect(body.data.choices).toEqual([{ name: 'Option 1', value: 'option1' }])
+  })
+
+  it('should create activity response', async () => {
+    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    const response = ctx.resActivity()
+    const body = await response.json() //JSON.parse(response.body as string)
+    expect(body.type).toEqual(12) // LAUNCH_ACTIVITY
   })
 })
