@@ -13,13 +13,16 @@ A library for building Discord bots on Cloudflare Workers.
 - **Commit messages should explain "Why":** Each commit message should describe the reason or motivation behind the change.
 - **Code comments should clarify "Why not":** Comments should address why alternative approaches were not chosen.
 
-### TypeScript Files (.ts)
+### TypeScript
+
 - Naming Conventions:
   - Default: camelCase
   - rest-path.ts: snake_case base (e.g., _category_$_tag)
-- Test framework: Vitest
-  - `*.spec.ts` - Unit tests
-  - `*.test.ts` - Integration tests
+
+### Vitest
+
+- `*.spec.ts` - Unit tests
+- `*.test.ts` - Integration tests
 
 ### Code Style
 - Use Biome for code formatting and linting
