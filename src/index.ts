@@ -4,6 +4,7 @@ export type {
   ComponentContext,
   AutocompleteContext,
   ModalContext,
+  CronContext,
   CommandHandler,
   ComponentHandler,
   AutocompleteHandler,
@@ -12,7 +13,6 @@ export type {
 } from './types'
 export * from './discord-hono'
 export { CUSTOM_ID_SEPARATOR } from './utils'
-export { CronContext } from './context'
 export * from './rest'
 export * from './builders'
 export * from './helpers'

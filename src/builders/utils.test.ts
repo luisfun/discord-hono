@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest'
 import { CUSTOM_ID_SEPARATOR } from '../utils'
 import { Builder, ifThrowHasSemicolon, warnBuilder } from './utils'
 

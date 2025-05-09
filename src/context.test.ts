@@ -7,7 +7,7 @@ import type {
 } from 'discord-api-types/v10'
 import { Locale } from 'discord-api-types/v10'
 import { describe, expect, it, vi } from 'vitest'
-import { CronContext, InteractionContext } from './context'
+import { Context } from './context'
 import { _webhooks_$_$_messages_original, createRest } from './rest'
 import type { CommandContext, ComponentContext } from './types'
 
@@ -35,7 +35,7 @@ vi.mock('./utils', async () => {
   }
 })
 
-describe('CronContext', () => {
+describe('Context', () => {
   const env = { TEST_ENV: 'test' }
   const executionCtx = {
     waitUntil: vi.fn(),
@@ -46,28 +46,28 @@ describe('CronContext', () => {
   const key = 'test-key'
 
   it('should create a context with all properties', () => {
-    const ctx = new CronContext([env, executionCtx, discordEnv, key], cronEvent)
+    const ctx = new Context(env, executionCtx, discordEnv, key, cronEvent)
     expect(ctx.env).toEqual(env)
     expect(ctx.executionCtx).toEqual(executionCtx)
     expect(ctx.key).toEqual(key)
-    expect(ctx.cronEvent).toEqual(cronEvent)
+    expect(ctx.interaction).toEqual(cronEvent)
   })
 
   it('should handle variables', () => {
-    const ctx = new CronContext([env, executionCtx, discordEnv, key], cronEvent)
+    const ctx = new Context<{ Variables: { testVar: string } }, any>(env, executionCtx, discordEnv, key, cronEvent)
     ctx.set('testVar', 'testValue')
     expect(ctx.get('testVar')).toEqual('testValue')
     expect(ctx.var).toEqual({ testVar: 'testValue' })
   })
 
   it('should provide access to rest client', () => {
-    const ctx = new CronContext([env, executionCtx, discordEnv, key], cronEvent)
+    const ctx = new Context(env, executionCtx, discordEnv, key, cronEvent)
     expect(ctx.rest).toBeDefined()
     expect(createRest).toHaveBeenCalledWith('test-token')
   })
 })
 
-describe('InteractionContext', () => {
+describe('Context', () => {
   const env = { TEST_ENV: 'test' }
   const executionCtx = {
     waitUntil: vi.fn(),
@@ -254,8 +254,11 @@ describe('InteractionContext', () => {
   }
 
   it('should handle command interactions', () => {
-    const ctx = new InteractionContext<{ Variables: { option1: string } }, any>(
-      [env, executionCtx, discordEnv, key],
+    const ctx = new Context<{ Variables: { option1: string } }, any>(
+      env,
+      executionCtx,
+      discordEnv,
+      key,
       commandInteraction,
     )
     expect(ctx.interaction).toEqual(commandInteraction)
@@ -263,7 +266,7 @@ describe('InteractionContext', () => {
   })
 
   it('should handle subcommand interactions', () => {
-    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], subCommandInteraction)
+    const ctx = new Context(env, executionCtx, discordEnv, key, subCommandInteraction)
     expect(ctx.sub).toEqual({
       group: 'group',
       command: 'sub',
@@ -272,23 +275,29 @@ describe('InteractionContext', () => {
   })
 
   it('should handle component interactions', () => {
-    const ctx = new InteractionContext<{ Variables: { custom_id: string } }, any>(
-      [env, executionCtx, discordEnv, key],
+    const ctx = new Context<{ Variables: { custom_id: string } }, any>(
+      env,
+      executionCtx,
+      discordEnv,
+      key,
       componentInteraction,
     )
     expect(ctx.get('custom_id')).toEqual('button-1')
   })
 
   it('should handle autocomplete interactions', () => {
-    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], autocompleteInteraction)
+    const ctx = new Context(env, executionCtx, discordEnv, key, autocompleteInteraction)
     expect(ctx.focused).toBeDefined()
     expect(ctx.focused?.name).toEqual('option1')
     expect(ctx.focused?.value).toEqual('val')
   })
 
   it('should handle modal interactions', () => {
-    const ctx = new InteractionContext<{ Variables: { custom_id: string; 'input-1': string } }, any>(
-      [env, executionCtx, discordEnv, key],
+    const ctx = new Context<{ Variables: { custom_id: string; 'input-1': string } }, any>(
+      env,
+      executionCtx,
+      discordEnv,
+      key,
       modalInteraction,
     )
     expect(ctx.get('custom_id')).toEqual('modal-1')
@@ -296,14 +305,14 @@ describe('InteractionContext', () => {
   })
 
   it('should set flags correctly', async () => {
-    const ctx = new InteractionContext<any, CommandContext>([env, executionCtx, discordEnv, key], commandInteraction)
+    const ctx = new Context<any, CommandContext>(env, executionCtx, discordEnv, key, commandInteraction)
     const response = ctx.flags('EPHEMERAL').res('Test message')
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.data.flags).toEqual(64) // EPHEMERAL flag value
   })
 
   it('should create proper response', async () => {
-    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    const ctx = new Context(env, executionCtx, discordEnv, key, commandInteraction)
     const response = ctx.res('Test message')
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.type).toEqual(4) // CHANNEL_MESSAGE_WITH_SOURCE
@@ -311,17 +320,14 @@ describe('InteractionContext', () => {
   })
 
   it('should create defer response', async () => {
-    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    const ctx = new Context(env, executionCtx, discordEnv, key, commandInteraction)
     const response = ctx.resDefer()
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.type).toEqual(5) // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
   })
 
   it('should create update response for components', async () => {
-    const ctx = new InteractionContext<any, ComponentContext>(
-      [env, executionCtx, discordEnv, key],
-      componentInteraction,
-    )
+    const ctx = new Context<any, ComponentContext>(env, executionCtx, discordEnv, key, componentInteraction)
     const response = ctx.update().res('Updated message')
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.type).toEqual(7) // UPDATE_MESSAGE
@@ -329,12 +335,12 @@ describe('InteractionContext', () => {
   })
 
   it('should throw error for invalid method calls', () => {
-    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    const ctx = new Context(env, executionCtx, discordEnv, key, commandInteraction)
     expect(() => ctx.update()).toThrow('c.***')
   })
 
   it('should allow followup messages', async () => {
-    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    const ctx = new Context(env, executionCtx, discordEnv, key, commandInteraction)
     await ctx.followup('Followup message')
     expect(ctx.rest).toHaveBeenCalledWith(
       'PATCH',
@@ -346,7 +352,7 @@ describe('InteractionContext', () => {
   })
 
   it('should create modal response', async () => {
-    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    const ctx = new Context(env, executionCtx, discordEnv, key, commandInteraction)
     const response = ctx.resModal({ title: 'Test Modal', custom_id: 'modal-test', components: [] })
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.type).toEqual(9) // MODAL
@@ -354,7 +360,7 @@ describe('InteractionContext', () => {
   })
 
   it('should create autocomplete response', async () => {
-    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], autocompleteInteraction)
+    const ctx = new Context(env, executionCtx, discordEnv, key, autocompleteInteraction)
     const response = ctx.resAutocomplete({ choices: [{ name: 'Option 1', value: 'option1' }] })
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.type).toEqual(8) // APPLICATION_COMMAND_AUTOCOMPLETE_RESULT
@@ -362,9 +368,19 @@ describe('InteractionContext', () => {
   })
 
   it('should create activity response', async () => {
-    const ctx = new InteractionContext([env, executionCtx, discordEnv, key], commandInteraction)
+    const ctx = new Context(env, executionCtx, discordEnv, key, commandInteraction)
     const response = ctx.resActivity()
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.type).toEqual(12) // LAUNCH_ACTIVITY
+  })
+
+  it('should throw error when event is not found', () => {
+    const ctx = new Context(env, undefined, discordEnv, key, commandInteraction)
+    expect(() => ctx.event).toThrow('c.event: not found')
+  })
+
+  it('should throw error when executionCtx is not found', () => {
+    const ctx = new Context(env, undefined, discordEnv, key, commandInteraction)
+    expect(() => ctx.executionCtx).toThrow('c.executionCtx: not found')
   })
 })

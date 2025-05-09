@@ -18,7 +18,8 @@ import type {
   LayoutSeparator,
 } from './builders/components-v2'
 import type { Embed } from './builders/embed'
-import type { CronContext, InteractionContext } from './context'
+import type { Poll } from './builders/poll'
+import type { Context } from './context'
 
 ////////// Env //////////
 
@@ -47,24 +48,39 @@ type ComponentInteraction<T extends ComponentType> =
   APIMessageComponentInteraction
 
 export type CommandContext<E extends Env = any> = ExcludeMethods<
-  InteractionContext<E, CommandContext<E>>,
+  Context<E, CommandContext<E>>,
   'update' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: APIApplicationCommandInteraction }
 
 export type ComponentContext<E extends Env = any, T extends ComponentType = any> = ExcludeMethods<
-  InteractionContext<E & { Variables: { custom_id?: string } }, ComponentContext<E, T>>,
+  Context<E & { Variables: { custom_id?: string } }, ComponentContext<E, T>>,
   'sub' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: ComponentInteraction<T> }
 
 export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
-  InteractionContext<E, AutocompleteContext<E>>,
+  Context<E, AutocompleteContext<E>>,
   'flags' | 'res' | 'resDefer' | 'resActivity' | 'followup' | 'resModal' | 'update' | 'interaction'
 > & { interaction: APIApplicationCommandAutocompleteInteraction }
 
 export type ModalContext<E extends Env = any> = ExcludeMethods<
-  InteractionContext<E & { Variables: { custom_id?: string } }, ModalContext<E>>,
+  Context<E & { Variables: { custom_id?: string } }, ModalContext<E>>,
   'sub' | 'resModal' | 'update' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: APIModalSubmitInteraction }
+
+export type CronContext<E extends Env = any> = ExcludeMethods<
+  Context<E, CronContext<E>>,
+  | 'flags'
+  | 'res'
+  | 'resDefer'
+  | 'resActivity'
+  | 'followup'
+  | 'sub'
+  | 'resModal'
+  | 'update'
+  | 'focused'
+  | 'resAutocomplete'
+  | 'interaction'
+> & { interaction: CronEvent }
 
 ////////// Handler //////////
 
@@ -117,7 +133,7 @@ export abstract class FetchEventLike {
 ////////// InteractionData //////////
 
 export type CustomCallbackData<T extends Record<string, unknown>> =
-  | (Omit<T, 'components' | 'embeds'> & {
+  | (Omit<T, 'components' | 'embeds' | 'poll'> & {
       components?:
         | Components
         | (
@@ -131,6 +147,7 @@ export type CustomCallbackData<T extends Record<string, unknown>> =
           )[]
         | T['components']
       embeds?: (Embed | EmbedBuilder)[] | T['embeds']
+      poll?: Poll | T['poll']
     })
   | string
 

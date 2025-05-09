@@ -1,4 +1,5 @@
-import { CronContext } from './context'
+import { describe, expect, it, vi } from 'vitest'
+import { Context } from './context'
 import { DiscordHono } from './discord-hono'
 
 describe('DiscordHono', () => {
@@ -81,7 +82,7 @@ describe('DiscordHono', () => {
       app.cron('0 0 * * *', handler)
       const event = { cron: '0 0 * * *', type: '', scheduledTime: 0 }
       await app.scheduled(event, {})
-      expect(handler).toHaveBeenCalledWith(expect.any(CronContext))
+      expect(handler).toHaveBeenCalledWith(expect.any(Context))
     })
   })
 })
@@ -92,7 +93,7 @@ describe('HandlerMap', () => {
     const app = new DiscordHono().cron('', handler)
     const event = { cron: '0 0 * * *', type: '', scheduledTime: 0 }
     await app.scheduled(event, {})
-    expect(handler).toHaveBeenCalledWith(expect.any(CronContext))
+    expect(handler).toHaveBeenCalledWith(expect.any(Context))
   })
 
   it('should throw error', async () => {

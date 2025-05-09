@@ -21,6 +21,7 @@ import type {
   AutocompleteContext,
   CommandContext,
   ComponentContext,
+  CronContext,
   CronEvent,
   CustomCallbackData,
   DiscordEnv,
@@ -34,8 +35,6 @@ import { formData, newError, prepareData, toJSON } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
-type CoreConstructor<E extends Env> = [E['Bindings'], ExecutionCtx, DiscordEnv, string]
-
 // biome-ignore lint: Same definition as Hono
 type ContextVariableMap = {}
 interface SetVar<E extends Env> {
@@ -48,18 +47,79 @@ interface GetVar<E extends Env> {
 }
 type IsAny<T> = boolean extends (T extends never ? true : false) ? true : false
 
-abstract class ContextAll<E extends Env> {
+type AutocompleteOption =
+  | APIApplicationCommandInteractionDataStringOption
+  | APIApplicationCommandInteractionDataIntegerOption
+  | APIApplicationCommandInteractionDataNumberOption
+
+export class Context<
+  E extends Env,
+  This extends CommandContext | ComponentContext | AutocompleteContext | ModalContext | CronContext,
+> {
   #env: E['Bindings'] = {}
   #executionCtx: ExecutionCtx
-  #discordToken: string | undefined
+  #discord: DiscordEnv
   #key: string
   #var = new Map()
   #rest: ReturnType<typeof createRest> | undefined = undefined
-  constructor([env, executionCtx, discord, key]: CoreConstructor<E>) {
+  // interaction
+  #interaction: APIInteraction | CronEvent
+  #flags: { flags?: number } = {} // 235
+  #sub = { group: '', command: '', string: '' } // 24
+  #update = false // 3
+  #focused: AutocompleteOption | undefined // 4
+  #throwIfNotAllowType = (allowType: (APIInteraction | CronEvent)['type'][]) => {
+    if (!allowType.includes(this.#interaction.type)) throw newError('c.***', 'Invalid method')
+  }
+  constructor(
+    env: E['Bindings'],
+    executionCtx: ExecutionCtx,
+    discord: DiscordEnv,
+    key: string,
+    interaction: APIInteraction | CronEvent,
+  ) {
     this.#env = env
     this.#executionCtx = executionCtx
-    this.#discordToken = discord.TOKEN
+    this.#discord = discord
     this.#key = key
+    this.#interaction = interaction
+    switch (interaction.type) {
+      case 2:
+      case 4: {
+        let options: APIApplicationCommandInteractionDataOption[] | undefined
+        if ('options' in interaction.data) {
+          options = interaction.data.options
+          if (options?.[0].type === 2) {
+            this.#sub.group = options[0].name
+            this.#sub.string = `${options[0].name} `
+            options = options[0].options
+          }
+          if (options?.[0].type === 1) {
+            this.#sub.command = options[0].name
+            this.#sub.string += options[0].name
+            options = options[0].options
+          }
+        }
+        if (options)
+          for (const e of options) {
+            const { type } = e
+            if ((type === 3 || type === 4 || type === 10) && e.focused) this.#focused = e
+            // @ts-expect-error
+            this.set(e.name, e.value)
+          }
+        break
+      }
+      // @ts-expect-error
+      // biome-ignore lint: falling through case
+      case 5: {
+        const modalRows = interaction.data?.components
+        if (modalRows)
+          // @ts-expect-error
+          for (const row of modalRows) for (const modal of row.components) this.set(modal.custom_id, modal.value)
+      }
+      case 3:
+        ;(this as ComponentContext | ModalContext).set('custom_id', interaction.data?.custom_id)
+    }
   }
 
   /**
@@ -105,71 +165,8 @@ abstract class ContextAll<E extends Env> {
    * `c.rest` = `createRest(c.env.DISCORD_TOKEN)`
    */
   get rest(): ReturnType<typeof createRest> {
-    this.#rest ??= createRest(this.#discordToken)
+    this.#rest ??= createRest(this.#discord.TOKEN)
     return this.#rest
-  }
-}
-
-type AutocompleteOption =
-  | APIApplicationCommandInteractionDataStringOption
-  | APIApplicationCommandInteractionDataIntegerOption
-  | APIApplicationCommandInteractionDataNumberOption
-
-export class InteractionContext<
-  E extends Env,
-  This extends CommandContext | ComponentContext | AutocompleteContext | ModalContext,
-> extends ContextAll<E> {
-  #discordApplicationId: string | undefined
-  #interaction: APIInteraction
-  #flags: { flags?: number } = {} // 235
-  #sub = { group: '', command: '', string: '' } // 24
-  #update = false // 3
-  #focused: AutocompleteOption | undefined // 4
-  #throwIfNotAllowType = (allowType: APIInteraction['type'][]) => {
-    if (!allowType.includes(this.#interaction.type)) throw newError('c.***', 'Invalid method')
-  }
-  constructor(core: CoreConstructor<E>, interaction: APIInteraction) {
-    super(core)
-    this.#discordApplicationId = core[2].APPLICATION_ID
-    this.#interaction = interaction
-    switch (interaction.type) {
-      case 2:
-      case 4: {
-        let options: APIApplicationCommandInteractionDataOption[] | undefined
-        if ('options' in interaction.data) {
-          options = interaction.data.options
-          if (options?.[0].type === 2) {
-            this.#sub.group = options[0].name
-            this.#sub.string = `${options[0].name} `
-            options = options[0].options
-          }
-          if (options?.[0].type === 1) {
-            this.#sub.command = options[0].name
-            this.#sub.string += options[0].name
-            options = options[0].options
-          }
-        }
-        if (options)
-          for (const e of options) {
-            const { type } = e
-            if ((type === 3 || type === 4 || type === 10) && e.focused) this.#focused = e
-            // @ts-expect-error
-            this.set(e.name, e.value)
-          }
-        break
-      }
-      case 3:
-      case 5: {
-        // @ts-expect-error
-        this.set('custom_id', interaction.data?.custom_id)
-        if (interaction.type === 3) break
-        // case 5:
-        const modalRows = interaction.data?.components
-        if (modalRows)
-          // @ts-expect-error
-          for (const row of modalRows) for (const modal of row.components) this.set(modal.custom_id, modal.value)
-      }
-    }
   }
 
   /**
@@ -259,8 +256,8 @@ export class InteractionContext<
    */
   followup = (data?: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>, file?: FileData) => {
     this.#throwIfNotAllowType([2, 3, 5])
-    if (!this.#discordApplicationId) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
-    const pathVars: [string, string] = [this.#discordApplicationId, this.interaction.token]
+    if (!this.#discord.APPLICATION_ID) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
+    const pathVars: [string, string] = [this.#discord.APPLICATION_ID, (this.interaction as APIInteraction).token]
     if (data || file) return this.rest('PATCH', _webhooks_$_$_messages_original, pathVars, data || {}, file)
     return this.rest('DELETE', _webhooks_$_$_messages_original, pathVars)
   }
@@ -330,20 +327,5 @@ export class InteractionContext<
   resAutocomplete = (data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData) => {
     this.#throwIfNotAllowType([4])
     return Response.json({ type: 8, data: toJSON(data) } satisfies APIApplicationCommandAutocompleteResponse)
-  }
-}
-
-export class CronContext<E extends Env = any> extends ContextAll<E> {
-  #cronEvent: CronEvent
-  constructor(core: CoreConstructor<E>, event: CronEvent) {
-    super(core)
-    this.#cronEvent = event
-  }
-
-  /**
-   * Cron Event
-   */
-  get cronEvent(): CronEvent {
-    return this.#cronEvent
   }
 }

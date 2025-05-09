@@ -11,11 +11,13 @@ export const prepareData = <T extends Record<string, unknown>>(
   if (!data) return undefined
   if (typeof data === 'string') return { content: data } as unknown as T
   if (Array.isArray(data)) return data
-  const { components, embeds, ...rest } = data
+  const { components, embeds, poll, ...rest } = data
   // @ts-expect-error Finally, the type is adjusted using an 'as' clause.
   if (components) rest.components = Array.isArray(components) ? components.map(toJSON) : toJSON(components)
   // @ts-expect-error Finally, the type is adjusted using an 'as' clause.
   if (embeds) rest.embeds = embeds.map(toJSON)
+  // @ts-expect-error Finally, the type is adjusted using an 'as' clause.
+  if (poll) rest.poll = toJSON(poll)
   return rest as T
 }
 
