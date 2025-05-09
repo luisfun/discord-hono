@@ -367,4 +367,14 @@ describe('InteractionContext', () => {
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.type).toEqual(12) // LAUNCH_ACTIVITY
   })
+
+  it('should throw error when event is not found', () => {
+    const ctx = new InteractionContext([env, undefined, discordEnv, key], commandInteraction)
+    expect(() => ctx.event).toThrow('c.event: not found')
+  })
+
+  it('should throw error when executionCtx is not found', () => {
+    const ctx = new InteractionContext([env, undefined, discordEnv, key], commandInteraction)
+    expect(() => ctx.executionCtx).toThrow('c.executionCtx: not found')
+  })
 })
