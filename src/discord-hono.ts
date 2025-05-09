@@ -1,10 +1,11 @@
 import type { APIInteraction, APIInteractionResponsePong } from 'discord-api-types/v10'
-import { CronContext, InteractionContext } from './context'
+import { Context } from './context'
 import type {
   AutocompleteHandler,
   CommandHandler,
   ComponentHandler,
   ComponentType,
+  CronContext,
   CronEvent,
   CronHandler,
   DiscordEnv,
@@ -149,7 +150,7 @@ export class DiscordHono<E extends Env = Env> {
               interaction.type,
               key,
               // @ts-expect-error
-            )(new InteractionContext([env, executionCtx, discord, key], interaction))
+            )(new Context(env, executionCtx, discord, key, interaction))
         }
         return Response.json({ error: 'Unknown Type' }, { status: 400 })
       }
@@ -165,7 +166,7 @@ export class DiscordHono<E extends Env = Env> {
    */
   scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) => {
     const handler = this.#get(0, event.cron)
-    const c = new CronContext([env, executionCtx, this.#discord(env), event.cron], event)
+    const c = new Context(env, executionCtx, this.#discord(env), event.cron, event) as CronContext
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(c))
     else await handler(c)
   }
