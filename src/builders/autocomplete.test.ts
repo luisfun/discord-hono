@@ -1,4 +1,5 @@
 import type { APICommandAutocompleteInteractionResponseCallbackData } from 'discord-api-types/v10'
+import { describe, expect, it } from 'vitest'
 import { Autocomplete } from './autocomplete'
 
 describe('Autocomplete', () => {

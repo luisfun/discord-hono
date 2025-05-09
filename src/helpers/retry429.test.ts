@@ -1,3 +1,4 @@
+import { describe, expect, it, vi } from 'vitest' // 追加
 import { retry429 } from './retry429'
 
 describe('retry429', () => {

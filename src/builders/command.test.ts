@@ -5,6 +5,7 @@ import {
   InteractionContextType,
   Locale,
 } from 'discord-api-types/v10'
+import { describe, expect, it, vi } from 'vitest'
 import { Command, Option, SubCommand, SubGroup } from './command'
 
 describe('Command class', () => {

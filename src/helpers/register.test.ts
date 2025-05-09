@@ -1,4 +1,4 @@
-//import { Rest } from '../rest/rest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest/rest-path'
 import { register } from './register'
 

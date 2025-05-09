@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest'
 import { CUSTOM_ID_SEPARATOR } from '../utils'
 import { Modal, TextInput } from './modal'
 
