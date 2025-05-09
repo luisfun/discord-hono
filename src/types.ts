@@ -18,6 +18,7 @@ import type {
   LayoutSeparator,
 } from './builders/components-v2'
 import type { Embed } from './builders/embed'
+import type { Poll } from './builders/poll'
 import type { CronContext, InteractionContext } from './context'
 
 ////////// Env //////////
@@ -117,7 +118,7 @@ export abstract class FetchEventLike {
 ////////// InteractionData //////////
 
 export type CustomCallbackData<T extends Record<string, unknown>> =
-  | (Omit<T, 'components' | 'embeds'> & {
+  | (Omit<T, 'components' | 'embeds' | 'poll'> & {
       components?:
         | Components
         | (
@@ -131,6 +132,7 @@ export type CustomCallbackData<T extends Record<string, unknown>> =
           )[]
         | T['components']
       embeds?: (Embed | EmbedBuilder)[] | T['embeds']
+      poll?: Poll | T['poll']
     })
   | string
 
