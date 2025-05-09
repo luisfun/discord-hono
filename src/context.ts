@@ -110,7 +110,7 @@ export class Context<
         break
       }
       // @ts-expect-error
-      // biome-ignore lint: falling through case
+      // biome-ignore lint: case 5 extracts custom_id in the same way as case 3.
       case 5: {
         const modalRows = interaction.data?.components
         if (modalRows)
