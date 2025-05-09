@@ -21,9 +21,7 @@ A library for building Discord bots on Cloudflare Workers.
 
 ### Vitest
 
-- File Naming Conventions:
-  - `*.spec.ts` - Unit tests
-  - `*.test.ts` - Integration tests
+- File Naming Conventions: `*.test.ts`
 
 ### Code Style
 - Use Biome for code formatting and linting
