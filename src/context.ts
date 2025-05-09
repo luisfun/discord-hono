@@ -109,17 +109,16 @@ export class Context<
           }
         break
       }
-      case 3:
+      // @ts-expect-error
+      // biome-ignore lint: falling through case
       case 5: {
-        // @ts-expect-error
-        this.set('custom_id', interaction.data?.custom_id)
-        if (interaction.type === 3) break
-        // case 5:
         const modalRows = interaction.data?.components
         if (modalRows)
           // @ts-expect-error
           for (const row of modalRows) for (const modal of row.components) this.set(modal.custom_id, modal.value)
       }
+      case 3:
+        ;(this as ComponentContext | ModalContext).set('custom_id', interaction.data?.custom_id)
     }
   }
 
