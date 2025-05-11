@@ -196,14 +196,15 @@ export class Select<T extends SelectType = 'String'> extends Builder<SelectCompo
    */
   default_values = (
     // biome-ignore format: ternary operator
-    ...e: T extends 'String' ? undefined[] :
+    ...e: T extends 'String' ? never[] :
       {
         id: string
         type:
           T extends 'User' ? 'user' :
           T extends 'Role' ? 'role' :
           T extends 'Channel' ? 'channel' :
-          'user' | 'role'
+          T extends 'Mentionable' ? 'user' | 'role' :
+          never
       }[]
     // @ts-expect-error
   ) => this.#assign('default_values', ['User', 'Role', 'Channel', 'Mentionable'], { default_values: e })

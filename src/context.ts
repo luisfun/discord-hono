@@ -118,7 +118,11 @@ export class Context<
           for (const row of modalRows) for (const modal of row.components) this.set(modal.custom_id, modal.value)
       }
       case 3:
+        // with case 5
         ;(this as ComponentContext | ModalContext).set('custom_id', interaction.data?.custom_id)
+        // not case 5, select only
+        // @ts-expect-error
+        if ('values' in interaction.data) this.set(key, interaction.data.values)
     }
   }
 
