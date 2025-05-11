@@ -40,7 +40,16 @@ export class Components {
   toJSON = () => this.#components
 }
 
-type ButtonStyle = 'Primary' | 'Secondary' | 'Success' | 'Danger' | 'Link' | 'SKU'
+//type ButtonStyle = 'Primary' | 'Secondary' | 'Success' | 'Danger' | 'Link' | 'SKU'
+const buttonStyleNum = {
+  Primary: 1,
+  Secondary: 2,
+  Success: 3,
+  Danger: 4,
+  Link: 5,
+  SKU: 6,
+} as const
+type ButtonStyle = keyof typeof buttonStyleNum
 export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButtonComponent> {
   #style: ButtonStyle
   #uniqueStr = ''
@@ -62,15 +71,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
     labels: T extends 'SKU' ? '' | undefined : string | [string | APIMessageComponentEmoji, string],
     button_style: T = 'Primary' as T,
   ) {
-    const styleNum = {
-      Primary: 1,
-      Secondary: 2,
-      Success: 3,
-      Danger: 4,
-      Link: 5,
-      SKU: 6,
-    } as const
-    const style = styleNum[button_style] || 1
+    const style = buttonStyleNum[button_style] || 1
     const custom_id = str + CUSTOM_ID_SEPARATOR
     const isArrayLabels = Array.isArray(labels)
     const label: string | undefined = isArrayLabels ? labels[1] : labels
@@ -118,7 +119,16 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {string} e
    * @returns {this}
    */
-  label = (e: T extends 'SKU' ? undefined : string) => this.#assign('emoji', ['SKU'], { label: e })
+  label = (e: T extends 'SKU' ? undefined : string) => this.#assign('label', ['SKU'], { label: e })
+  /**
+   * Overwrite button style
+   *
+   * available: Primary, Secondary, Success, Danger
+   * @param {"Primary" | "Secondary" | "Success" | "Danger"} e
+   * @returns {this}
+   */
+  style = (e: Exclude<ButtonStyle, 'Link' | 'SKU'>) =>
+    this.#assign('style', ['Link', 'SKU'], { style: buttonStyleNum[e] })
 }
 
 type SelectType = 'String' | 'User' | 'Role' | 'Mentionable' | 'Channel'
