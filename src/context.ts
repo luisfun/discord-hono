@@ -309,7 +309,7 @@ export class Context<
    * ```
    */
   update = (bool = true) => {
-    this.#throwIfNotAllowType([3])
+    this.#throwIfNotAllowType([3, 5])
     this.#update = bool
     return this as unknown as This
   }

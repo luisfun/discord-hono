@@ -64,7 +64,7 @@ export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
 
 export type ModalContext<E extends Env = any> = ExcludeMethods<
   Context<E & { Variables: { custom_id?: string } }, ModalContext<E>>,
-  'sub' | 'resModal' | 'update' | 'focused' | 'resAutocomplete' | 'interaction'
+  'sub' | 'resModal' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: APIModalSubmitInteraction }
 
 export type CronContext<E extends Env = any> = ExcludeMethods<
