@@ -20,7 +20,6 @@ export abstract class Builder<Obj extends {}> {
 }
 
 export const warnBuilder = (clas: string, type: string, method: string) =>
-  // biome-ignore lint: console
   console.warn(`⚠️ ${clas}(${type}).${method} is not available`)
 
 export const ifThrowHasSemicolon = (str: string) => {
