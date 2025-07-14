@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
   "formatter": {
     "indentStyle": "space",
     "lineWidth": 120
@@ -10,13 +10,15 @@
       "quoteStyle": "single",
       "jsxQuoteStyle": "double",
       "semicolons": "asNeeded"
-    },
-    "globals": ["vi", "test", "describe", "it", "beforeEach", "afterEach", "expect"] // vitest globals
+    }
   },
-  "organizeImports": { "enabled": true },
   "linter": {
+    "domains": {
+      "project": "all",
+      "test": "all"
+    },
     "rules": {
-      "all": true,
+      "recommended": true,
       "correctness": {
         "useImportExtensions": "off" // For simple coding purposes
       },
@@ -24,20 +26,13 @@
         "noBarrelFile": "off", // For simple coding purposes
         "noReExportAll": "off" // For consistency in file separation
       },
-      "style": {
-        "noDefaultExport": "off", // using default export
-        "noNonNullAssertion": "off", // Allow Non Null
-        "useBlockStatements": "off", // For simple coding purposes
-        "useDefaultSwitchClause": "off", // For simple coding purposes
-        "useNamingConvention": "off", // To accommodate the special naming conventions
-        "useSingleCaseStatement": "off" // For simple coding purposes
-      },
       "suspicious": {
-        "noExplicitAny": "off" // Allow type any
+        "noExplicitAny": "off", // Allow type any
+        "noConsole": "warn"
       }
     }
   },
   "files": {
-    "ignore": ["coverage", "dist", "package.json"]
+    "includes": [".github/**", "src/**", "*.ts", "*.md", "*.json", "*.jsonc"]
   }
 }
