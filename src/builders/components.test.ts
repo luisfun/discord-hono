@@ -41,7 +41,6 @@ describe('Components Builder', () => {
     })
 
     it('should warn when adding more than 5 action rows', () => {
-      // biome-ignore lint: empty block
       const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
       const components = new Components()
 

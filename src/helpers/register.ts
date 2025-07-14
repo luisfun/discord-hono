@@ -31,7 +31,7 @@ export const register = async (
   if (res.ok) {
     logText = '===== ✅ Success ====='
     // biome-ignore lint: console
-    console.log(logText)
+    console.info(logText)
   } else {
     logText = `Error registering commands\n${res.url}: ${res.status} ${res.statusText}`
     try {

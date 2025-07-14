@@ -142,7 +142,6 @@ describe('Option class', () => {
   })
 
   it('warns when using incompatible methods', () => {
-    // biome-ignore lint: empty block
     const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     // @ts-expect-error
     const _option = new Option('str', 'String', 'String')
