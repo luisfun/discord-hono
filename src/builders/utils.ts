@@ -1,5 +1,9 @@
 import { CUSTOM_ID_SEPARATOR } from '../utils'
 
+export type MergeObjects<T extends object[]> = T extends [infer F, ...infer R]
+  ? F & MergeObjects<Extract<R, object[]>>
+  : {}
+
 export abstract class Builder<Obj extends {}> {
   #store: Obj
   constructor(init: Obj) {

@@ -13,7 +13,7 @@ import type {
   RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10'
 import { toJSON } from '../utils'
-import { Builder, warnBuilder } from './utils'
+import { Builder, type MergeObjects, warnBuilder } from './utils'
 
 type ExtractOptionArgs<T> = T extends Option<infer K, infer T2, infer R>
   ? {
@@ -30,8 +30,6 @@ type ExtractOptionArgs<T> = T extends Option<infer K, infer T2, infer R>
       : Partial<O>
     : never
   : never
-
-type MergeObjects<T extends object[]> = T extends [infer F, ...infer R] ? F & MergeObjects<Extract<R, object[]>> : {}
 
 type ExtractOptionsObject<T extends any[]> = MergeObjects<{
   [I in keyof T]: T[I] extends Option<any, any, any>

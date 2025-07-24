@@ -1,6 +1,6 @@
 import type { APIModalInteractionResponseCallbackData, APITextInputComponent } from 'discord-api-types/v10'
 import { CUSTOM_ID_SEPARATOR, toJSON } from '../utils'
-import { Builder, ifThrowHasSemicolon } from './utils'
+import { Builder, ifThrowHasSemicolon, type MergeObjects } from './utils'
 
 type ExtractTextInputArgs<T> = T extends TextInput<infer K, infer R>
   ? { [P in K]: string } extends infer O
@@ -9,8 +9,6 @@ type ExtractTextInputArgs<T> = T extends TextInput<infer K, infer R>
       : Partial<O>
     : never
   : never
-
-type MergeObjects<T extends object[]> = T extends [infer F, ...infer R] ? F & MergeObjects<Extract<R, object[]>> : {}
 
 type ExtractTextInputsObject<T extends any[]> = MergeObjects<{
   [I in keyof T]: T[I] extends TextInput<any, any> ? ExtractTextInputArgs<T[I]> : never
