@@ -30,13 +30,12 @@ class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
   }
 }
 
-// biome-ignore lint: Null Variables
 type Var = {}
 
 type Factory<E extends Env> = {
   discord: (init?: InitOptions<E>) => DiscordHonoExtends<E>
   command: <V extends Var>(
-    command: Command,
+    command: Command<V>,
     handler: CommandHandler<E & { Variables?: V }>,
   ) => { command: Command; handler: CommandHandler<E> }
   component: <V extends Var, C extends ComponentType>(
@@ -44,7 +43,7 @@ type Factory<E extends Env> = {
     handler: ComponentHandler<E & { Variables?: V }, C>,
   ) => { component: C; handler: ComponentHandler<E, C> }
   autocomplete: <V extends Var>(
-    command: Command,
+    command: Command<V>,
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,
     handler: CommandHandler<E & { Variables?: V }>,
   ) => { command: Command; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E> }

@@ -15,6 +15,34 @@ import type {
 import { toJSON } from '../utils'
 import { Builder, warnBuilder } from './utils'
 
+type ExtractOptionArgs<T> = T extends Option<infer K, infer T2, infer R>
+  ? {
+      [P in K]: T2 extends 'String'
+        ? string
+        : T2 extends 'Integer' | 'Number'
+          ? number
+          : T2 extends 'Boolean'
+            ? boolean
+            : string // 暫定的 contextの改変を合わせて
+    } extends infer O
+    ? R extends true
+      ? O
+      : Partial<O>
+    : never
+  : never
+
+type MergeObjects<T extends object[]> = T extends [infer F, ...infer R] ? F & MergeObjects<Extract<R, object[]>> : {}
+
+type ExtractOptionsObject<T extends any[]> = MergeObjects<{
+  [I in keyof T]: T[I] extends Option<any, any>
+    ? ExtractOptionArgs<T[I]>
+    : T[I] extends SubCommand<infer V>
+      ? V
+      : T[I] extends SubGroup<infer V>
+        ? V
+        : never
+}>
+
 abstract class CommandBase<
   Obj extends RESTPostAPIApplicationCommandsJSONBody | APIApplicationCommandOption,
 > extends Builder<Obj> {
@@ -44,7 +72,7 @@ abstract class CommandBase<
   description_localizations = (e: Partial<Record<Locale, string>>) => this.a({ description_localizations: e } as Obj)
 }
 
-export class Command extends CommandBase<RESTPostAPIApplicationCommandsJSONBody> {
+export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicationCommandsJSONBody> {
   /**
    * @param {string} e
    * @returns {this}
@@ -75,8 +103,9 @@ export class Command extends CommandBase<RESTPostAPIApplicationCommandsJSONBody>
    * @param {...(Option | APIApplicationCommandOption)} e
    * @returns {this}
    */
-  options = (...e: (Option<any> | SubGroup | SubCommand | APIApplicationCommandOption)[]) =>
-    this.a({ options: e.map(toJSON) })
+  options = <O extends (Option<any, any> | SubGroup | SubCommand | APIApplicationCommandOption)[]>(
+    ...e: O
+  ): Command<ExtractOptionsObject<O>> => this.a({ options: e.map(toJSON) })
   /**
    * @param {string | null} e
    * @returns {this}
@@ -137,7 +166,7 @@ export class Command extends CommandBase<RESTPostAPIApplicationCommandsJSONBody>
   handler = (e: EntryPointCommandHandlerType) => this.a({ handler: e })
 }
 
-export class SubGroup extends CommandBase<APIApplicationCommandSubcommandGroupOption> {
+export class SubGroup<_V extends {} = {}> extends CommandBase<APIApplicationCommandSubcommandGroupOption> {
   /**
    * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object)
    * @param {string} name 1-32 character name
@@ -151,10 +180,12 @@ export class SubGroup extends CommandBase<APIApplicationCommandSubcommandGroupOp
    * @param {...(SubCommand | APIApplicationCommandSubcommandOption)} e
    * @returns {this}
    */
-  options = (...e: (SubCommand | APIApplicationCommandSubcommandOption)[]) => this.a({ options: e.map(toJSON) })
+  options = <O extends (SubCommand | APIApplicationCommandSubcommandOption)[]>(
+    ...e: O
+  ): SubGroup<ExtractOptionsObject<O>> => this.a({ options: e.map(toJSON) })
 }
 
-export class SubCommand extends CommandBase<APIApplicationCommandSubcommandOption> {
+export class SubCommand<_V extends {} = {}> extends CommandBase<APIApplicationCommandSubcommandOption> {
   /**
    * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object)
    * @param {string} name 1-32 character name
@@ -168,7 +199,9 @@ export class SubCommand extends CommandBase<APIApplicationCommandSubcommandOptio
    * @param {...(Option | APIApplicationCommandBasicOption)} e
    * @returns {this}
    */
-  options = (...e: (Option<any> | APIApplicationCommandBasicOption)[]) => this.a({ options: e.map(toJSON) })
+  options = <O extends (Option<any, any> | APIApplicationCommandBasicOption)[]>(
+    ...e: O
+  ): SubCommand<ExtractOptionsObject<O>> => this.a({ options: e.map(toJSON) })
 }
 
 type OptionType =
@@ -181,7 +214,11 @@ type OptionType =
   | 'Role'
   | 'Mentionable'
   | 'Attachment'
-export class Option<T extends OptionType = 'String'> extends CommandBase<APIApplicationCommandBasicOption> {
+export class Option<
+  K extends string,
+  T extends OptionType = 'String',
+  _R extends boolean = false,
+> extends CommandBase<APIApplicationCommandBasicOption> {
   #type: OptionType
   #assign = (method: string, doType: OptionType[], obj: Partial<APIApplicationCommandBasicOption>) => {
     if (!doType.includes(this.#type)) {
@@ -196,7 +233,7 @@ export class Option<T extends OptionType = 'String'> extends CommandBase<APIAppl
    * @param {string} description 1-100 character description
    * @param {"String" | "Integer" | "Number" | "Boolean" | "User" | "Channel" | "Role" | "Mentionable" | "Attachment"} [option_type="String"]
    */
-  constructor(name: string, description: string, option_type: T = 'String' as T) {
+  constructor(name: K, description: string, option_type: T = 'String' as T) {
     const typeNum = {
       String: 3,
       Integer: 4,
@@ -216,7 +253,7 @@ export class Option<T extends OptionType = 'String'> extends CommandBase<APIAppl
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  required = (e = true) => this.a({ required: e })
+  required = <R extends boolean = true>(e: R = true as R): Option<K, T, R> => this.a({ required: e })
   /**
    * available: String, Integer, Number
    * @param {...APIApplicationCommandOptionChoice<string | number>} e
