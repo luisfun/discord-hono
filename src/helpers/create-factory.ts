@@ -48,7 +48,7 @@ type Factory<E extends Env> = {
     handler: CommandHandler<E & { Variables?: V }>,
   ) => { command: Command; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E> }
   modal: <V extends Var>(
-    modal: Modal,
+    modal: Modal<V>,
     handler: ModalHandler<E & { Variables?: V }>,
   ) => { modal: Modal; handler: ModalHandler<E> }
   cron: <V extends Var>(

@@ -2,7 +2,21 @@ import type { APIModalInteractionResponseCallbackData, APITextInputComponent } f
 import { CUSTOM_ID_SEPARATOR, toJSON } from '../utils'
 import { Builder, ifThrowHasSemicolon } from './utils'
 
-export class Modal {
+type ExtractTextInputArgs<T> = T extends TextInput<infer K, infer R>
+  ? { [P in K]: string } extends infer O
+    ? R extends true
+      ? O
+      : Partial<O>
+    : never
+  : never
+
+type MergeObjects<T extends object[]> = T extends [infer F, ...infer R] ? F & MergeObjects<Extract<R, object[]>> : {}
+
+type ExtractTextInputsObject<T extends any[]> = MergeObjects<{
+  [I in keyof T]: T[I] extends TextInput<any, any> ? ExtractTextInputArgs<T[I]> : never
+}>
+
+export class Modal<_V extends {} = {}> {
   #uniqueStr: string
   #data: APIModalInteractionResponseCallbackData
   /**
@@ -31,7 +45,7 @@ export class Modal {
    * @param {...(TextInput | APITextInputComponent)} e
    * @returns {this}
    */
-  row = (...e: (TextInput | APITextInputComponent)[]) => {
+  row = <O extends (TextInput<any, any> | APITextInputComponent)[]>(...e: O): Modal<ExtractTextInputsObject<O>> => {
     this.#data.components.push({
       type: 1,
       components: e.map(toJSON),
@@ -49,14 +63,14 @@ export class Modal {
   }
 }
 
-export class TextInput extends Builder<APITextInputComponent> {
+export class TextInput<K extends string, _R extends boolean = false> extends Builder<APITextInputComponent> {
   /**
    * [Text Input Structure](https://discord.com/developers/docs/interactions/message-components#text-input-object)
    * @param {string} custom_id
    * @param {string} label
    * @param {"Single" | "Multi"} [input_style="Single"]
    */
-  constructor(custom_id: string, label: string, input_style?: 'Single' | 'Multi') {
+  constructor(custom_id: K, label: string, input_style?: 'Single' | 'Multi') {
     super({ type: 4, custom_id, label, style: input_style === 'Multi' ? 2 : 1 })
   }
   /**
@@ -74,7 +88,7 @@ export class TextInput extends Builder<APITextInputComponent> {
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  required = (e = true) => this.a({ required: e })
+  required = <R extends boolean = true>(e: R = true as R): TextInput<K, R> => this.a({ required: e })
   /**
    * The pre-filled text in the text input
    * @param {string} e

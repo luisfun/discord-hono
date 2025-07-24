@@ -34,7 +34,7 @@ type ExtractOptionArgs<T> = T extends Option<infer K, infer T2, infer R>
 type MergeObjects<T extends object[]> = T extends [infer F, ...infer R] ? F & MergeObjects<Extract<R, object[]>> : {}
 
 type ExtractOptionsObject<T extends any[]> = MergeObjects<{
-  [I in keyof T]: T[I] extends Option<any, any>
+  [I in keyof T]: T[I] extends Option<any, any, any>
     ? ExtractOptionArgs<T[I]>
     : T[I] extends SubCommand<infer V>
       ? V
@@ -103,7 +103,7 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {...(Option | APIApplicationCommandOption)} e
    * @returns {this}
    */
-  options = <O extends (Option<any, any> | SubGroup | SubCommand | APIApplicationCommandOption)[]>(
+  options = <O extends (Option<any, any, any> | SubGroup | SubCommand | APIApplicationCommandOption)[]>(
     ...e: O
   ): Command<ExtractOptionsObject<O>> => this.a({ options: e.map(toJSON) })
   /**
@@ -199,7 +199,7 @@ export class SubCommand<_V extends {} = {}> extends CommandBase<APIApplicationCo
    * @param {...(Option | APIApplicationCommandBasicOption)} e
    * @returns {this}
    */
-  options = <O extends (Option<any, any> | APIApplicationCommandBasicOption)[]>(
+  options = <O extends (Option<any, any, any> | APIApplicationCommandBasicOption)[]>(
     ...e: O
   ): SubCommand<ExtractOptionsObject<O>> => this.a({ options: e.map(toJSON) })
 }
