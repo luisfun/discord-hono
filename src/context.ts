@@ -35,7 +35,6 @@ import { formData, newError, prepareData, toJSON } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
-// biome-ignore lint: Same definition as Hono
 type ContextVariableMap = {}
 interface SetVar<E extends Env> {
   <Key extends keyof ContextVariableMap>(key: Key, value: ContextVariableMap[Key]): void
