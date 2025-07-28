@@ -1,4 +1,5 @@
 import type { Command } from '../builders/command'
+import type { Select } from '../builders/components'
 import type { Modal } from '../builders/modal'
 import { DiscordHono } from '../discord-hono'
 import type {
@@ -32,13 +33,17 @@ class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
 
 type Var = {}
 
+// @ts-expect-error
+// biome-ignore lint: infer T2
+type ExtractComponentVars<T> = T extends Select<infer K, infer T2> ? { [P in K]: string[] } : {}
+
 type Factory<E extends Env> = {
   discord: (init?: InitOptions<E>) => DiscordHonoExtends<E>
   command: <V extends Var>(
     command: Command<V>,
     handler: CommandHandler<E & { Variables?: V }>,
   ) => { command: Command; handler: CommandHandler<E> }
-  component: <V extends Var, C extends ComponentType>(
+  component: <V extends ExtractComponentVars<C>, C extends ComponentType>(
     component: C,
     handler: ComponentHandler<E & { Variables?: V }, C>,
   ) => { component: C; handler: ComponentHandler<E, C> }

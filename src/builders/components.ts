@@ -24,7 +24,7 @@ export class Components {
    * @param {...(Button | Select | APIComponentInMessageActionRow)} e
    * @returns {this}
    */
-  row = (...e: (Button<any> | Select<any> | APIComponentInMessageActionRow)[]) => {
+  row = (...e: (Button<any> | Select<any, any> | APIComponentInMessageActionRow)[]) => {
     if (this.#components.length >= 5) console.warn('You can have up to 5 Action Rows per message')
     this.#components.push({
       type: 1,
@@ -137,7 +137,7 @@ type SelectComponent =
   | APIRoleSelectComponent
   | APIMentionableSelectComponent
   | APIChannelSelectComponent
-export class Select<T extends SelectType = 'String'> extends Builder<SelectComponent> {
+export class Select<K extends string, T extends SelectType = 'String'> extends Builder<SelectComponent> {
   #type: SelectType
   #uniqueStr = ''
   #assign = (method: string, doType: SelectType[], obj: Partial<SelectComponent>) => {
@@ -152,7 +152,7 @@ export class Select<T extends SelectType = 'String'> extends Builder<SelectCompo
    * @param {string} unique_id
    * @param {"String" | "User" | "Role" | "Mentionable" | "Channel"} [selectType="String"]
    */
-  constructor(unique_id: string, select_type: T = 'String' as T) {
+  constructor(unique_id: K, select_type: T = 'String' as T) {
     ifThrowHasSemicolon(unique_id)
     const typeNum = {
       String: 3,

@@ -40,11 +40,11 @@ export type DiscordEnv = {
 
 export type ExcludeMethods<T, K extends keyof T> = { [P in keyof T as P extends K ? never : P]: T[P] }
 
-export type ComponentType = Button<any> | Select<any> //'Button' | 'Select'
+export type ComponentType = Button<any> | Select<any, any> //'Button' | 'Select'
 // biome-ignore format: ternary operator
 type ComponentInteraction<T extends ComponentType> =
   T extends Button<any> ? APIMessageComponentButtonInteraction :
-  T extends Select<any> ? APIMessageComponentSelectMenuInteraction :
+  T extends Select<any, any> ? APIMessageComponentSelectMenuInteraction :
   APIMessageComponentInteraction
 
 export type CommandContext<E extends Env = any> = ExcludeMethods<
