@@ -53,7 +53,7 @@ class LayoutImpl<T extends LayoutStyle> extends Builder<LayoutComponent<T>> {
   components = (
     ...e: (
       // biome-ignore format: ternary operator
-      T extends 'Action Row' ? APIComponentInMessageActionRow | Button<any> | Select<any> :
+      T extends 'Action Row' ? APIComponentInMessageActionRow | Button<any> | Select<any, any> :
       T extends 'Section' ? APISectionComponent | ContentTextDisplay :
       T extends 'Container' ?
         | APIContainerComponent
