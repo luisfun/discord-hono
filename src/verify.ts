@@ -13,11 +13,7 @@ const hex2bin = (hex: string) => {
 
 export const verify = async (body: string, signature: string | null, timestamp: string | null, publicKey: string) => {
   if (!body || !signature || !timestamp) return false
-  const { subtle } =
-    (typeof window !== 'undefined' && window.crypto) ||
-    (typeof globalThis !== 'undefined' && globalThis.crypto) ||
-    (typeof crypto !== 'undefined' && crypto) ||
-    {}
+  const subtle: SubtleCrypto | undefined = globalThis.crypto?.subtle
   if (subtle === undefined) throw newError('verify', 'crypto')
   return await subtle.verify(
     { name: 'Ed25519' },
