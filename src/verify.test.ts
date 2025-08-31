@@ -32,7 +32,7 @@ describe('verify', () => {
       },
     })
     expect(await verify(body, signature, timestamp, publicKey)).toBe(false)
-    // subtle.verifyが呼ばれていることを確認
+    // Verify that subtle.verify was called
     expect(mockVerify).toHaveBeenCalled()
     expect(mockImportKey).toHaveBeenCalled()
   })
