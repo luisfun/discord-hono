@@ -36,10 +36,8 @@ export const newError = (locate: string, text: string) => new Error(`discord-hon
 export const queryStringify = (query: Record<string, unknown> | undefined) => {
   if (!query) return ''
   const queryMap: Record<string, string> = {}
-  for (const [key, value] of Object.entries(query)) {
-    if (value === undefined) continue
-    queryMap[key] = String(value)
-  }
+  // Simplified handling of null and undefined values
+  for (const [key, value] of Object.entries(query)) if (value != null) queryMap[key] = String(value)
   return `?${new URLSearchParams(queryMap).toString()}`
 }
 
