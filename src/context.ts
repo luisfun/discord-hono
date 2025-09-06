@@ -144,7 +144,7 @@ export class Context<
   set<Key extends keyof E['Variables']>(key: Key, value: E['Variables'][Key]): void
   set<Key extends keyof ContextVariableMap>(key: Key, value: ContextVariableMap[Key]): void
   set(key: string, value: unknown) {
-    return this.#var.set(key, value)
+    this.#var.set(key, value)
   }
   /**
    * @param {string} key
