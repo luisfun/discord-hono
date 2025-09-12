@@ -2,6 +2,7 @@ export * from './builders'
 export * from './discord-hono'
 export * from './helpers'
 export * from './rest'
+export * from './test-helpers'
 export type {
   AutocompleteContext,
   AutocompleteHandler,
