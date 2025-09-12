@@ -1,34 +1,22 @@
 // @ts-check
 
 import { DiscordHono } from 'discord-hono'
-import { bench, group, run } from 'mitata'
-import { DiscordHono as NewDiscordHono } from '../dist/index.js'
+import { bench, run } from 'mitata'
+import { Command, DiscordHono as NewDiscordHono, testCommandRequestInit, testVerifyTrue } from '../dist/index.js'
 import pkg from '../package.json' with { type: 'json' }
 
-const app = new DiscordHono()
-const newApp = new NewDiscordHono()
+const init = testCommandRequestInit(new Command('test', 'Test command'))
+const env = { DISCORD_PUBLIC_KEY: 'f'.repeat(64) }
 
-const req = new Request('http://localhost/', {
-  method: 'POST',
-  headers: {
-    'x-signature-ed25519': 'f'.repeat(128),
-    'x-signature-timestamp': '1',
-    'content-type': 'application/json',
-  },
-  body: JSON.stringify({ type: 1 }),
+bench(`discord-hono: ${pkg.devDependencies['discord-hono']}`, async () => {
+  await new DiscordHono({ verify: testVerifyTrue })
+    .command('test', c => c.res('ok'))
+    .fetch(new Request('http://localhost', init), env)
 })
-
-const env = {
-  DISCORD_PUBLIC_KEY: 'f'.repeat(64),
-}
-
-group('Benchmark discord-hono', () => {
-  bench(`discord-hono: ${pkg.devDependencies['discord-hono']}`, async () => {
-    await app.fetch(req.clone(), env)
-  })
-  bench('discord-hono: next', async () => {
-    await newApp.fetch(req.clone(), env)
-  })
+bench('discord-hono: next', async () => {
+  await new NewDiscordHono({ verify: testVerifyTrue })
+    .command('test', c => c.res('ok'))
+    .fetch(new Request('http://localhost', init), env)
 })
 
 await run()
