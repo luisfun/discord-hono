@@ -14,4 +14,4 @@ body:
     attributes:
       label: Pull Request
       options:
-        - label: I'm willing to submit a pull request for this idea
+        - label: Available and eager to create a pull request
