@@ -14,7 +14,7 @@ export const testCommandRequestBody = (command: Command | ReturnType<Command['to
 /**
  * ✅ Command Name
  * @param {Command | ReturnType<Command['toJSON']>} command
- * @returns {string}
+ * @returns {RequestInit}
  */
 export const testCommandRequestInit = (command: Command | ReturnType<Command['toJSON']>): RequestInit => ({
   method: 'POST',
