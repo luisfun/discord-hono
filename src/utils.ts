@@ -24,7 +24,10 @@ export const prepareData = <T extends Record<string, unknown>>(
 export const formData = (data?: object, file?: FileData) => {
   const body = new FormData()
   if (data && Object.keys(data).length > 0) body.append('payload_json', JSON.stringify(data))
-  if (file) (Array.isArray(file) ? file : [file]).forEach((f, i) => body.append(`files[${i}]`, f.blob, f.name))
+  if (file)
+    (Array.isArray(file) ? file : [file]).forEach((f, i) => {
+      body.append(`files[${i}]`, f.blob, f.name)
+    })
   return body
 }
 

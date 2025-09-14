@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "formatter": {
     "indentStyle": "space",
     "lineWidth": 120
@@ -41,6 +41,6 @@
     }
   },
   "files": {
-    "includes": [".github/**", "src/**", "*.ts", "*.md", "*.json", "*.jsonc"]
+    "includes": [".github/**", "src/**", "bench/**", "*.ts", "*.md", "*.json", "*.jsonc"]
   }
 }
