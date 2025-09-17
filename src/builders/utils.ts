@@ -12,7 +12,7 @@ export abstract class Builder<Obj extends {}> {
   /**
    * assign object `Object.assign(this.#store, obj)`
    */
-  protected a = (obj: Partial<Obj>) => {
+  protected a(obj: Partial<Obj>) {
     Object.assign(this.#store, obj)
     return this
   }
@@ -20,7 +20,9 @@ export abstract class Builder<Obj extends {}> {
    * export json object
    * @returns {Obj}
    */
-  toJSON = () => ({ ...this.#store })
+  toJSON() {
+    return { ...this.#store }
+  }
 }
 
 export const warnBuilder = (clas: string, type: string, method: string) =>

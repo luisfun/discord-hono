@@ -44,13 +44,15 @@ class LayoutImpl<T extends LayoutStyle> extends Builder<LayoutComponent<T>> {
    * @param {number} e
    * @returns {this}
    */
-  id = (e: number) => this.a({ id: e } as Partial<LayoutComponent<T>>)
+  id(e: number) {
+    return this.a({ id: e } as Partial<LayoutComponent<T>>)
+  }
   /**
    * required: [Action Row](https://discord.com/developers/docs/components/reference#action-row-action-row-structure), [Section](https://discord.com/developers/docs/components/reference#section-section-structure), [Container](https://discord.com/developers/docs/components/reference#container-container-structure)
    * @param e
    * @returns {this}
    */
-  components = (
+  components(
     ...e: (
       // biome-ignore format: ternary operator
       T extends 'Action Row' ? APIComponentInMessageActionRow | Button<any> | Select<any, any> :
@@ -61,47 +63,58 @@ class LayoutImpl<T extends LayoutStyle> extends Builder<LayoutComponent<T>> {
         | ContentTextDisplay | ContentMediaGallery | ContentFile :
       never
     )[]
-  ) =>
+  ) {
     // @ts-expect-error
-    this.a({ components: e.map(toJSON) })
+    return this.a({ components: e.map(toJSON) })
+  }
   /**
    * available: [Section](https://discord.com/developers/docs/components/reference#section-section-structure)
    * @param {APIButtonComponent | APIThumbnailComponent} e
    * @returns {this}
    */
-  accessory = (
+  accessory(
     e: T extends 'Section' ? APIButtonComponent | APIThumbnailComponent | Button<any> | ContentThumbnail : never,
-  ) =>
+  ) {
     // @ts-expect-error
-    this.a({ accessory: toJSON(e) })
+    return this.a({ accessory: toJSON(e) })
+  }
   /**
    * available: [Separator](https://discord.com/developers/docs/components/reference#separator-separator-structure)
    * @param {boolean} e
    * @returns {this}
    */
-  // @ts-expect-error
-  divider = (e: T extends 'Separator' ? boolean : never) => this.a({ divider: e })
+  divider(e: T extends 'Separator' ? boolean : never) {
+    // @ts-expect-error
+    return this.a({ divider: e })
+  }
   /**
    * available: [Separator](https://discord.com/developers/docs/components/reference#separator-separator-structure)
    * @param {1 | 2} e
    * @returns {this}
    */
-  // @ts-expect-error
-  spacing = (e: T extends 'Separator' ? 1 | 2 : never) => this.a({ spacing: e })
+  spacing(e: T extends 'Separator' ? 1 | 2 : never) {
+    // @ts-expect-error
+    return this.a({ spacing: e })
+  }
   /**
    * available: [Container](https://discord.com/developers/docs/components/reference#container-container-structure)
    * @param {number} e
    * @returns {this}
    */
-  // @ts-expect-error
-  accent_color = (e: T extends 'Container' ? number : never) => this.a({ accent_color: e })
+  accent_color(e: T extends 'Container' ? number : never) {
+    // @ts-expect-error
+    return this.a({ accent_color: e })
+  }
   /**
    * available: [Container](https://discord.com/developers/docs/components/reference#container-container-structure)
    * @param {boolean} [e=true] default: true
    * @returns {this}
    */
   // @ts-expect-error
-  spoiler = (e: T extends 'Container' ? boolean : never = true) => this.a({ spoiler: e })
+  spoiler(e: T extends 'Container' ? boolean : never = true) {
+    // @ts-expect-error
+    return this.a({ spoiler: e })
+  }
 }
 
 export type LayoutActionRow = ExcludeMethods<
@@ -177,21 +190,28 @@ class ContentImpl<T extends ContentStyle = 'Text Display'> extends Builder<Conte
    * @param {number} e
    * @returns {this}
    */
-  id = (e: number) => this.a({ id: e } as Partial<ContentJson<T>>)
+  id(e: number) {
+    return this.a({ id: e } as Partial<ContentJson<T>>)
+  }
   /**
    * available: [Thumbnail](https://discord.com/developers/docs/components/reference#thumbnail-thumbnail-structure)
    * @param {string} e
    * @returns {this}
    */
-  // @ts-expect-error
-  description = (e: T extends 'Thumbnail' ? string : never) => this.a({ description: e })
+  description(e: T extends 'Thumbnail' ? string : never) {
+    // @ts-expect-error
+    return this.a({ description: e })
+  }
   /**
    * available: [Thumbnail](https://discord.com/developers/docs/components/reference#thumbnail-thumbnail-structure), [File](https://discord.com/developers/docs/components/reference#file-file-structure)
    * @param {string} e
    * @returns {this}
    */
   // @ts-expect-error
-  spoiler = (e: T extends 'Thumbnail' | 'File' ? boolean : never = true) => this.a({ spoiler: e })
+  spoiler(e: T extends 'Thumbnail' | 'File' ? boolean : never = true) {
+    // @ts-expect-error
+    return this.a({ spoiler: e })
+  }
 }
 
 export type ContentTextDisplay = ExcludeMethods<ContentImpl<'Text Display'>, 'description' | 'spoiler'>
