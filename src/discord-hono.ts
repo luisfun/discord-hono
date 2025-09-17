@@ -35,7 +35,7 @@ type AnyHandler<E extends Env, N extends HandlerNumber> =
   never
 
 export class DiscordHono<E extends Env = Env> {
-  #verify: Verify = verify
+  #verify: Verify
   #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
   #map = new Map<string, AnyHandler<E, HandlerNumber>>()
   #set<N extends HandlerNumber>(num: N, key: string, value: AnyHandler<E, N>) {
@@ -52,7 +52,7 @@ export class DiscordHono<E extends Env = Env> {
    * @param {InitOptions} options
    */
   constructor(options?: InitOptions<E>) {
-    if (options?.verify) this.#verify = options.verify
+    this.#verify = options?.verify ?? verify
     this.#discord = env => {
       const discordEnv = options?.discordEnv ? options.discordEnv(env) : {}
       return {
