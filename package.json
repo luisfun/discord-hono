@@ -33,10 +33,12 @@
     "@arethetypeswrong/cli": "^0.18.2",
     "@biomejs/biome": "2.2.4",
     "@discordjs/builders": "^1.11.3",
+    "@types/node": "^24.5.1",
     "@vitest/coverage-v8": "^3.2.4",
     "discord-api-types": "^0.38.24",
     "discord-hono": "0.19.5",
     "mitata": "^1.0.34",
+    "ts-morph": "^27.0.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
