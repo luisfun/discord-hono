@@ -15,7 +15,7 @@ import type {
 import { CUSTOM_ID_SEPARATOR, newError } from '../utils'
 
 class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
-  loader = (handlers: Handler<E>[]) => {
+  loader(handlers: Handler<E>[]) {
     for (const elem of handlers) {
       if ('command' in elem) {
         if ('autocomplete' in elem) this.autocomplete(elem.command.toJSON().name, elem.autocomplete, elem.handler)
@@ -38,29 +38,29 @@ type Var = {}
 type ExtractComponentVars<T> = T extends Select<infer K, infer T2> ? { [P in K]: string[] } : {}
 
 type Factory<E extends Env> = {
-  discord: (init?: InitOptions<E>) => DiscordHonoExtends<E>
-  command: <V extends Var>(
+  discord(init?: InitOptions<E>): DiscordHonoExtends<E>
+  command<V extends Var>(
     command: Command<V>,
     handler: CommandHandler<E & { Variables?: V }>,
-  ) => { command: Command; handler: CommandHandler<E> }
-  component: <V extends ExtractComponentVars<C>, C extends ComponentType>(
+  ): { command: Command; handler: CommandHandler<E> }
+  component<V extends ExtractComponentVars<C>, C extends ComponentType>(
     component: C,
     handler: ComponentHandler<E & { Variables?: V }, C>,
-  ) => { component: C; handler: ComponentHandler<E, C> }
-  autocomplete: <V extends Var>(
+  ): { component: C; handler: ComponentHandler<E, C> }
+  autocomplete<V extends Var>(
     command: Command<V>,
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,
     handler: CommandHandler<E & { Variables?: V }>,
-  ) => { command: Command; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E> }
-  modal: <V extends Var>(
+  ): { command: Command; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E> }
+  modal<V extends Var>(
     modal: Modal<V>,
     handler: ModalHandler<E & { Variables?: V }>,
-  ) => { modal: Modal; handler: ModalHandler<E> }
-  cron: <V extends Var>(
+  ): { modal: Modal; handler: ModalHandler<E> }
+  cron<V extends Var>(
     cron: string,
     handler: CronHandler<E & { Variables?: V }>,
-  ) => { cron: string; handler: CronHandler<E> }
-  getCommands: (handlers: Handler<E>[]) => Command[]
+  ): { cron: string; handler: CronHandler<E> }
+  getCommands(handlers: Handler<E>[]): Command[]
 }
 
 type Handler<E extends Env> =
@@ -71,15 +71,29 @@ type Handler<E extends Env> =
   | ReturnType<Factory<E>['cron']>
 
 export const createFactory = <E extends Env = Env>(): Factory<E> => ({
-  discord: init => new DiscordHonoExtends<E>(init),
-  command: (command, handler) => ({ command, handler: handler as CommandHandler<E> }),
-  component: (component, handler) => ({ component, handler: handler as ComponentHandler<E, any> }),
-  autocomplete: (command, autocomplete, handler) => ({
-    command,
-    autocomplete: autocomplete as AutocompleteHandler<E>,
-    handler: handler as CommandHandler<E>,
-  }),
-  modal: (modal, handler) => ({ modal, handler: handler as ModalHandler<E> }),
-  cron: (cron, handler) => ({ cron, handler: handler as CronHandler<E> }),
-  getCommands: handlers => handlers.filter(e => 'command' in e).map(e => e.command),
+  discord(init) {
+    return new DiscordHonoExtends<E>(init)
+  },
+  command(command, handler) {
+    return { command, handler: handler as CommandHandler<E> }
+  },
+  component(component, handler) {
+    return { component, handler: handler as ComponentHandler<E, any> }
+  },
+  autocomplete(command, autocomplete, handler) {
+    return {
+      command,
+      autocomplete: autocomplete as AutocompleteHandler<E>,
+      handler: handler as CommandHandler<E>,
+    }
+  },
+  modal(modal, handler) {
+    return { modal, handler: handler as ModalHandler<E> }
+  },
+  cron(cron, handler) {
+    return { cron, handler: handler as CronHandler<E> }
+  },
+  getCommands(handlers) {
+    return handlers.filter(e => 'command' in e).map(e => e.command)
+  },
 })

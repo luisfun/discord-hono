@@ -24,7 +24,7 @@ export class Components {
    * @param {...(Button | Select | APIComponentInMessageActionRow)} e
    * @returns {this}
    */
-  row = (...e: (Button<any> | Select<any, any> | APIComponentInMessageActionRow)[]) => {
+  row(...e: (Button<any> | Select<any, any> | APIComponentInMessageActionRow)[]) {
     if (this.#components.length >= 5) console.warn('You can have up to 5 Action Rows per message')
     this.#components.push({
       type: 1,
@@ -36,7 +36,9 @@ export class Components {
    * export json object
    * @returns {Obj}
    */
-  toJSON = () => this.#components
+  toJSON() {
+    return this.#components
+  }
 }
 
 //type ButtonStyle = 'Primary' | 'Secondary' | 'Success' | 'Danger' | 'Link' | 'SKU'
@@ -52,7 +54,7 @@ type ButtonStyle = keyof typeof buttonStyleNum
 export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButtonComponent> {
   #style: ButtonStyle
   #uniqueStr = ''
-  #assign = (method: string, doNotStyle: ButtonStyle[], obj: Partial<APIButtonComponent>) => {
+  #assign(method: string, doNotStyle: ButtonStyle[], obj: Partial<APIButtonComponent>) {
     if (doNotStyle.includes(this.#style)) {
       warnBuilder('Button', this.#style, method)
       return this
@@ -96,21 +98,25 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {string | APIMessageComponentEmoji} e
    * @returns {this}
    */
-  emoji = (e: T extends 'SKU' ? undefined : string | APIMessageComponentEmoji) =>
-    this.#assign('emoji', ['SKU'], { emoji: typeof e === 'string' ? { name: e } : e })
+  emoji(e: T extends 'SKU' ? undefined : string | APIMessageComponentEmoji) {
+    return this.#assign('emoji', ['SKU'], { emoji: typeof e === 'string' ? { name: e } : e })
+  }
   /**
    * available: Primary, Secondary, Success, Danger
    * @param {string} e
    * @returns {this}
    */
-  custom_id = (e: T extends 'Link' | 'SKU' ? undefined : string) =>
-    this.#assign('custom_id', ['Link', 'SKU'], { custom_id: this.#uniqueStr + e })
+  custom_id(e: T extends 'Link' | 'SKU' ? undefined : string) {
+    return this.#assign('custom_id', ['Link', 'SKU'], { custom_id: this.#uniqueStr + e })
+  }
   /**
    * available: ALL
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  disabled = (e = true) => this.a({ disabled: e })
+  disabled(e = true) {
+    return this.a({ disabled: e })
+  }
   /**
    * Overwrite label
    *
@@ -118,7 +124,9 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {string} e
    * @returns {this}
    */
-  label = (e: T extends 'SKU' ? undefined : string) => this.#assign('label', ['SKU'], { label: e })
+  label(e: T extends 'SKU' ? undefined : string) {
+    return this.#assign('label', ['SKU'], { label: e })
+  }
   /**
    * Overwrite button style
    *
@@ -126,8 +134,9 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {"Primary" | "Secondary" | "Success" | "Danger"} e
    * @returns {this}
    */
-  style = (e: Exclude<ButtonStyle, 'Link' | 'SKU'>) =>
-    this.#assign('style', ['Link', 'SKU'], { style: buttonStyleNum[e] })
+  style(e: Exclude<ButtonStyle, 'Link' | 'SKU'>) {
+    return this.#assign('style', ['Link', 'SKU'], { style: buttonStyleNum[e] })
+  }
 }
 
 type SelectType = 'String' | 'User' | 'Role' | 'Mentionable' | 'Channel'
@@ -140,7 +149,7 @@ type SelectComponent =
 export class Select<K extends string, T extends SelectType = 'String'> extends Builder<SelectComponent> {
   #type: SelectType
   #uniqueStr = ''
-  #assign = (method: string, doType: SelectType[], obj: Partial<SelectComponent>) => {
+  #assign(method: string, doType: SelectType[], obj: Partial<SelectComponent>) {
     if (!doType.includes(this.#type)) {
       warnBuilder('Select', this.#type, method)
       return this
@@ -171,7 +180,9 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {string} e
    * @returns {this}
    */
-  custom_id = (e: string) => this.a({ custom_id: this.#uniqueStr + e })
+  custom_id(e: string) {
+    return this.a({ custom_id: this.#uniqueStr + e })
+  }
   /**
    * required: String
    *
@@ -179,8 +190,9 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {APISelectMenuOption} e
    * @returns {this}
    */
-  options = (...e: T extends 'String' ? APISelectMenuOption[] : undefined[]) =>
-    this.#assign('options', ['String'], { options: e as APISelectMenuOption[] })
+  options(...e: T extends 'String' ? APISelectMenuOption[] : undefined[]) {
+    return this.#assign('options', ['String'], { options: e as APISelectMenuOption[] })
+  }
   /**
    * available: Channel
    *
@@ -188,14 +200,17 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {...ChannelType} e
    * @returns {this}
    */
-  channel_types = (...e: T extends 'Channel' ? ChannelType[] : undefined[]) =>
-    this.#assign('channel_types', ['Channel'], { channel_types: e as ChannelType[] })
+  channel_types(...e: T extends 'Channel' ? ChannelType[] : undefined[]) {
+    return this.#assign('channel_types', ['Channel'], { channel_types: e as ChannelType[] })
+  }
   /**
    * Custom placeholder text if nothing is selected, max 150 characters
    * @param {string} e
    * @returns {this}
    */
-  placeholder = (e: string) => this.a({ placeholder: e })
+  placeholder(e: string) {
+    return this.a({ placeholder: e })
+  }
   /**
    * available: User, Role, Channel, Mentionable
    *
@@ -203,7 +218,7 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {...{ id: string, type: "user" | "role" | "channel" }} e
    * @returns {this}
    */
-  default_values = (
+  default_values(
     // biome-ignore format: ternary operator
     ...e: T extends 'String' ? never[] :
       {
@@ -215,24 +230,32 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
           T extends 'Mentionable' ? 'user' | 'role' :
           never
       }[]
+  ) {
     // @ts-expect-error
-  ) => this.#assign('default_values', ['User', 'Role', 'Channel', 'Mentionable'], { default_values: e })
+    return this.#assign('default_values', ['User', 'Role', 'Channel', 'Mentionable'], { default_values: e })
+  }
   /**
    * The minimum number of items that must be chosen; min 0, max 25
    * @param {number} [e=1]
    * @returns {this}
    */
-  min_values = (e = 1) => this.a({ min_values: e })
+  min_values(e = 1) {
+    return this.a({ min_values: e })
+  }
   /**
    * The maximum number of items that can be chosen; max 25
    * @param {number} [e=1]
    * @returns {this}
    */
-  max_values = (e = 1) => this.a({ max_values: e })
+  max_values(e = 1) {
+    return this.a({ max_values: e })
+  }
   /**
    * Disable the select
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  disabled = (e = true) => this.a({ disabled: e })
+  disabled(e = true) {
+    return this.a({ disabled: e })
+  }
 }

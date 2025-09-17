@@ -59,7 +59,9 @@ abstract class CommandBase<
    * @param {Partial<Record<Locale, string>>} e
    * @returns {this}
    */
-  name_localizations = (e: Partial<Record<Locale, string>>) => this.a({ name_localizations: e } as Obj)
+  name_localizations(e: Partial<Record<Locale, string>>) {
+    return this.a({ name_localizations: e } as Obj)
+  }
   /**
    * [Locale](https://discord.com/developers/docs/reference#locales)
    *
@@ -67,7 +69,9 @@ abstract class CommandBase<
    * @param {Partial<Record<Locale, string>>} e
    * @returns {this}
    */
-  description_localizations = (e: Partial<Record<Locale, string>>) => this.a({ description_localizations: e } as Obj)
+  description_localizations(e: Partial<Record<Locale, string>>) {
+    return this.a({ description_localizations: e } as Obj)
+  }
 }
 
 export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicationCommandsJSONBody> {
@@ -75,46 +79,60 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {string} e
    * @returns {this}
    */
-  // @ts-expect-error ??? why
-  id = (e: string) => this.a({ id: e })
+  id(e: string) {
+    // @ts-expect-error
+    return this.a({ id: e })
+  }
   /**
    * [Application Command Types](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types)
    * @param {ApplicationCommandType} e
    * @returns {this}
    */
-  type = (e: ApplicationCommandType) => this.a({ type: e })
+  type(e: ApplicationCommandType) {
+    return this.a({ type: e })
+  }
   /**
    * @param {string} e
    * @returns {this}
    */
-  // @ts-expect-error ??? why
-  application_id = (e: string) => this.a({ application_id: e })
+  application_id(e: string) {
+    // @ts-expect-error
+    return this.a({ application_id: e })
+  }
   /**
    * Guild id of the command, if not global
    * @param {string} e
    * @returns {this}
    */
-  // @ts-expect-error ??? why
-  guild_id = (e: string) => this.a({ guild_id: e })
+  guild_id(e: string) {
+    // @ts-expect-error
+    return this.a({ guild_id: e })
+  }
   /**
    * Valid Types: 1:CHAT_INPUT
    * @param {...(Option | APIApplicationCommandOption)} e
    * @returns {this}
    */
-  options = <O extends (Option<any, any, any> | SubGroup | SubCommand | APIApplicationCommandOption)[]>(
+  options<O extends (Option<any, any, any> | SubGroup | SubCommand | APIApplicationCommandOption)[]>(
     ...e: O
-  ): Command<ExtractOptionsObject<O>> => this.a({ options: e.map(toJSON) })
+  ): Command<ExtractOptionsObject<O>> {
+    return this.a({ options: e.map(toJSON) })
+  }
   /**
    * @param {string | null} e
    * @returns {this}
    */
-  default_member_permissions = (e: string | null) => this.a({ default_member_permissions: e })
+  default_member_permissions(e: string | null) {
+    return this.a({ default_member_permissions: e })
+  }
   /**
    * @deprecated Use `contexts` instead
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  dm_permission = (e = true) => this.a({ dm_permission: e })
+  dm_permission(e = true) {
+    return this.a({ dm_permission: e })
+  }
   /**
    * Whether the command is enabled by default when the app is added to a guild
    *
@@ -123,13 +141,17 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  default_permission = (e = true) => this.a({ default_permission: e })
+  default_permission(e = true) {
+    return this.a({ default_permission: e })
+  }
   /**
    * Indicates whether the command is age-restricted
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  nsfw = (e = true) => this.a({ nsfw: e })
+  nsfw(e = true) {
+    return this.a({ nsfw: e })
+  }
   /**
    * [Application Integration Types](https://discord.com/developers/docs/resources/application#application-object-application-integration-types)
    *
@@ -138,7 +160,9 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {...ApplicationIntegrationType} e
    * @returns {this}
    */
-  integration_types = (...e: ApplicationIntegrationType[]) => this.a({ integration_types: e })
+  integration_types(...e: ApplicationIntegrationType[]) {
+    return this.a({ integration_types: e })
+  }
   /**
    * [Interaction Context Types](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-context-types)
    *
@@ -147,13 +171,17 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {...InteractionContextType} e
    * @returns {this}
    */
-  contexts = (...e: InteractionContextType[]) => this.a({ contexts: e })
+  contexts(...e: InteractionContextType[]) {
+    return this.a({ contexts: e })
+  }
   /**
    * @param {string} e
    * @returns {this}
    */
-  // @ts-expect-error ??? why
-  version = (e: string) => this.a({ version: e })
+  version(e: string) {
+    // @ts-expect-error
+    return this.a({ version: e })
+  }
   /**
    * Valid Types: 4:PRIMARY_ENTRY_POINT
    *
@@ -161,7 +189,9 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param e
    * @returns
    */
-  handler = (e: EntryPointCommandHandlerType) => this.a({ handler: e })
+  handler(e: EntryPointCommandHandlerType) {
+    return this.a({ handler: e })
+  }
 }
 
 export class SubGroup<_V extends {} = {}> extends CommandBase<APIApplicationCommandSubcommandGroupOption> {
@@ -178,9 +208,11 @@ export class SubGroup<_V extends {} = {}> extends CommandBase<APIApplicationComm
    * @param {...(SubCommand | APIApplicationCommandSubcommandOption)} e
    * @returns {this}
    */
-  options = <O extends (SubCommand | APIApplicationCommandSubcommandOption)[]>(
+  options<O extends (SubCommand | APIApplicationCommandSubcommandOption)[]>(
     ...e: O
-  ): SubGroup<ExtractOptionsObject<O>> => this.a({ options: e.map(toJSON) })
+  ): SubGroup<ExtractOptionsObject<O>> {
+    return this.a({ options: e.map(toJSON) })
+  }
 }
 
 export class SubCommand<_V extends {} = {}> extends CommandBase<APIApplicationCommandSubcommandOption> {
@@ -197,9 +229,11 @@ export class SubCommand<_V extends {} = {}> extends CommandBase<APIApplicationCo
    * @param {...(Option | APIApplicationCommandBasicOption)} e
    * @returns {this}
    */
-  options = <O extends (Option<any, any, any> | APIApplicationCommandBasicOption)[]>(
+  options<O extends (Option<any, any, any> | APIApplicationCommandBasicOption)[]>(
     ...e: O
-  ): SubCommand<ExtractOptionsObject<O>> => this.a({ options: e.map(toJSON) })
+  ): SubCommand<ExtractOptionsObject<O>> {
+    return this.a({ options: e.map(toJSON) })
+  }
 }
 
 type OptionType =
@@ -218,7 +252,7 @@ export class Option<
   _R extends boolean = false,
 > extends CommandBase<APIApplicationCommandBasicOption> {
   #type: OptionType
-  #assign = (method: string, doType: OptionType[], obj: Partial<APIApplicationCommandBasicOption>) => {
+  #assign(method: string, doType: OptionType[], obj: Partial<APIApplicationCommandBasicOption>) {
     if (!doType.includes(this.#type)) {
       warnBuilder('Option', this.#type, method)
       return this
@@ -251,20 +285,25 @@ export class Option<
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  required = <R extends boolean = true>(e: R = true as R): Option<K, T, R> => this.a({ required: e })
+  required<R extends boolean = true>(e: R = true as R): Option<K, T, R> {
+    return this.a({ required: e })
+  }
   /**
    * available: String, Integer, Number
    * @param {...APIApplicationCommandOptionChoice<string | number>} e
    * @returns {this}
    */
-  choices = (
+  choices(
     // biome-ignore format: ternary operator
     ...e:
       T extends 'String' ? APIApplicationCommandOptionChoice<string>[] :
       T extends 'Integer' | 'Number' ? APIApplicationCommandOptionChoice<number>[] :
       undefined[]
-  ) =>
-    this.#assign('choices', ['String', 'Integer', 'Number'], { choices: e as APIApplicationCommandOptionChoice<any>[] })
+  ) {
+    return this.#assign('choices', ['String', 'Integer', 'Number'], {
+      choices: e as APIApplicationCommandOptionChoice<any>[],
+    })
+  }
   /**
    * available: Channel
    *
@@ -272,40 +311,48 @@ export class Option<
    * @param {...ChannelType} e
    * @returns {this}
    */
-  channel_types = (...e: T extends 'Channel' ? ChannelType[] : undefined[]) =>
+  channel_types(...e: T extends 'Channel' ? ChannelType[] : undefined[]) {
     // @ts-expect-error
-    this.#assign('channel_types', ['Channel'], { channel_types: e as ChannelType[] })
+    return this.#assign('channel_types', ['Channel'], { channel_types: e as ChannelType[] })
+  }
   /**
    * available: Integer, Number
    * @param e
    * @returns {this}
    */
-  min_value = (e: T extends 'Integer' | 'Number' ? number : undefined) =>
-    this.#assign('min_value', ['Integer', 'Number'], { min_value: e })
+  min_value(e: T extends 'Integer' | 'Number' ? number : undefined) {
+    return this.#assign('min_value', ['Integer', 'Number'], { min_value: e })
+  }
   /**
    * available: Integer, Number
    * @param e
    * @returns {this}
    */
-  max_value = (e: T extends 'Integer' | 'Number' ? number : undefined) =>
-    this.#assign('max_value', ['Integer', 'Number'], { max_value: e })
+  max_value(e: T extends 'Integer' | 'Number' ? number : undefined) {
+    return this.#assign('max_value', ['Integer', 'Number'], { max_value: e })
+  }
   /**
    * available: String
    * @param e 0 - 6000
    * @returns {this}
    */
-  min_length = (e: T extends 'String' ? number : undefined) => this.#assign('min_length', ['String'], { min_length: e })
+  min_length(e: T extends 'String' ? number : undefined) {
+    return this.#assign('min_length', ['String'], { min_length: e })
+  }
   /**
    * available: String
    * @param e 1 - 6000
    * @returns {this}
    */
-  max_length = (e: T extends 'String' ? number : undefined) => this.#assign('max_length', ['String'], { max_length: e })
+  max_length(e: T extends 'String' ? number : undefined) {
+    return this.#assign('max_length', ['String'], { max_length: e })
+  }
   /**
    * available: String, Integer, Number
    * @param e default: true
    * @returns {this}
    */
-  autocomplete = (e?: T extends 'String' | 'Integer' | 'Number' ? boolean : undefined) =>
-    this.#assign('autocomplete', ['String', 'Integer', 'Number'], { autocomplete: e !== false })
+  autocomplete(e?: T extends 'String' | 'Integer' | 'Number' ? boolean : undefined) {
+    return this.#assign('autocomplete', ['String', 'Integer', 'Number'], { autocomplete: e !== false })
+  }
 }

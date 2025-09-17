@@ -47,7 +47,7 @@ export class Context<
   E extends Env,
   This extends CommandContext | ComponentContext | AutocompleteContext | ModalContext | CronContext,
 > {
-  #env: E['Bindings'] = {}
+  #env: E['Bindings']
   #executionCtx: ExecutionCtx
   #discord: DiscordEnv
   #key: string
@@ -143,7 +143,7 @@ export class Context<
    */
   set<Key extends keyof E['Variables']>(key: Key, value: E['Variables'][Key]): void
   set<Key extends keyof ContextVariableMap>(key: Key, value: ContextVariableMap[Key]): void
-  set(key: string, value: unknown) {
+  set(key: string, value: unknown): void {
     this.#var.set(key, value)
   }
   /**
@@ -152,7 +152,7 @@ export class Context<
    */
   get<Key extends keyof E['Variables']>(key: Key): E['Variables'][Key]
   get<Key extends keyof ContextVariableMap>(key: Key): ContextVariableMap[Key]
-  get(key: string) {
+  get(key: string): unknown {
     return this.#var.get(key)
   }
   /**

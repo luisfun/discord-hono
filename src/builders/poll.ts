@@ -17,29 +17,39 @@ export class Poll extends Builder<RESTAPIPoll> {
    * @param {string} question
    * @returns {this}
    */
-  question = (question: string) => this.a({ question: { text: question } })
+  question(question: string) {
+    return this.a({ question: { text: question } })
+  }
   /**
    * overwrite answers
    * @param {string | [string | APIPartialEmoji, string]} answers
    * @returns {this}
    */
-  answers = (...answers: (string | [string | APIPartialEmoji, string])[]) => this.a({ answers: answersRemap(answers) })
+  answers(...answers: (string | [string | APIPartialEmoji, string])[]) {
+    return this.a({ answers: answersRemap(answers) })
+  }
   /**
    * Number of hours the poll should be open for, up to 32 days. Defaults to 24
    * @param {number} duration
    * @returns {this}
    */
-  duration = (duration = 24) => this.a({ duration })
+  duration(duration = 24) {
+    return this.a({ duration })
+  }
   /**
    * Whether a user can select multiple answers.
    * @param {boolean} allow_multiselect
    * @returns {this}
    */
-  allow_multiselect = (allow_multiselect = true) => this.a({ allow_multiselect })
+  allow_multiselect(allow_multiselect = true) {
+    return this.a({ allow_multiselect })
+  }
   /**
    * https://discord.com/developers/docs/resources/poll#layout-type
    * @param {number} layout_type
    * @returns {this}
    */
-  layout_type = (layout_type: number) => this.a({ layout_type })
+  layout_type(layout_type: number) {
+    return this.a({ layout_type })
+  }
 }

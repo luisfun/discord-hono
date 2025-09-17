@@ -30,12 +30,14 @@ export class Modal<_V extends {} = {}> {
    * export json data
    * @returns {APIModalInteractionResponseCallbackData}
    */
-  toJSON = () => this.#data
+  toJSON() {
+    return this.#data
+  }
   /**
    * @param {string} e
    * @returns {this}
    */
-  custom_id = (e: string) => {
+  custom_id(e: string) {
     this.#data.custom_id = this.#uniqueStr + e
     return this
   }
@@ -43,7 +45,7 @@ export class Modal<_V extends {} = {}> {
    * @param {...(TextInput | APITextInputComponent)} e
    * @returns {this}
    */
-  row = <O extends (TextInput<any, any> | APITextInputComponent)[]>(...e: O): Modal<ExtractTextInputsObject<O>> => {
+  row<O extends (TextInput<any, any> | APITextInputComponent)[]>(...e: O): Modal<ExtractTextInputsObject<O>> {
     this.#data.components.push({
       type: 1,
       components: e.map(toJSON),
@@ -55,7 +57,7 @@ export class Modal<_V extends {} = {}> {
    * @param {string} e
    * @returns {this}
    */
-  title = (e: string) => {
+  title(e: string) {
     this.#data.title = e
     return this
   }
@@ -75,27 +77,37 @@ export class TextInput<K extends string, _R extends boolean = false> extends Bui
    * @param {number} e
    * @returns {this}
    */
-  min_length = (e: number) => this.a({ min_length: e })
+  min_length(e: number) {
+    return this.a({ min_length: e })
+  }
   /**
    * @param {number} e
    * @returns {this}
    */
-  max_length = (e: number) => this.a({ max_length: e })
+  max_length(e: number) {
+    return this.a({ max_length: e })
+  }
   /**
    * Whether or not this text input is required or not
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  required = <R extends boolean = true>(e: R = true as R): TextInput<K, R> => this.a({ required: e })
+  required<R extends boolean = true>(e: R = true as R): TextInput<K, R> {
+    return this.a({ required: e })
+  }
   /**
    * The pre-filled text in the text input
    * @param {string} e
    * @returns {this}
    */
-  value = (e: string) => this.a({ value: e })
+  value(e: string) {
+    return this.a({ value: e })
+  }
   /**
    * @param {string} e
    * @returns {this}
    */
-  placeholder = (e: string) => this.a({ placeholder: e })
+  placeholder(e: string) {
+    return this.a({ placeholder: e })
+  }
 }
