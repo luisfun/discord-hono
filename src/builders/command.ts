@@ -59,7 +59,7 @@ abstract class CommandBase<
    * @param {Partial<Record<Locale, string>>} e
    * @returns {this}
    */
-  name_localizations(e: Partial<Record<Locale, string>>) {
+  name_localizations(e: Partial<Record<Locale, string>>): this {
     return this.a({ name_localizations: e } as Obj)
   }
   /**
@@ -69,7 +69,7 @@ abstract class CommandBase<
    * @param {Partial<Record<Locale, string>>} e
    * @returns {this}
    */
-  description_localizations(e: Partial<Record<Locale, string>>) {
+  description_localizations(e: Partial<Record<Locale, string>>): this {
     return this.a({ description_localizations: e } as Obj)
   }
 }
@@ -79,7 +79,7 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {string} e
    * @returns {this}
    */
-  id(e: string) {
+  id(e: string): this {
     // @ts-expect-error
     return this.a({ id: e })
   }
@@ -88,14 +88,14 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {ApplicationCommandType} e
    * @returns {this}
    */
-  type(e: ApplicationCommandType) {
+  type(e: ApplicationCommandType): this {
     return this.a({ type: e })
   }
   /**
    * @param {string} e
    * @returns {this}
    */
-  application_id(e: string) {
+  application_id(e: string): this {
     // @ts-expect-error
     return this.a({ application_id: e })
   }
@@ -104,7 +104,7 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {string} e
    * @returns {this}
    */
-  guild_id(e: string) {
+  guild_id(e: string): this {
     // @ts-expect-error
     return this.a({ guild_id: e })
   }
@@ -122,7 +122,7 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {string | null} e
    * @returns {this}
    */
-  default_member_permissions(e: string | null) {
+  default_member_permissions(e: string | null): this {
     return this.a({ default_member_permissions: e })
   }
   /**
@@ -130,7 +130,7 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  dm_permission(e = true) {
+  dm_permission(e = true): this {
     return this.a({ dm_permission: e })
   }
   /**
@@ -141,7 +141,7 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  default_permission(e = true) {
+  default_permission(e = true): this {
     return this.a({ default_permission: e })
   }
   /**
@@ -149,7 +149,7 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  nsfw(e = true) {
+  nsfw(e = true): this {
     return this.a({ nsfw: e })
   }
   /**
@@ -160,7 +160,7 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {...ApplicationIntegrationType} e
    * @returns {this}
    */
-  integration_types(...e: ApplicationIntegrationType[]) {
+  integration_types(...e: ApplicationIntegrationType[]): this {
     return this.a({ integration_types: e })
   }
   /**
@@ -171,14 +171,14 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {...InteractionContextType} e
    * @returns {this}
    */
-  contexts(...e: InteractionContextType[]) {
+  contexts(...e: InteractionContextType[]): this {
     return this.a({ contexts: e })
   }
   /**
    * @param {string} e
    * @returns {this}
    */
-  version(e: string) {
+  version(e: string): this {
     // @ts-expect-error
     return this.a({ version: e })
   }
@@ -189,7 +189,7 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param e
    * @returns
    */
-  handler(e: EntryPointCommandHandlerType) {
+  handler(e: EntryPointCommandHandlerType): this {
     return this.a({ handler: e })
   }
 }
@@ -252,7 +252,7 @@ export class Option<
   _R extends boolean = false,
 > extends CommandBase<APIApplicationCommandBasicOption> {
   #type: OptionType
-  #assign(method: string, doType: OptionType[], obj: Partial<APIApplicationCommandBasicOption>) {
+  #assign(method: string, doType: OptionType[], obj: Partial<APIApplicationCommandBasicOption>): this {
     if (!doType.includes(this.#type)) {
       warnBuilder('Option', this.#type, method)
       return this
@@ -299,7 +299,7 @@ export class Option<
       T extends 'String' ? APIApplicationCommandOptionChoice<string>[] :
       T extends 'Integer' | 'Number' ? APIApplicationCommandOptionChoice<number>[] :
       undefined[]
-  ) {
+  ): this {
     return this.#assign('choices', ['String', 'Integer', 'Number'], {
       choices: e as APIApplicationCommandOptionChoice<any>[],
     })
@@ -311,7 +311,7 @@ export class Option<
    * @param {...ChannelType} e
    * @returns {this}
    */
-  channel_types(...e: T extends 'Channel' ? ChannelType[] : undefined[]) {
+  channel_types(...e: T extends 'Channel' ? ChannelType[] : undefined[]): this {
     // @ts-expect-error
     return this.#assign('channel_types', ['Channel'], { channel_types: e as ChannelType[] })
   }
@@ -320,7 +320,7 @@ export class Option<
    * @param e
    * @returns {this}
    */
-  min_value(e: T extends 'Integer' | 'Number' ? number : undefined) {
+  min_value(e: T extends 'Integer' | 'Number' ? number : undefined): this {
     return this.#assign('min_value', ['Integer', 'Number'], { min_value: e })
   }
   /**
@@ -328,7 +328,7 @@ export class Option<
    * @param e
    * @returns {this}
    */
-  max_value(e: T extends 'Integer' | 'Number' ? number : undefined) {
+  max_value(e: T extends 'Integer' | 'Number' ? number : undefined): this {
     return this.#assign('max_value', ['Integer', 'Number'], { max_value: e })
   }
   /**
@@ -336,7 +336,7 @@ export class Option<
    * @param e 0 - 6000
    * @returns {this}
    */
-  min_length(e: T extends 'String' ? number : undefined) {
+  min_length(e: T extends 'String' ? number : undefined): this {
     return this.#assign('min_length', ['String'], { min_length: e })
   }
   /**
@@ -344,7 +344,7 @@ export class Option<
    * @param e 1 - 6000
    * @returns {this}
    */
-  max_length(e: T extends 'String' ? number : undefined) {
+  max_length(e: T extends 'String' ? number : undefined): this {
     return this.#assign('max_length', ['String'], { max_length: e })
   }
   /**
@@ -352,7 +352,7 @@ export class Option<
    * @param e default: true
    * @returns {this}
    */
-  autocomplete(e?: T extends 'String' | 'Integer' | 'Number' ? boolean : undefined) {
+  autocomplete(e?: T extends 'String' | 'Integer' | 'Number' ? boolean : undefined): this {
     return this.#assign('autocomplete', ['String', 'Integer', 'Number'], { autocomplete: e !== false })
   }
 }

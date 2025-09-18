@@ -12,7 +12,7 @@ export class Embed extends Builder<APIEmbed> {
    * @param {string} e Length limit: 256 characters
    * @returns {this}
    */
-  title(e: string) {
+  title(e: string): this {
     return this.a({ title: e })
   }
   /**
@@ -20,35 +20,35 @@ export class Embed extends Builder<APIEmbed> {
    * @param {EmbedType} e
    * @returns {this}
    */
-  type(e: EmbedType) {
+  type(e: EmbedType): this {
     return this.a({ type: e })
   }
   /**
    * @param {string} e Length limit: 4096 characters
    * @returns {this}
    */
-  description(e: string) {
+  description(e: string): this {
     return this.a({ description: e })
   }
   /**
    * @param {string} e
    * @returns {this}
    */
-  url(e: string) {
+  url(e: string): this {
     return this.a({ url: e })
   }
   /**
    * @param {string} e ISO8601 timestamp
    * @returns {this}
    */
-  timestamp(e: string) {
+  timestamp(e: string): this {
     return this.a({ timestamp: e })
   }
   /**
    * @param {number} e
    * @returns {this}
    */
-  color(e: number) {
+  color(e: number): this {
     return this.a({ color: e })
   }
   /**
@@ -56,7 +56,7 @@ export class Embed extends Builder<APIEmbed> {
    * @param {APIEmbed["footer"]} e
    * @returns {this}
    */
-  footer(e: APIEmbed['footer']) {
+  footer(e: APIEmbed['footer']): this {
     return this.a({ footer: e })
   }
   /**
@@ -64,7 +64,7 @@ export class Embed extends Builder<APIEmbed> {
    * @param {APIEmbed["image"]} e
    * @returns {this}
    */
-  image(e: APIEmbed['image']) {
+  image(e: APIEmbed['image']): this {
     return this.a({ image: e })
   }
   /**
@@ -72,7 +72,7 @@ export class Embed extends Builder<APIEmbed> {
    * @param {APIEmbed["thumbnail"]} e
    * @returns {this}
    */
-  thumbnail(e: APIEmbed['thumbnail']) {
+  thumbnail(e: APIEmbed['thumbnail']): this {
     return this.a({ thumbnail: e })
   }
   /**
@@ -80,7 +80,7 @@ export class Embed extends Builder<APIEmbed> {
    * @param {APIEmbed["video"]} e
    * @returns {this}
    */
-  video(e: APIEmbed['video']) {
+  video(e: APIEmbed['video']): this {
     return this.a({ video: e })
   }
   /**
@@ -88,7 +88,7 @@ export class Embed extends Builder<APIEmbed> {
    * @param {APIEmbed["provider"]} e
    * @returns {this}
    */
-  provider(e: APIEmbed['provider']) {
+  provider(e: APIEmbed['provider']): this {
     return this.a({ provider: e })
   }
   /**
@@ -96,7 +96,7 @@ export class Embed extends Builder<APIEmbed> {
    * @param {APIEmbed["author"]} e
    * @returns {this}
    */
-  author(e: APIEmbed['author']) {
+  author(e: APIEmbed['author']): this {
     return this.a({ author: e })
   }
   /**
@@ -104,7 +104,7 @@ export class Embed extends Builder<APIEmbed> {
    * @param {...APIEmbedField} e Length limit: 25 field objects
    * @returns {this}
    */
-  fields(...e: APIEmbedField[]) {
+  fields(...e: APIEmbedField[]): this {
     return this.a({ fields: e })
   }
 }

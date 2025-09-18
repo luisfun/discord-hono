@@ -24,7 +24,7 @@ export class Components {
    * @param {...(Button | Select | APIComponentInMessageActionRow)} e
    * @returns {this}
    */
-  row(...e: (Button<any> | Select<any, any> | APIComponentInMessageActionRow)[]) {
+  row(...e: (Button<any> | Select<any, any> | APIComponentInMessageActionRow)[]): this {
     if (this.#components.length >= 5) console.warn('You can have up to 5 Action Rows per message')
     this.#components.push({
       type: 1,
@@ -36,7 +36,7 @@ export class Components {
    * export json object
    * @returns {Obj}
    */
-  toJSON() {
+  toJSON(): APIActionRowComponent<APIComponentInMessageActionRow>[] {
     return this.#components
   }
 }
@@ -54,7 +54,7 @@ type ButtonStyle = keyof typeof buttonStyleNum
 export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButtonComponent> {
   #style: ButtonStyle
   #uniqueStr = ''
-  #assign(method: string, doNotStyle: ButtonStyle[], obj: Partial<APIButtonComponent>) {
+  #assign(method: string, doNotStyle: ButtonStyle[], obj: Partial<APIButtonComponent>): this {
     if (doNotStyle.includes(this.#style)) {
       warnBuilder('Button', this.#style, method)
       return this
@@ -98,7 +98,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {string | APIMessageComponentEmoji} e
    * @returns {this}
    */
-  emoji(e: T extends 'SKU' ? undefined : string | APIMessageComponentEmoji) {
+  emoji(e: T extends 'SKU' ? undefined : string | APIMessageComponentEmoji): this {
     return this.#assign('emoji', ['SKU'], { emoji: typeof e === 'string' ? { name: e } : e })
   }
   /**
@@ -106,7 +106,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {string} e
    * @returns {this}
    */
-  custom_id(e: T extends 'Link' | 'SKU' ? undefined : string) {
+  custom_id(e: T extends 'Link' | 'SKU' ? undefined : string): this {
     return this.#assign('custom_id', ['Link', 'SKU'], { custom_id: this.#uniqueStr + e })
   }
   /**
@@ -114,7 +114,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  disabled(e = true) {
+  disabled(e = true): this {
     return this.a({ disabled: e })
   }
   /**
@@ -124,7 +124,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {string} e
    * @returns {this}
    */
-  label(e: T extends 'SKU' ? undefined : string) {
+  label(e: T extends 'SKU' ? undefined : string): this {
     return this.#assign('label', ['SKU'], { label: e })
   }
   /**
@@ -134,7 +134,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {"Primary" | "Secondary" | "Success" | "Danger"} e
    * @returns {this}
    */
-  style(e: Exclude<ButtonStyle, 'Link' | 'SKU'>) {
+  style(e: Exclude<ButtonStyle, 'Link' | 'SKU'>): this {
     return this.#assign('style', ['Link', 'SKU'], { style: buttonStyleNum[e] })
   }
 }
@@ -149,7 +149,7 @@ type SelectComponent =
 export class Select<K extends string, T extends SelectType = 'String'> extends Builder<SelectComponent> {
   #type: SelectType
   #uniqueStr = ''
-  #assign(method: string, doType: SelectType[], obj: Partial<SelectComponent>) {
+  #assign(method: string, doType: SelectType[], obj: Partial<SelectComponent>): this {
     if (!doType.includes(this.#type)) {
       warnBuilder('Select', this.#type, method)
       return this
@@ -180,7 +180,7 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {string} e
    * @returns {this}
    */
-  custom_id(e: string) {
+  custom_id(e: string): this {
     return this.a({ custom_id: this.#uniqueStr + e })
   }
   /**
@@ -190,7 +190,7 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {APISelectMenuOption} e
    * @returns {this}
    */
-  options(...e: T extends 'String' ? APISelectMenuOption[] : undefined[]) {
+  options(...e: T extends 'String' ? APISelectMenuOption[] : undefined[]): this {
     return this.#assign('options', ['String'], { options: e as APISelectMenuOption[] })
   }
   /**
@@ -200,7 +200,7 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {...ChannelType} e
    * @returns {this}
    */
-  channel_types(...e: T extends 'Channel' ? ChannelType[] : undefined[]) {
+  channel_types(...e: T extends 'Channel' ? ChannelType[] : undefined[]): this {
     return this.#assign('channel_types', ['Channel'], { channel_types: e as ChannelType[] })
   }
   /**
@@ -208,7 +208,7 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {string} e
    * @returns {this}
    */
-  placeholder(e: string) {
+  placeholder(e: string): this {
     return this.a({ placeholder: e })
   }
   /**
@@ -230,7 +230,7 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
           T extends 'Mentionable' ? 'user' | 'role' :
           never
       }[]
-  ) {
+  ): this {
     // @ts-expect-error
     return this.#assign('default_values', ['User', 'Role', 'Channel', 'Mentionable'], { default_values: e })
   }
@@ -239,7 +239,7 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {number} [e=1]
    * @returns {this}
    */
-  min_values(e = 1) {
+  min_values(e = 1): this {
     return this.a({ min_values: e })
   }
   /**
@@ -247,7 +247,7 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {number} [e=1]
    * @returns {this}
    */
-  max_values(e = 1) {
+  max_values(e = 1): this {
     return this.a({ max_values: e })
   }
   /**
@@ -255,7 +255,7 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  disabled(e = true) {
+  disabled(e = true): this {
     return this.a({ disabled: e })
   }
 }

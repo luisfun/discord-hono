@@ -38,7 +38,7 @@ export class DiscordHono<E extends Env = Env> {
   #verify: Verify
   #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
   #map = new Map<string, AnyHandler<E, HandlerNumber>>()
-  #set<N extends HandlerNumber>(num: N, key: string, value: AnyHandler<E, N>) {
+  #set<N extends HandlerNumber>(num: N, key: string, value: AnyHandler<E, N>): this {
     this.#map.set(`${num}${key}`, value)
     return this
   }
@@ -69,7 +69,7 @@ export class DiscordHono<E extends Env = Env> {
    * @param handler
    * @returns {this}
    */
-  command(command: string, handler: CommandHandler<E>) {
+  command(command: string, handler: CommandHandler<E>): this {
     return this.#set(2, command, handler)
   }
   /**
@@ -77,7 +77,7 @@ export class DiscordHono<E extends Env = Env> {
    * @param handler
    * @returns {this}
    */
-  component<T extends ComponentType>(component_id: string, handler: ComponentHandler<E, T>) {
+  component<T extends ComponentType>(component_id: string, handler: ComponentHandler<E, T>): this {
     return this.#set(3, component_id, handler)
   }
   /**
@@ -86,7 +86,7 @@ export class DiscordHono<E extends Env = Env> {
    * @param handler
    * @returns {this}
    */
-  autocomplete(command: string, autocomplete: AutocompleteHandler<E>, handler?: CommandHandler<E>) {
+  autocomplete(command: string, autocomplete: AutocompleteHandler<E>, handler?: CommandHandler<E>): this {
     return (handler ? this.#set(2, command, handler) : this).#set(4, command, autocomplete)
   }
   /**
@@ -94,7 +94,7 @@ export class DiscordHono<E extends Env = Env> {
    * @param handler
    * @returns {this}
    */
-  modal(modal_id: string, handler: ModalHandler<E>) {
+  modal(modal_id: string, handler: ModalHandler<E>): this {
     return this.#set(5, modal_id, handler)
   }
   /**
@@ -102,7 +102,7 @@ export class DiscordHono<E extends Env = Env> {
    * @param handler
    * @returns {this}
    */
-  cron(cron: string, handler: CronHandler<E>) {
+  cron(cron: string, handler: CronHandler<E>): this {
     return this.#set(0, cron, handler)
   }
 
@@ -112,7 +112,7 @@ export class DiscordHono<E extends Env = Env> {
    * @param executionCtx
    * @returns {Promise<Response>}
    */
-  async fetch(request: Request, env?: E['Bindings'], executionCtx?: ExecutionContext) {
+  async fetch(request: Request, env?: E['Bindings'], executionCtx?: ExecutionContext): Promise<Response> {
     switch (request.method) {
       case 'GET':
         return new Response('Operational🔥')
@@ -170,7 +170,7 @@ export class DiscordHono<E extends Env = Env> {
    * @param {Record<string, unknown>} env
    * @param executionCtx
    */
-  async scheduled(event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext) {
+  async scheduled(event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext): Promise<void> {
     const handler = this.#get(0, event.cron)
     const c = new Context(env, executionCtx, this.#discord(env), event.cron, event) as CronContext
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(c))

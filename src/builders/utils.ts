@@ -12,7 +12,7 @@ export abstract class Builder<Obj extends {}> {
   /**
    * assign object `Object.assign(this.#store, obj)`
    */
-  protected a(obj: Partial<Obj>) {
+  protected a(obj: Partial<Obj>): this {
     Object.assign(this.#store, obj)
     return this
   }
@@ -20,7 +20,7 @@ export abstract class Builder<Obj extends {}> {
    * export json object
    * @returns {Obj}
    */
-  toJSON() {
+  toJSON(): Obj {
     return { ...this.#store }
   }
 }

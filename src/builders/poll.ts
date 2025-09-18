@@ -17,7 +17,7 @@ export class Poll extends Builder<RESTAPIPoll> {
    * @param {string} question
    * @returns {this}
    */
-  question(question: string) {
+  question(question: string): this {
     return this.a({ question: { text: question } })
   }
   /**
@@ -25,7 +25,7 @@ export class Poll extends Builder<RESTAPIPoll> {
    * @param {string | [string | APIPartialEmoji, string]} answers
    * @returns {this}
    */
-  answers(...answers: (string | [string | APIPartialEmoji, string])[]) {
+  answers(...answers: (string | [string | APIPartialEmoji, string])[]): this {
     return this.a({ answers: answersRemap(answers) })
   }
   /**
@@ -33,7 +33,7 @@ export class Poll extends Builder<RESTAPIPoll> {
    * @param {number} duration
    * @returns {this}
    */
-  duration(duration = 24) {
+  duration(duration = 24): this {
     return this.a({ duration })
   }
   /**
@@ -41,7 +41,7 @@ export class Poll extends Builder<RESTAPIPoll> {
    * @param {boolean} allow_multiselect
    * @returns {this}
    */
-  allow_multiselect(allow_multiselect = true) {
+  allow_multiselect(allow_multiselect = true): this {
     return this.a({ allow_multiselect })
   }
   /**
@@ -49,7 +49,7 @@ export class Poll extends Builder<RESTAPIPoll> {
    * @param {number} layout_type
    * @returns {this}
    */
-  layout_type(layout_type: number) {
+  layout_type(layout_type: number): this {
     return this.a({ layout_type })
   }
 }
