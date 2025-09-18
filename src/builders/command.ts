@@ -49,7 +49,7 @@ abstract class CommandBase<
    * @param {string} name 1-32 character name; `CHAT_INPUT` command names must be all lowercase matching `^[-_\p{L}\p{N}\p{sc=Deva}\p{sc=Thai}]{1,32}$`
    * @param {string} description 1-100 character description for `CHAT_INPUT` commands, empty string for `USER` and `MESSAGE` commands
    */
-  constructor(name: string, description = '') {
+  constructor(name: string, description: string = '') {
     super({ name, description } as Obj)
   }
   /**
@@ -130,7 +130,7 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  dm_permission(e = true): this {
+  dm_permission(e: boolean = true): this {
     return this.a({ dm_permission: e })
   }
   /**
@@ -141,7 +141,7 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  default_permission(e = true): this {
+  default_permission(e: boolean = true): this {
     return this.a({ default_permission: e })
   }
   /**
@@ -149,7 +149,7 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  nsfw(e = true): this {
+  nsfw(e: boolean = true): this {
     return this.a({ nsfw: e })
   }
   /**
@@ -200,7 +200,7 @@ export class SubGroup<_V extends {} = {}> extends CommandBase<APIApplicationComm
    * @param {string} name 1-32 character name
    * @param {string} description 1-100 character description
    */
-  constructor(name: string, description = '') {
+  constructor(name: string, description: string = '') {
     super(name, description)
     this.a({ type: 2 })
   }
@@ -221,7 +221,7 @@ export class SubCommand<_V extends {} = {}> extends CommandBase<APIApplicationCo
    * @param {string} name 1-32 character name
    * @param {string} description 1-100 character description
    */
-  constructor(name: string, description = '') {
+  constructor(name: string, description: string = '') {
     super(name, description)
     this.a({ type: 1 })
   }

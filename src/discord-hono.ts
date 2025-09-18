@@ -53,7 +53,7 @@ export class DiscordHono<E extends Env = Env> {
    */
   constructor(options?: InitOptions<E>) {
     this.#verify = options?.verify ?? verify
-    this.#discord = env => {
+    this.#discord = (env: DiscordEnvBindings | undefined): DiscordEnv => {
       const discordEnv = options?.discordEnv ? options.discordEnv(env) : {}
       return {
         APPLICATION_ID: env?.DISCORD_APPLICATION_ID,

@@ -175,7 +175,7 @@ export class Context<
   /**
    * [Interaction Object](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
    */
-  get interaction() {
+  get interaction(): APIInteraction | CronEvent {
     return this.#interaction
   }
 
@@ -257,7 +257,16 @@ export class Context<
    * return c.update().resDefer(c => c.followup())
    * ```
    */
-  followup(data?: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>, file?: FileData): Promise<Omit<Response, "json"> & { json(): Promise<import("/Users/phips/ExcludeFromBackup/src/discord-hono/node_modules/discord-api-types/v10").APIMessage>; }> {
+  followup(
+    data?: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>,
+    file?: FileData,
+  ): Promise<
+    Omit<Response, 'json'> & {
+      json(): Promise<
+        import('/Users/phips/ExcludeFromBackup/src/discord-hono/node_modules/discord-api-types/v10').APIMessage
+      >
+    }
+  > {
     this.#throwIfNotAllowType([2, 3, 5])
     if (!this.#discord.APPLICATION_ID) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
     const pathVars: [string, string] = [this.#discord.APPLICATION_ID, (this.interaction as APIInteraction).token]
@@ -307,7 +316,7 @@ export class Context<
    * return c.update().res('Edit the original message')
    * ```
    */
-  update(bool = true): This {
+  update(bool: boolean = true): This {
     this.#throwIfNotAllowType([3, 5])
     this.#update = bool
     return this as unknown as This
@@ -318,7 +327,7 @@ export class Context<
    *
    * [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data)
    */
-  get focused() {
+  get focused(): AutocompleteOption | undefined {
     this.#throwIfNotAllowType([4])
     return this.#focused
   }

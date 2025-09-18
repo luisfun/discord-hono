@@ -135,7 +135,11 @@ export const Layout = LayoutImpl as {
   new (style: 'Container'): LayoutContainer
 }
 
-const mediaItem = (str: string) => ({
+interface MediaItem {
+  url: string
+}
+
+const mediaItem = (str: string): MediaItem => ({
   url: URL.canParse(str) || str.startsWith('attachment://') ? str : `attachment://${str}`,
 })
 

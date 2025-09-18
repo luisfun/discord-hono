@@ -25,9 +25,9 @@ export abstract class Builder<Obj extends {}> {
   }
 }
 
-export const warnBuilder = (clas: string, type: string, method: string) =>
+export const warnBuilder = (clas: string, type: string, method: string): void =>
   console.warn(`⚠️ ${clas}(${type}).${method} is not available`)
 
-export const ifThrowHasSemicolon = (str: string) => {
+export const ifThrowHasSemicolon = (str: string): void => {
   if (str.includes(CUSTOM_ID_SEPARATOR)) throw new Error(`Don't use "${CUSTOM_ID_SEPARATOR}"`)
 }

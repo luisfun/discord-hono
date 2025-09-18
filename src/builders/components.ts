@@ -114,7 +114,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  disabled(e = true): this {
+  disabled(e: true = true): this {
     return this.a({ disabled: e })
   }
   /**
@@ -239,7 +239,7 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {number} [e=1]
    * @returns {this}
    */
-  min_values(e = 1): this {
+  min_values(e: number = 1): this {
     return this.a({ min_values: e })
   }
   /**
@@ -247,7 +247,7 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {number} [e=1]
    * @returns {this}
    */
-  max_values(e = 1): this {
+  max_values(e: number = 1): this {
     return this.a({ max_values: e })
   }
   /**
@@ -255,7 +255,7 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  disabled(e = true): this {
+  disabled(e: boolean = true): this {
     return this.a({ disabled: e })
   }
 }
