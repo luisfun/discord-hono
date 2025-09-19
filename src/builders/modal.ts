@@ -30,14 +30,14 @@ export class Modal<_V extends {} = {}> {
    * export json data
    * @returns {APIModalInteractionResponseCallbackData}
    */
-  toJSON() {
+  toJSON(): APIModalInteractionResponseCallbackData {
     return this.#data
   }
   /**
    * @param {string} e
    * @returns {this}
    */
-  custom_id(e: string) {
+  custom_id(e: string): this {
     this.#data.custom_id = this.#uniqueStr + e
     return this
   }
@@ -57,7 +57,7 @@ export class Modal<_V extends {} = {}> {
    * @param {string} e
    * @returns {this}
    */
-  title(e: string) {
+  title(e: string): this {
     this.#data.title = e
     return this
   }
@@ -77,14 +77,14 @@ export class TextInput<K extends string, _R extends boolean = false> extends Bui
    * @param {number} e
    * @returns {this}
    */
-  min_length(e: number) {
+  min_length(e: number): this {
     return this.a({ min_length: e })
   }
   /**
    * @param {number} e
    * @returns {this}
    */
-  max_length(e: number) {
+  max_length(e: number): this {
     return this.a({ max_length: e })
   }
   /**
@@ -100,14 +100,14 @@ export class TextInput<K extends string, _R extends boolean = false> extends Bui
    * @param {string} e
    * @returns {this}
    */
-  value(e: string) {
+  value(e: string): this {
     return this.a({ value: e })
   }
   /**
    * @param {string} e
    * @returns {this}
    */
-  placeholder(e: string) {
+  placeholder(e: string): this {
     return this.a({ placeholder: e })
   }
 }

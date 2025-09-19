@@ -37,6 +37,9 @@
             "allow": ["assert", "error", "info", "warn"]
           }
         }
+      },
+      "nursery": {
+        "useExplicitType": "warn"
       }
     }
   },

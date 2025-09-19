@@ -11,6 +11,7 @@ import type {
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIInteractionResponseDeferredMessageUpdate,
   APIInteractionResponseLaunchActivity,
+  APIMessage,
   APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
   RESTPatchAPIInteractionOriginalResponseJSONBody,
@@ -59,7 +60,7 @@ export class Context<
   #sub = { group: '', command: '', string: '' } // 24
   #update = false // 3
   #focused: AutocompleteOption | undefined // 4
-  #throwIfNotAllowType(allowType: (APIInteraction | CronEvent)['type'][]) {
+  #throwIfNotAllowType(allowType: (APIInteraction | CronEvent)['type'][]): void {
     if (!allowType.includes(this.#interaction.type)) throw newError('c.***', 'Invalid method')
   }
   constructor(
@@ -175,7 +176,7 @@ export class Context<
   /**
    * [Interaction Object](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object)
    */
-  get interaction() {
+  get interaction(): APIInteraction | CronEvent {
     return this.#interaction
   }
 
@@ -188,7 +189,7 @@ export class Context<
    * return c.flags('SUPPRESS_EMBEDS', 'EPHEMERAL').res('[Docs](https://example.com)')
    * ```
    */
-  flags(...flag: ('SUPPRESS_EMBEDS' | 'EPHEMERAL' | 'SUPPRESS_NOTIFICATIONS' | 'IS_COMPONENTS_V2')[]) {
+  flags(...flag: ('SUPPRESS_EMBEDS' | 'EPHEMERAL' | 'SUPPRESS_NOTIFICATIONS' | 'IS_COMPONENTS_V2')[]): This {
     this.#throwIfNotAllowType([2, 3, 5])
     const flagNum = {
       SUPPRESS_EMBEDS: 1 << 2,
@@ -206,7 +207,7 @@ export class Context<
    * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
    * @returns {Response}
    */
-  res(data: CustomCallbackData<APIInteractionResponseCallbackData>, file?: FileData) {
+  res(data: CustomCallbackData<APIInteractionResponseCallbackData>, file?: FileData): Response {
     this.#throwIfNotAllowType([2, 3, 5])
     const body: APIInteractionResponse = {
       data: { ...this.#flags, ...prepareData(data) },
@@ -223,7 +224,7 @@ export class Context<
    * return c.resDefer(c => c.followup('Delayed Message'))
    * ```
    */
-  resDefer(handler?: (c: This) => Promise<unknown>) {
+  resDefer(handler?: (c: This) => Promise<unknown>): Response {
     this.#throwIfNotAllowType([2, 3, 5])
     if (handler) this.executionCtx.waitUntil(handler(this as unknown as This))
     return Response.json(
@@ -240,7 +241,7 @@ export class Context<
    * Launch the Activity associated with the app. Only available for apps with Activities enabled
    * @returns {Response}
    */
-  resActivity() {
+  resActivity(): Response {
     this.#throwIfNotAllowType([2, 3, 5])
     return Response.json({ type: 12 } satisfies APIInteractionResponseLaunchActivity)
   }
@@ -257,7 +258,10 @@ export class Context<
    * return c.update().resDefer(c => c.followup())
    * ```
    */
-  followup(data?: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>, file?: FileData) {
+  followup(
+    data?: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>,
+    file?: FileData,
+  ): Promise<Omit<Response, 'json'> & { json(): Promise<APIMessage> }> {
     this.#throwIfNotAllowType([2, 3, 5])
     if (!this.#discord.APPLICATION_ID) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
     const pathVars: [string, string] = [this.#discord.APPLICATION_ID, (this.interaction as APIInteraction).token]
@@ -293,7 +297,7 @@ export class Context<
    * )
    * ```
    */
-  resModal(data: Modal | APIModalInteractionResponseCallbackData) {
+  resModal(data: Modal | APIModalInteractionResponseCallbackData): Response {
     this.#throwIfNotAllowType([2, 3])
     return Response.json({ type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse)
   }
@@ -307,7 +311,7 @@ export class Context<
    * return c.update().res('Edit the original message')
    * ```
    */
-  update(bool = true) {
+  update(bool: boolean = true): This {
     this.#throwIfNotAllowType([3, 5])
     this.#update = bool
     return this as unknown as This
@@ -318,7 +322,7 @@ export class Context<
    *
    * [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data)
    */
-  get focused() {
+  get focused(): AutocompleteOption | undefined {
     this.#throwIfNotAllowType([4])
     return this.#focused
   }
@@ -327,7 +331,7 @@ export class Context<
    * @param {Autocomplete | APICommandAutocompleteInteractionResponseCallbackData} data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
    * @returns {Response}
    */
-  resAutocomplete(data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData) {
+  resAutocomplete(data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData): Response {
     this.#throwIfNotAllowType([4])
     return Response.json({ type: 8, data: toJSON(data) } satisfies APIApplicationCommandAutocompleteResponse)
   }

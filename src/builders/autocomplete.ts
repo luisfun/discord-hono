@@ -7,7 +7,7 @@ export class Autocomplete extends Builder<APICommandAutocompleteInteractionRespo
     super({})
     this.#search = search?.toString() || ''
   }
-  choices(...e: Required<APICommandAutocompleteInteractionResponseCallbackData>['choices']) {
+  choices(...e: Required<APICommandAutocompleteInteractionResponseCallbackData>['choices']): this {
     const choices = e.filter(e2 => {
       if (e2.name.includes(this.#search)) return true
       if (Object.values(e2.name_localizations || {}).some(e3 => e3?.includes(this.#search))) return true

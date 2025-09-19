@@ -1,7 +1,9 @@
 import type { APIPartialEmoji, RESTAPIPoll } from 'discord-api-types/v10'
 import { Builder } from './utils'
 
-const answersRemap = (answers: (string | [string | APIPartialEmoji, string])[]) =>
+const answersRemap = (
+  answers: (string | [string | APIPartialEmoji, string])[],
+): { poll_media: { emoji?: APIPartialEmoji; text: string } }[] =>
   answers.map(e => ({
     poll_media: Array.isArray(e)
       ? { emoji: typeof e[0] === 'string' ? { id: null, name: e[0] } : e[0], text: e[1] }
@@ -17,7 +19,7 @@ export class Poll extends Builder<RESTAPIPoll> {
    * @param {string} question
    * @returns {this}
    */
-  question(question: string) {
+  question(question: string): this {
     return this.a({ question: { text: question } })
   }
   /**
@@ -25,7 +27,7 @@ export class Poll extends Builder<RESTAPIPoll> {
    * @param {string | [string | APIPartialEmoji, string]} answers
    * @returns {this}
    */
-  answers(...answers: (string | [string | APIPartialEmoji, string])[]) {
+  answers(...answers: (string | [string | APIPartialEmoji, string])[]): this {
     return this.a({ answers: answersRemap(answers) })
   }
   /**
@@ -33,7 +35,7 @@ export class Poll extends Builder<RESTAPIPoll> {
    * @param {number} duration
    * @returns {this}
    */
-  duration(duration = 24) {
+  duration(duration: number = 24): this {
     return this.a({ duration })
   }
   /**
@@ -41,7 +43,7 @@ export class Poll extends Builder<RESTAPIPoll> {
    * @param {boolean} allow_multiselect
    * @returns {this}
    */
-  allow_multiselect(allow_multiselect = true) {
+  allow_multiselect(allow_multiselect: boolean = true): this {
     return this.a({ allow_multiselect })
   }
   /**
@@ -49,7 +51,7 @@ export class Poll extends Builder<RESTAPIPoll> {
    * @param {number} layout_type
    * @returns {this}
    */
-  layout_type(layout_type: number) {
+  layout_type(layout_type: number): this {
     return this.a({ layout_type })
   }
 }

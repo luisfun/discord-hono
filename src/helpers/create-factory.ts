@@ -15,7 +15,7 @@ import type {
 import { CUSTOM_ID_SEPARATOR, newError } from '../utils'
 
 class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
-  loader(handlers: Handler<E>[]) {
+  loader(handlers: Handler<E>[]): this {
     for (const elem of handlers) {
       if ('command' in elem) {
         if ('autocomplete' in elem) this.autocomplete(elem.command.toJSON().name, elem.autocomplete, elem.handler)

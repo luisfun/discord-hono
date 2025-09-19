@@ -44,7 +44,7 @@ class LayoutImpl<T extends LayoutStyle> extends Builder<LayoutComponent<T>> {
    * @param {number} e
    * @returns {this}
    */
-  id(e: number) {
+  id(e: number): this {
     return this.a({ id: e } as Partial<LayoutComponent<T>>)
   }
   /**
@@ -63,7 +63,7 @@ class LayoutImpl<T extends LayoutStyle> extends Builder<LayoutComponent<T>> {
         | ContentTextDisplay | ContentMediaGallery | ContentFile :
       never
     )[]
-  ) {
+  ): this {
     // @ts-expect-error
     return this.a({ components: e.map(toJSON) })
   }
@@ -74,7 +74,7 @@ class LayoutImpl<T extends LayoutStyle> extends Builder<LayoutComponent<T>> {
    */
   accessory(
     e: T extends 'Section' ? APIButtonComponent | APIThumbnailComponent | Button<any> | ContentThumbnail : never,
-  ) {
+  ): this {
     // @ts-expect-error
     return this.a({ accessory: toJSON(e) })
   }
@@ -83,7 +83,7 @@ class LayoutImpl<T extends LayoutStyle> extends Builder<LayoutComponent<T>> {
    * @param {boolean} e
    * @returns {this}
    */
-  divider(e: T extends 'Separator' ? boolean : never) {
+  divider(e: T extends 'Separator' ? boolean : never): this {
     // @ts-expect-error
     return this.a({ divider: e })
   }
@@ -92,7 +92,7 @@ class LayoutImpl<T extends LayoutStyle> extends Builder<LayoutComponent<T>> {
    * @param {1 | 2} e
    * @returns {this}
    */
-  spacing(e: T extends 'Separator' ? 1 | 2 : never) {
+  spacing(e: T extends 'Separator' ? 1 | 2 : never): this {
     // @ts-expect-error
     return this.a({ spacing: e })
   }
@@ -101,7 +101,7 @@ class LayoutImpl<T extends LayoutStyle> extends Builder<LayoutComponent<T>> {
    * @param {number} e
    * @returns {this}
    */
-  accent_color(e: T extends 'Container' ? number : never) {
+  accent_color(e: T extends 'Container' ? number : never): this {
     // @ts-expect-error
     return this.a({ accent_color: e })
   }
@@ -111,7 +111,7 @@ class LayoutImpl<T extends LayoutStyle> extends Builder<LayoutComponent<T>> {
    * @returns {this}
    */
   // @ts-expect-error
-  spoiler(e: T extends 'Container' ? boolean : never = true) {
+  spoiler(e: T extends 'Container' ? boolean : never = true): this {
     // @ts-expect-error
     return this.a({ spoiler: e })
   }
@@ -135,7 +135,11 @@ export const Layout = LayoutImpl as {
   new (style: 'Container'): LayoutContainer
 }
 
-const mediaItem = (str: string) => ({
+interface MediaItem {
+  url: string
+}
+
+const mediaItem = (str: string): MediaItem => ({
   url: URL.canParse(str) || str.startsWith('attachment://') ? str : `attachment://${str}`,
 })
 
@@ -190,7 +194,7 @@ class ContentImpl<T extends ContentStyle = 'Text Display'> extends Builder<Conte
    * @param {number} e
    * @returns {this}
    */
-  id(e: number) {
+  id(e: number): this {
     return this.a({ id: e } as Partial<ContentJson<T>>)
   }
   /**
@@ -198,7 +202,7 @@ class ContentImpl<T extends ContentStyle = 'Text Display'> extends Builder<Conte
    * @param {string} e
    * @returns {this}
    */
-  description(e: T extends 'Thumbnail' ? string : never) {
+  description(e: T extends 'Thumbnail' ? string : never): this {
     // @ts-expect-error
     return this.a({ description: e })
   }
@@ -208,7 +212,7 @@ class ContentImpl<T extends ContentStyle = 'Text Display'> extends Builder<Conte
    * @returns {this}
    */
   // @ts-expect-error
-  spoiler(e: T extends 'Thumbnail' | 'File' ? boolean : never = true) {
+  spoiler(e: T extends 'Thumbnail' | 'File' ? boolean : never = true): this {
     // @ts-expect-error
     return this.a({ spoiler: e })
   }

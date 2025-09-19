@@ -8,7 +8,7 @@ describe('Builder', () => {
       super({ test: '' })
     }
 
-    setTest(value: string) {
+    setTest(value: string): this {
       return this.a({ test: value })
     }
   }

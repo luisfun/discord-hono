@@ -12,7 +12,7 @@ export abstract class Builder<Obj extends {}> {
   /**
    * assign object `Object.assign(this.#store, obj)`
    */
-  protected a(obj: Partial<Obj>) {
+  protected a(obj: Partial<Obj>): this {
     Object.assign(this.#store, obj)
     return this
   }
@@ -20,14 +20,14 @@ export abstract class Builder<Obj extends {}> {
    * export json object
    * @returns {Obj}
    */
-  toJSON() {
+  toJSON(): Obj {
     return { ...this.#store }
   }
 }
 
-export const warnBuilder = (clas: string, type: string, method: string) =>
+export const warnBuilder = (clas: string, type: string, method: string): void =>
   console.warn(`⚠️ ${clas}(${type}).${method} is not available`)
 
-export const ifThrowHasSemicolon = (str: string) => {
+export const ifThrowHasSemicolon = (str: string): void => {
   if (str.includes(CUSTOM_ID_SEPARATOR)) throw new Error(`Don't use "${CUSTOM_ID_SEPARATOR}"`)
 }
