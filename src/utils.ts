@@ -2,12 +2,11 @@ import type { CustomCallbackData, FileData } from './types'
 
 export const CUSTOM_ID_SEPARATOR = ';'
 
-// type any !!!!!!!!!
-export const toJSON = (obj: object) => ('toJSON' in obj && typeof obj.toJSON === 'function' ? obj.toJSON() : obj)
+export const toJSON = (obj: object): any => ('toJSON' in obj && typeof obj.toJSON === 'function' ? obj.toJSON() : obj)
 
 export const prepareData = <T extends Record<string, unknown>>(
   data: CustomCallbackData<T> | Record<string, unknown>[] | undefined,
-) => {
+): T | Record<string, unknown>[] | undefined => {
   if (!data) return undefined
   if (typeof data === 'string') return { content: data } as unknown as T
   if (Array.isArray(data)) return data
@@ -21,7 +20,7 @@ export const prepareData = <T extends Record<string, unknown>>(
   return rest as T
 }
 
-export const formData = (data?: object, file?: FileData) => {
+export const formData = (data?: object, file?: FileData): FormData => {
   const body = new FormData()
   if (data && Object.keys(data).length > 0) body.append('payload_json', JSON.stringify(data))
   if (file)
@@ -34,9 +33,9 @@ export const formData = (data?: object, file?: FileData) => {
 /**
  * new Error(\`discord-hono(${locate}): ${text}\`)
  */
-export const newError = (locate: string, text: string) => new Error(`discord-hono(${locate}): ${text}`)
+export const newError = (locate: string, text: string): Error => new Error(`discord-hono(${locate}): ${text}`)
 
-export const queryStringify = (query: Record<string, unknown> | undefined) => {
+export const queryStringify = (query: Record<string, unknown> | undefined): '' | `?${string}` => {
   if (!query) return ''
   const queryMap: Record<string, string> = {}
   // Simplified handling of null and undefined values

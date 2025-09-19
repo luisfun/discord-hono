@@ -25,7 +25,7 @@ export const createRest =
     variables: string[] = [],
     data?: (Record<string, any> & { query?: any }) | Record<string, any>[] | string,
     file?: FileData,
-  ) => {
+  ): ReturnType<typeof fetch> => {
     if (!token) throw newError('REST', 'DISCORD_TOKEN')
     const isGet = method.toUpperCase() === 'GET'
     const vars = [...variables]

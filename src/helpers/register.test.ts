@@ -1,9 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest/rest-path'
 import { register } from './register'
 
-const mockRest = vi.fn()
-const mockToken = vi.fn(() => 'mock-token')()
+const mockRest: Mock = vi.fn()
+const mockToken: string = vi.fn(() => 'mock-token')()
 
 vi.mock('../utils')
 vi.mock('../rest/rest', () => ({

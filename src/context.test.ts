@@ -29,9 +29,9 @@ vi.mock('./utils', async () => {
   return {
     ...actual,
     newError: (name: string, message: string) => new Error(`${name}: ${message}`),
-    prepareData: (data: any) => (typeof data === 'string' ? { content: data } : data),
+    prepareData: (data: unknown) => (typeof data === 'string' ? { content: data } : data),
     formData: vi.fn().mockReturnValue(new FormData()),
-    toJSON: (data: any) => data,
+    toJSON: (data: unknown) => data,
   }
 })
 

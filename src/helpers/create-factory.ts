@@ -33,9 +33,7 @@ class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
 
 type Var = {}
 
-// @ts-expect-error
-// biome-ignore lint: infer T2
-type ExtractComponentVars<T> = T extends Select<infer K, infer T2> ? { [P in K]: string[] } : {}
+type ExtractComponentVars<T> = T extends Select<infer K, infer _T2> ? { [P in K]: string[] } : {}
 
 type Factory<E extends Env> = {
   discord(init?: InitOptions<E>): DiscordHonoExtends<E>
@@ -71,15 +69,19 @@ type Handler<E extends Env> =
   | ReturnType<Factory<E>['cron']>
 
 export const createFactory = <E extends Env = Env>(): Factory<E> => ({
+  // biome-ignore lint/nursery/useExplicitType: omitted
   discord(init) {
     return new DiscordHonoExtends<E>(init)
   },
+  // biome-ignore lint/nursery/useExplicitType: omitted
   command(command, handler) {
     return { command, handler: handler as CommandHandler<E> }
   },
+  // biome-ignore lint/nursery/useExplicitType: omitted
   component(component, handler) {
     return { component, handler: handler as ComponentHandler<E, any> }
   },
+  // biome-ignore lint/nursery/useExplicitType: omitted
   autocomplete(command, autocomplete, handler) {
     return {
       command,
@@ -87,12 +89,15 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
       handler: handler as CommandHandler<E>,
     }
   },
+  // biome-ignore lint/nursery/useExplicitType: omitted
   modal(modal, handler) {
     return { modal, handler: handler as ModalHandler<E> }
   },
+  // biome-ignore lint/nursery/useExplicitType: omitted
   cron(cron, handler) {
     return { cron, handler: handler as CronHandler<E> }
   },
+  // biome-ignore lint/nursery/useExplicitType: omitted
   getCommands(handlers) {
     return handlers.filter(e => 'command' in e).map(e => e.command)
   },

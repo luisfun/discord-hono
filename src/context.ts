@@ -44,6 +44,12 @@ type AutocompleteOption =
   | APIApplicationCommandInteractionDataIntegerOption
   | APIApplicationCommandInteractionDataNumberOption
 
+type SubKey = {
+  group: string
+  command: string
+  string: string
+}
+
 export class Context<
   E extends Env,
   This extends CommandContext | ComponentContext | AutocompleteContext | ModalContext | CronContext,
@@ -57,7 +63,7 @@ export class Context<
   // interaction
   #interaction: APIInteraction | CronEvent
   #flags: { flags?: number } = {} // 235
-  #sub = { group: '', command: '', string: '' } // 24
+  #sub: SubKey = { group: '', command: '', string: '' } // 24
   #update = false // 3
   #focused: AutocompleteOption | undefined // 4
   #throwIfNotAllowType(allowType: (APIInteraction | CronEvent)['type'][]): void {
@@ -281,7 +287,7 @@ export class Context<
    * }
    * ```
    */
-  get sub() {
+  get sub(): SubKey {
     this.#throwIfNotAllowType([2, 4])
     return this.#sub
   }

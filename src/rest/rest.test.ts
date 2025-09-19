@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { formData } from '../utils'
 import { createRest } from './rest'
 
-const mockToken = vi.fn(() => 'mock-token')()
+const mockToken: string = vi.fn(() => 'mock-token')()
 
 // モックの作成
 vi.mock('../utils', () => ({
