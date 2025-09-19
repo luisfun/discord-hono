@@ -3,17 +3,7 @@ import { Builder } from './utils'
 
 const answersRemap = (
   answers: (string | [string | APIPartialEmoji, string])[],
-): {
-  poll_media:
-    | {
-        emoji: APIPartialEmoji
-        text: string
-      }
-    | {
-        text: string
-        emoji?: undefined
-      }
-}[] =>
+): { poll_media: { emoji?: APIPartialEmoji; text: string } }[] =>
   answers.map(e => ({
     poll_media: Array.isArray(e)
       ? { emoji: typeof e[0] === 'string' ? { id: null, name: e[0] } : e[0], text: e[1] }
