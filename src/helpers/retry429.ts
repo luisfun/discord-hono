@@ -5,8 +5,12 @@
  * @param {number} [addDelay=0] Additional delay milliseconds
  * @returns {ReturnType<typeof fetch>}
  */
-export const retry429 = (fetchFunc: () => ReturnType<typeof fetch>, retryCount: number, addDelay = 0) => {
-  const retryFetch = async (count: number) => {
+export const retry429 = (
+  fetchFunc: () => ReturnType<typeof fetch>,
+  retryCount: number,
+  addDelay: number = 0,
+): ReturnType<typeof fetch> => {
+  const retryFetch = async (count: number): ReturnType<typeof fetch> => {
     const res = await fetchFunc()
     if (res.status !== 429 || count < 1) return res
     const retryAfter = res.headers.get('Retry-After')

@@ -15,7 +15,7 @@ export const webhook = (
   // @ts-expect-error: インデックス シグネチャがありません。ts(2344)
   data: CustomCallbackData<RESTPostAPIWebhookWithTokenJSONBody & Query<RESTPostAPIWebhookWithTokenQuery>>,
   file?: FileData,
-) => {
+): ReturnType<typeof fetch> => {
   const headers: HeadersInit = {}
   if (!file) headers['content-type'] = 'application/json'
   const requestData: RequestInit = { method: 'POST', headers }

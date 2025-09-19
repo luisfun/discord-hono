@@ -17,7 +17,7 @@ export const register = async (
   application_id: string | undefined,
   token: string | undefined,
   guild_id?: string | undefined,
-) => {
+): Promise<string> => {
   if (!token) throw newError('register', 'DISCORD_TOKEN')
   if (!application_id) throw newError('register', 'DISCORD_APPLICATION_ID')
 
