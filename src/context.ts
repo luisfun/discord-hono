@@ -11,6 +11,7 @@ import type {
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIInteractionResponseDeferredMessageUpdate,
   APIInteractionResponseLaunchActivity,
+  APIMessage,
   APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
   RESTPatchAPIInteractionOriginalResponseJSONBody,
@@ -260,13 +261,7 @@ export class Context<
   followup(
     data?: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>,
     file?: FileData,
-  ): Promise<
-    Omit<Response, 'json'> & {
-      json(): Promise<
-        import('/Users/phips/ExcludeFromBackup/src/discord-hono/node_modules/discord-api-types/v10').APIMessage
-      >
-    }
-  > {
+  ): Promise<Omit<Response, 'json'> & { json(): Promise<APIMessage> }> {
     this.#throwIfNotAllowType([2, 3, 5])
     if (!this.#discord.APPLICATION_ID) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
     const pathVars: [string, string] = [this.#discord.APPLICATION_ID, (this.interaction as APIInteraction).token]
