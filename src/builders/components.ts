@@ -114,7 +114,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {boolean} [e=true]
    * @returns {this}
    */
-  disabled(e: true = true): this {
+  disabled(e: boolean = true): this {
     return this.a({ disabled: e })
   }
   /**
