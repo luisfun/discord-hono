@@ -26,16 +26,17 @@
     "fix": "biome check --write .",
     "fix:unsafe": "biome check --write --unsafe .",
     "test": "biome check . && tsc && vitest run --coverage",
-    "bench": "npm run build && node bench/discord-hono.js",
-    "build": "tsup src/index.ts --format esm --dts --clean && attw -P . --ignore-rules cjs-resolves-to-esm"
+    "build": "tsup src/index.ts --format esm --dts --clean && attw -P . --ignore-rules cjs-resolves-to-esm",
+    "bench:only": "node --expose-gc bench/discord-hono.js",
+    "bench": "npm run build && npm run bench:only"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
     "@biomejs/biome": "2.2.4",
     "@discordjs/builders": "^1.11.3",
     "@vitest/coverage-v8": "^3.2.4",
-    "discord-api-types": "^0.38.24",
-    "discord-hono": "0.19.5",
+    "discord-api-types": "^0.38.26",
+    "discord-hono": "0.19.6",
     "mitata": "^1.0.34",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2",

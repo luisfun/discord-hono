@@ -25,6 +25,9 @@
       "complexity": {
         "noBannedTypes": "off" // Allow banned types
       },
+      "nursery": {
+        "useExplicitType": "warn" // Encourage explicit type annotation
+      },
       "performance": {
         "noBarrelFile": "off", // For simple coding purposes
         "noReExportAll": "off" // For consistency in file separation
@@ -32,14 +35,11 @@
       "suspicious": {
         "noExplicitAny": "off", // Allow type any
         "noConsole": {
-          "level": "warn",
+          "level": "on",
           "options": {
             "allow": ["assert", "error", "info", "warn"]
           }
         }
-      },
-      "nursery": {
-        "useExplicitType": "warn"
       }
     }
   },
