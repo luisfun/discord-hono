@@ -12,7 +12,7 @@ For quick questions or immediate assistance, consider using our Discord chat.
 
 ![node](https://img.shields.io/badge/Node.js-5FA04E?logo=Node.js&logoColor=white) ![npm](https://img.shields.io/badge/npm-CB3837?logo=npm&logoColor=white)
 
-- Run `npm i` to install
+- Run `npm ci` to install
 - Run `npm run fix` before commit
 - Run `npm run test` before pull request
 
