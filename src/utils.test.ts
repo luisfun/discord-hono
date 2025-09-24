@@ -103,8 +103,8 @@ describe('formData function', () => {
     ]
     formData(undefined, mockFiles)
 
-    expect(appendSpy).toHaveBeenCalledWith('files[0]', mockFiles[0].blob, mockFiles[0].name)
-    expect(appendSpy).toHaveBeenCalledWith('files[1]', mockFiles[1].blob, mockFiles[1].name)
+    expect(appendSpy).toHaveBeenCalledWith('files[0]', mockFiles[0]?.blob, mockFiles[0]?.name)
+    expect(appendSpy).toHaveBeenCalledWith('files[1]', mockFiles[1]?.blob, mockFiles[1]?.name)
   })
 
   it('should handle both data and file', () => {

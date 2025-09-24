@@ -11,7 +11,7 @@ import type {
   APIUserSelectComponent,
   ChannelType,
 } from 'discord-api-types/v10'
-import { CUSTOM_ID_SEPARATOR, toJSON } from '../utils'
+import { CUSTOM_ID_SEPARATOR, isArray, isString, toJSON } from '../utils'
 import { Builder, ifThrowHasSemicolon, warnBuilder } from './utils'
 
 /**
@@ -74,8 +74,8 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
   ) {
     const style = buttonStyleNum[button_style] || 1
     const custom_id = str + CUSTOM_ID_SEPARATOR
-    const isArrayLabels = Array.isArray(labels)
-    const label: string | undefined = isArrayLabels ? labels[1] : labels
+    const isArrayLabels = isArray(labels)
+    const label: string = isArrayLabels ? labels[1] : (labels as string)
     let obj: APIButtonComponent
     switch (style) {
       case 5:
@@ -99,7 +99,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @returns {this}
    */
   emoji(e: T extends 'SKU' ? undefined : string | APIMessageComponentEmoji): this {
-    return this.#assign('emoji', ['SKU'], { emoji: typeof e === 'string' ? { name: e } : e })
+    return this.#assign('emoji', ['SKU'], { emoji: isString(e) ? { name: e } : (e as APIMessageComponentEmoji) })
   }
   /**
    * available: Primary, Secondary, Success, Danger
@@ -125,7 +125,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @returns {this}
    */
   label(e: T extends 'SKU' ? undefined : string): this {
-    return this.#assign('label', ['SKU'], { label: e })
+    return this.#assign('label', ['SKU'], { label: e as string })
   }
   /**
    * Overwrite button style

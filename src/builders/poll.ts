@@ -1,17 +1,16 @@
 import type { APIPartialEmoji, RESTAPIPoll } from 'discord-api-types/v10'
+import { isArray, isString } from '../utils'
 import { Builder } from './utils'
 
 const answersRemap = (
   answers: (string | [string | APIPartialEmoji, string])[],
 ): { poll_media: { emoji?: APIPartialEmoji; text: string } }[] =>
   answers.map(e => ({
-    poll_media: Array.isArray(e)
-      ? { emoji: typeof e[0] === 'string' ? { id: null, name: e[0] } : e[0], text: e[1] }
-      : { text: e },
+    poll_media: isArray(e) ? { emoji: isString(e[0]) ? { id: null, name: e[0] } : e[0], text: e[1] } : { text: e },
   }))
 
 export class Poll extends Builder<RESTAPIPoll> {
-  constructor(question?: string, ...answers: (string | [string | APIPartialEmoji, string])[]) {
+  constructor(question: string = '', ...answers: (string | [string | APIPartialEmoji, string])[]) {
     super({ question: { text: question }, answers: answersRemap(answers) })
   }
   /**

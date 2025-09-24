@@ -31,9 +31,9 @@ export type Env = {
 ////////// DiscordEnv //////////
 
 export type DiscordEnv = {
-  TOKEN?: string
-  PUBLIC_KEY?: string
-  APPLICATION_ID?: string
+  TOKEN?: string | undefined
+  PUBLIC_KEY?: string | undefined
+  APPLICATION_ID?: string | undefined
 }
 
 ////////// Context //////////

@@ -321,7 +321,7 @@ export class Option<
    * @returns {this}
    */
   min_value(e: T extends 'Integer' | 'Number' ? number : undefined): this {
-    return this.#assign('min_value', ['Integer', 'Number'], { min_value: e })
+    return this.#assign('min_value', ['Integer', 'Number'], { min_value: e as number })
   }
   /**
    * available: Integer, Number
@@ -329,7 +329,7 @@ export class Option<
    * @returns {this}
    */
   max_value(e: T extends 'Integer' | 'Number' ? number : undefined): this {
-    return this.#assign('max_value', ['Integer', 'Number'], { max_value: e })
+    return this.#assign('max_value', ['Integer', 'Number'], { max_value: e as number })
   }
   /**
    * available: String
@@ -337,7 +337,7 @@ export class Option<
    * @returns {this}
    */
   min_length(e: T extends 'String' ? number : undefined): this {
-    return this.#assign('min_length', ['String'], { min_length: e })
+    return this.#assign('min_length', ['String'], { min_length: e as number })
   }
   /**
    * available: String
@@ -345,7 +345,7 @@ export class Option<
    * @returns {this}
    */
   max_length(e: T extends 'String' ? number : undefined): this {
-    return this.#assign('max_length', ['String'], { max_length: e })
+    return this.#assign('max_length', ['String'], { max_length: e as number })
   }
   /**
    * available: String, Integer, Number

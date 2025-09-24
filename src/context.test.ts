@@ -10,6 +10,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { Context } from './context'
 import { _webhooks_$_$_messages_original, createRest } from './rest'
 import type { CommandContext, ComponentContext } from './types'
+import { isString } from './utils'
 
 // Mock createRest to avoid actual API calls
 vi.mock('./rest', () => ({
@@ -29,7 +30,7 @@ vi.mock('./utils', async () => {
   return {
     ...actual,
     newError: (name: string, message: string) => new Error(`${name}: ${message}`),
-    prepareData: (data: unknown) => (typeof data === 'string' ? { content: data } : data),
+    prepareData: (data: unknown) => (isString(data) ? { content: data } : data),
     formData: vi.fn().mockReturnValue(new FormData()),
     toJSON: (data: unknown) => data,
   }

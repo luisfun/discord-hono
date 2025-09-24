@@ -11,7 +11,7 @@ import type {
   APIThumbnailComponent,
 } from 'discord-api-types/v10'
 import type { ExcludeMethods } from '../types'
-import { toJSON } from '../utils'
+import { isArray, isString, toJSON } from '../utils'
 import type { Button, Select } from './components'
 import { Builder } from './utils'
 
@@ -172,18 +172,18 @@ class ContentImpl<T extends ContentStyle = 'Text Display'> extends Builder<Conte
   constructor(data: ContentData<T>, style: T = 'Text Display' as T) {
     switch (style) {
       case 'Thumbnail':
-        super({ type: 11, media: typeof data === 'string' ? mediaItem(data) : data } as ContentJson<T>)
+        super({ type: 11, media: isString(data) ? mediaItem(data) : data } as ContentJson<T>)
         break
       case 'Media Gallery': {
-        const items = (Array.isArray(data) ? data : [data]) as (string | APIMediaGalleryComponent['items'][number])[]
+        const items = (isArray(data) ? data : [data]) as (string | APIMediaGalleryComponent['items'][number])[]
         super({
           type: 12,
-          items: items.map(item => (typeof item === 'string' ? { media: mediaItem(item) } : item)),
+          items: items.map(item => (isString(item) ? { media: mediaItem(item) } : item)),
         } as ContentJson<T>)
         break
       }
       case 'File':
-        super({ type: 13, file: typeof data === 'string' ? mediaItem(data) : data } as ContentJson<T>)
+        super({ type: 13, file: isString(data) ? mediaItem(data) : data } as ContentJson<T>)
         break
       default: // Text Display
         super({ type: 10, content: data } as ContentJson<T>)

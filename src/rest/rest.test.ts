@@ -14,6 +14,7 @@ vi.mock('../utils', () => ({
       .map(([key, value]) => `${key}=${value}`)
       .join('&')}`
   }),
+  isString: vi.fn(value => typeof value === 'string'),
 }))
 
 describe('Rest', () => {
@@ -35,7 +36,7 @@ describe('Rest', () => {
     const mockResponse = { json: vi.fn().mockResolvedValue({ data: 'mock_data' }) }
     mockFetch.mockResolvedValue(mockResponse)
     // @ts-expect-error
-    const result = await rest('GET', '/users/{user.id}/emoji/{emoji.id}', ['123', '45678'], { query: 'param' }).then(
+    const result = await rest('GET', '/users/{user.id}/emoji/{emoji.id}', ['123', '45678', { query: 'param' }]).then(
       r => r.json(),
     )
 
