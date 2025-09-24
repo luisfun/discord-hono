@@ -54,7 +54,7 @@ export class DiscordHono<E extends Env = Env> {
   constructor(options?: InitOptions<E>) {
     this.#verify = options?.verify ?? verify
     this.#discord = (env: DiscordEnvBindings | undefined): DiscordEnv => {
-      const discordEnv = options?.discordEnv ? options.discordEnv(env) : {}
+      const discordEnv = options?.discordEnv ? options.discordEnv(env as E['Bindings']) : {}
       return {
         APPLICATION_ID: env?.DISCORD_APPLICATION_ID,
         TOKEN: env?.DISCORD_TOKEN,
@@ -138,7 +138,7 @@ export class DiscordHono<E extends Env = Env> {
             case 3:
             case 5: {
               const id = interaction.data.custom_id
-              const key = id.split(CUSTOM_ID_SEPARATOR)[0]
+              const key = id.split(CUSTOM_ID_SEPARATOR)[0] ?? ''
               interaction.data.custom_id = id.slice(key.length + 1)
               return key
             }

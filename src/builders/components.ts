@@ -75,7 +75,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
     const style = buttonStyleNum[button_style] || 1
     const custom_id = str + CUSTOM_ID_SEPARATOR
     const isArrayLabels = isArray(labels)
-    const label: string | undefined = isArrayLabels ? labels[1] : labels
+    const label: string = isArrayLabels ? labels[1] : (labels as string)
     let obj: APIButtonComponent
     switch (style) {
       case 5:
@@ -99,7 +99,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @returns {this}
    */
   emoji(e: T extends 'SKU' ? undefined : string | APIMessageComponentEmoji): this {
-    return this.#assign('emoji', ['SKU'], { emoji: isString(e) ? { name: e } : e })
+    return this.#assign('emoji', ['SKU'], { emoji: isString(e) ? { name: e } : (e as APIMessageComponentEmoji) })
   }
   /**
    * available: Primary, Secondary, Success, Danger
@@ -125,7 +125,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @returns {this}
    */
   label(e: T extends 'SKU' ? undefined : string): this {
-    return this.#assign('label', ['SKU'], { label: e })
+    return this.#assign('label', ['SKU'], { label: e as string })
   }
   /**
    * Overwrite button style

@@ -10,7 +10,7 @@ const answersRemap = (
   }))
 
 export class Poll extends Builder<RESTAPIPoll> {
-  constructor(question?: string, ...answers: (string | [string | APIPartialEmoji, string])[]) {
+  constructor(question: string = '', ...answers: (string | [string | APIPartialEmoji, string])[]) {
     super({ question: { text: question }, answers: answersRemap(answers) })
   }
   /**

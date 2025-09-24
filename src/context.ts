@@ -87,12 +87,12 @@ export class Context<
         let options: APIApplicationCommandInteractionDataOption[] | undefined
         if ('options' in interaction.data) {
           options = interaction.data.options
-          if (options?.[0].type === 2) {
+          if (options?.[0]?.type === 2) {
             this.#sub.group = options[0].name
             this.#sub.string = `${options[0].name} `
             options = options[0].options
           }
-          if (options?.[0].type === 1) {
+          if (options?.[0]?.type === 1) {
             this.#sub.command = options[0].name
             this.#sub.string += options[0].name
             options = options[0].options

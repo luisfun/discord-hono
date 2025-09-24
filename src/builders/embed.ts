@@ -53,50 +53,50 @@ export class Embed extends Builder<APIEmbed> {
   }
   /**
    * [Footer Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-footer-structure)
-   * @param {APIEmbed["footer"]} e
+   * @param {NonNullable<APIEmbed["footer"]>} e
    * @returns {this}
    */
-  footer(e: APIEmbed['footer']): this {
+  footer(e: NonNullable<APIEmbed['footer']>): this {
     return this.a({ footer: e })
   }
   /**
    * [Image Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-image-structure)
-   * @param {APIEmbed["image"]} e
+   * @param {NonNullable<APIEmbed["image"]>} e
    * @returns {this}
    */
-  image(e: APIEmbed['image']): this {
+  image(e: NonNullable<APIEmbed['image']>): this {
     return this.a({ image: e })
   }
   /**
    * [Thumbnail Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-thumbnail-structure)
-   * @param {APIEmbed["thumbnail"]} e
+   * @param {NonNullable<APIEmbed["thumbnail"]>} e
    * @returns {this}
    */
-  thumbnail(e: APIEmbed['thumbnail']): this {
+  thumbnail(e: NonNullable<APIEmbed['thumbnail']>): this {
     return this.a({ thumbnail: e })
   }
   /**
    * [Video Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-video-structure)
-   * @param {APIEmbed["video"]} e
+   * @param {NonNullable<APIEmbed["video"]>} e
    * @returns {this}
    */
-  video(e: APIEmbed['video']): this {
+  video(e: NonNullable<APIEmbed['video']>): this {
     return this.a({ video: e })
   }
   /**
    * [Provider Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-provider-structure)
-   * @param {APIEmbed["provider"]} e
+   * @param {NonNullable<APIEmbed["provider"]>} e
    * @returns {this}
    */
-  provider(e: APIEmbed['provider']): this {
+  provider(e: NonNullable<APIEmbed['provider']>): this {
     return this.a({ provider: e })
   }
   /**
    * [Author Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-author-structure)
-   * @param {APIEmbed["author"]} e
+   * @param {NonNullable<APIEmbed["author"]>} e
    * @returns {this}
    */
-  author(e: APIEmbed['author']): this {
+  author(e: NonNullable<APIEmbed['author']>): this {
     return this.a({ author: e })
   }
   /**
