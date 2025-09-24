@@ -26,7 +26,7 @@ export const testCommandRequestBodyJson = <V extends {}>(
       if (options) {
         interaction.data.options = []
         // @ts-expect-error
-        for (const [name, value] of options) {
+        for (const [name, value] of Object.entries(options)) {
           const type = cmd.options.find(opt => opt.name === name)?.type
           if (!type) throw newError('testCommandRequestBody', `option: "${name}" is not found`)
           // @ts-expect-error
