@@ -8,5 +8,5 @@
     "forceConsistentCasingInFileNames": true,
     "erasableSyntaxOnly": true
   },
-  "include": [".github/**/*", "bench/**/*", "src/**/*", "*"]
+  "include": [".github/**/*", "src/**/*", "*"]
 }
