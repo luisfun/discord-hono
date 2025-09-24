@@ -1,5 +1,5 @@
 import type { FileData } from '../types'
-import { formData, newError, prepareData, queryStringify } from '../utils'
+import { formData, isString, newError, prepareData, queryStringify } from '../utils'
 import type { Rest } from './rest-types'
 
 const API_VER = 'v10'
@@ -22,24 +22,19 @@ export const createRest =
   (
     method: string,
     path: string,
-    variables: string[] = [],
-    data?: (Record<string, any> & { query?: any }) | Record<string, any>[] | string,
+    variables: (string | Record<string, any>)[] = [],
+    data?: Record<string, any> | Record<string, any>[] | string,
     file?: FileData,
   ): ReturnType<typeof fetch> => {
     if (!token) throw newError('REST', 'DISCORD_TOKEN')
-    const isGet = method.toUpperCase() === 'GET'
-    const vars = [...variables]
+    const vars = variables.filter(v => isString(v))
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
     if (!file) headers['content-type'] = 'application/json'
-    const requestData: RequestInit = { method, headers }
-    const prepared:
-      | (Record<string, unknown> & { query?: Record<string, unknown> })
-      | Record<string, unknown>[]
-      | undefined = prepareData(data)
-    if (!isGet) requestData.body = file ? formData(prepared, file) : JSON.stringify(prepared)
+    const prepared: Record<string, unknown> | Record<string, unknown>[] | undefined = prepareData(data)
+    const init: RequestInit = { method, headers, body: file ? formData(prepared, file) : JSON.stringify(prepared) }
     return fetch(
-      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + queryStringify(Array.isArray(prepared) ? undefined : isGet ? prepared : prepared?.query)}`,
-      requestData,
+      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + queryStringify(variables.find(v => !isString(v)) as Record<string, unknown> | undefined)}`,
+      init,
     )
   }
 
@@ -53,8 +48,7 @@ const res2 = await rest('GET', '/applications/{application.id}/activity-instance
   'application.id',
   'instance_id',
 ]).then(r => r.json())
-// @ts-expect-error
-const res3 = await rest('GET', '/unknown', [], { content: '' }).then(r => r.json())
-const res4 = await rest('GET', '/applications/@me').then(r => r.json())
+const res3 = await rest('GET', '/channels/{channel.id}', ['channel.id']).then(r => r.json())
+const res4 = await rest('GET', '/users/@me/guilds', [{ after: '' }]).then(r => r.json())
 const res5 = await rest('POST', "/interactions/{interaction.id}/{interaction.token}/callback", ["", ""], {type: 1}).then(r => r.json())
 */

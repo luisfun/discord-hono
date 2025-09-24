@@ -448,6 +448,7 @@ type RestPathNV<M extends RestMethod> =
     // User
     | typeof _users_me
     | typeof _users_me_connections
+    | typeof _users_me_guilds
     // Voice
     | typeof _voice_regions
   : never
@@ -456,9 +457,12 @@ type RestPathNV<M extends RestMethod> =
 type RestPathVars<M extends RestMethod> =
   M extends 'GET' ?
     // Receiving and Responding
+    | typeof _webhooks_$_$_messages_original
     | typeof _webhooks_$_$_messages_$
     // Application Commands
+    | typeof _applications_$_commands
     | typeof _applications_$_commands_$
+    | typeof _applications_$_guilds_$_commands
     | typeof _applications_$_guilds_$_commands_$
     | typeof _applications_$_guilds_$_commands_permissions
     | typeof _applications_$_guilds_$_commands_$_permissions
@@ -466,6 +470,8 @@ type RestPathVars<M extends RestMethod> =
     | typeof _applications_$_activityinstances_$
     // Application Role Connection Metadata
     | typeof _applications_$_roleconnections_metadata
+    // Audit Log
+    | typeof _guilds_$_auditlogs
     // Auto Moderation
     | typeof _guilds_$_automoderation_rules
     | typeof _guilds_$_automoderation_rules_$
@@ -473,14 +479,25 @@ type RestPathVars<M extends RestMethod> =
     | typeof _channels_$
     | typeof _channels_$_invites
     | typeof _channels_$_pins
+    | typeof _channels_$_threadmembers_$
+    | typeof _channels_$_threadmembers
+    | typeof _channels_$_threads_archived_public
+    | typeof _channels_$_threads_archived_private
+    | typeof _channels_$_users_me_threads_archived_private
     // Emoji
     | typeof _guilds_$_emojis
     | typeof _guilds_$_emojis_$
     | typeof _applications_$_emojis
     | typeof _applications_$_emojis_$
     // Entitlement
+    | typeof _applications_$_entitlements
     | typeof _applications_$_entitlements_$
     // Guild
+    | typeof _guilds_$
+    | typeof _guilds_$_members
+    | typeof _guilds_$_bans
+    | typeof _guilds_$_prune
+    | typeof _guilds_$_widgetpng
     | typeof _guilds_$_preview
     | typeof _guilds_$_channels
     | typeof _guilds_$_threads_active
@@ -496,11 +513,21 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_$_vanityurl
     | typeof _guilds_$_welcomescreen
     | typeof _guilds_$_onboarding
+    // Guild Schedule Event
+    | typeof _guilds_$_scheduledevents
+    | typeof _guilds_$_scheduledevents_$
+    | typeof _guilds_$_scheduledevents_$_users
     // Guild Template
     | typeof _guilds_templates_$
     | typeof _guilds_$_templates
+    // Invite
+    | typeof _invites_$
     // Message
+    | typeof _channels_$_messages
     | typeof _channels_$_messages_$
+    | typeof _channels_$_messages_$_reactions_$
+    // Poll
+    | typeof _channels_$_polls_$_answers_$
     // SKU
     | typeof _applications_$_skus
     // Soundboard
@@ -514,6 +541,7 @@ type RestPathVars<M extends RestMethod> =
     | typeof _guilds_$_stickers
     | typeof _guilds_$_stickers_$
     // Subscription
+    | typeof _skus_$_subscriptions
     | typeof _skus_$_subscriptions_$
     // User
     | typeof _users_$
@@ -602,49 +630,6 @@ type RestPathVars<M extends RestMethod> =
     | typeof _webhooks_$
     | typeof _webhooks_$_$
     | typeof _webhooks_$_$_messages_$
-  : never
-
-// Optional化のチェック GET のみ
-// biome-ignore format: ternary operator
-type RestPathVarsOptionalData<M extends RestMethod> =
-  M extends 'GET' ?
-    // Receiving and Responding
-    | typeof _webhooks_$_$_messages_original
-    | typeof _webhooks_$_$_messages_$
-    // Application Commands
-    | typeof _applications_$_commands
-    | typeof _applications_$_guilds_$_commands
-    // Audit Log
-    | typeof _guilds_$_auditlogs
-    // Channel
-    | typeof _channels_$_threadmembers_$
-    | typeof _channels_$_threadmembers
-    | typeof _channels_$_threads_archived_public
-    | typeof _channels_$_threads_archived_private
-    | typeof _channels_$_users_me_threads_archived_private
-    // Entitlement
-    | typeof _applications_$_entitlements
-    // Guild
-    | typeof _guilds_$
-    | typeof _guilds_$_members
-    | typeof _guilds_$_bans
-    | typeof _guilds_$_prune
-    | typeof _guilds_$_widgetpng
-    // Guild Schedule Event
-    | typeof _guilds_$_scheduledevents
-    | typeof _guilds_$_scheduledevents_$
-    | typeof _guilds_$_scheduledevents_$_users
-    // Invite
-    | typeof _invites_$
-    // Message
-    | typeof _channels_$_messages
-    | typeof _channels_$_messages_$_reactions_$
-    // Poll
-    | typeof _channels_$_polls_$_answers_$
-    // Subscription
-    | typeof _skus_$_subscriptions
-    // User
-    | typeof _users_me_guilds
   : never
 
 // biome-ignore format: ternary operator
@@ -778,7 +763,6 @@ type RestPathVarsDataFile<M extends RestMethod> =
 export type RestPath<M extends RestMethod> =
   | RestPathNV<M>
   | RestPathVars<M>
-  | RestPathVarsOptionalData<M>
   | RestPathVarsData<M>
   | RestPathVarsDataFile<M>
 
@@ -918,12 +902,12 @@ export type RestVariables<P extends RestPath<any>> =
 
 ////////////////////////////////////////
 //////                            //////
-//////            Data            //////
+//////            Query           //////
 //////                            //////
 ////////////////////////////////////////
 
 // biome-ignore format: ternary operator
-export type RestData<M extends RestMethod, P extends RestPath<M>> =
+export type RestQuery<M extends RestMethod, P extends RestPath<M>> =
   M extends 'GET' ?
     // Receiving and Responding
     P extends typeof _webhooks_$_$_messages_original ? RESTGetAPIWebhookWithTokenMessageQuery :
@@ -964,7 +948,24 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // User
     P extends typeof _users_me_guilds ? RESTGetAPICurrentUserGuildsQuery :
     never
-  : M extends 'PUT' ?
+  : M extends 'POST' ?
+    // Receiving and Responding
+    P extends typeof _interactions_$_$_callback ? RESTPostAPIInteractionCallbackQuery :
+    // Webhook
+    P extends typeof _webhooks_$_$_slack ? RESTPostAPIWebhookWithTokenSlackQuery :
+    P extends typeof _webhooks_$_$_github ? RESTPostAPIWebhookWithTokenGitHubQuery :
+    never
+  : never
+
+////////////////////////////////////////
+//////                            //////
+//////            Data            //////
+//////                            //////
+////////////////////////////////////////
+
+// biome-ignore format: ternary operator
+export type RestData<M extends RestMethod, P extends RestPath<M>> =
+  M extends 'PUT' ?
     // Application Commands
     P extends typeof _applications_$_commands ? RESTPutAPIApplicationCommandsJSONBody :
     P extends typeof _applications_$_guilds_$_commands ? RESTPutAPIApplicationGuildCommandsJSONBody :
@@ -988,7 +989,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     // @ts-expect-error インデックス シグネチャがありません。ts(2344)
     P extends typeof _webhooks_$_$ ? CustomCallbackData<RESTPostAPIInteractionFollowupJSONBody> | CustomCallbackData<RESTPostAPIWebhookWithTokenJSONBody & Query<RESTPostAPIWebhookWithTokenQuery>> | undefined :
     // Receiving and Responding
-    P extends typeof _interactions_$_$_callback ? APIInteractionResponse & Query<RESTPostAPIInteractionCallbackQuery> | undefined :
+    P extends typeof _interactions_$_$_callback ? APIInteractionResponse :
     // Application Commands
     P extends typeof _applications_$_commands ? RESTPostAPIApplicationCommandsJSONBody :
     P extends typeof _applications_$_guilds_$_commands ? RESTPostAPIApplicationGuildCommandsJSONBody :
@@ -1029,8 +1030,6 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _users_me_channels ? RESTPostAPICurrentUserCreateDMChannelJSONBody | CouldNotFind :
     // Webhook
     P extends typeof _channels_$_webhooks ? RESTPostAPIChannelWebhookJSONBody :
-    P extends typeof _webhooks_$_$_slack ? Query<RESTPostAPIWebhookWithTokenSlackQuery> :
-    P extends typeof _webhooks_$_$_github ? Query<RESTPostAPIWebhookWithTokenGitHubQuery> :
     never
   : M extends 'PATCH' ?
     // Duplication
@@ -1407,29 +1406,23 @@ export type Rest = {
   <M extends RestMethod, P extends RestPathNV<M>>(
     method: M,
     path: P,
-    variables?: RestVariables<P>,
+    variables?: RestVariables<P> | [...RestVariables<P>, RestQuery<M, P>],
   ): Promise<TypedResponse<RestResult<M, P>>>
   <M extends RestMethod, P extends RestPathVars<M>>(
     method: M,
     path: P,
-    variables: RestVariables<P>,
-  ): Promise<TypedResponse<RestResult<M, P>>>
-  <M extends RestMethod, P extends RestPathVarsOptionalData<M>>(
-    method: M,
-    path: P,
-    variables: RestVariables<P>,
-    data?: RestData<M, P>,
+    variables: RestVariables<P> | [...RestVariables<P>, RestQuery<M, P>],
   ): Promise<TypedResponse<RestResult<M, P>>>
   <M extends RestMethod, P extends RestPathVarsData<M>>(
     method: M,
     path: P,
-    variables: RestVariables<P>,
+    variables: RestVariables<P> | [...RestVariables<P>, RestQuery<M, P>],
     data: RestData<M, P>,
   ): Promise<TypedResponse<RestResult<M, P>>>
   <M extends RestMethod, P extends RestPathVarsDataFile<M>>(
     method: M,
     path: P,
-    variables: RestVariables<P>,
+    variables: RestVariables<P> | [...RestVariables<P>, RestQuery<M, P>],
     data: RestData<M, P>,
     file?: RestFile<M, P>,
   ): Promise<TypedResponse<RestResult<M, P>>>
