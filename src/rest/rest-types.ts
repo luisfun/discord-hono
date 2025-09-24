@@ -633,11 +633,15 @@ type RestPathVars<M extends RestMethod> =
   : never
 
 // biome-ignore format: ternary operator
-type RestPathVarsData<M extends RestMethod> =
+type RestPathVarsQueryRequired<M extends RestMethod> =
   M extends 'GET' ?
     // Guild
     | typeof _guilds_$_members_search
-  : M extends 'PUT' ?
+  : never
+
+// biome-ignore format: ternary operator
+type RestPathVarsData<M extends RestMethod> =
+  M extends 'PUT' ?
     // Application Commands
     | typeof _applications_$_commands
     | typeof _applications_$_guilds_$_commands
@@ -763,6 +767,7 @@ type RestPathVarsDataFile<M extends RestMethod> =
 export type RestPath<M extends RestMethod> =
   | RestPathNV<M>
   | RestPathVars<M>
+  | RestPathVarsQueryRequired<M>
   | RestPathVarsData<M>
   | RestPathVarsDataFile<M>
 
@@ -1412,6 +1417,11 @@ export type Rest = {
     method: M,
     path: P,
     variables: RestVariables<P> | [...RestVariables<P>, RestQuery<M, P>],
+  ): Promise<TypedResponse<RestResult<M, P>>>
+  <M extends RestMethod, P extends RestPathVarsQueryRequired<M>>(
+    method: M,
+    path: P,
+    variables: [...RestVariables<P>, RestQuery<M, P>],
   ): Promise<TypedResponse<RestResult<M, P>>>
   <M extends RestMethod, P extends RestPathVarsData<M>>(
     method: M,

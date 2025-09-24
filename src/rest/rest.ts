@@ -14,7 +14,7 @@ export const createRest =
    * [Documentation](https://discord-hono.luis.fun/interactions/rest/)
    * @param {'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'} method
    * @param {string} path Official document path
-   * @param {string[]} variables Variable part of official document path
+   * @param {(string | Record<string, any>)[]} variables Variable part of official document path
    * @param {Record<string, any> | Record<string, any>[]} data
    * @param {FileData} file
    * @returns {Promise<Response>}
@@ -31,10 +31,9 @@ export const createRest =
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
     if (!file) headers['content-type'] = 'application/json'
     const prepared: Record<string, unknown> | Record<string, unknown>[] | undefined = prepareData(data)
-    const init: RequestInit = { method, headers, body: file ? formData(prepared, file) : JSON.stringify(prepared) }
     return fetch(
       `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + queryStringify(variables.find(v => !isString(v)) as Record<string, unknown> | undefined)}`,
-      init,
+      { method, headers, body: file ? formData(prepared, file) : JSON.stringify(prepared) },
     )
   }
 
