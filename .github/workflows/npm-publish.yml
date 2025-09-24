@@ -32,7 +32,7 @@ jobs:
           node-version: 'lts/*'
           registry-url: 'https://registry.npmjs.org'
       - run: |
-          npm i -g npm@latest
+          npm i -g npm@11.6.0
           npm ci
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
