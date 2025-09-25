@@ -30,10 +30,12 @@ export const createRest =
     const vars = variables.filter(v => isString(v))
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
     if (!file) headers['content-type'] = 'application/json'
-    const prepared: Record<string, unknown> | Record<string, unknown>[] | undefined = prepareData(data)
+    const requestInit: RequestInit = { method, headers }
+    if (method.toUpperCase() !== 'GET')
+      requestInit.body = file ? formData(prepareData(data), file) : JSON.stringify(prepareData(data))
     return fetch(
       `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + queryStringify(variables.find(v => !isString(v)) as Record<string, unknown> | undefined)}`,
-      { method, headers, body: file ? formData(prepared, file) : JSON.stringify(prepared) },
+      requestInit,
     )
   }
 
