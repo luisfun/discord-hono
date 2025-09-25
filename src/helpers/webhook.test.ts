@@ -9,7 +9,6 @@ vi.mock('../utils', async importOriginal => {
     ...actual,
     formData: vi.fn((data, file) => `mocked-form-data-${JSON.stringify(data)}-${JSON.stringify(file)}`),
     prepareData: vi.fn(data => ({ ...data, prepared: true })),
-    //queryStringify: vi.fn(() => '?mocked-query'),
   }
 })
 
