@@ -292,7 +292,7 @@ import type {
   //RESTPostAPIGuildStickerFormDataBody,
   //RESTPostAPIGuildStickerResult,
 } from 'discord-api-types/v10'
-import type { CustomCallbackData, FileData } from '../types'
+import type { CustomCallbackData, FileData, TypedResponse } from '../types'
 import type {
   _applications_$_activityinstances_$,
   _applications_$_commands,
@@ -425,8 +425,6 @@ import type {
 // [Create Guild Sticker](https://discord.com/developers/docs/resources/sticker#create-guild-sticker) // https://discord-api-types.dev/search?q=RESTPostAPIGuildSticker
 
 type CouldNotFind = Record<string, unknown>
-
-export type Query<T> = { query?: T }
 
 export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 
@@ -954,6 +952,8 @@ export type RestQuery<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _users_me_guilds ? RESTGetAPICurrentUserGuildsQuery :
     never
   : M extends 'POST' ?
+    // Duplication
+    P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenQuery :
     // Receiving and Responding
     P extends typeof _interactions_$_$_callback ? RESTPostAPIInteractionCallbackQuery :
     // Webhook
@@ -992,7 +992,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
   : M extends 'POST' ?
     // Duplication
     // @ts-expect-error インデックス シグネチャがありません。ts(2344)
-    P extends typeof _webhooks_$_$ ? CustomCallbackData<RESTPostAPIInteractionFollowupJSONBody> | CustomCallbackData<RESTPostAPIWebhookWithTokenJSONBody & Query<RESTPostAPIWebhookWithTokenQuery>> | undefined :
+    P extends typeof _webhooks_$_$ ? CustomCallbackData<RESTPostAPIInteractionFollowupJSONBody> | CustomCallbackData<RESTPostAPIWebhookWithTokenJSONBody> | undefined :
     // Receiving and Responding
     P extends typeof _interactions_$_$_callback ? APIInteractionResponse :
     // Application Commands
@@ -1404,8 +1404,6 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     P extends typeof _webhooks_$_$_messages_$ ? RESTDeleteAPIWebhookWithTokenMessageResult :
     never
   : never
-
-type TypedResponse<T> = Omit<Response, 'json'> & { json(): Promise<T> }
 
 export type Rest = {
   <M extends RestMethod, P extends RestPathNV<M>>(

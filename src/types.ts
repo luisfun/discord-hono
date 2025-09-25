@@ -158,3 +158,7 @@ type FileUnit = {
   name: string
 }
 export type FileData = FileUnit | FileUnit[]
+
+///////// TypedResponse //////////
+
+export type TypedResponse<T> = Omit<Response, 'json'> & { json(): Promise<T> }
