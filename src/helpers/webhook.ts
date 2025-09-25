@@ -1,25 +1,23 @@
-import type { RESTPostAPIWebhookWithTokenJSONBody, RESTPostAPIWebhookWithTokenQuery } from 'discord-api-types/v10'
-import type { Query } from '../rest/rest-types'
-import type { CustomCallbackData, FileData } from '../types'
-import { formData, prepareData, queryStringify } from '../utils'
+import type { _webhooks_$_$, RestData, RestFile, RestQuery, RestResult } from '../rest'
+import type { TypedResponse } from '../types'
+import { formData, isArray, prepareData, queryStringify } from '../utils'
 
 /**
  * [Documentation](https://discord-hono.luis.fun/interactions/webhook/)
- * @param {string} url webhook url
- * @param {CustomCallbackData<RESTPostAPIWebhookWithTokenJSONBody & Query<RESTPostAPIWebhookWithTokenQuery>>} data [RESTPostAPIWebhookWithTokenJSONBody](https://discord-api-types.dev/api/next/discord-api-types-v10/interface/RESTPostAPIWebhookWithTokenJSONBody)
- * @param {FileData} file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
- * @returns {Promise<Response>}
+ * @param {string | [string] | [string, RestQuery<"POST", typeof _webhooks_$_$>]} url webhook url
+ * @param {RestData<"POST", typeof _webhooks_$_$>} data [RESTPostAPIWebhookWithTokenJSONBody](https://discord-api-types.dev/api/next/discord-api-types-v10/interface/RESTPostAPIWebhookWithTokenJSONBody)
+ * @param {RestFile<"POST", typeof _webhooks_$_$>} file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
+ * @returns {RestResult<"POST", typeof _webhooks_$_$>}
  */
 export const webhook = (
-  url: string,
-  // @ts-expect-error: インデックス シグネチャがありません。ts(2344)
-  data: CustomCallbackData<RESTPostAPIWebhookWithTokenJSONBody & Query<RESTPostAPIWebhookWithTokenQuery>>,
-  file?: FileData,
-): ReturnType<typeof fetch> => {
-  const headers: HeadersInit = {}
-  if (!file) headers['content-type'] = 'application/json'
-  const requestData: RequestInit = { method: 'POST', headers }
-  const prepared = prepareData(data) as (Record<string, unknown> & { query?: Record<string, unknown> }) | undefined
-  requestData.body = file ? formData(prepared, file) : JSON.stringify(prepared)
-  return fetch(`${url + queryStringify(prepared?.query)}`, requestData)
-}
+  url: string | [string] | [string, RestQuery<'POST', typeof _webhooks_$_$>],
+  data: RestData<'POST', typeof _webhooks_$_$>,
+  file?: RestFile<'POST', typeof _webhooks_$_$>,
+): Promise<TypedResponse<RestResult<'POST', typeof _webhooks_$_$>>> =>
+  fetch(isArray(url) ? `${url[0] + queryStringify(url[1] as Record<string, unknown> | undefined)}` : url, {
+    method: 'POST',
+    headers: file ? {} : { 'content-type': 'application/json' },
+    body: file ? formData(prepareData(data), file) : JSON.stringify(prepareData(data)),
+  })
+
+// const res = await webhook('https://discord.com/api/webhooks/123/abc', 'Hello, world!').then(r => r.json())

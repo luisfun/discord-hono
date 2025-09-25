@@ -31,6 +31,7 @@ import type {
   FetchEventLike,
   FileData,
   ModalContext,
+  TypedResponse,
 } from './types'
 import { formData, newError, prepareData, toJSON } from './utils'
 
@@ -267,7 +268,7 @@ export class Context<
   followup(
     data?: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>,
     file?: FileData,
-  ): Promise<Omit<Response, 'json'> & { json(): Promise<APIMessage> }> {
+  ): Promise<TypedResponse<APIMessage | never>> {
     this.#throwIfNotAllowType([2, 3, 5])
     if (!this.#discord.APPLICATION_ID) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
     const pathVars: [string, string] = [this.#discord.APPLICATION_ID, (this.interaction as APIInteraction).token]

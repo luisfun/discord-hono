@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { formData, queryStringify } from '../utils'
+import { formData } from '../utils'
 import { webhook } from './webhook'
 
 // モックの設定
@@ -9,7 +9,6 @@ vi.mock('../utils', async importOriginal => {
     ...actual,
     formData: vi.fn((data, file) => `mocked-form-data-${JSON.stringify(data)}-${JSON.stringify(file)}`),
     prepareData: vi.fn(data => ({ ...data, prepared: true })),
-    queryStringify: vi.fn(() => '?mocked-query'),
   }
 })
 
@@ -32,7 +31,7 @@ describe('webhook', () => {
     await webhook(url, data)
 
     expect(globalThis.fetch).toHaveBeenCalledTimes(1)
-    expect(globalThis.fetch).toHaveBeenCalledWith(`${url}?mocked-query`, {
+    expect(globalThis.fetch).toHaveBeenCalledWith(`${url}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ ...data, prepared: true }),
@@ -47,7 +46,7 @@ describe('webhook', () => {
     await webhook(url, data, file)
 
     expect(globalThis.fetch).toHaveBeenCalledTimes(1)
-    expect(globalThis.fetch).toHaveBeenCalledWith(`${url}?mocked-query`, {
+    expect(globalThis.fetch).toHaveBeenCalledWith(`${url}`, {
       method: 'POST',
       headers: {},
       body: `mocked-form-data-${JSON.stringify({ ...data, prepared: true })}-${JSON.stringify(file)}`,
@@ -59,13 +58,11 @@ describe('webhook', () => {
     const url = 'https://discord.com/api/webhooks/123/abc'
     const data = {
       content: 'Hello, world!',
-      query: { wait: true, thread_id: '456' },
     }
 
-    await webhook(url, data)
+    await webhook([url, { wait: true, thread_id: '456' }], data)
 
-    expect(queryStringify).toHaveBeenCalledWith(data.query)
-    expect(globalThis.fetch).toHaveBeenCalledWith(`${url}?mocked-query`, expect.any(Object))
+    expect(globalThis.fetch).toHaveBeenCalledWith(`${url}?wait=true&thread_id=456`, expect.any(Object))
   })
 
   it('should handle array of files correctly', async () => {
