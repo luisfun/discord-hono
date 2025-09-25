@@ -62,7 +62,6 @@ describe('webhook', () => {
 
     await webhook([url, { wait: true, thread_id: '456' }], data)
 
-    //expect(queryStringify).toHaveBeenCalledWith(data.query)
     expect(globalThis.fetch).toHaveBeenCalledWith(`${url}?wait=true&thread_id=456`, expect.any(Object))
   })
 
