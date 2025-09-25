@@ -1,6 +1,6 @@
-import type { FileData } from '../types'
+import type { TypedResponse } from '../types'
 import { formData, isString, newError, prepareData, queryStringify } from '../utils'
-import type { Rest } from './rest-types'
+import type { Rest, RestData, RestFile, RestMethod, RestPath, RestQuery, RestResult, RestVariables } from './rest-types'
 
 const API_VER = 'v10'
 
@@ -12,27 +12,27 @@ export const createRest =
   (token: string | undefined): Rest =>
   /**
    * [Documentation](https://discord-hono.luis.fun/interactions/rest/)
-   * @param {'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'} method
-   * @param {string} path Official document path
+   * @param {RestMethod} method
+   * @param {RestPath<any>} path Official document path
    * @param {(string | Record<string, any>)[]} variables Variable part of official document path
    * @param {Record<string, any> | Record<string, any>[]} data
    * @param {FileData} file
    * @returns {Promise<Response>}
    */
-  (
-    method: string,
-    path: string,
-    variables: (string | Record<string, any>)[] = [],
-    data?: Record<string, any> | Record<string, any>[] | string,
-    file?: FileData,
-  ): ReturnType<typeof fetch> => {
+  <M extends RestMethod, P extends RestPath<M>>(
+    method: M,
+    path: P,
+    variables: RestVariables<P> | [...RestVariables<P>, RestQuery<M, P>] | [] = [],
+    data?: RestData<M, P>,
+    file?: RestFile<M, P>,
+  ): Promise<TypedResponse<RestResult<M, P>>> => {
     if (!token) throw newError('REST', 'DISCORD_TOKEN')
     const vars = variables.filter(v => isString(v))
     const headers: HeadersInit = { Authorization: `Bot ${token}` }
     if (!file) headers['content-type'] = 'application/json'
     const requestInit: RequestInit = { method, headers }
     if (method.toUpperCase() !== 'GET')
-      requestInit.body = file ? formData(prepareData(data), file) : JSON.stringify(prepareData(data))
+      requestInit.body = file ? formData(prepareData<any>(data), file) : JSON.stringify(prepareData(data))
     return fetch(
       `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + queryStringify(variables.find(v => !isString(v)) as Record<string, unknown> | undefined)}`,
       requestInit,
