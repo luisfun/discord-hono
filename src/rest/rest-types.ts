@@ -294,121 +294,121 @@ import type {
 } from 'discord-api-types/v10'
 import type { CustomCallbackData, FileData, TypedResponse } from '../types'
 import type {
-  _applications_$_activityinstances_$,
-  _applications_$_commands,
-  _applications_$_commands_$,
-  _applications_$_emojis,
-  _applications_$_emojis_$,
-  _applications_$_entitlements,
-  _applications_$_entitlements_$,
-  _applications_$_entitlements_$_consume,
-  _applications_$_guilds_$_commands,
-  _applications_$_guilds_$_commands_$,
-  _applications_$_guilds_$_commands_$_permissions,
-  _applications_$_guilds_$_commands_permissions,
-  _applications_$_roleconnections_metadata,
-  _applications_$_skus,
-  _applications_me,
-  _channels_$,
-  _channels_$_followers,
-  _channels_$_invites,
-  _channels_$_messages,
-  _channels_$_messages_$,
-  _channels_$_messages_$_crosspost,
-  _channels_$_messages_$_reactions,
-  _channels_$_messages_$_reactions_$,
-  _channels_$_messages_$_reactions_$_$,
-  _channels_$_messages_$_reactions_$_me,
-  _channels_$_messages_$_threads,
-  _channels_$_messages_bulkdelete,
-  _channels_$_permissions_$,
-  _channels_$_pins,
-  _channels_$_pins_$,
-  _channels_$_polls_$_answers_$,
-  _channels_$_polls_$_expire,
-  _channels_$_recipients_$,
-  _channels_$_sendsoundboardsound,
-  _channels_$_threadmembers,
-  _channels_$_threadmembers_$,
-  _channels_$_threadmembers_me,
-  _channels_$_threads,
-  _channels_$_threads_archived_private,
-  _channels_$_threads_archived_public,
-  _channels_$_typing,
-  _channels_$_users_me_threads_archived_private,
-  _channels_$_webhooks,
-  _guilds,
-  _guilds_$,
-  _guilds_$_auditlogs,
-  _guilds_$_automoderation_rules,
-  _guilds_$_automoderation_rules_$,
-  _guilds_$_bans,
-  _guilds_$_bans_$,
-  _guilds_$_bulkban,
-  _guilds_$_channels,
-  _guilds_$_emojis,
-  _guilds_$_emojis_$,
-  _guilds_$_incidentactions,
-  _guilds_$_integrations,
-  _guilds_$_integrations_$,
-  _guilds_$_invites,
-  _guilds_$_members,
-  _guilds_$_members_$,
-  _guilds_$_members_$_roles_$,
-  _guilds_$_members_me,
-  _guilds_$_members_me_nick,
-  _guilds_$_members_search,
-  _guilds_$_mfa,
-  _guilds_$_onboarding,
-  _guilds_$_preview,
-  _guilds_$_prune,
-  _guilds_$_regions,
-  _guilds_$_roles,
-  _guilds_$_roles_$,
-  _guilds_$_scheduledevents,
-  _guilds_$_scheduledevents_$,
-  _guilds_$_scheduledevents_$_users,
-  _guilds_$_soundboardsounds,
-  _guilds_$_soundboardsounds_$,
-  _guilds_$_stickers,
-  _guilds_$_stickers_$,
-  _guilds_$_templates,
-  _guilds_$_templates_$,
-  _guilds_$_threads_active,
-  _guilds_$_vanityurl,
-  _guilds_$_voicestates_$,
-  _guilds_$_voicestates_me,
-  _guilds_$_webhooks,
-  _guilds_$_welcomescreen,
-  _guilds_$_widget,
-  _guilds_$_widgetjson,
-  _guilds_$_widgetpng,
-  _guilds_templates_$,
-  _interactions_$_$_callback,
-  _invites_$,
-  _skus_$_subscriptions,
-  _skus_$_subscriptions_$,
-  _soundboarddefaultsounds,
-  _stageinstances,
-  _stageinstances_$,
-  _stickerpacks,
-  _stickerpacks_$,
-  _stickers_$,
-  _users_$,
-  _users_me,
-  _users_me_applications_$_roleconnection,
-  _users_me_channels,
-  _users_me_connections,
-  _users_me_guilds,
-  _users_me_guilds_$,
-  _users_me_guilds_$_member,
-  _voice_regions,
-  _webhooks_$,
-  _webhooks_$_$,
-  _webhooks_$_$_github,
-  _webhooks_$_$_messages_$,
-  _webhooks_$_$_messages_original,
-  _webhooks_$_$_slack,
+  $applications$_$activityinstances$_,
+  $applications$_$commands,
+  $applications$_$commands$_,
+  $applications$_$emojis,
+  $applications$_$emojis$_,
+  $applications$_$entitlements,
+  $applications$_$entitlements$_,
+  $applications$_$entitlements$_$consume,
+  $applications$_$guilds$_$commands,
+  $applications$_$guilds$_$commands$_,
+  $applications$_$guilds$_$commands$_$permissions,
+  $applications$_$guilds$_$commands$permissions,
+  $applications$_$roleconnections$metadata,
+  $applications$_$skus,
+  $applications$me,
+  $channels$_,
+  $channels$_$followers,
+  $channels$_$invites,
+  $channels$_$messages,
+  $channels$_$messages$_,
+  $channels$_$messages$_$crosspost,
+  $channels$_$messages$_$reactions,
+  $channels$_$messages$_$reactions$_,
+  $channels$_$messages$_$reactions$_$_,
+  $channels$_$messages$_$reactions$_$me,
+  $channels$_$messages$_$threads,
+  $channels$_$messages$bulkdelete,
+  $channels$_$permissions$_,
+  $channels$_$pins,
+  $channels$_$pins$_,
+  $channels$_$polls$_$answers$_,
+  $channels$_$polls$_$expire,
+  $channels$_$recipients$_,
+  $channels$_$sendsoundboardsound,
+  $channels$_$threadmembers,
+  $channels$_$threadmembers$_,
+  $channels$_$threadmembers$me,
+  $channels$_$threads,
+  $channels$_$threads$archived$private,
+  $channels$_$threads$archived$public,
+  $channels$_$typing,
+  $channels$_$users$me$threads$archived$private,
+  $channels$_$webhooks,
+  $guilds,
+  $guilds$_,
+  $guilds$_$auditlogs,
+  $guilds$_$automoderation$rules,
+  $guilds$_$automoderation$rules$_,
+  $guilds$_$bans,
+  $guilds$_$bans$_,
+  $guilds$_$bulkban,
+  $guilds$_$channels,
+  $guilds$_$emojis,
+  $guilds$_$emojis$_,
+  $guilds$_$incidentactions,
+  $guilds$_$integrations,
+  $guilds$_$integrations$_,
+  $guilds$_$invites,
+  $guilds$_$members,
+  $guilds$_$members$_,
+  $guilds$_$members$_$roles$_,
+  $guilds$_$members$me,
+  $guilds$_$members$me$nick,
+  $guilds$_$members$search,
+  $guilds$_$mfa,
+  $guilds$_$onboarding,
+  $guilds$_$preview,
+  $guilds$_$prune,
+  $guilds$_$regions,
+  $guilds$_$roles,
+  $guilds$_$roles$_,
+  $guilds$_$scheduledevents,
+  $guilds$_$scheduledevents$_,
+  $guilds$_$scheduledevents$_$users,
+  $guilds$_$soundboardsounds,
+  $guilds$_$soundboardsounds$_,
+  $guilds$_$stickers,
+  $guilds$_$stickers$_,
+  $guilds$_$templates,
+  $guilds$_$templates$_,
+  $guilds$_$threads$active,
+  $guilds$_$vanityurl,
+  $guilds$_$voicestates$_,
+  $guilds$_$voicestates$me,
+  $guilds$_$webhooks,
+  $guilds$_$welcomescreen,
+  $guilds$_$widget,
+  $guilds$_$widgetjson,
+  $guilds$_$widgetpng,
+  $guilds$templates$_,
+  $interactions$_$_$callback,
+  $invites$_,
+  $skus$_$subscriptions,
+  $skus$_$subscriptions$_,
+  $soundboarddefaultsounds,
+  $stageinstances,
+  $stageinstances$_,
+  $stickerpacks,
+  $stickerpacks$_,
+  $stickers$_,
+  $users$_,
+  $users$me,
+  $users$me$applications$_$roleconnection,
+  $users$me$channels,
+  $users$me$connections,
+  $users$me$guilds,
+  $users$me$guilds$_,
+  $users$me$guilds$_$member,
+  $voice$regions,
+  $webhooks$_,
+  $webhooks$_$_,
+  $webhooks$_$_$github,
+  $webhooks$_$_$messages$_,
+  $webhooks$_$_$messages$original,
+  $webhooks$_$_$slack,
 } from './rest-path'
 
 ///// Unknowns /////
@@ -438,328 +438,328 @@ export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 type RestPathNV<M extends RestMethod> =
   M extends 'GET' ?
     // Application
-    | typeof _applications_me
+    | typeof $applications$me
     // Soundboard
-    | typeof _soundboarddefaultsounds
+    | typeof $soundboarddefaultsounds
     // Sticker
-    | typeof _stickerpacks
+    | typeof $stickerpacks
     // User
-    | typeof _users_me
-    | typeof _users_me_connections
-    | typeof _users_me_guilds
+    | typeof $users$me
+    | typeof $users$me$connections
+    | typeof $users$me$guilds
     // Voice
-    | typeof _voice_regions
+    | typeof $voice$regions
   : never
 
 // biome-ignore format: ternary operator
 type RestPathVars<M extends RestMethod> =
   M extends 'GET' ?
     // Receiving and Responding
-    | typeof _webhooks_$_$_messages_original
-    | typeof _webhooks_$_$_messages_$
+    | typeof $webhooks$_$_$messages$original
+    | typeof $webhooks$_$_$messages$_
     // Application Commands
-    | typeof _applications_$_commands
-    | typeof _applications_$_commands_$
-    | typeof _applications_$_guilds_$_commands
-    | typeof _applications_$_guilds_$_commands_$
-    | typeof _applications_$_guilds_$_commands_permissions
-    | typeof _applications_$_guilds_$_commands_$_permissions
+    | typeof $applications$_$commands
+    | typeof $applications$_$commands$_
+    | typeof $applications$_$guilds$_$commands
+    | typeof $applications$_$guilds$_$commands$_
+    | typeof $applications$_$guilds$_$commands$permissions
+    | typeof $applications$_$guilds$_$commands$_$permissions
     // Application
-    | typeof _applications_$_activityinstances_$
+    | typeof $applications$_$activityinstances$_
     // Application Role Connection Metadata
-    | typeof _applications_$_roleconnections_metadata
+    | typeof $applications$_$roleconnections$metadata
     // Audit Log
-    | typeof _guilds_$_auditlogs
+    | typeof $guilds$_$auditlogs
     // Auto Moderation
-    | typeof _guilds_$_automoderation_rules
-    | typeof _guilds_$_automoderation_rules_$
+    | typeof $guilds$_$automoderation$rules
+    | typeof $guilds$_$automoderation$rules$_
     // Channel
-    | typeof _channels_$
-    | typeof _channels_$_invites
-    | typeof _channels_$_pins
-    | typeof _channels_$_threadmembers_$
-    | typeof _channels_$_threadmembers
-    | typeof _channels_$_threads_archived_public
-    | typeof _channels_$_threads_archived_private
-    | typeof _channels_$_users_me_threads_archived_private
+    | typeof $channels$_
+    | typeof $channels$_$invites
+    | typeof $channels$_$pins
+    | typeof $channels$_$threadmembers$_
+    | typeof $channels$_$threadmembers
+    | typeof $channels$_$threads$archived$public
+    | typeof $channels$_$threads$archived$private
+    | typeof $channels$_$users$me$threads$archived$private
     // Emoji
-    | typeof _guilds_$_emojis
-    | typeof _guilds_$_emojis_$
-    | typeof _applications_$_emojis
-    | typeof _applications_$_emojis_$
+    | typeof $guilds$_$emojis
+    | typeof $guilds$_$emojis$_
+    | typeof $applications$_$emojis
+    | typeof $applications$_$emojis$_
     // Entitlement
-    | typeof _applications_$_entitlements
-    | typeof _applications_$_entitlements_$
+    | typeof $applications$_$entitlements
+    | typeof $applications$_$entitlements$_
     // Guild
-    | typeof _guilds_$
-    | typeof _guilds_$_members
-    | typeof _guilds_$_bans
-    | typeof _guilds_$_prune
-    | typeof _guilds_$_widgetpng
-    | typeof _guilds_$_preview
-    | typeof _guilds_$_channels
-    | typeof _guilds_$_threads_active
-    | typeof _guilds_$_members_$
-    | typeof _guilds_$_bans_$
-    | typeof _guilds_$_roles
-    | typeof _guilds_$_roles_$
-    | typeof _guilds_$_regions
-    | typeof _guilds_$_invites
-    | typeof _guilds_$_integrations
-    | typeof _guilds_$_widget
-    | typeof _guilds_$_widgetjson
-    | typeof _guilds_$_vanityurl
-    | typeof _guilds_$_welcomescreen
-    | typeof _guilds_$_onboarding
+    | typeof $guilds$_
+    | typeof $guilds$_$members
+    | typeof $guilds$_$bans
+    | typeof $guilds$_$prune
+    | typeof $guilds$_$widgetpng
+    | typeof $guilds$_$preview
+    | typeof $guilds$_$channels
+    | typeof $guilds$_$threads$active
+    | typeof $guilds$_$members$_
+    | typeof $guilds$_$bans$_
+    | typeof $guilds$_$roles
+    | typeof $guilds$_$roles$_
+    | typeof $guilds$_$regions
+    | typeof $guilds$_$invites
+    | typeof $guilds$_$integrations
+    | typeof $guilds$_$widget
+    | typeof $guilds$_$widgetjson
+    | typeof $guilds$_$vanityurl
+    | typeof $guilds$_$welcomescreen
+    | typeof $guilds$_$onboarding
     // Guild Schedule Event
-    | typeof _guilds_$_scheduledevents
-    | typeof _guilds_$_scheduledevents_$
-    | typeof _guilds_$_scheduledevents_$_users
+    | typeof $guilds$_$scheduledevents
+    | typeof $guilds$_$scheduledevents$_
+    | typeof $guilds$_$scheduledevents$_$users
     // Guild Template
-    | typeof _guilds_templates_$
-    | typeof _guilds_$_templates
+    | typeof $guilds$templates$_
+    | typeof $guilds$_$templates
     // Invite
-    | typeof _invites_$
+    | typeof $invites$_
     // Message
-    | typeof _channels_$_messages
-    | typeof _channels_$_messages_$
-    | typeof _channels_$_messages_$_reactions_$
+    | typeof $channels$_$messages
+    | typeof $channels$_$messages$_
+    | typeof $channels$_$messages$_$reactions$_
     // Poll
-    | typeof _channels_$_polls_$_answers_$
+    | typeof $channels$_$polls$_$answers$_
     // SKU
-    | typeof _applications_$_skus
+    | typeof $applications$_$skus
     // Soundboard
-    | typeof _guilds_$_soundboardsounds
-    | typeof _guilds_$_soundboardsounds_$
+    | typeof $guilds$_$soundboardsounds
+    | typeof $guilds$_$soundboardsounds$_
     // Stage Instance
-    | typeof _stageinstances_$
+    | typeof $stageinstances$_
     // Sticker
-    | typeof _stickers_$
-    | typeof _stickerpacks_$
-    | typeof _guilds_$_stickers
-    | typeof _guilds_$_stickers_$
+    | typeof $stickers$_
+    | typeof $stickerpacks$_
+    | typeof $guilds$_$stickers
+    | typeof $guilds$_$stickers$_
     // Subscription
-    | typeof _skus_$_subscriptions
-    | typeof _skus_$_subscriptions_$
+    | typeof $skus$_$subscriptions
+    | typeof $skus$_$subscriptions$_
     // User
-    | typeof _users_$
-    | typeof _users_me_guilds_$_member
-    | typeof _users_me_applications_$_roleconnection
+    | typeof $users$_
+    | typeof $users$me$guilds$_$member
+    | typeof $users$me$applications$_$roleconnection
     // Voice
-    | typeof _guilds_$_voicestates_me
-    | typeof _guilds_$_voicestates_$
+    | typeof $guilds$_$voicestates$me
+    | typeof $guilds$_$voicestates$_
     // Webhook
-    | typeof _channels_$_webhooks
-    | typeof _guilds_$_webhooks
-    | typeof _webhooks_$
-    | typeof _webhooks_$_$
+    | typeof $channels$_$webhooks
+    | typeof $guilds$_$webhooks
+    | typeof $webhooks$_
+    | typeof $webhooks$_$_
   : M extends 'PUT' ?
     // Channel
-    | typeof _channels_$_pins_$
-    | typeof _channels_$_threadmembers_me
-    | typeof _channels_$_threadmembers_$
+    | typeof $channels$_$pins$_
+    | typeof $channels$_$threadmembers$me
+    | typeof $channels$_$threadmembers$_
     // Guild
-    | typeof _guilds_$_members_$_roles_$
+    | typeof $guilds$_$members$_$roles$_
     // Guild Template
-    | typeof _guilds_$_templates_$
+    | typeof $guilds$_$templates$_
     // Message
-    | typeof _channels_$_messages_$_reactions_$_me
+    | typeof $channels$_$messages$_$reactions$_$me
   : M extends 'POST' ?
     // Channel
-    | typeof _channels_$_typing
+    | typeof $channels$_$typing
     // Entitlement
-    | typeof _applications_$_entitlements_$_consume
+    | typeof $applications$_$entitlements$_$consume
     // Message
-    | typeof _channels_$_messages_$_crosspost
+    | typeof $channels$_$messages$_$crosspost
     // Poll
-    | typeof _channels_$_polls_$_expire
+    | typeof $channels$_$polls$_$expire
   : M extends 'PATCH' ?
     // Receiving and Responding
-    | typeof _webhooks_$_$_messages_$
+    | typeof $webhooks$_$_$messages$_
   : M extends 'DELETE' ?
     // Receiving and Responding
-    | typeof _webhooks_$_$_messages_original
-    | typeof _webhooks_$_$_messages_$
+    | typeof $webhooks$_$_$messages$original
+    | typeof $webhooks$_$_$messages$_
     // Application Commands
-    | typeof _applications_$_commands_$
-    | typeof _applications_$_guilds_$_commands_$
+    | typeof $applications$_$commands$_
+    | typeof $applications$_$guilds$_$commands$_
     // Auto Moderation
-    | typeof _guilds_$_automoderation_rules_$
+    | typeof $guilds$_$automoderation$rules$_
     // Channel
-    | typeof _channels_$
-    | typeof _channels_$_permissions_$
-    | typeof _channels_$_pins_$
-    | typeof _channels_$_recipients_$
-    | typeof _channels_$_threadmembers_me
-    | typeof _channels_$_threadmembers_$
+    | typeof $channels$_
+    | typeof $channels$_$permissions$_
+    | typeof $channels$_$pins$_
+    | typeof $channels$_$recipients$_
+    | typeof $channels$_$threadmembers$me
+    | typeof $channels$_$threadmembers$_
     // Emoji
-    | typeof _guilds_$_emojis_$
-    | typeof _applications_$_emojis_$
+    | typeof $guilds$_$emojis$_
+    | typeof $applications$_$emojis$_
     // Entitlement
-    | typeof _applications_$_entitlements_$
+    | typeof $applications$_$entitlements$_
     // Guild
-    | typeof _guilds_$
-    | typeof _guilds_$_members_$_roles_$
-    | typeof _guilds_$_members_$
-    | typeof _guilds_$_bans_$
-    | typeof _guilds_$_roles_$
-    | typeof _guilds_$_integrations_$
+    | typeof $guilds$_
+    | typeof $guilds$_$members$_$roles$_
+    | typeof $guilds$_$members$_
+    | typeof $guilds$_$bans$_
+    | typeof $guilds$_$roles$_
+    | typeof $guilds$_$integrations$_
     // Guild Schedule Event
-    | typeof _guilds_$_scheduledevents_$
+    | typeof $guilds$_$scheduledevents$_
     // Guild Template
-    | typeof _guilds_$_templates_$
+    | typeof $guilds$_$templates$_
     // Invite
-    | typeof _invites_$
+    | typeof $invites$_
     // Message
-    | typeof _channels_$_messages_$_reactions_$_me
-    | typeof _channels_$_messages_$_reactions_$_$  
-    | typeof _channels_$_messages_$_reactions
-    | typeof _channels_$_messages_$_reactions_$
-    | typeof _channels_$_messages_$
+    | typeof $channels$_$messages$_$reactions$_$me
+    | typeof $channels$_$messages$_$reactions$_$_
+    | typeof $channels$_$messages$_$reactions
+    | typeof $channels$_$messages$_$reactions$_
+    | typeof $channels$_$messages$_
     // Soundboard
-    | typeof _guilds_$_soundboardsounds_$
+    | typeof $guilds$_$soundboardsounds$_
     // Stage Instance
-    | typeof _stageinstances_$
+    | typeof $stageinstances$_
     // Sticker
-    | typeof _guilds_$_stickers_$
+    | typeof $guilds$_$stickers$_
     // User
-    | typeof _users_me_guilds_$
+    | typeof $users$me$guilds$_
     // Webhook
-    | typeof _webhooks_$
-    | typeof _webhooks_$_$
-    | typeof _webhooks_$_$_messages_$
+    | typeof $webhooks$_
+    | typeof $webhooks$_$_
+    | typeof $webhooks$_$_$messages$_
   : never
 
 // biome-ignore format: ternary operator
 type RestPathVarsQueryRequired<M extends RestMethod> =
   M extends 'GET' ?
     // Guild
-    | typeof _guilds_$_members_search
+    | typeof $guilds$_$members$search
   : never
 
 // biome-ignore format: ternary operator
 type RestPathVarsData<M extends RestMethod> =
   M extends 'PUT' ?
     // Application Commands
-    | typeof _applications_$_commands
-    | typeof _applications_$_guilds_$_commands
-    | typeof _applications_$_guilds_$_commands_$_permissions
-    | typeof _applications_$_guilds_$_commands_permissions
+    | typeof $applications$_$commands
+    | typeof $applications$_$guilds$_$commands
+    | typeof $applications$_$guilds$_$commands$_$permissions
+    | typeof $applications$_$guilds$_$commands$permissions
     // Application Role Connection Metadata
-    | typeof _applications_$_roleconnections_metadata
+    | typeof $applications$_$roleconnections$metadata
     // Channel
-    | typeof _channels_$_permissions_$
-    | typeof _channels_$_recipients_$
+    | typeof $channels$_$permissions$_
+    | typeof $channels$_$recipients$_
     // Guild
-    | typeof _guilds_$_members_$
-    | typeof _guilds_$_bans_$
-    | typeof _guilds_$_onboarding
-    | typeof _guilds_$_incidentactions
+    | typeof $guilds$_$members$_
+    | typeof $guilds$_$bans$_
+    | typeof $guilds$_$onboarding
+    | typeof $guilds$_$incidentactions
     // User
-    | typeof _users_me_applications_$_roleconnection
+    | typeof $users$me$applications$_$roleconnection
   : M extends 'POST' ?
     // Application Commands
-    | typeof _applications_$_commands
-    | typeof _applications_$_guilds_$_commands
+    | typeof $applications$_$commands
+    | typeof $applications$_$guilds$_$commands
     // Auto Moderation
-    | typeof _guilds_$_automoderation_rules
+    | typeof $guilds$_$automoderation$rules
     // Channel
-    | typeof _channels_$_invites
-    | typeof _channels_$_followers
-    | typeof _channels_$_messages_$_threads
-    | typeof _channels_$_threads
+    | typeof $channels$_$invites
+    | typeof $channels$_$followers
+    | typeof $channels$_$messages$_$threads
+    | typeof $channels$_$threads
     // Emoji
-    | typeof _guilds_$_emojis
-    | typeof _applications_$_emojis
+    | typeof $guilds$_$emojis
+    | typeof $applications$_$emojis
     // Entitlement
-    | typeof _applications_$_entitlements
+    | typeof $applications$_$entitlements
     // Guild
-    | typeof _guilds
-    | typeof _guilds_$_channels
-    | typeof _guilds_$_bulkban
-    | typeof _guilds_$_roles
-    | typeof _guilds_$_roles_$
-    | typeof _guilds_$_mfa
-    | typeof _guilds_$_prune
+    | typeof $guilds
+    | typeof $guilds$_$channels
+    | typeof $guilds$_$bulkban
+    | typeof $guilds$_$roles
+    | typeof $guilds$_$roles$_
+    | typeof $guilds$_$mfa
+    | typeof $guilds$_$prune
     // Guild Schedule Event
-    | typeof _guilds_$_scheduledevents
+    | typeof $guilds$_$scheduledevents
     // Guild Template
-    | typeof _guilds_templates_$
-    | typeof _guilds_$_templates
+    | typeof $guilds$templates$_
+    | typeof $guilds$_$templates
     // Message
-    | typeof _channels_$_messages_bulkdelete
+    | typeof $channels$_$messages$bulkdelete
     // Soundboard
-    | typeof _channels_$_sendsoundboardsound
-    | typeof _guilds_$_soundboardsounds
+    | typeof $channels$_$sendsoundboardsound
+    | typeof $guilds$_$soundboardsounds
     // Stage Instance
-    | typeof _stageinstances
+    | typeof $stageinstances
     // User
-    | typeof _users_me_channels
+    | typeof $users$me$channels
     // Webhook
-    | typeof _channels_$_webhooks
-    | typeof _webhooks_$_$
-    | typeof _webhooks_$_$_slack
-    | typeof _webhooks_$_$_github
+    | typeof $channels$_$webhooks
+    | typeof $webhooks$_$_
+    | typeof $webhooks$_$_$slack
+    | typeof $webhooks$_$_$github
   : M extends 'PATCH' ?
     // Application Commands
-    | typeof _applications_$_commands_$
-    | typeof _applications_$_guilds_$_commands_$
+    | typeof $applications$_$commands$_
+    | typeof $applications$_$guilds$_$commands$_
     // Application
-    | typeof _applications_me
+    | typeof $applications$me
     // Auto Moderation
-    | typeof _guilds_$_automoderation_rules_$
+    | typeof $guilds$_$automoderation$rules$_
     // Channel
-    | typeof _channels_$
+    | typeof $channels$_
     // Emoji
-    | typeof _guilds_$_emojis_$
-    | typeof _applications_$_emojis_$
+    | typeof $guilds$_$emojis$_
+    | typeof $applications$_$emojis$_
     // Guild
-    | typeof _guilds_$
-    | typeof _guilds_$_channels
-    | typeof _guilds_$_members_$
-    | typeof _guilds_$_members_me
-    | typeof _guilds_$_members_me_nick
-    | typeof _guilds_$_roles
-    | typeof _guilds_$_widget
-    | typeof _guilds_$_welcomescreen
+    | typeof $guilds$_
+    | typeof $guilds$_$channels
+    | typeof $guilds$_$members$_
+    | typeof $guilds$_$members$me
+    | typeof $guilds$_$members$me$nick
+    | typeof $guilds$_$roles
+    | typeof $guilds$_$widget
+    | typeof $guilds$_$welcomescreen
     // Guild Schedule Event
-    | typeof _guilds_$_scheduledevents_$
+    | typeof $guilds$_$scheduledevents$_
     // Guild Template
-    | typeof _guilds_$_templates_$
+    | typeof $guilds$_$templates$_
     // Soundboard
-    | typeof _guilds_$_soundboardsounds_$
+    | typeof $guilds$_$soundboardsounds$_
     // Stage Instance
-    | typeof _stageinstances_$
+    | typeof $stageinstances$_
     // Sticker
-    | typeof _guilds_$_stickers_$
+    | typeof $guilds$_$stickers$_
     // User
-    | typeof _users_me
+    | typeof $users$me
     // Voice
-    | typeof _guilds_$_voicestates_me
-    | typeof _guilds_$_voicestates_$
+    | typeof $guilds$_$voicestates$me
+    | typeof $guilds$_$voicestates$_
     // Webhook
-    | typeof _webhooks_$
-    | typeof _webhooks_$_$
+    | typeof $webhooks$_
+    | typeof $webhooks$_$_
   : never
 
 // biome-ignore format: ternary operator
 type RestPathVarsDataFile<M extends RestMethod> =
   M extends 'POST' ?
     // Receiving and Responding
-    | typeof _interactions_$_$_callback
-    | typeof _webhooks_$_$
+    | typeof $interactions$_$_$callback
+    | typeof $webhooks$_$_
     // Channel
-    | typeof _channels_$_threads
+    | typeof $channels$_$threads
     // Message
-    | typeof _channels_$_messages
+    | typeof $channels$_$messages
   : M extends 'PATCH' ?
     // Receiving and Responding
-    | typeof _webhooks_$_$_messages_original
-    | typeof _webhooks_$_$_messages_$
+    | typeof $webhooks$_$_$messages$original
+    | typeof $webhooks$_$_$messages$_
     // Message
-    | typeof _channels_$_messages_$
+    | typeof $channels$_$messages$_
     // Webhook
-    | typeof _webhooks_$_$_messages_$
+    | typeof $webhooks$_$_$messages$_
   : never
 
 export type RestPath<M extends RestMethod> =
@@ -778,129 +778,129 @@ export type RestPath<M extends RestMethod> =
 // biome-ignore format: ternary operator
 export type RestVariables<P extends RestPath<any>> =
   P extends
-    | typeof _applications_me
-    | typeof _guilds
-    | typeof _soundboarddefaultsounds
-    | typeof _stageinstances
-    | typeof _stickerpacks
-    | typeof _users_me
-    | typeof _users_me_guilds
-    | typeof _users_me_channels
-    | typeof _users_me_connections
-    | typeof _voice_regions
+    | typeof $applications$me
+    | typeof $guilds
+    | typeof $soundboarddefaultsounds
+    | typeof $stageinstances
+    | typeof $stickerpacks
+    | typeof $users$me
+    | typeof $users$me$guilds
+    | typeof $users$me$channels
+    | typeof $users$me$connections
+    | typeof $voice$regions
   ? [] :
   P extends
-    | typeof _applications_$_commands
-    | typeof _applications_$_roleconnections_metadata
-    | typeof _guilds_$_auditlogs
-    | typeof _guilds_$_automoderation_rules
-    | typeof _channels_$
-    | typeof _channels_$_invites
-    | typeof _channels_$_followers
-    | typeof _channels_$_typing
-    | typeof _channels_$_pins
-    | typeof _channels_$_threads
-    | typeof _channels_$_threadmembers_me
-    | typeof _channels_$_threadmembers
-    | typeof _channels_$_threads_archived_public
-    | typeof _channels_$_threads_archived_private
-    | typeof _channels_$_users_me_threads_archived_private
-    | typeof _channels_$_messages
-    | typeof _channels_$_messages_bulkdelete
-    | typeof _guilds_$_emojis
-    | typeof _applications_$_emojis
-    | typeof _applications_$_entitlements
-    | typeof _guilds_$
-    | typeof _guilds_$_preview
-    | typeof _guilds_$_channels
-    | typeof _guilds_$_threads_active
-    | typeof _guilds_$_members
-    | typeof _guilds_$_members_search
-    | typeof _guilds_$_members_me
-    | typeof _guilds_$_members_me_nick
-    | typeof _guilds_$_bans
-    | typeof _guilds_$_bulkban
-    | typeof _guilds_$_roles
-    | typeof _guilds_$_mfa
-    | typeof _guilds_$_prune
-    | typeof _guilds_$_regions
-    | typeof _guilds_$_invites
-    | typeof _guilds_$_integrations
-    | typeof _guilds_$_widget
-    | typeof _guilds_$_widgetjson
-    | typeof _guilds_$_vanityurl
-    | typeof _guilds_$_widgetpng
-    | typeof _guilds_$_welcomescreen
-    | typeof _guilds_$_onboarding
-    | typeof _guilds_$_incidentactions
-    | typeof _guilds_$_scheduledevents
-    | typeof _guilds_templates_$
-    | typeof _guilds_$_templates
-    | typeof _invites_$
-    | typeof _applications_$_skus
-    | typeof _channels_$_sendsoundboardsound
-    | typeof _guilds_$_soundboardsounds
-    | typeof _stageinstances_$
-    | typeof _stickers_$
-    | typeof _stickerpacks_$
-    | typeof _guilds_$_stickers
-    | typeof _skus_$_subscriptions
-    | typeof _users_$
-    | typeof _users_me_guilds_$_member
-    | typeof _users_me_guilds_$
-    | typeof _users_me_applications_$_roleconnection
-    | typeof _guilds_$_voicestates_me
-    | typeof _channels_$_webhooks
-    | typeof _guilds_$_webhooks
-    | typeof _webhooks_$
+    | typeof $applications$_$commands
+    | typeof $applications$_$roleconnections$metadata
+    | typeof $guilds$_$auditlogs
+    | typeof $guilds$_$automoderation$rules
+    | typeof $channels$_
+    | typeof $channels$_$invites
+    | typeof $channels$_$followers
+    | typeof $channels$_$typing
+    | typeof $channels$_$pins
+    | typeof $channels$_$threads
+    | typeof $channels$_$threadmembers$me
+    | typeof $channels$_$threadmembers
+    | typeof $channels$_$threads$archived$public
+    | typeof $channels$_$threads$archived$private
+    | typeof $channels$_$users$me$threads$archived$private
+    | typeof $channels$_$messages
+    | typeof $channels$_$messages$bulkdelete
+    | typeof $guilds$_$emojis
+    | typeof $applications$_$emojis
+    | typeof $applications$_$entitlements
+    | typeof $guilds$_
+    | typeof $guilds$_$preview
+    | typeof $guilds$_$channels
+    | typeof $guilds$_$threads$active
+    | typeof $guilds$_$members
+    | typeof $guilds$_$members$search
+    | typeof $guilds$_$members$me
+    | typeof $guilds$_$members$me$nick
+    | typeof $guilds$_$bans
+    | typeof $guilds$_$bulkban
+    | typeof $guilds$_$roles
+    | typeof $guilds$_$mfa
+    | typeof $guilds$_$prune
+    | typeof $guilds$_$regions
+    | typeof $guilds$_$invites
+    | typeof $guilds$_$integrations
+    | typeof $guilds$_$widget
+    | typeof $guilds$_$widgetjson
+    | typeof $guilds$_$vanityurl
+    | typeof $guilds$_$widgetpng
+    | typeof $guilds$_$welcomescreen
+    | typeof $guilds$_$onboarding
+    | typeof $guilds$_$incidentactions
+    | typeof $guilds$_$scheduledevents
+    | typeof $guilds$templates$_
+    | typeof $guilds$_$templates
+    | typeof $invites$_
+    | typeof $applications$_$skus
+    | typeof $channels$_$sendsoundboardsound
+    | typeof $guilds$_$soundboardsounds
+    | typeof $stageinstances$_
+    | typeof $stickers$_
+    | typeof $stickerpacks$_
+    | typeof $guilds$_$stickers
+    | typeof $skus$_$subscriptions
+    | typeof $users$_
+    | typeof $users$me$guilds$_$member
+    | typeof $users$me$guilds$_
+    | typeof $users$me$applications$_$roleconnection
+    | typeof $guilds$_$voicestates$me
+    | typeof $channels$_$webhooks
+    | typeof $guilds$_$webhooks
+    | typeof $webhooks$_
   ? [string] :
   P extends
-    | typeof _interactions_$_$_callback
-    | typeof _webhooks_$_$_messages_original
-    | typeof _webhooks_$_$
-    | typeof _applications_$_commands_$
-    | typeof _applications_$_guilds_$_commands
-    | typeof _applications_$_guilds_$_commands_permissions
-    | typeof _applications_$_activityinstances_$
-    | typeof _guilds_$_automoderation_rules_$
-    | typeof _channels_$_permissions_$
-    | typeof _channels_$_pins_$
-    | typeof _channels_$_recipients_$
-    | typeof _channels_$_messages_$_threads
-    | typeof _channels_$_threadmembers_$
-    | typeof _channels_$_messages_$
-    | typeof _channels_$_messages_$_crosspost
-    | typeof _channels_$_messages_$_reactions
-    | typeof _guilds_$_emojis_$
-    | typeof _applications_$_emojis_$
-    | typeof _applications_$_entitlements_$
-    | typeof _applications_$_entitlements_$_consume
-    | typeof _guilds_$_members_$
-    | typeof _guilds_$_bans_$
-    | typeof _guilds_$_roles_$
-    | typeof _guilds_$_integrations_$
-    | typeof _guilds_$_scheduledevents_$
-    | typeof _guilds_$_scheduledevents_$_users
-    | typeof _guilds_$_templates_$
-    | typeof _channels_$_polls_$_expire
-    | typeof _guilds_$_soundboardsounds_$
-    | typeof _guilds_$_stickers_$
-    | typeof _skus_$_subscriptions_$
-    | typeof _guilds_$_voicestates_$
-    | typeof _webhooks_$_$_slack
-    | typeof _webhooks_$_$_github
+    | typeof $interactions$_$_$callback
+    | typeof $webhooks$_$_$messages$original
+    | typeof $webhooks$_$_
+    | typeof $applications$_$commands$_
+    | typeof $applications$_$guilds$_$commands
+    | typeof $applications$_$guilds$_$commands$permissions
+    | typeof $applications$_$activityinstances$_
+    | typeof $guilds$_$automoderation$rules$_
+    | typeof $channels$_$permissions$_
+    | typeof $channels$_$pins$_
+    | typeof $channels$_$recipients$_
+    | typeof $channels$_$messages$_$threads
+    | typeof $channels$_$threadmembers$_
+    | typeof $channels$_$messages$_
+    | typeof $channels$_$messages$_$crosspost
+    | typeof $channels$_$messages$_$reactions
+    | typeof $guilds$_$emojis$_
+    | typeof $applications$_$emojis$_
+    | typeof $applications$_$entitlements$_
+    | typeof $applications$_$entitlements$_$consume
+    | typeof $guilds$_$members$_
+    | typeof $guilds$_$bans$_
+    | typeof $guilds$_$roles$_
+    | typeof $guilds$_$integrations$_
+    | typeof $guilds$_$scheduledevents$_
+    | typeof $guilds$_$scheduledevents$_$users
+    | typeof $guilds$_$templates$_
+    | typeof $channels$_$polls$_$expire
+    | typeof $guilds$_$soundboardsounds$_
+    | typeof $guilds$_$stickers$_
+    | typeof $skus$_$subscriptions$_
+    | typeof $guilds$_$voicestates$_
+    | typeof $webhooks$_$_$slack
+    | typeof $webhooks$_$_$github
   ? [string, string] :
   P extends
-    | typeof _webhooks_$_$_messages_$
-    | typeof _applications_$_guilds_$_commands_$
-    | typeof _applications_$_guilds_$_commands_$_permissions
-    | typeof _guilds_$_members_$_roles_$
-    | typeof _channels_$_messages_$_reactions_$_me
-    | typeof _channels_$_messages_$_reactions_$
-    | typeof _channels_$_polls_$_answers_$
+    | typeof $webhooks$_$_$messages$_
+    | typeof $applications$_$guilds$_$commands$_
+    | typeof $applications$_$guilds$_$commands$_$permissions
+    | typeof $guilds$_$members$_$roles$_
+    | typeof $channels$_$messages$_$reactions$_$me
+    | typeof $channels$_$messages$_$reactions$_
+    | typeof $channels$_$polls$_$answers$_
   ? [string, string, string] :
   P extends
-    | typeof _channels_$_messages_$_reactions_$_$
+    | typeof $channels$_$messages$_$reactions$_$_
   ? [string, string, string, string] : string[]
 
 ////////////////////////////////////////
@@ -913,52 +913,52 @@ export type RestVariables<P extends RestPath<any>> =
 export type RestQuery<M extends RestMethod, P extends RestPath<M>> =
   M extends 'GET' ?
     // Receiving and Responding
-    P extends typeof _webhooks_$_$_messages_original ? RESTGetAPIWebhookWithTokenMessageQuery :
-    P extends typeof _webhooks_$_$_messages_$ ? RESTGetAPIWebhookWithTokenMessageQuery :
+    P extends typeof $webhooks$_$_$messages$original ? RESTGetAPIWebhookWithTokenMessageQuery :
+    P extends typeof $webhooks$_$_$messages$_ ? RESTGetAPIWebhookWithTokenMessageQuery :
     // Application Commands
-    P extends typeof _applications_$_commands ? RESTGetAPIApplicationCommandsQuery :
-    P extends typeof _applications_$_guilds_$_commands ? RESTGetAPIApplicationGuildCommandsQuery :
+    P extends typeof $applications$_$commands ? RESTGetAPIApplicationCommandsQuery :
+    P extends typeof $applications$_$guilds$_$commands ? RESTGetAPIApplicationGuildCommandsQuery :
     // Audit Log
-    P extends typeof _guilds_$_auditlogs ? RESTGetAPIAuditLogQuery :
+    P extends typeof $guilds$_$auditlogs ? RESTGetAPIAuditLogQuery :
     // Channel
-    P extends typeof _channels_$_threadmembers_$ ? RESTGetAPIChannelThreadMemberQuery :
-    P extends typeof _channels_$_threadmembers ? RESTGetAPIChannelThreadMembersQuery :
-    P extends typeof _channels_$_threads_archived_public ? CouldNotFind :
-    P extends typeof _channels_$_threads_archived_private ? CouldNotFind :
-    P extends typeof _channels_$_users_me_threads_archived_private ? CouldNotFind :
+    P extends typeof $channels$_$threadmembers$_ ? RESTGetAPIChannelThreadMemberQuery :
+    P extends typeof $channels$_$threadmembers ? RESTGetAPIChannelThreadMembersQuery :
+    P extends typeof $channels$_$threads$archived$public ? CouldNotFind :
+    P extends typeof $channels$_$threads$archived$private ? CouldNotFind :
+    P extends typeof $channels$_$users$me$threads$archived$private ? CouldNotFind :
     // Entitlement
-    P extends typeof _applications_$_entitlements ? RESTGetAPIEntitlementsQuery :
+    P extends typeof $applications$_$entitlements ? RESTGetAPIEntitlementsQuery :
     // Guild
-    P extends typeof _guilds_$ ? RESTGetAPIGuildQuery :
-    P extends typeof _guilds_$_members ? RESTGetAPIGuildMembersQuery :
-    P extends typeof _guilds_$_members_search ? RESTGetAPIGuildMembersSearchQuery :
-    P extends typeof _guilds_$_bans ? RESTGetAPIGuildBansQuery :
-    P extends typeof _guilds_$_prune ? RESTGetAPIGuildPruneCountQuery :
-    P extends typeof _guilds_$_widgetpng ? RESTGetAPIGuildWidgetImageQuery :
+    P extends typeof $guilds$_ ? RESTGetAPIGuildQuery :
+    P extends typeof $guilds$_$members ? RESTGetAPIGuildMembersQuery :
+    P extends typeof $guilds$_$members$search ? RESTGetAPIGuildMembersSearchQuery :
+    P extends typeof $guilds$_$bans ? RESTGetAPIGuildBansQuery :
+    P extends typeof $guilds$_$prune ? RESTGetAPIGuildPruneCountQuery :
+    P extends typeof $guilds$_$widgetpng ? RESTGetAPIGuildWidgetImageQuery :
     // Guild Schedule Event
-    P extends typeof _guilds_$_scheduledevents ? RESTGetAPIGuildScheduledEventsQuery :
-    P extends typeof _guilds_$_scheduledevents_$ ? RESTGetAPIGuildScheduledEventQuery :
-    P extends typeof _guilds_$_scheduledevents_$_users ? RESTGetAPIGuildScheduledEventUsersQuery :
+    P extends typeof $guilds$_$scheduledevents ? RESTGetAPIGuildScheduledEventsQuery :
+    P extends typeof $guilds$_$scheduledevents$_ ? RESTGetAPIGuildScheduledEventQuery :
+    P extends typeof $guilds$_$scheduledevents$_$users ? RESTGetAPIGuildScheduledEventUsersQuery :
     // Invite
-    P extends typeof _invites_$ ? RESTGetAPIInviteQuery :
+    P extends typeof $invites$_ ? RESTGetAPIInviteQuery :
     // Message
-    P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesQuery :
-    P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersQuery :
+    P extends typeof $channels$_$messages ? RESTGetAPIChannelMessagesQuery :
+    P extends typeof $channels$_$messages$_$reactions$_ ? RESTGetAPIChannelMessageReactionUsersQuery :
     // Poll
-    P extends typeof _channels_$_polls_$_answers_$ ? RESTGetAPIPollAnswerVotersQuery :
+    P extends typeof $channels$_$polls$_$answers$_ ? RESTGetAPIPollAnswerVotersQuery :
     // Subscription
-    P extends typeof _skus_$_subscriptions ? RESTGetAPISKUSubscriptionsQuery :
+    P extends typeof $skus$_$subscriptions ? RESTGetAPISKUSubscriptionsQuery :
     // User
-    P extends typeof _users_me_guilds ? RESTGetAPICurrentUserGuildsQuery :
+    P extends typeof $users$me$guilds ? RESTGetAPICurrentUserGuildsQuery :
     never
   : M extends 'POST' ?
     // Duplication
-    P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenQuery :
+    P extends typeof $webhooks$_$_ ? RESTPostAPIWebhookWithTokenQuery :
     // Receiving and Responding
-    P extends typeof _interactions_$_$_callback ? RESTPostAPIInteractionCallbackQuery :
+    P extends typeof $interactions$_$_$callback ? RESTPostAPIInteractionCallbackQuery :
     // Webhook
-    P extends typeof _webhooks_$_$_slack ? RESTPostAPIWebhookWithTokenSlackQuery :
-    P extends typeof _webhooks_$_$_github ? RESTPostAPIWebhookWithTokenGitHubQuery :
+    P extends typeof $webhooks$_$_$slack ? RESTPostAPIWebhookWithTokenSlackQuery :
+    P extends typeof $webhooks$_$_$github ? RESTPostAPIWebhookWithTokenGitHubQuery :
     never
   : never
 
@@ -972,118 +972,118 @@ export type RestQuery<M extends RestMethod, P extends RestPath<M>> =
 export type RestData<M extends RestMethod, P extends RestPath<M>> =
   M extends 'PUT' ?
     // Application Commands
-    P extends typeof _applications_$_commands ? RESTPutAPIApplicationCommandsJSONBody :
-    P extends typeof _applications_$_guilds_$_commands ? RESTPutAPIApplicationGuildCommandsJSONBody :
-    P extends typeof _applications_$_guilds_$_commands_$_permissions ? RESTPutAPIApplicationCommandPermissionsJSONBody :
-    P extends typeof _applications_$_guilds_$_commands_permissions ? RESTPutAPIGuildApplicationCommandsPermissionsJSONBody :
+    P extends typeof $applications$_$commands ? RESTPutAPIApplicationCommandsJSONBody :
+    P extends typeof $applications$_$guilds$_$commands ? RESTPutAPIApplicationGuildCommandsJSONBody :
+    P extends typeof $applications$_$guilds$_$commands$_$permissions ? RESTPutAPIApplicationCommandPermissionsJSONBody :
+    P extends typeof $applications$_$guilds$_$commands$permissions ? RESTPutAPIGuildApplicationCommandsPermissionsJSONBody :
     // Application Role Connection Metadata
-    P extends typeof _applications_$_roleconnections_metadata ? RESTPutAPIApplicationRoleConnectionMetadataJSONBody :
+    P extends typeof $applications$_$roleconnections$metadata ? RESTPutAPIApplicationRoleConnectionMetadataJSONBody :
     // Channel
-    P extends typeof _channels_$_permissions_$ ? RESTPutAPIChannelPermissionJSONBody :
-    P extends typeof _channels_$_recipients_$ ? RESTPutAPIChannelRecipientJSONBody :
+    P extends typeof $channels$_$permissions$_ ? RESTPutAPIChannelPermissionJSONBody :
+    P extends typeof $channels$_$recipients$_ ? RESTPutAPIChannelRecipientJSONBody :
     // Guild
-    P extends typeof _guilds_$_members_$ ? RESTPutAPIGuildMemberJSONBody :
-    P extends typeof _guilds_$_bans_$ ? RESTPutAPIGuildBanJSONBody :
-    P extends typeof _guilds_$_onboarding ? RESTPutAPIGuildOnboardingJSONBody :
-    P extends typeof _guilds_$_incidentactions ? RESTPutAPIGuildIncidentActionsJSONBody :
+    P extends typeof $guilds$_$members$_ ? RESTPutAPIGuildMemberJSONBody :
+    P extends typeof $guilds$_$bans$_ ? RESTPutAPIGuildBanJSONBody :
+    P extends typeof $guilds$_$onboarding ? RESTPutAPIGuildOnboardingJSONBody :
+    P extends typeof $guilds$_$incidentactions ? RESTPutAPIGuildIncidentActionsJSONBody :
     // User
-    P extends typeof _users_me_applications_$_roleconnection ? RESTPutAPICurrentUserApplicationRoleConnectionJSONBody :
+    P extends typeof $users$me$applications$_$roleconnection ? RESTPutAPICurrentUserApplicationRoleConnectionJSONBody :
     never
   : M extends 'POST' ?
     // Duplication
     // @ts-expect-error インデックス シグネチャがありません。ts(2344)
-    P extends typeof _webhooks_$_$ ? CustomCallbackData<RESTPostAPIInteractionFollowupJSONBody> | CustomCallbackData<RESTPostAPIWebhookWithTokenJSONBody> | undefined :
+    P extends typeof $webhooks$_$_ ? CustomCallbackData<RESTPostAPIInteractionFollowupJSONBody> | CustomCallbackData<RESTPostAPIWebhookWithTokenJSONBody> | undefined :
     // Receiving and Responding
-    P extends typeof _interactions_$_$_callback ? APIInteractionResponse :
+    P extends typeof $interactions$_$_$callback ? APIInteractionResponse :
     // Application Commands
-    P extends typeof _applications_$_commands ? RESTPostAPIApplicationCommandsJSONBody :
-    P extends typeof _applications_$_guilds_$_commands ? RESTPostAPIApplicationGuildCommandsJSONBody :
+    P extends typeof $applications$_$commands ? RESTPostAPIApplicationCommandsJSONBody :
+    P extends typeof $applications$_$guilds$_$commands ? RESTPostAPIApplicationGuildCommandsJSONBody :
     // Auto Moderation
-    P extends typeof _guilds_$_automoderation_rules ? RESTPostAPIAutoModerationRuleJSONBody :
+    P extends typeof $guilds$_$automoderation$rules ? RESTPostAPIAutoModerationRuleJSONBody :
     // Channel
-    P extends typeof _channels_$_invites ? RESTPostAPIChannelInviteJSONBody :
-    P extends typeof _channels_$_followers ? RESTPostAPIChannelFollowersJSONBody :
-    P extends typeof _channels_$_messages_$_threads ? RESTPostAPIChannelMessagesThreadsJSONBody :
-    P extends typeof _channels_$_threads ? RESTPostAPIChannelThreadsJSONBody | undefined | CouldNotFind :
+    P extends typeof $channels$_$invites ? RESTPostAPIChannelInviteJSONBody :
+    P extends typeof $channels$_$followers ? RESTPostAPIChannelFollowersJSONBody :
+    P extends typeof $channels$_$messages$_$threads ? RESTPostAPIChannelMessagesThreadsJSONBody :
+    P extends typeof $channels$_$threads ? RESTPostAPIChannelThreadsJSONBody | undefined | CouldNotFind :
     // Emoji
-    P extends typeof _guilds_$_emojis ? RESTPostAPIGuildEmojiJSONBody :
-    P extends typeof _applications_$_emojis ? RESTPostAPIApplicationEmojiJSONBody :
+    P extends typeof $guilds$_$emojis ? RESTPostAPIGuildEmojiJSONBody :
+    P extends typeof $applications$_$emojis ? RESTPostAPIApplicationEmojiJSONBody :
     // Entitlement
-    P extends typeof _applications_$_entitlements ? RESTPostAPIEntitlementJSONBody :
+    P extends typeof $applications$_$entitlements ? RESTPostAPIEntitlementJSONBody :
     // Guild
-    P extends typeof _guilds ? RESTPostAPIGuildsJSONBody :
-    P extends typeof _guilds_$_channels ? RESTPostAPIGuildChannelJSONBody :
-    P extends typeof _guilds_$_bulkban ? RESTPostAPIGuildBulkBanJSONBody :
-    P extends typeof _guilds_$_roles ? RESTPostAPIGuildRoleJSONBody :
-    P extends typeof _guilds_$_mfa ? RESTPostAPIGuildsMFAJSONBody :
-    P extends typeof _guilds_$_prune ? RESTPostAPIGuildPruneJSONBody :
+    P extends typeof $guilds ? RESTPostAPIGuildsJSONBody :
+    P extends typeof $guilds$_$channels ? RESTPostAPIGuildChannelJSONBody :
+    P extends typeof $guilds$_$bulkban ? RESTPostAPIGuildBulkBanJSONBody :
+    P extends typeof $guilds$_$roles ? RESTPostAPIGuildRoleJSONBody :
+    P extends typeof $guilds$_$mfa ? RESTPostAPIGuildsMFAJSONBody :
+    P extends typeof $guilds$_$prune ? RESTPostAPIGuildPruneJSONBody :
     // Guild Schedule Event
-    P extends typeof _guilds_$_scheduledevents ? RESTPostAPIGuildScheduledEventJSONBody :
+    P extends typeof $guilds$_$scheduledevents ? RESTPostAPIGuildScheduledEventJSONBody :
     // Guild Template
-    P extends typeof _guilds_templates_$ ? RESTPostAPITemplateCreateGuildJSONBody :
-    P extends typeof _guilds_$_templates ? RESTPostAPIGuildTemplatesJSONBody :
+    P extends typeof $guilds$templates$_ ? RESTPostAPITemplateCreateGuildJSONBody :
+    P extends typeof $guilds$_$templates ? RESTPostAPIGuildTemplatesJSONBody :
     // Message
     // @ts-expect-error インデックス シグネチャがありません。ts(2344)
-    P extends typeof _channels_$_messages ? CustomCallbackData<RESTPostAPIChannelMessageJSONBody> | undefined :
-    P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
+    P extends typeof $channels$_$messages ? CustomCallbackData<RESTPostAPIChannelMessageJSONBody> | undefined :
+    P extends typeof $channels$_$messages$bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteJSONBody :
     // Soundboard
-    P extends typeof _channels_$_sendsoundboardsound ? RESTPostAPISoundboardSendSoundJSONBody :
-    P extends typeof _guilds_$_soundboardsounds ? RESTPostAPIGuildSoundboardSoundJSONBody :
+    P extends typeof $channels$_$sendsoundboardsound ? RESTPostAPISoundboardSendSoundJSONBody :
+    P extends typeof $guilds$_$soundboardsounds ? RESTPostAPIGuildSoundboardSoundJSONBody :
     // Stage Instance
-    P extends typeof _stageinstances ? RESTPostAPIStageInstanceJSONBody :
+    P extends typeof $stageinstances ? RESTPostAPIStageInstanceJSONBody :
     // User
-    P extends typeof _users_me_channels ? RESTPostAPICurrentUserCreateDMChannelJSONBody | CouldNotFind :
+    P extends typeof $users$me$channels ? RESTPostAPICurrentUserCreateDMChannelJSONBody | CouldNotFind :
     // Webhook
-    P extends typeof _channels_$_webhooks ? RESTPostAPIChannelWebhookJSONBody :
+    P extends typeof $channels$_$webhooks ? RESTPostAPIChannelWebhookJSONBody :
     never
   : M extends 'PATCH' ?
     // Duplication
-    P extends typeof _webhooks_$_$_messages_$ ? CustomCallbackData<RESTPatchAPIInteractionFollowupJSONBody> | CustomCallbackData<RESTPatchAPIWebhookWithTokenMessageJSONBody> | undefined :
+    P extends typeof $webhooks$_$_$messages$_ ? CustomCallbackData<RESTPatchAPIInteractionFollowupJSONBody> | CustomCallbackData<RESTPatchAPIWebhookWithTokenMessageJSONBody> | undefined :
     // Receiving and Responding
-    P extends typeof _webhooks_$_$_messages_original ? CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody> | undefined :
+    P extends typeof $webhooks$_$_$messages$original ? CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody> | undefined :
     // Application Commands
-    P extends typeof _applications_$_commands_$ ? RESTPatchAPIApplicationCommandJSONBody :
-    P extends typeof _applications_$_guilds_$_commands_$ ? RESTPatchAPIApplicationGuildCommandJSONBody :
+    P extends typeof $applications$_$commands$_ ? RESTPatchAPIApplicationCommandJSONBody :
+    P extends typeof $applications$_$guilds$_$commands$_ ? RESTPatchAPIApplicationGuildCommandJSONBody :
     // Application
-    P extends typeof _applications_me ? RESTPatchCurrentApplicationJSONBody :
+    P extends typeof $applications$me ? RESTPatchCurrentApplicationJSONBody :
     // Auto Moderation
-    P extends typeof _guilds_$_automoderation_rules_$ ? RESTPatchAPIAutoModerationRuleJSONBody :
+    P extends typeof $guilds$_$automoderation$rules$_ ? RESTPatchAPIAutoModerationRuleJSONBody :
     // Channel
-    P extends typeof _channels_$ ? RESTPatchAPIChannelJSONBody :
+    P extends typeof $channels$_ ? RESTPatchAPIChannelJSONBody :
     // Emoji
-    P extends typeof _guilds_$_emojis_$ ? RESTPatchAPIGuildEmojiJSONBody :
-    P extends typeof _applications_$_emojis_$ ? RESTPatchAPIApplicationEmojiJSONBody :
+    P extends typeof $guilds$_$emojis$_ ? RESTPatchAPIGuildEmojiJSONBody :
+    P extends typeof $applications$_$emojis$_ ? RESTPatchAPIApplicationEmojiJSONBody :
     // Guild
-    P extends typeof _guilds_$ ? RESTPatchAPIGuildJSONBody :
-    P extends typeof _guilds_$_channels ? RESTPatchAPIGuildChannelPositionsJSONBody :
-    P extends typeof _guilds_$_members_$ ? RESTPatchAPIGuildMemberJSONBody :
-    P extends typeof _guilds_$_members_me ? RESTPatchAPICurrentGuildMemberJSONBody :
-    P extends typeof _guilds_$_members_me_nick ? RESTPatchAPICurrentGuildMemberNicknameJSONBody :
-    P extends typeof _guilds_$_roles ? RESTPatchAPIGuildRolePositionsJSONBody :
-    P extends typeof _guilds_$_roles_$ ? RESTPatchAPIGuildRoleJSONBody :
-    P extends typeof _guilds_$_widget ? RESTPatchAPIGuildWidgetSettingsJSONBody :
-    P extends typeof _guilds_$_welcomescreen ? RESTPatchAPIGuildWelcomeScreenJSONBody :
+    P extends typeof $guilds$_ ? RESTPatchAPIGuildJSONBody :
+    P extends typeof $guilds$_$channels ? RESTPatchAPIGuildChannelPositionsJSONBody :
+    P extends typeof $guilds$_$members$_ ? RESTPatchAPIGuildMemberJSONBody :
+    P extends typeof $guilds$_$members$me ? RESTPatchAPICurrentGuildMemberJSONBody :
+    P extends typeof $guilds$_$members$me$nick ? RESTPatchAPICurrentGuildMemberNicknameJSONBody :
+    P extends typeof $guilds$_$roles ? RESTPatchAPIGuildRolePositionsJSONBody :
+    P extends typeof $guilds$_$roles$_ ? RESTPatchAPIGuildRoleJSONBody :
+    P extends typeof $guilds$_$widget ? RESTPatchAPIGuildWidgetSettingsJSONBody :
+    P extends typeof $guilds$_$welcomescreen ? RESTPatchAPIGuildWelcomeScreenJSONBody :
     // Guild Schedule Event
-    P extends typeof _guilds_$_scheduledevents_$ ? RESTPatchAPIGuildScheduledEventJSONBody :
+    P extends typeof $guilds$_$scheduledevents$_ ? RESTPatchAPIGuildScheduledEventJSONBody :
     // Guild Template
-    P extends typeof _guilds_$_templates_$ ? RESTPatchAPIGuildTemplateJSONBody :
+    P extends typeof $guilds$_$templates$_ ? RESTPatchAPIGuildTemplateJSONBody :
     // Message
     // @ts-expect-error インデックス シグネチャがありません。ts(2344)
-    P extends typeof _channels_$_messages_$ ? CustomCallbackData<RESTPatchAPIChannelMessageJSONBody> | undefined :
+    P extends typeof $channels$_$messages$_ ? CustomCallbackData<RESTPatchAPIChannelMessageJSONBody> | undefined :
     // Soundboard
-    P extends typeof _guilds_$_soundboardsounds_$ ? RESTPatchAPIGuildSoundboardSoundJSONBody :
+    P extends typeof $guilds$_$soundboardsounds$_ ? RESTPatchAPIGuildSoundboardSoundJSONBody :
     // Stage Instance
-    P extends typeof _stageinstances_$ ? RESTPatchAPIStageInstanceJSONBody :
+    P extends typeof $stageinstances$_ ? RESTPatchAPIStageInstanceJSONBody :
     // Sticker
-    P extends typeof _guilds_$_stickers_$ ? RESTPatchAPIGuildStickerJSONBody :
+    P extends typeof $guilds$_$stickers$_ ? RESTPatchAPIGuildStickerJSONBody :
     // User
-    P extends typeof _users_me ? RESTPatchAPICurrentUserJSONBody :
+    P extends typeof $users$me ? RESTPatchAPICurrentUserJSONBody :
     // Voice
-    P extends typeof _guilds_$_voicestates_me ? RESTPatchAPIGuildVoiceStateCurrentMemberJSONBody :
-    P extends typeof _guilds_$_voicestates_$ ? RESTPatchAPIGuildVoiceStateUserJSONBody :
+    P extends typeof $guilds$_$voicestates$me ? RESTPatchAPIGuildVoiceStateCurrentMemberJSONBody :
+    P extends typeof $guilds$_$voicestates$_ ? RESTPatchAPIGuildVoiceStateUserJSONBody :
     // Webhook
-    P extends typeof _webhooks_$ ? RESTPatchAPIWebhookJSONBody :
-    P extends typeof _webhooks_$_$ ? RESTPatchAPIWebhookWithTokenJSONBody :
+    P extends typeof $webhooks$_ ? RESTPatchAPIWebhookJSONBody :
+    P extends typeof $webhooks$_$_ ? RESTPatchAPIWebhookWithTokenJSONBody :
     never
   : never
 
@@ -1098,20 +1098,20 @@ export type RestFile<M extends RestMethod, P extends RestPath<M>> =
   M extends 'POST' ?
     P extends
       // Receiving and Responding
-      | typeof _interactions_$_$_callback
-      | typeof _webhooks_$_$
+      | typeof $interactions$_$_$callback
+      | typeof $webhooks$_$_
       // Channel
-      | typeof _channels_$_threads
+      | typeof $channels$_$threads
       // Message
-      | typeof _channels_$_messages
+      | typeof $channels$_$messages
     ? FileData : never
   : M extends 'PATCH' ?
     P extends
       // Receiving and Responding
-      | typeof _webhooks_$_$_messages_original
-      | typeof _webhooks_$_$_messages_$
+      | typeof $webhooks$_$_$messages$original
+      | typeof $webhooks$_$_$messages$_
       // Message
-      | typeof _channels_$_messages_$
+      | typeof $channels$_$messages$_
     ? FileData : never
   : never
 
@@ -1125,283 +1125,283 @@ export type RestFile<M extends RestMethod, P extends RestPath<M>> =
 export type RestResult<M extends RestMethod, P extends RestPath<M>> =
   M extends 'GET' ?
     // Receiving and Responding
-    P extends typeof _webhooks_$_$_messages_original ? RESTGetAPIInteractionOriginalResponseResult :
-    P extends typeof _webhooks_$_$_messages_$ ? RESTGetAPIInteractionFollowupResult | RESTGetAPIWebhookWithTokenMessageResult :
+    P extends typeof $webhooks$_$_$messages$original ? RESTGetAPIInteractionOriginalResponseResult :
+    P extends typeof $webhooks$_$_$messages$_ ? RESTGetAPIInteractionFollowupResult | RESTGetAPIWebhookWithTokenMessageResult :
     // Application Commands
-    P extends typeof _applications_$_commands ? RESTGetAPIApplicationCommandsResult :
-    P extends typeof _applications_$_commands_$ ? RESTGetAPIApplicationCommandResult :
-    P extends typeof _applications_$_guilds_$_commands ? RESTGetAPIApplicationGuildCommandsResult :
-    P extends typeof _applications_$_guilds_$_commands_$ ? RESTGetAPIApplicationGuildCommandResult :
-    P extends typeof _applications_$_guilds_$_commands_permissions ? RESTGetAPIGuildApplicationCommandsPermissionsResult :
-    P extends typeof _applications_$_guilds_$_commands_$_permissions ? RESTGetAPIApplicationCommandPermissionsResult :
+    P extends typeof $applications$_$commands ? RESTGetAPIApplicationCommandsResult :
+    P extends typeof $applications$_$commands$_ ? RESTGetAPIApplicationCommandResult :
+    P extends typeof $applications$_$guilds$_$commands ? RESTGetAPIApplicationGuildCommandsResult :
+    P extends typeof $applications$_$guilds$_$commands$_ ? RESTGetAPIApplicationGuildCommandResult :
+    P extends typeof $applications$_$guilds$_$commands$permissions ? RESTGetAPIGuildApplicationCommandsPermissionsResult :
+    P extends typeof $applications$_$guilds$_$commands$_$permissions ? RESTGetAPIApplicationCommandPermissionsResult :
     // Application
-    P extends typeof _applications_me ? RESTGetCurrentApplicationResult :
-    P extends typeof _applications_$_activityinstances_$ ? CouldNotFind :
+    P extends typeof $applications$me ? RESTGetCurrentApplicationResult :
+    P extends typeof $applications$_$activityinstances$_ ? CouldNotFind :
     // Application Role Connection Metadata
-    P extends typeof _applications_$_roleconnections_metadata ? RESTGetAPIApplicationRoleConnectionMetadataResult :
+    P extends typeof $applications$_$roleconnections$metadata ? RESTGetAPIApplicationRoleConnectionMetadataResult :
     // Audit Log
-    P extends typeof _guilds_$_auditlogs ? RESTGetAPIAuditLogResult :
+    P extends typeof $guilds$_$auditlogs ? RESTGetAPIAuditLogResult :
     // Auto Moderation
-    P extends typeof _guilds_$_automoderation_rules ? RESTGetAPIAutoModerationRulesResult :
-    P extends typeof _guilds_$_automoderation_rules_$ ? RESTGetAPIAutoModerationRuleResult :
+    P extends typeof $guilds$_$automoderation$rules ? RESTGetAPIAutoModerationRulesResult :
+    P extends typeof $guilds$_$automoderation$rules$_ ? RESTGetAPIAutoModerationRuleResult :
     // Channel
-    P extends typeof _channels_$ ? RESTGetAPIChannelResult :
-    P extends typeof _channels_$_invites ? RESTGetAPIChannelInvitesResult :
-    P extends typeof _channels_$_pins ? RESTGetAPIChannelPinsResult :
-    P extends typeof _channels_$_threadmembers_$ ? RESTGetAPIChannelThreadMemberResult :
-    P extends typeof _channels_$_threadmembers ? RESTGetAPIChannelThreadMembersResult :
-    P extends typeof _channels_$_threads_archived_public ? RESTGetAPIChannelThreadsArchivedPublicResult :
-    P extends typeof _channels_$_threads_archived_private ? RESTGetAPIChannelThreadsArchivedPrivateResult :
-    P extends typeof _channels_$_users_me_threads_archived_private ? CouldNotFind :
+    P extends typeof $channels$_ ? RESTGetAPIChannelResult :
+    P extends typeof $channels$_$invites ? RESTGetAPIChannelInvitesResult :
+    P extends typeof $channels$_$pins ? RESTGetAPIChannelPinsResult :
+    P extends typeof $channels$_$threadmembers$_ ? RESTGetAPIChannelThreadMemberResult :
+    P extends typeof $channels$_$threadmembers ? RESTGetAPIChannelThreadMembersResult :
+    P extends typeof $channels$_$threads$archived$public ? RESTGetAPIChannelThreadsArchivedPublicResult :
+    P extends typeof $channels$_$threads$archived$private ? RESTGetAPIChannelThreadsArchivedPrivateResult :
+    P extends typeof $channels$_$users$me$threads$archived$private ? CouldNotFind :
     // Emoji
-    P extends typeof _guilds_$_emojis ? RESTGetAPIGuildEmojisResult :
-    P extends typeof _guilds_$_emojis_$ ? RESTGetAPIGuildEmojiResult :
-    P extends typeof _applications_$_emojis ? RESTGetAPIApplicationEmojisResult :
-    P extends typeof _applications_$_emojis_$ ? RESTGetAPIApplicationEmojiResult :
+    P extends typeof $guilds$_$emojis ? RESTGetAPIGuildEmojisResult :
+    P extends typeof $guilds$_$emojis$_ ? RESTGetAPIGuildEmojiResult :
+    P extends typeof $applications$_$emojis ? RESTGetAPIApplicationEmojisResult :
+    P extends typeof $applications$_$emojis$_ ? RESTGetAPIApplicationEmojiResult :
     // Entitlement
-    P extends typeof _applications_$_entitlements ? RESTGetAPIEntitlementsResult :
-    P extends typeof _applications_$_entitlements_$ ? RESTGetAPIEntitlementResult :
+    P extends typeof $applications$_$entitlements ? RESTGetAPIEntitlementsResult :
+    P extends typeof $applications$_$entitlements$_ ? RESTGetAPIEntitlementResult :
     // Guild
-    P extends typeof _guilds_$ ? RESTGetAPIGuildResult :
-    P extends typeof _guilds_$_preview ? RESTGetAPIGuildPreviewResult :
-    P extends typeof _guilds_$_channels ? RESTGetAPIGuildChannelsResult :
-    P extends typeof _guilds_$_threads_active ? RESTGetAPIGuildThreadsResult :
-    P extends typeof _guilds_$_members_$ ? RESTGetAPIGuildMemberResult :
-    P extends typeof _guilds_$_members ? RESTGetAPIGuildMembersResult :
-    P extends typeof _guilds_$_members_search ? RESTGetAPIGuildMembersSearchResult :
-    P extends typeof _guilds_$_bans ? RESTGetAPIGuildBansResult :
-    P extends typeof _guilds_$_bans_$ ? RESTGetAPIGuildBanResult :
-    P extends typeof _guilds_$_roles ? RESTGetAPIGuildRolesResult :
-    P extends typeof _guilds_$_roles_$ ? RESTGetAPIGuildRoleResult :
-    P extends typeof _guilds_$_prune ? RESTGetAPIGuildPruneCountResult :
-    P extends typeof _guilds_$_regions ? RESTGetAPIGuildVoiceRegionsResult :
-    P extends typeof _guilds_$_invites ? RESTGetAPIGuildInvitesResult :
-    P extends typeof _guilds_$_integrations ? RESTGetAPIGuildIntegrationsResult :
-    P extends typeof _guilds_$_widget ? RESTGetAPIGuildWidgetSettingsResult :
-    P extends typeof _guilds_$_widgetjson ? RESTGetAPIGuildWidgetJSONResult :
-    P extends typeof _guilds_$_vanityurl ? RESTGetAPIGuildVanityUrlResult :
-    P extends typeof _guilds_$_widgetpng ? RESTGetAPIGuildWidgetImageResult :
-    P extends typeof _guilds_$_welcomescreen ? RESTGetAPIGuildWelcomeScreenResult :
-    P extends typeof _guilds_$_onboarding ? RESTGetAPIGuildOnboardingResult :
+    P extends typeof $guilds$_ ? RESTGetAPIGuildResult :
+    P extends typeof $guilds$_$preview ? RESTGetAPIGuildPreviewResult :
+    P extends typeof $guilds$_$channels ? RESTGetAPIGuildChannelsResult :
+    P extends typeof $guilds$_$threads$active ? RESTGetAPIGuildThreadsResult :
+    P extends typeof $guilds$_$members$_ ? RESTGetAPIGuildMemberResult :
+    P extends typeof $guilds$_$members ? RESTGetAPIGuildMembersResult :
+    P extends typeof $guilds$_$members$search ? RESTGetAPIGuildMembersSearchResult :
+    P extends typeof $guilds$_$bans ? RESTGetAPIGuildBansResult :
+    P extends typeof $guilds$_$bans$_ ? RESTGetAPIGuildBanResult :
+    P extends typeof $guilds$_$roles ? RESTGetAPIGuildRolesResult :
+    P extends typeof $guilds$_$roles$_ ? RESTGetAPIGuildRoleResult :
+    P extends typeof $guilds$_$prune ? RESTGetAPIGuildPruneCountResult :
+    P extends typeof $guilds$_$regions ? RESTGetAPIGuildVoiceRegionsResult :
+    P extends typeof $guilds$_$invites ? RESTGetAPIGuildInvitesResult :
+    P extends typeof $guilds$_$integrations ? RESTGetAPIGuildIntegrationsResult :
+    P extends typeof $guilds$_$widget ? RESTGetAPIGuildWidgetSettingsResult :
+    P extends typeof $guilds$_$widgetjson ? RESTGetAPIGuildWidgetJSONResult :
+    P extends typeof $guilds$_$vanityurl ? RESTGetAPIGuildVanityUrlResult :
+    P extends typeof $guilds$_$widgetpng ? RESTGetAPIGuildWidgetImageResult :
+    P extends typeof $guilds$_$welcomescreen ? RESTGetAPIGuildWelcomeScreenResult :
+    P extends typeof $guilds$_$onboarding ? RESTGetAPIGuildOnboardingResult :
     // Guild Schedule Event
-    P extends typeof _guilds_$_scheduledevents ? RESTGetAPIGuildScheduledEventsResult :
-    P extends typeof _guilds_$_scheduledevents_$ ? RESTGetAPIGuildScheduledEventResult :
-    P extends typeof _guilds_$_scheduledevents_$_users ? RESTGetAPIGuildScheduledEventUsersResult :
+    P extends typeof $guilds$_$scheduledevents ? RESTGetAPIGuildScheduledEventsResult :
+    P extends typeof $guilds$_$scheduledevents$_ ? RESTGetAPIGuildScheduledEventResult :
+    P extends typeof $guilds$_$scheduledevents$_$users ? RESTGetAPIGuildScheduledEventUsersResult :
     // Guild Template
-    P extends typeof _guilds_templates_$ ? RESTGetAPITemplateResult :
-    P extends typeof _guilds_$_templates ? RESTGetAPIGuildTemplatesResult :
+    P extends typeof $guilds$templates$_ ? RESTGetAPITemplateResult :
+    P extends typeof $guilds$_$templates ? RESTGetAPIGuildTemplatesResult :
     // Invite
-    P extends typeof _invites_$ ? RESTGetAPIInviteResult :
+    P extends typeof $invites$_ ? RESTGetAPIInviteResult :
     // Message
-    P extends typeof _channels_$_messages ? RESTGetAPIChannelMessagesResult :
-    P extends typeof _channels_$_messages_$ ? RESTGetAPIChannelMessageResult :
-    P extends typeof _channels_$_messages_$_reactions_$ ? RESTGetAPIChannelMessageReactionUsersResult :
+    P extends typeof $channels$_$messages ? RESTGetAPIChannelMessagesResult :
+    P extends typeof $channels$_$messages$_ ? RESTGetAPIChannelMessageResult :
+    P extends typeof $channels$_$messages$_$reactions$_ ? RESTGetAPIChannelMessageReactionUsersResult :
     // Poll
-    P extends typeof _channels_$_polls_$_answers_$ ? RESTGetAPIPollAnswerVotersResult :
+    P extends typeof $channels$_$polls$_$answers$_ ? RESTGetAPIPollAnswerVotersResult :
     // SKU
-    P extends typeof _applications_$_skus ? RESTGetAPISKUsResult :
+    P extends typeof $applications$_$skus ? RESTGetAPISKUsResult :
     // Soundboard
-    P extends typeof _soundboarddefaultsounds ? RESTGetAPISoundboardDefaultSoundsResult :
-    P extends typeof _guilds_$_soundboardsounds ? RESTGetAPIGuildSoundboardSoundsResult :
-    P extends typeof _guilds_$_soundboardsounds_$ ? RESTGetAPIGuildSoundboardSoundResult :
+    P extends typeof $soundboarddefaultsounds ? RESTGetAPISoundboardDefaultSoundsResult :
+    P extends typeof $guilds$_$soundboardsounds ? RESTGetAPIGuildSoundboardSoundsResult :
+    P extends typeof $guilds$_$soundboardsounds$_ ? RESTGetAPIGuildSoundboardSoundResult :
     // Stage Instance
-    P extends typeof _stageinstances_$ ? RESTGetAPIStageInstanceResult :
+    P extends typeof $stageinstances$_ ? RESTGetAPIStageInstanceResult :
     // Sticker
-    P extends typeof _stickers_$ ? RESTGetAPIStickerResult :
-    P extends typeof _stickerpacks ? RESTGetStickerPacksResult :
-    P extends typeof _stickerpacks_$ ? RESTGetAPIStickerPackResult :
-    P extends typeof _guilds_$_stickers ? RESTGetAPIGuildStickersResult :
-    P extends typeof _guilds_$_stickers_$ ? RESTGetAPIGuildStickerResult :
+    P extends typeof $stickers$_ ? RESTGetAPIStickerResult :
+    P extends typeof $stickerpacks ? RESTGetStickerPacksResult :
+    P extends typeof $stickerpacks$_ ? RESTGetAPIStickerPackResult :
+    P extends typeof $guilds$_$stickers ? RESTGetAPIGuildStickersResult :
+    P extends typeof $guilds$_$stickers$_ ? RESTGetAPIGuildStickerResult :
     // Subscription
-    P extends typeof _skus_$_subscriptions ? RESTGetAPISKUSubscriptionsResult :
-    P extends typeof _skus_$_subscriptions_$ ? RESTGetAPISKUSubscriptionResult :
+    P extends typeof $skus$_$subscriptions ? RESTGetAPISKUSubscriptionsResult :
+    P extends typeof $skus$_$subscriptions$_ ? RESTGetAPISKUSubscriptionResult :
     // User
-    P extends typeof _users_me ? RESTGetAPICurrentUserResult :
-    P extends typeof _users_$ ? RESTGetAPIUserResult :
-    P extends typeof _users_me_guilds ? RESTGetAPICurrentUserGuildsResult :
-    P extends typeof _users_me_guilds_$_member ? RESTGetCurrentUserGuildMemberResult :
-    P extends typeof _users_me_connections ? RESTGetAPICurrentUserConnectionsResult :
-    P extends typeof _users_me_applications_$_roleconnection ? RESTGetAPICurrentUserApplicationRoleConnectionResult :
+    P extends typeof $users$me ? RESTGetAPICurrentUserResult :
+    P extends typeof $users$_ ? RESTGetAPIUserResult :
+    P extends typeof $users$me$guilds ? RESTGetAPICurrentUserGuildsResult :
+    P extends typeof $users$me$guilds$_$member ? RESTGetCurrentUserGuildMemberResult :
+    P extends typeof $users$me$connections ? RESTGetAPICurrentUserConnectionsResult :
+    P extends typeof $users$me$applications$_$roleconnection ? RESTGetAPICurrentUserApplicationRoleConnectionResult :
     // Voice
-    P extends typeof _voice_regions ? RESTGetAPIVoiceRegionsResult :
-    P extends typeof _guilds_$_voicestates_me ? RESTGetAPIGuildVoiceStateCurrentMemberResult :
-    P extends typeof _guilds_$_voicestates_$ ? RESTGetAPIGuildVoiceStateUserResult :
+    P extends typeof $voice$regions ? RESTGetAPIVoiceRegionsResult :
+    P extends typeof $guilds$_$voicestates$me ? RESTGetAPIGuildVoiceStateCurrentMemberResult :
+    P extends typeof $guilds$_$voicestates$_ ? RESTGetAPIGuildVoiceStateUserResult :
     // Webhook
-    P extends typeof _channels_$_webhooks ? RESTGetAPIChannelWebhooksResult :
-    P extends typeof _guilds_$_webhooks ? RESTGetAPIGuildWebhooksResult :
-    P extends typeof _webhooks_$ ? RESTGetAPIWebhookResult :
-    P extends typeof _webhooks_$_$ ? RESTGetAPIWebhookWithTokenResult :
+    P extends typeof $channels$_$webhooks ? RESTGetAPIChannelWebhooksResult :
+    P extends typeof $guilds$_$webhooks ? RESTGetAPIGuildWebhooksResult :
+    P extends typeof $webhooks$_ ? RESTGetAPIWebhookResult :
+    P extends typeof $webhooks$_$_ ? RESTGetAPIWebhookWithTokenResult :
     never
   : M extends 'PUT' ?
     // Application Commands
-    P extends typeof _applications_$_commands ? RESTPutAPIApplicationCommandsResult :
-    P extends typeof _applications_$_guilds_$_commands ? RESTPutAPIApplicationGuildCommandsResult :
-    P extends typeof _applications_$_guilds_$_commands_$_permissions ? RESTPutAPIApplicationCommandPermissionsResult :
-    P extends typeof _applications_$_guilds_$_commands_permissions ? RESTPutAPIGuildApplicationCommandsPermissionsResult :
+    P extends typeof $applications$_$commands ? RESTPutAPIApplicationCommandsResult :
+    P extends typeof $applications$_$guilds$_$commands ? RESTPutAPIApplicationGuildCommandsResult :
+    P extends typeof $applications$_$guilds$_$commands$_$permissions ? RESTPutAPIApplicationCommandPermissionsResult :
+    P extends typeof $applications$_$guilds$_$commands$permissions ? RESTPutAPIGuildApplicationCommandsPermissionsResult :
     // Application Role Connection Metadata
-    P extends typeof _applications_$_roleconnections_metadata ? RESTPutAPIApplicationRoleConnectionMetadataResult :
+    P extends typeof $applications$_$roleconnections$metadata ? RESTPutAPIApplicationRoleConnectionMetadataResult :
     // Channel
-    P extends typeof _channels_$_permissions_$ ? RESTPutAPIChannelPermissionResult :
-    P extends typeof _channels_$_pins_$ ? RESTPutAPIChannelPinResult :
-    P extends typeof _channels_$_recipients_$ ? RESTPutAPIChannelRecipientResult :
-    P extends typeof _channels_$_threadmembers_me ? RESTPutAPIChannelThreadMembersResult :
-    P extends typeof _channels_$_threadmembers_$ ? RESTPutAPIChannelThreadMembersResult :
+    P extends typeof $channels$_$permissions$_ ? RESTPutAPIChannelPermissionResult :
+    P extends typeof $channels$_$pins$_ ? RESTPutAPIChannelPinResult :
+    P extends typeof $channels$_$recipients$_ ? RESTPutAPIChannelRecipientResult :
+    P extends typeof $channels$_$threadmembers$me ? RESTPutAPIChannelThreadMembersResult :
+    P extends typeof $channels$_$threadmembers$_ ? RESTPutAPIChannelThreadMembersResult :
     // Guild
-    P extends typeof _guilds_$_members_$ ? RESTPutAPIGuildMemberResult :
-    P extends typeof _guilds_$_members_$_roles_$ ? RESTPutAPIGuildMemberRoleResult :
-    P extends typeof _guilds_$_bans_$ ? RESTPutAPIGuildBanResult :
-    P extends typeof _guilds_$_onboarding ? RESTPutAPIGuildOnboardingResult :
-    P extends typeof _guilds_$_incidentactions ? CouldNotFind :
+    P extends typeof $guilds$_$members$_ ? RESTPutAPIGuildMemberResult :
+    P extends typeof $guilds$_$members$_$roles$_ ? RESTPutAPIGuildMemberRoleResult :
+    P extends typeof $guilds$_$bans$_ ? RESTPutAPIGuildBanResult :
+    P extends typeof $guilds$_$onboarding ? RESTPutAPIGuildOnboardingResult :
+    P extends typeof $guilds$_$incidentactions ? CouldNotFind :
     // Guild Template
-    P extends typeof _guilds_$_templates_$ ? RESTPutAPIGuildTemplateSyncResult :
+    P extends typeof $guilds$_$templates$_ ? RESTPutAPIGuildTemplateSyncResult :
     // Message
-    P extends typeof _channels_$_messages_$_reactions_$_me ? RESTPutAPIChannelMessageReactionResult :
+    P extends typeof $channels$_$messages$_$reactions$_$me ? RESTPutAPIChannelMessageReactionResult :
     // User
-    P extends typeof _users_me_applications_$_roleconnection ? RESTPutAPICurrentUserApplicationRoleConnectionResult :
+    P extends typeof $users$me$applications$_$roleconnection ? RESTPutAPICurrentUserApplicationRoleConnectionResult :
     never
   : M extends 'POST' ?
     // Receiving and Responding
-    P extends typeof _interactions_$_$_callback ? RESTPostAPIInteractionCallbackResult :
-    P extends typeof _webhooks_$_$ ? RESTPostAPIInteractionFollowupResult :
+    P extends typeof $interactions$_$_$callback ? RESTPostAPIInteractionCallbackResult :
+    P extends typeof $webhooks$_$_ ? RESTPostAPIInteractionFollowupResult :
     // Application Commands
-    P extends typeof _applications_$_commands ? RESTPostAPIApplicationCommandsResult :
-    P extends typeof _applications_$_guilds_$_commands ? RESTPostAPIApplicationGuildCommandsResult :
+    P extends typeof $applications$_$commands ? RESTPostAPIApplicationCommandsResult :
+    P extends typeof $applications$_$guilds$_$commands ? RESTPostAPIApplicationGuildCommandsResult :
     // Auto Moderation
-    P extends typeof _guilds_$_automoderation_rules ? RESTPostAPIAutoModerationRuleResult :
+    P extends typeof $guilds$_$automoderation$rules ? RESTPostAPIAutoModerationRuleResult :
     // Channel
-    P extends typeof _channels_$_invites ? RESTPostAPIChannelInviteResult :
-    P extends typeof _channels_$_followers ? RESTPostAPIChannelFollowersResult :
-    P extends typeof _channels_$_typing ? RESTPostAPIChannelTypingResult :
-    P extends typeof _channels_$_messages_$_threads ? RESTPostAPIChannelMessagesThreadsResult :
-    P extends typeof _channels_$_threads ? RESTPostAPIChannelThreadsResult | CouldNotFind :
+    P extends typeof $channels$_$invites ? RESTPostAPIChannelInviteResult :
+    P extends typeof $channels$_$followers ? RESTPostAPIChannelFollowersResult :
+    P extends typeof $channels$_$typing ? RESTPostAPIChannelTypingResult :
+    P extends typeof $channels$_$messages$_$threads ? RESTPostAPIChannelMessagesThreadsResult :
+    P extends typeof $channels$_$threads ? RESTPostAPIChannelThreadsResult | CouldNotFind :
     // Emoji
-    P extends typeof _guilds_$_emojis ? RESTPostAPIGuildEmojiResult :
-    P extends typeof _applications_$_emojis ? RESTPostAPIApplicationEmojiResult :
+    P extends typeof $guilds$_$emojis ? RESTPostAPIGuildEmojiResult :
+    P extends typeof $applications$_$emojis ? RESTPostAPIApplicationEmojiResult :
     // Entitlement
-    P extends typeof _applications_$_entitlements_$_consume ? RESTPostAPIEntitlementConsumeResult :
-    P extends typeof _applications_$_entitlements ? RESTPostAPIEntitlementResult :
+    P extends typeof $applications$_$entitlements$_$consume ? RESTPostAPIEntitlementConsumeResult :
+    P extends typeof $applications$_$entitlements ? RESTPostAPIEntitlementResult :
     // Guild
-    P extends typeof _guilds ? RESTPostAPIGuildsResult :
-    P extends typeof _guilds_$_channels ? RESTPostAPIGuildChannelResult :
-    P extends typeof _guilds_$_bulkban ? RESTPostAPIGuildBulkBanResult :
-    P extends typeof _guilds_$_roles ? RESTPostAPIGuildRoleResult :
-    P extends typeof _guilds_$_mfa ? RESTPostAPIGuildsMFAResult :
-    P extends typeof _guilds_$_prune ? RESTPostAPIGuildPruneResult :
+    P extends typeof $guilds ? RESTPostAPIGuildsResult :
+    P extends typeof $guilds$_$channels ? RESTPostAPIGuildChannelResult :
+    P extends typeof $guilds$_$bulkban ? RESTPostAPIGuildBulkBanResult :
+    P extends typeof $guilds$_$roles ? RESTPostAPIGuildRoleResult :
+    P extends typeof $guilds$_$mfa ? RESTPostAPIGuildsMFAResult :
+    P extends typeof $guilds$_$prune ? RESTPostAPIGuildPruneResult :
     // Guild Schedule Event
-    P extends typeof _guilds_$_scheduledevents ? RESTPostAPIGuildScheduledEventResult :
+    P extends typeof $guilds$_$scheduledevents ? RESTPostAPIGuildScheduledEventResult :
     // Guild Template
-    P extends typeof _guilds_templates_$ ? RESTPostAPITemplateCreateGuildResult :
-    P extends typeof _guilds_$_templates ? RESTPostAPIGuildTemplatesResult :
+    P extends typeof $guilds$templates$_ ? RESTPostAPITemplateCreateGuildResult :
+    P extends typeof $guilds$_$templates ? RESTPostAPIGuildTemplatesResult :
     // Message
-    P extends typeof _channels_$_messages ? RESTPostAPIChannelMessageResult :
-    P extends typeof _channels_$_messages_$_crosspost ? RESTPostAPIChannelMessageCrosspostResult :
-    P extends typeof _channels_$_messages_bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteResult :
+    P extends typeof $channels$_$messages ? RESTPostAPIChannelMessageResult :
+    P extends typeof $channels$_$messages$_$crosspost ? RESTPostAPIChannelMessageCrosspostResult :
+    P extends typeof $channels$_$messages$bulkdelete ? RESTPostAPIChannelMessagesBulkDeleteResult :
     // Poll
-    P extends typeof _channels_$_polls_$_expire ? RESTPostAPIPollExpireResult :
+    P extends typeof $channels$_$polls$_$expire ? RESTPostAPIPollExpireResult :
     // Soundboard
-    P extends typeof _guilds_$_soundboardsounds ? RESTPostAPIGuildSoundboardSoundResult :
+    P extends typeof $guilds$_$soundboardsounds ? RESTPostAPIGuildSoundboardSoundResult :
     // Stage Instance
-    P extends typeof _stageinstances ? RESTPostAPIStageInstanceResult :
+    P extends typeof $stageinstances ? RESTPostAPIStageInstanceResult :
     // User
-    P extends typeof _users_me_channels ? RESTPostAPICurrentUserCreateDMChannelResult | CouldNotFind :
+    P extends typeof $users$me$channels ? RESTPostAPICurrentUserCreateDMChannelResult | CouldNotFind :
     // Webhook
-    P extends typeof _channels_$_webhooks ? RESTPostAPIChannelWebhookResult :
-    P extends typeof _webhooks_$_$ ? RESTPostAPIWebhookWithTokenResult | RESTPostAPIWebhookWithTokenWaitResult :
-    P extends typeof _webhooks_$_$_slack ? RESTPostAPIWebhookWithTokenSlackResult | RESTPostAPIWebhookWithTokenSlackWaitResult :
-    P extends typeof _webhooks_$_$_github ? RESTPostAPIWebhookWithTokenGitHubResult | RESTPostAPIWebhookWithTokenGitHubWaitResult :
+    P extends typeof $channels$_$webhooks ? RESTPostAPIChannelWebhookResult :
+    P extends typeof $webhooks$_$_ ? RESTPostAPIWebhookWithTokenResult | RESTPostAPIWebhookWithTokenWaitResult :
+    P extends typeof $webhooks$_$_$slack ? RESTPostAPIWebhookWithTokenSlackResult | RESTPostAPIWebhookWithTokenSlackWaitResult :
+    P extends typeof $webhooks$_$_$github ? RESTPostAPIWebhookWithTokenGitHubResult | RESTPostAPIWebhookWithTokenGitHubWaitResult :
     never
   : M extends 'PATCH' ?
     // Receiving and Responding
-    P extends typeof _webhooks_$_$_messages_original ? RESTPatchAPIInteractionOriginalResponseResult :
-    P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIInteractionFollowupResult :
+    P extends typeof $webhooks$_$_$messages$original ? RESTPatchAPIInteractionOriginalResponseResult :
+    P extends typeof $webhooks$_$_$messages$_ ? RESTPatchAPIInteractionFollowupResult :
     // Application Commands
-    P extends typeof _applications_$_commands_$ ? RESTPatchAPIApplicationCommandResult :
-    P extends typeof _applications_$_guilds_$_commands_$ ? RESTPatchAPIApplicationGuildCommandResult :
+    P extends typeof $applications$_$commands$_ ? RESTPatchAPIApplicationCommandResult :
+    P extends typeof $applications$_$guilds$_$commands$_ ? RESTPatchAPIApplicationGuildCommandResult :
     // Application
-    P extends typeof _applications_me ? RESTPatchCurrentApplicationResult :
+    P extends typeof $applications$me ? RESTPatchCurrentApplicationResult :
     // Auto Moderation
-    P extends typeof _guilds_$_automoderation_rules_$ ? RESTPatchAPIAutoModerationRuleResult :
+    P extends typeof $guilds$_$automoderation$rules$_ ? RESTPatchAPIAutoModerationRuleResult :
     // Channel
-    P extends typeof _channels_$ ? RESTPatchAPIChannelResult :
+    P extends typeof $channels$_ ? RESTPatchAPIChannelResult :
     // Emoji
-    P extends typeof _guilds_$_emojis_$ ? RESTPatchAPIGuildEmojiResult :
-    P extends typeof _applications_$_emojis_$ ? RESTPatchAPIApplicationEmojiResult :
+    P extends typeof $guilds$_$emojis$_ ? RESTPatchAPIGuildEmojiResult :
+    P extends typeof $applications$_$emojis$_ ? RESTPatchAPIApplicationEmojiResult :
     // Guild
-    P extends typeof _guilds_$ ? RESTPatchAPIGuildResult :
-    P extends typeof _guilds_$_channels ? RESTPatchAPIGuildChannelPositionsResult :
-    P extends typeof _guilds_$_members_$ ? RESTPatchAPIGuildMemberResult :
-    P extends typeof _guilds_$_members_me ? CouldNotFind :
-    P extends typeof _guilds_$_members_me_nick ? RESTPatchAPICurrentGuildMemberNicknameResult :
-    P extends typeof _guilds_$_roles ? RESTPatchAPIGuildRolePositionsResult :
-    P extends typeof _guilds_$_roles_$ ? RESTPatchAPIGuildRoleResult :
-    P extends typeof _guilds_$_widget ? RESTPatchAPIGuildWidgetSettingsResult :
-    P extends typeof _guilds_$_welcomescreen ? RESTPatchAPIGuildWelcomeScreenResult :
+    P extends typeof $guilds$_ ? RESTPatchAPIGuildResult :
+    P extends typeof $guilds$_$channels ? RESTPatchAPIGuildChannelPositionsResult :
+    P extends typeof $guilds$_$members$_ ? RESTPatchAPIGuildMemberResult :
+    P extends typeof $guilds$_$members$me ? CouldNotFind :
+    P extends typeof $guilds$_$members$me$nick ? RESTPatchAPICurrentGuildMemberNicknameResult :
+    P extends typeof $guilds$_$roles ? RESTPatchAPIGuildRolePositionsResult :
+    P extends typeof $guilds$_$roles$_ ? RESTPatchAPIGuildRoleResult :
+    P extends typeof $guilds$_$widget ? RESTPatchAPIGuildWidgetSettingsResult :
+    P extends typeof $guilds$_$welcomescreen ? RESTPatchAPIGuildWelcomeScreenResult :
     // Guild Schedule Event
-    P extends typeof _guilds_$_scheduledevents_$ ? RESTPatchAPIGuildScheduledEventResult :
+    P extends typeof $guilds$_$scheduledevents$_ ? RESTPatchAPIGuildScheduledEventResult :
     // Guild Template
-    P extends typeof _guilds_$_templates_$ ? RESTPatchAPIGuildTemplateResult :
+    P extends typeof $guilds$_$templates$_ ? RESTPatchAPIGuildTemplateResult :
     // Message
-    P extends typeof _channels_$_messages_$ ? RESTPatchAPIChannelMessageResult :
+    P extends typeof $channels$_$messages$_ ? RESTPatchAPIChannelMessageResult :
     // Soundboard
-    P extends typeof _guilds_$_soundboardsounds_$ ? RESTPatchAPIGuildSoundboardSoundResult :
+    P extends typeof $guilds$_$soundboardsounds$_ ? RESTPatchAPIGuildSoundboardSoundResult :
     // Stage Instance
-    P extends typeof _stageinstances_$ ? RESTPatchAPIStageInstanceResult :
+    P extends typeof $stageinstances$_ ? RESTPatchAPIStageInstanceResult :
     // Sticker
-    P extends typeof _guilds_$_stickers_$ ? RESTPatchAPIGuildStickerResult :
+    P extends typeof $guilds$_$stickers$_ ? RESTPatchAPIGuildStickerResult :
     // User
-    P extends typeof _users_me ? RESTPatchAPICurrentUserResult :
+    P extends typeof $users$me ? RESTPatchAPICurrentUserResult :
     // Voice
-    P extends typeof _guilds_$_voicestates_me ? RESTPatchAPIGuildVoiceStateCurrentMemberResult :
-    P extends typeof _guilds_$_voicestates_$ ? RESTPatchAPIGuildVoiceStateUserResult :
+    P extends typeof $guilds$_$voicestates$me ? RESTPatchAPIGuildVoiceStateCurrentMemberResult :
+    P extends typeof $guilds$_$voicestates$_ ? RESTPatchAPIGuildVoiceStateUserResult :
     // Webhook
-    P extends typeof _webhooks_$ ? RESTPatchAPIWebhookResult :
-    P extends typeof _webhooks_$_$ ? RESTPatchAPIWebhookWithTokenResult :
-    P extends typeof _webhooks_$_$_messages_$ ? RESTPatchAPIWebhookWithTokenMessageResult :
+    P extends typeof $webhooks$_ ? RESTPatchAPIWebhookResult :
+    P extends typeof $webhooks$_$_ ? RESTPatchAPIWebhookWithTokenResult :
+    P extends typeof $webhooks$_$_$messages$_ ? RESTPatchAPIWebhookWithTokenMessageResult :
     never
   : M extends 'DELETE' ?
     // Channel
-    P extends typeof _channels_$ ? RESTDeleteAPIChannelResult :
-    P extends typeof _channels_$_permissions_$ ? RESTDeleteAPIChannelPermissionResult :
-    P extends typeof _channels_$_pins_$ ? RESTDeleteAPIChannelPinResult :
-    P extends typeof _channels_$_recipients_$ ? RESTDeleteAPIChannelRecipientResult :
-    P extends typeof _channels_$_threadmembers_me ? RESTDeleteAPIChannelThreadMembersResult :
-    P extends typeof _channels_$_threadmembers_$ ? RESTDeleteAPIChannelThreadMembersResult :
+    P extends typeof $channels$_ ? RESTDeleteAPIChannelResult :
+    P extends typeof $channels$_$permissions$_ ? RESTDeleteAPIChannelPermissionResult :
+    P extends typeof $channels$_$pins$_ ? RESTDeleteAPIChannelPinResult :
+    P extends typeof $channels$_$recipients$_ ? RESTDeleteAPIChannelRecipientResult :
+    P extends typeof $channels$_$threadmembers$me ? RESTDeleteAPIChannelThreadMembersResult :
+    P extends typeof $channels$_$threadmembers$_ ? RESTDeleteAPIChannelThreadMembersResult :
     // Emoji
-    P extends typeof _guilds_$_emojis_$ ? RESTDeleteAPIGuildEmojiResult :
-    P extends typeof _applications_$_emojis_$ ? RESTDeleteAPIApplicationEmojiResult :
+    P extends typeof $guilds$_$emojis$_ ? RESTDeleteAPIGuildEmojiResult :
+    P extends typeof $applications$_$emojis$_ ? RESTDeleteAPIApplicationEmojiResult :
     // Entitlement
-    P extends typeof _applications_$_entitlements_$ ? RESTDeleteAPIEntitlementResult :
+    P extends typeof $applications$_$entitlements$_ ? RESTDeleteAPIEntitlementResult :
     // Guild
-    P extends typeof _guilds_$ ? RESTDeleteAPIGuildResult :
-    P extends typeof _guilds_$_members_$_roles_$ ? RESTDeleteAPIGuildMemberRoleResult :
-    P extends typeof _guilds_$_members_$ ? RESTDeleteAPIGuildMemberResult :
-    P extends typeof _guilds_$_bans_$ ? RESTDeleteAPIGuildBanResult :
-    P extends typeof _guilds_$_roles_$ ? RESTDeleteAPIGuildRoleResult :
-    P extends typeof _guilds_$_integrations_$ ? RESTDeleteAPIGuildIntegrationResult :
+    P extends typeof $guilds$_ ? RESTDeleteAPIGuildResult :
+    P extends typeof $guilds$_$members$_$roles$_ ? RESTDeleteAPIGuildMemberRoleResult :
+    P extends typeof $guilds$_$members$_ ? RESTDeleteAPIGuildMemberResult :
+    P extends typeof $guilds$_$bans$_ ? RESTDeleteAPIGuildBanResult :
+    P extends typeof $guilds$_$roles$_ ? RESTDeleteAPIGuildRoleResult :
+    P extends typeof $guilds$_$integrations$_ ? RESTDeleteAPIGuildIntegrationResult :
     // Guild Schedule Event
-    P extends typeof _guilds_$_scheduledevents_$ ? RESTDeleteAPIGuildScheduledEventResult :
+    P extends typeof $guilds$_$scheduledevents$_ ? RESTDeleteAPIGuildScheduledEventResult :
     // Guild Template
-    P extends typeof _guilds_$_templates_$ ? RESTDeleteAPIGuildTemplateResult :
+    P extends typeof $guilds$_$templates$_ ? RESTDeleteAPIGuildTemplateResult :
     // Invite
-    P extends typeof _invites_$ ? RESTDeleteAPIInviteResult :
+    P extends typeof $invites$_ ? RESTDeleteAPIInviteResult :
     // Message
-    P extends typeof _channels_$_messages_$_reactions_$_me ? RESTDeleteAPIChannelMessageOwnReactionResult :
-    P extends typeof _channels_$_messages_$_reactions_$_$ ? RESTDeleteAPIChannelMessageUserReactionResult :
-    P extends typeof _channels_$_messages_$_reactions ? CouldNotFind :
-    P extends typeof _channels_$_messages_$_reactions_$ ? RESTDeleteAPIChannelMessageReactionResult :
-    P extends typeof _channels_$_messages_$ ? RESTDeleteAPIChannelMessageResult :
+    P extends typeof $channels$_$messages$_$reactions$_$me ? RESTDeleteAPIChannelMessageOwnReactionResult :
+    P extends typeof $channels$_$messages$_$reactions$_$_ ? RESTDeleteAPIChannelMessageUserReactionResult :
+    P extends typeof $channels$_$messages$_$reactions ? CouldNotFind :
+    P extends typeof $channels$_$messages$_$reactions$_ ? RESTDeleteAPIChannelMessageReactionResult :
+    P extends typeof $channels$_$messages$_ ? RESTDeleteAPIChannelMessageResult :
     // Soundboard
-    P extends typeof _guilds_$_soundboardsounds_$ ? RESTDeleteAPIGuildSoundboardSoundResult :
+    P extends typeof $guilds$_$soundboardsounds$_ ? RESTDeleteAPIGuildSoundboardSoundResult :
     // Stage Instance
-    P extends typeof _stageinstances_$ ? RESTDeleteAPIStageInstanceResult :
+    P extends typeof $stageinstances$_ ? RESTDeleteAPIStageInstanceResult :
     // Sticker
-    P extends typeof _guilds_$_stickers_$ ? RESTDeleteAPIGuildStickerResult :
+    P extends typeof $guilds$_$stickers$_ ? RESTDeleteAPIGuildStickerResult :
     // User
-    P extends typeof _users_me_guilds_$ ? RESTDeleteAPICurrentUserGuildResult :
+    P extends typeof $users$me$guilds$_ ? RESTDeleteAPICurrentUserGuildResult :
     // Webhook
-    P extends typeof _webhooks_$ ? RESTDeleteAPIWebhookResult :
-    P extends typeof _webhooks_$_$ ? RESTDeleteAPIWebhookWithTokenResult :
-    P extends typeof _webhooks_$_$_messages_$ ? RESTDeleteAPIWebhookWithTokenMessageResult :
+    P extends typeof $webhooks$_ ? RESTDeleteAPIWebhookResult :
+    P extends typeof $webhooks$_$_ ? RESTDeleteAPIWebhookWithTokenResult :
+    P extends typeof $webhooks$_$_$messages$_ ? RESTDeleteAPIWebhookWithTokenMessageResult :
     never
   : never
 
