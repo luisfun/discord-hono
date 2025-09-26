@@ -8,7 +8,7 @@ import type {
 import { Locale } from 'discord-api-types/v10'
 import { describe, expect, it, vi } from 'vitest'
 import { Context } from './context'
-import { _webhooks_$_$_messages_original, createRest } from './rest'
+import { $webhooks$_$_$messages$original, createRest } from './rest'
 import type { CommandContext, ComponentContext } from './types'
 import { isString } from './utils'
 
@@ -21,7 +21,7 @@ vi.mock('./rest', () => ({
       return Promise.resolve({})
     }),
   ),
-  _webhooks_$_$_messages_original: '/webhooks/{}/{}/messages/@original',
+  $webhooks$_$_$messages$original: '/webhooks/{}/{}/messages/@original',
 }))
 
 // Mock newError for testing error throwing
@@ -345,7 +345,7 @@ describe('Context', () => {
     await ctx.followup('Followup message')
     expect(ctx.rest).toHaveBeenCalledWith(
       'PATCH',
-      _webhooks_$_$_messages_original,
+      $webhooks$_$_$messages$original,
       ['app-id', 'token'],
       'Followup message',
       undefined,

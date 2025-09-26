@@ -17,7 +17,7 @@ import type {
   RESTPatchAPIInteractionOriginalResponseJSONBody,
 } from 'discord-api-types/v10'
 import type { Autocomplete, Modal } from './builders'
-import { _webhooks_$_$_messages_original, createRest } from './rest'
+import { $webhooks$_$_$messages$original, createRest } from './rest'
 import type {
   AutocompleteContext,
   CommandContext,
@@ -272,8 +272,8 @@ export class Context<
     this.#throwIfNotAllowType([2, 3, 5])
     if (!this.#discord.APPLICATION_ID) throw newError('c.followup', 'DISCORD_APPLICATION_ID')
     const pathVars: [string, string] = [this.#discord.APPLICATION_ID, (this.interaction as APIInteraction).token]
-    if (data || file) return this.rest('PATCH', _webhooks_$_$_messages_original, pathVars, data || {}, file)
-    return this.rest('DELETE', _webhooks_$_$_messages_original, pathVars)
+    if (data || file) return this.rest('PATCH', $webhooks$_$_$messages$original, pathVars, data || {}, file)
+    return this.rest('DELETE', $webhooks$_$_$messages$original, pathVars)
   }
 
   /**
