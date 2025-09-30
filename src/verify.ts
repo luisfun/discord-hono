@@ -4,10 +4,11 @@
 
 import { newError } from './utils'
 
+// const hex2bin = Uint8Array.fromHex // ES2025
 const hex2bin = (hex: string): Uint8Array<ArrayBuffer> => {
   const len = hex.length
   const bin = new Uint8Array(len >> 1)
-  for (let i = 0; i < len; i += 2) bin[i >> 1] = Number.parseInt(hex.substring(i, i + 2), 16)
+  for (let i = 0; i < len; i += 2) bin[i >> 1] = parseInt(hex.slice(i, i + 2), 16)
   return bin
 }
 
