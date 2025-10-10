@@ -33,7 +33,7 @@ import type {
   ModalContext,
   TypedResponse,
 } from './types'
-import { formData, newError, prepareData, toJSON } from './utils'
+import { formData, type MessageFlag, messageFlags, newError, prepareData, toJSON } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -196,16 +196,9 @@ export class Context<
    * return c.flags('SUPPRESS_EMBEDS', 'EPHEMERAL').res('[Docs](https://example.com)')
    * ```
    */
-  flags(...flag: ('SUPPRESS_EMBEDS' | 'EPHEMERAL' | 'SUPPRESS_NOTIFICATIONS' | 'IS_COMPONENTS_V2')[]): This {
+  flags(...flag: MessageFlag[]): This {
     this.#throwIfNotAllowType([2, 3, 5])
-    const flagNum = {
-      SUPPRESS_EMBEDS: 1 << 2,
-      EPHEMERAL: 1 << 6,
-      SUPPRESS_NOTIFICATIONS: 1 << 12,
-      IS_COMPONENTS_V2: 1 << 15,
-    } as const
-    this.#flags.flags = 0
-    for (const f of flag) this.#flags.flags |= flagNum[f]
+    this.#flags.flags = messageFlags(...flag)
     return this as unknown as This
   }
 
