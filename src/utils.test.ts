@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, test, vi } from 'vitest'
 import { Components, Embed } from '.'
-import { formData, newError, prepareData, queryStringify, toJSON } from './utils'
+import { formData, messageFlags, newError, prepareData, queryStringify, toJSON } from './utils'
 
 describe('toJSON function', () => {
   it('should return the result of toJSON method if it exists', () => {
@@ -155,5 +155,28 @@ describe('queryStringify', () => {
 
   it('should handle empty object', () => {
     expect(queryStringify({})).toBe('?')
+  })
+})
+
+describe('messageFlags', () => {
+  it('should return 0 when no flags are provided', () => {
+    // 何も指定しない場合は 0
+    expect(messageFlags()).toBe(0)
+  })
+
+  it('should return correct value for single flag', () => {
+    // 各フラグ単体
+    expect(messageFlags('SUPPRESS_EMBEDS')).toBe(1 << 2)
+    expect(messageFlags('EPHEMERAL')).toBe(1 << 6)
+    expect(messageFlags('SUPPRESS_NOTIFICATIONS')).toBe(1 << 12)
+    expect(messageFlags('IS_COMPONENTS_V2')).toBe(1 << 15)
+  })
+
+  it('should combine multiple flags using bitwise OR', () => {
+    // 複数フラグの組み合わせ
+    expect(messageFlags('SUPPRESS_EMBEDS', 'EPHEMERAL')).toBe((1 << 2) | (1 << 6))
+    expect(messageFlags('SUPPRESS_EMBEDS', 'SUPPRESS_NOTIFICATIONS', 'IS_COMPONENTS_V2')).toBe(
+      (1 << 2) | (1 << 12) | (1 << 15),
+    )
   })
 })

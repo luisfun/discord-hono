@@ -16,4 +16,4 @@ export type {
   ModalContext,
   ModalHandler,
 } from './types'
-export { CUSTOM_ID_SEPARATOR } from './utils'
+export { CUSTOM_ID_SEPARATOR, messageFlags } from './utils'
