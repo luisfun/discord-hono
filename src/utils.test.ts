@@ -70,9 +70,12 @@ describe('formData function', () => {
     appendSpy = vi.fn()
     vi.stubGlobal(
       'FormData',
-      vi.fn(() => ({
-        append: appendSpy,
-      })),
+      class {
+        append: typeof appendSpy
+        constructor() {
+          this.append = appendSpy
+        }
+      },
     )
   })
 
