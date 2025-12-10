@@ -33,15 +33,15 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
-    "@biomejs/biome": "2.3.2",
-    "@discordjs/builders": "^1.13.0",
-    "@tsconfig/strictest": "^2.0.7",
-    "@vitest/coverage-v8": "^4.0.6",
-    "discord-api-types": "^0.38.31",
+    "@biomejs/biome": "2.3.8",
+    "@discordjs/builders": "^1.13.1",
+    "@tsconfig/strictest": "^2.0.8",
+    "@vitest/coverage-v8": "^4.0.15",
+    "discord-api-types": "^0.38.36",
     "discord-hono": "0.20.1",
     "mitata": "^1.0.34",
-    "tsup": "^8.5.0",
+    "tsup": "^8.5.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.6"
+    "vitest": "^4.0.15"
   }
 }
