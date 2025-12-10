@@ -15,21 +15,22 @@ import type {
 import { toJSON } from '../utils'
 import { Builder, type MergeObjects, warnBuilder } from './utils'
 
-type ExtractOptionArgs<T> = T extends Option<infer K, infer T2, infer R>
-  ? {
-      [P in K]: T2 extends 'String'
-        ? string
-        : T2 extends 'Integer' | 'Number'
-          ? number
-          : T2 extends 'Boolean'
-            ? boolean
-            : string // 暫定的 contextの改変を合わせて
-    } extends infer O
-    ? R extends true
-      ? O
-      : Partial<O>
+type ExtractOptionArgs<T> =
+  T extends Option<infer K, infer T2, infer R>
+    ? {
+        [P in K]: T2 extends 'String'
+          ? string
+          : T2 extends 'Integer' | 'Number'
+            ? number
+            : T2 extends 'Boolean'
+              ? boolean
+              : string // 暫定的 contextの改変を合わせて
+      } extends infer O
+      ? R extends true
+        ? O
+        : Partial<O>
+      : never
     : never
-  : never
 
 type ExtractOptionsObject<T extends any[]> = MergeObjects<{
   [I in keyof T]: T[I] extends Option<any, any, any>
