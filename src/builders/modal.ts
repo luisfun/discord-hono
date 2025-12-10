@@ -2,13 +2,14 @@ import type { APIModalInteractionResponseCallbackData, APITextInputComponent } f
 import { CUSTOM_ID_SEPARATOR, toJSON } from '../utils'
 import { Builder, ifThrowHasSemicolon, type MergeObjects } from './utils'
 
-type ExtractTextInputArgs<T> = T extends TextInput<infer K, infer R>
-  ? { [P in K]: string } extends infer O
-    ? R extends true
-      ? O
-      : Partial<O>
+type ExtractTextInputArgs<T> =
+  T extends TextInput<infer K, infer R>
+    ? { [P in K]: string } extends infer O
+      ? R extends true
+        ? O
+        : Partial<O>
+      : never
     : never
-  : never
 
 type ExtractTextInputsObject<T extends any[]> = MergeObjects<{
   [I in keyof T]: T[I] extends TextInput<any, any> ? ExtractTextInputArgs<T[I]> : never
