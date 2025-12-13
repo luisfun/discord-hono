@@ -10,4 +10,4 @@ applyTo: 'src/**, bench/**'
 - Include JSDoc comments for public APIs
 ## Styling Guides
 - Formatter/Linter: Biome
-- sh scripts: `npm run fix`
+- npm scripts: `npm run fix`
