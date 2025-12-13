@@ -2,8 +2,9 @@
 applyTo: 'src/rest/rest-path.ts'
 ---
 ## Naming Conventions
-- Convert `/` to `$` and `{VER}` to `_`
-- `varName = varValue.replaceAll('/', '$').replaceAll('{VAR}', '_')`
+Convert the value to a variable name using the following rules:
+- Replace `/` with `$`
+- Replace `{VER}` with `_`
 ### Example
 varValue: `/categories/{category}/tags/{tag}`
 varName: `$categories$_$tags$_`
