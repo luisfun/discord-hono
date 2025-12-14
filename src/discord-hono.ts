@@ -155,7 +155,7 @@ export class DiscordHono<E extends Env = Env> {
             return await this.#get(
               interaction.type,
               key,
-              // @ts-expect-error
+              // @ts-expect-error ts(2345) -- ignore due to complex type inference
             )(new Context(env, executionCtx, discord, key, interaction))
         }
         return Response.json({ error: 'Unknown Type' }, { status: 400 })
