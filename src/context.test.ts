@@ -347,7 +347,9 @@ describe('Context', () => {
       'PATCH',
       $webhooks$_$_$messages$original,
       ['app-id', 'token'],
-      'Followup message',
+      {
+        content: 'Followup message',
+      },
       undefined,
     )
   })
