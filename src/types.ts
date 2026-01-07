@@ -80,6 +80,7 @@ export type CronContext<E extends Env = any> = ExcludeMethods<
   | 'focused'
   | 'resAutocomplete'
   | 'interaction'
+  | 'resolved'
 > & { interaction: CronEvent }
 
 ////////// Handler //////////

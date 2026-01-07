@@ -6,12 +6,14 @@ import type {
   APIApplicationCommandInteractionDataStringOption,
   APICommandAutocompleteInteractionResponseCallbackData,
   APIInteraction,
+  APIInteractionDataResolved,
   APIInteractionResponse,
   APIInteractionResponseCallbackData,
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIInteractionResponseDeferredMessageUpdate,
   APIInteractionResponseLaunchActivity,
   APIMessage,
+  APIMessageApplicationCommandInteractionDataResolved,
   APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
   RESTPatchAPIInteractionOriginalResponseJSONBody,
@@ -50,6 +52,13 @@ type SubKey = {
   command: string
   string: string
 }
+
+type ResolvedCategory = keyof APIInteractionDataResolved | keyof APIMessageApplicationCommandInteractionDataResolved
+type ResolvedReturnType<T extends ResolvedCategory> = T extends keyof APIInteractionDataResolved
+  ? NonNullable<APIInteractionDataResolved[T]>[string]
+  : T extends keyof APIMessageApplicationCommandInteractionDataResolved
+    ? APIMessageApplicationCommandInteractionDataResolved[T][string]
+    : never
 
 export class Context<
   E extends Env,
@@ -341,5 +350,29 @@ export class Context<
   resAutocomplete(data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData): Response {
     this.#throwIfNotAllowType([4])
     return Response.json({ type: 8, data: toJSON(data) } satisfies APIApplicationCommandAutocompleteResponse)
+  }
+
+  /**
+   * Get Resolved Data
+   * @beta This may include breaking changes
+   * @param {'attachments' | 'channels' | 'members' | 'messages' | 'roles' | 'users'} category 'attachments' | 'channels' | 'members' | 'messages' | 'roles' | 'users'
+   * @param {string} id id to get specific resolved object
+   * @returns resolved object or undefined
+   */
+  resolved<T extends ResolvedCategory>(category: T, id?: string): ResolvedReturnType<T> | undefined {
+    this.#throwIfNotAllowType([2, 3, 4, 5])
+    const { data } = this.#interaction as APIInteraction
+    if (!(data && 'resolved' in data && data.resolved)) return undefined
+    const { resolved } = data
+    if (!id) {
+      if ('type' in data) {
+        if (data.type === 2 && category === 'users')
+          return resolved[category as keyof typeof resolved]?.[data.target_id]
+        if (data.type === 3 && category === 'messages')
+          return resolved[category as keyof typeof resolved]?.[data.target_id]
+      }
+      return undefined
+    }
+    return resolved[category as keyof typeof resolved]?.[id]
   }
 }
