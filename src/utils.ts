@@ -3,15 +3,16 @@ import type { CustomCallbackData, FileData } from './types'
 export const CUSTOM_ID_SEPARATOR = ';'
 
 const flagData = {
-  SUPPRESS_EMBEDS: 1 << 2,
-  EPHEMERAL: 1 << 6,
-  SUPPRESS_NOTIFICATIONS: 1 << 12,
-  IS_COMPONENTS_V2: 1 << 15,
+  SUPPRESS_EMBEDS: 2,
+  EPHEMERAL: 6,
+  SUPPRESS_NOTIFICATIONS: 12,
+  IS_COMPONENTS_V2: 15,
 } as const
 
 export type MessageFlag = keyof typeof flagData
 
-export const messageFlags = (...flag: MessageFlag[]): number => flag.reduce((result, f) => result | flagData[f], 0)
+export const messageFlags = (...flag: MessageFlag[]): number =>
+  flag.reduce((result, f) => result | (1 << flagData[f]), 0)
 
 export const toJSON = (obj: object): any => ('toJSON' in obj && typeof obj.toJSON === 'function' ? obj.toJSON() : obj)
 
