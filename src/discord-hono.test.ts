@@ -1,6 +1,8 @@
+import { Hono } from 'hono'
 import { describe, expect, it, vi } from 'vitest'
 import { Context } from './context'
 import { DiscordHono } from './discord-hono'
+import { testVerifyTrue } from './test-helpers'
 
 describe('DiscordHono', () => {
   const app = new DiscordHono()
@@ -101,5 +103,21 @@ describe('HandlerMap', () => {
     const app = new DiscordHono().cron('0 0 * * *', handler)
     const event = { cron: '0 * * * *', type: '', scheduledTime: 0 }
     await expect(app.scheduled(event, {})).rejects.toThrow()
+  })
+})
+
+describe('hono integration', () => {
+  it('should work with hono', async () => {
+    const discord = new DiscordHono({ discordEnv: () => ({ PUBLIC_KEY: 'test' }), verify: testVerifyTrue })
+    discord.command('ping', c => c.res('Pong!'))
+    const hono = new Hono()
+    hono.get('/', c => c.text('I like apples'))
+    hono.mount('/interactions', discord.fetch)
+    const req = new Request('http://localhost/interactions', {
+      method: 'POST',
+      body: JSON.stringify({ type: 2, data: { name: 'ping' } }),
+    })
+    const res = await hono.request(req)
+    expect(res.status).toBe(200)
   })
 })

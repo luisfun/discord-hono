@@ -106,13 +106,16 @@ export class DiscordHono<E extends Env = Env> {
     return this.#set(0, cron, handler)
   }
 
+  // Define as arrow functions to preserve the `this` reference (prototype methods lose `this` binding).
+  // Avoid `.bind()` to reduce code size.
+  // Mainly to minimize boilerplate when mounting via honoApp.
   /**
    * @param {Request} request
    * @param {Record<string, unknown>} env
    * @param executionCtx
    * @returns {Promise<Response>}
    */
-  async fetch(request: Request, env?: E['Bindings'], executionCtx?: ExecutionContext): Promise<Response> {
+  fetch = async (request: Request, env?: E['Bindings'], executionCtx?: ExecutionContext): Promise<Response> => {
     switch (request.method) {
       case 'GET':
         return new Response('Operational🔥')
@@ -164,13 +167,14 @@ export class DiscordHono<E extends Env = Env> {
     return new Response('Not Found', { status: 404 })
   }
 
+  // Define as an arrow function like `fetch` to preserve the `this` binding.
   /**
    * Method triggered by cloudflare workers' crons
    * @param event
    * @param {Record<string, unknown>} env
    * @param executionCtx
    */
-  async scheduled(event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext): Promise<void> {
+  scheduled = async (event: CronEvent, env: E['Bindings'], executionCtx?: ExecutionContext): Promise<void> => {
     const handler = this.#get(0, event.cron)
     const c = new Context(env, executionCtx, this.#discord(env), event.cron, event) as CronContext
     if (executionCtx?.waitUntil) executionCtx.waitUntil(handler(c))
