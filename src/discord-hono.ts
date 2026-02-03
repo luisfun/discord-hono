@@ -106,7 +106,7 @@ export class DiscordHono<E extends Env = Env> {
     return this.#set(0, cron, handler)
   }
 
-  // Define as arrow functions to preserve the `this` reference (prototype methods lose `this` binding).
+  // Define as an arrow function to prevent incorrect `this` binding when the method is used as a callback.
   // Avoid `.bind()` to reduce code size.
   // Mainly to minimize boilerplate when mounting via honoApp.
   /**
