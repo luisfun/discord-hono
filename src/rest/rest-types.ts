@@ -1,3 +1,4 @@
+// biome-ignore-start lint/suspicious/noDeprecatedImports: Keep it available until it’s deleted
 import type {
   APIInteractionResponse,
   RESTDeleteAPIApplicationEmojiResult,
@@ -292,6 +293,7 @@ import type {
   //RESTPostAPIGuildStickerFormDataBody,
   //RESTPostAPIGuildStickerResult,
 } from 'discord-api-types/v10'
+// biome-ignore-end lint/suspicious/noDeprecatedImports: Keep it available until it’s deleted
 import type { CustomCallbackData, FileData, TypedResponse } from '../types'
 import type {
   $applications$_$activityinstances$_,

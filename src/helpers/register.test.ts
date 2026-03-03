@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
-import { _applications_$_commands, _applications_$_guilds_$_commands } from '../rest/rest-path'
+import { $applications$_$commands, $applications$_$guilds$_$commands } from '../rest/rest-path'
 import { register } from './register'
 
 const mockRest: Mock = vi.fn()
@@ -36,7 +36,7 @@ describe('register function', () => {
 
     expect(mockRest).toHaveBeenCalledWith(
       'PUT',
-      _applications_$_guilds_$_commands,
+      $applications$_$guilds$_$commands,
       [mockApplicationId, mockGuildId],
       expect.any(Array),
     )
@@ -49,7 +49,7 @@ describe('register function', () => {
 
     const result = await register(mockCommands, mockApplicationId, mockToken)
 
-    expect(mockRest).toHaveBeenCalledWith('PUT', _applications_$_commands, [mockApplicationId], expect.any(Array))
+    expect(mockRest).toHaveBeenCalledWith('PUT', $applications$_$commands, [mockApplicationId], expect.any(Array))
     expect(result).toContain('✅ Success')
   })
 
