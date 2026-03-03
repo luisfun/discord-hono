@@ -1,6 +1,6 @@
 // @ts-check
 
-// biome-ignore lint/correctness/noUnresolvedImports: unknown error
+// biome-ignore-all lint/correctness/noUnresolvedImports: Ignore for local processing
 import { DiscordHono as DiscordHonoOld } from 'discord-hono'
 import { bench, boxplot, compact, run, summary } from 'mitata'
 import { Command, DiscordHono, Option, testCommandRequestInit, testVerifyTrue } from '../dist/index.js'
