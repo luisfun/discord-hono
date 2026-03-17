@@ -59,6 +59,9 @@ type ResolvedReturnType<T extends ResolvedCategory> = T extends keyof APIInterac
   : T extends keyof APIMessageApplicationCommandInteractionDataResolved
     ? APIMessageApplicationCommandInteractionDataResolved[T][string]
     : never
+type RenamedResolved = {
+  [K in ResolvedCategory]: Record<string, ResolvedReturnType<K> | undefined>
+}
 
 export class Context<
   E extends Env,
@@ -74,6 +77,14 @@ export class Context<
   #interaction: APIInteraction | CronEvent
   #flags: { flags?: number } = {} // 235
   #sub: SubKey = { group: '', command: '', string: '' } // 24
+  #resolved: RenamedResolved = {
+    attachments: {},
+    channels: {},
+    members: {},
+    messages: {},
+    roles: {},
+    users: {},
+  } // 2345
   #update = false // 3
   #focused: AutocompleteOption | undefined // 4
   #throwIfNotAllowType(allowType: (APIInteraction | CronEvent)['type'][]): void {
@@ -111,10 +122,26 @@ export class Context<
         if (options)
           for (const e of options) {
             const { type } = e
+            // string | integer | number
             if ((type === 3 || type === 4 || type === 10) && e.focused) this.#focused = e
             // @ts-expect-error
             this.set(e.name, e.value)
+            // user | channel | role | mentionable | attachment
+            if ((type === 6 || type === 7 || type === 8 || type === 9 || type === 11) && 'resolved' in interaction.data)
+              // !!! resolvedMap is any !!!
+              for (const [category, resolvedMap] of Object.entries(interaction.data.resolved))
+                if (resolvedMap[e.value]) this.#resolved[category as ResolvedCategory][e.name] = resolvedMap[e.value]
           }
+        if (interaction.data.type === 2)
+          // biome-ignore lint/complexity/useLiteralKeys: dynamic key access is required
+          this.#resolved.users['target'] = interaction.data.resolved.users[
+            interaction.data.target_id
+          ] as ResolvedReturnType<'users'>
+        else if (interaction.data.type === 3)
+          // biome-ignore lint/complexity/useLiteralKeys: dynamic key access is required
+          this.#resolved.messages['target'] = interaction.data.resolved.messages[
+            interaction.data.target_id
+          ] as ResolvedReturnType<'messages'>
         break
       }
       // @ts-expect-error
@@ -355,24 +382,10 @@ export class Context<
   /**
    * Get Resolved Data
    * @beta This may include breaking changes
-   * @param {'attachments' | 'channels' | 'members' | 'messages' | 'roles' | 'users'} category 'attachments' | 'channels' | 'members' | 'messages' | 'roles' | 'users'
-   * @param {string} id id to get specific resolved object
-   * @returns resolved object or undefined
+   * @returns renamed resolved object
    */
-  resolved<T extends ResolvedCategory>(category: T, id?: string): ResolvedReturnType<T> | undefined {
-    this.#throwIfNotAllowType([2, 3, 4, 5])
-    const { data } = this.#interaction as APIInteraction
-    if (!(data && 'resolved' in data && data.resolved)) return undefined
-    const { resolved } = data
-    if (!id) {
-      if ('type' in data) {
-        if (data.type === 2 && category === 'users')
-          return resolved[category as keyof typeof resolved]?.[data.target_id]
-        if (data.type === 3 && category === 'messages')
-          return resolved[category as keyof typeof resolved]?.[data.target_id]
-      }
-      return undefined
-    }
-    return resolved[category as keyof typeof resolved]?.[id]
+  get resolved(): RenamedResolved {
+    this.#throwIfNotAllowType([2, 4])
+    return this.#resolved
   }
 }
