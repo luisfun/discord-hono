@@ -42,7 +42,7 @@
     "hono": "^4.12.3",
     "mitata": "^1.0.34",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.2",
     "vitest": "^4.0.18"
   }
 }
