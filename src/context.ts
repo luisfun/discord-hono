@@ -59,6 +59,9 @@ type ResolvedReturnType<T extends ResolvedCategory> = T extends keyof APIInterac
   : T extends keyof APIMessageApplicationCommandInteractionDataResolved
     ? APIMessageApplicationCommandInteractionDataResolved[T][string]
     : never
+type RetypedResolved = {
+  [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined>
+}
 
 export class Context<
   E extends Env,
@@ -111,6 +114,7 @@ export class Context<
         if (options)
           for (const e of options) {
             const { type } = e
+            // string | integer | number
             if ((type === 3 || type === 4 || type === 10) && e.focused) this.#focused = e
             // @ts-expect-error
             this.set(e.name, e.value)
@@ -355,24 +359,12 @@ export class Context<
   /**
    * Get Resolved Data
    * @beta This may include breaking changes
-   * @param {'attachments' | 'channels' | 'members' | 'messages' | 'roles' | 'users'} category 'attachments' | 'channels' | 'members' | 'messages' | 'roles' | 'users'
-   * @param {string} id id to get specific resolved object
-   * @returns resolved object or undefined
+   * @returns resolved object
    */
-  resolved<T extends ResolvedCategory>(category: T, id?: string): ResolvedReturnType<T> | undefined {
+  get resolved(): RetypedResolved {
     this.#throwIfNotAllowType([2, 3, 4, 5])
-    const { data } = this.#interaction as APIInteraction
-    if (!(data && 'resolved' in data && data.resolved)) return undefined
-    const { resolved } = data
-    if (!id) {
-      if ('type' in data) {
-        if (data.type === 2 && category === 'users')
-          return resolved[category as keyof typeof resolved]?.[data.target_id]
-        if (data.type === 3 && category === 'messages')
-          return resolved[category as keyof typeof resolved]?.[data.target_id]
-      }
-      return undefined
-    }
-    return resolved[category as keyof typeof resolved]?.[id]
+    // if(!('data' in this.#interaction && 'resolved' in this.#interaction.data)) return undefined
+    // @ts-expect-error: Simplified notation, no type guard performed
+    return this.#interaction?.data?.resolved ?? {}
   }
 }
