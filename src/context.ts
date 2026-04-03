@@ -60,7 +60,7 @@ type ResolvedReturnType<T extends ResolvedCategory> = T extends keyof APIInterac
     ? APIMessageApplicationCommandInteractionDataResolved[T][string]
     : never
 type RenamedResolved = {
-  [K in ResolvedCategory]: Record<string, ResolvedReturnType<K> | undefined>
+  [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined>
 }
 
 export class Context<
@@ -77,14 +77,6 @@ export class Context<
   #interaction: APIInteraction | CronEvent
   #flags: { flags?: number } = {} // 235
   #sub: SubKey = { group: '', command: '', string: '' } // 24
-  #resolved: RenamedResolved = {
-    attachments: {},
-    channels: {},
-    members: {},
-    messages: {},
-    roles: {},
-    users: {},
-  } // 2345
   #update = false // 3
   #focused: AutocompleteOption | undefined // 4
   #throwIfNotAllowType(allowType: (APIInteraction | CronEvent)['type'][]): void {
@@ -126,22 +118,7 @@ export class Context<
             if ((type === 3 || type === 4 || type === 10) && e.focused) this.#focused = e
             // @ts-expect-error
             this.set(e.name, e.value)
-            // user | channel | role | mentionable | attachment
-            if ((type === 6 || type === 7 || type === 8 || type === 9 || type === 11) && 'resolved' in interaction.data)
-              // !!! resolvedMap is any !!!
-              for (const [category, resolvedMap] of Object.entries(interaction.data.resolved))
-                if (resolvedMap[e.value]) this.#resolved[category as ResolvedCategory][e.name] = resolvedMap[e.value]
           }
-        if (interaction.data.type === 2)
-          // biome-ignore lint/complexity/useLiteralKeys: dynamic key access is required
-          this.#resolved.users['target'] = interaction.data.resolved.users[
-            interaction.data.target_id
-          ] as ResolvedReturnType<'users'>
-        else if (interaction.data.type === 3)
-          // biome-ignore lint/complexity/useLiteralKeys: dynamic key access is required
-          this.#resolved.messages['target'] = interaction.data.resolved.messages[
-            interaction.data.target_id
-          ] as ResolvedReturnType<'messages'>
         break
       }
       // @ts-expect-error
@@ -385,7 +362,9 @@ export class Context<
    * @returns renamed resolved object
    */
   get resolved(): RenamedResolved {
-    this.#throwIfNotAllowType([2, 4])
-    return this.#resolved
+    this.#throwIfNotAllowType([2, 3, 4, 5])
+    // if(!('data' in this.#interaction && 'resolved' in this.#interaction.data)) return undefined
+    // @ts-expect-error: Simplified notation, no type guard performed
+    return (this.#interaction?.data?.resolved as RenamedResolved) ?? {}
   }
 }

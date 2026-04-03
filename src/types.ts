@@ -54,7 +54,7 @@ export type CommandContext<E extends Env = any> = ExcludeMethods<
 
 export type ComponentContext<E extends Env = any, T extends ComponentType = any> = ExcludeMethods<
   Context<E & { Variables: { custom_id?: string } }, ComponentContext<E, T>>,
-  'sub' | 'focused' | 'resAutocomplete' | 'interaction' | 'resolved'
+  'sub' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: ComponentInteraction<T> }
 
 export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
@@ -64,7 +64,7 @@ export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
 
 export type ModalContext<E extends Env = any> = ExcludeMethods<
   Context<E & { Variables: { custom_id?: string } }, ModalContext<E>>,
-  'sub' | 'resModal' | 'focused' | 'resAutocomplete' | 'interaction' | 'resolved'
+  'sub' | 'resModal' | 'focused' | 'resAutocomplete' | 'interaction'
 > & { interaction: APIModalSubmitInteraction }
 
 export type CronContext<E extends Env = any> = ExcludeMethods<
