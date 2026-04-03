@@ -59,7 +59,7 @@ type ResolvedReturnType<T extends ResolvedCategory> = T extends keyof APIInterac
   : T extends keyof APIMessageApplicationCommandInteractionDataResolved
     ? APIMessageApplicationCommandInteractionDataResolved[T][string]
     : never
-type RenamedResolved = {
+type RetypedResolved = {
   [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined>
 }
 
@@ -361,10 +361,10 @@ export class Context<
    * @beta This may include breaking changes
    * @returns renamed resolved object
    */
-  get resolved(): RenamedResolved {
+  get resolved(): RetypedResolved {
     this.#throwIfNotAllowType([2, 3, 4, 5])
     // if(!('data' in this.#interaction && 'resolved' in this.#interaction.data)) return undefined
     // @ts-expect-error: Simplified notation, no type guard performed
-    return (this.#interaction?.data?.resolved as RenamedResolved) ?? {}
+    return this.#interaction?.data?.resolved ?? {}
   }
 }
