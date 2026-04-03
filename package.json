@@ -33,16 +33,16 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",
-    "@biomejs/biome": "^2.4.4",
-    "@discordjs/builders": "^1.13.1",
+    "@biomejs/biome": "^2.4.10",
+    "@discordjs/builders": "^1.14.1",
     "@tsconfig/strictest": "^2.0.8",
-    "@vitest/coverage-v8": "^4.0.18",
-    "discord-api-types": "^0.38.40",
+    "@vitest/coverage-v8": "^4.1.2",
+    "discord-api-types": "^0.38.43",
     "discord-hono": "0.20.3",
-    "hono": "^4.12.3",
+    "hono": "^4.12.9",
     "mitata": "^1.0.34",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2"
   }
 }
