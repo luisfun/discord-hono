@@ -359,7 +359,7 @@ export class Context<
   /**
    * Get Resolved Data
    * @beta This may include breaking changes
-   * @returns renamed resolved object
+   * @returns resolved object
    */
   get resolved(): RetypedResolved {
     this.#throwIfNotAllowType([2, 3, 4, 5])
