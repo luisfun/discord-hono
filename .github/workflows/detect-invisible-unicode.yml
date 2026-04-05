@@ -23,41 +23,17 @@ jobs:
         run: |
           set -euo pipefail
 
-          # PR と push のどちらでも動くように「比較対象(base)」を決める
-          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-            BASE_SHA="${{ github.event.pull_request.base.sha }}"
-            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
-          else
-            # push の場合: 直前コミットとの比較（新規ブランチなどで before が空の時は HEAD^ を使う）
-            BASE_SHA="${{ github.event.before }}"
-            HEAD_SHA="${{ github.sha }}"
-            if [[ -z "${BASE_SHA}" || "${BASE_SHA}" == "0000000000000000000000000000000000000000" ]]; then
-              BASE_SHA="$(git rev-parse "${HEAD_SHA}^" 2>/dev/null || true)"
-            fi
-          fi
-
-          if [[ -z "${BASE_SHA}" ]]; then
-            echo "Base SHA is empty; skipping (cannot compute diff)."
-            exit 0
-          fi
-
-          echo "Diff range: ${BASE_SHA}..${HEAD_SHA}"
-
-          # 変更されたファイル一覧（追加/変更/リネームのみ）。削除は除外。
-          mapfile -t files < <(git diff -z --name-only --diff-filter=ACMR "${BASE_SHA}" "${HEAD_SHA}")
-
-          if (( ${#files[@]} == 0 )); then
-            echo "No changed files."
-            exit 0
-          fi
+          # SHA の決定ロジックは Python 側に移譲します（イベント JSON を読んで fallback を行う）
+          echo "Running invisible/bidi detection (SHA logic in Python)."
 
           # 走査対象から除外したいもの（必要に応じて調整）
           # - lockfile / minified / 生成物 / バイナリになりがちな拡張子 など
           exclude_regex='(^dist/|^build/|^vendor/|^\.git/|package-lock\.json$|pnpm-lock\.yaml$|yarn\.lock$|\.min\.(js|css)$)'
           echo "Exclude regex: ${exclude_regex}"
+          export EXCLUDE_REGEX="${exclude_regex}"
 
           python3 - << 'PY'
-          import os, re, subprocess, sys
+          import os, re, subprocess, sys, json
 
           exclude_regex = re.compile(os.environ.get("EXCLUDE_REGEX", ""))
           # 主に問題になりやすい不可視・制御系（必要なら増やせます）
@@ -66,7 +42,7 @@ jobs:
           # - Soft hyphen: U+00AD（見えにくい）
           # - Word joiner: U+2060
           # - Mongolian vowel separator: U+180E（古いが混入検知したい場合）
-          SUSPECT_RANGES = [
+            SUSPECT_RANGES = [
               (0x200B, 0x200F),  # zero-width 等
               (0x202A, 0x202E),  # bidi embedding/override
               (0x2060, 0x2060),  # word joiner
@@ -87,13 +63,45 @@ jobs:
                           break
               return hits
 
-          # bash側で作った files 配列を git から再取得（安定）
-          base_sha = os.environ["BASE_SHA"]
-          head_sha = os.environ["HEAD_SHA"]
-          diff_files = subprocess.check_output(
+            # GitHub Actions のイベント JSON（GITHUB_EVENT_PATH）や環境変数から SHA を決定する
+            event_name = os.environ.get("GITHUB_EVENT_NAME", "")
+            event_path = os.environ.get("GITHUB_EVENT_PATH")
+            event = {}
+            if event_path and os.path.exists(event_path):
+              try:
+                with open(event_path, "r", encoding="utf-8") as f:
+                  event = json.load(f)
+              except Exception:
+                event = {}
+
+            if event_name == "pull_request":
+              base_sha = event.get("pull_request", {}).get("base", {}).get("sha")
+              head_sha = event.get("pull_request", {}).get("head", {}).get("sha")
+            else:
+              base_sha = event.get("before")
+              head_sha = event.get("after") or os.environ.get("GITHUB_SHA")
+
+            # push の新規ブランチなどで before が空/全ゼロのときは HEAD^ を使う
+            if not base_sha or base_sha == "0000000000000000000000000000000000000000":
+              try:
+                base_sha = subprocess.check_output(["git", "rev-parse", f"{head_sha}^"], text=True).strip()
+              except Exception:
+                base_sha = ""
+
+            if not base_sha:
+              print("Base SHA is empty; skipping (cannot compute diff).")
+              sys.exit(0)
+
+            if not head_sha:
+              print("HEAD SHA is missing; aborting.")
+              sys.exit(1)
+
+            print(f"Diff range: {base_sha}..{head_sha}")
+
+            diff_files = subprocess.check_output(
               ["git", "diff", "--name-only", "--diff-filter=ACMR", base_sha, head_sha],
               text=True
-          ).splitlines()
+            ).splitlines()
 
           failures = []
           for path in diff_files:
@@ -136,7 +144,5 @@ jobs:
           print("OK: no suspicious invisible/bidi control characters found in changed files.")
           PY
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           EXCLUDE_REGEX: '(^dist/|^build/|^vendor/|^\.git/|package-lock\.json$|pnpm-lock\.yaml$|yarn\.lock$|\.min\.(js|css)$)'
           
