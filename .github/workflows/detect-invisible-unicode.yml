@@ -143,6 +143,4 @@ jobs:
 
           print("OK: no suspicious invisible/bidi control characters found in changed files.")
           PY
-        env:
-          EXCLUDE_REGEX: '(^dist/|^build/|^vendor/|^\.git/|package-lock\.json$|pnpm-lock\.yaml$|yarn\.lock$|\.min\.(js|css)$)'
           
