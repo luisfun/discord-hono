@@ -42,7 +42,7 @@ jobs:
           # - Soft hyphen: U+00AD（見えにくい）
           # - Word joiner: U+2060
           # - Mongolian vowel separator: U+180E（古いが混入検知したい場合）
-            SUSPECT_RANGES = [
+          SUSPECT_RANGES = [
               (0x200B, 0x200F),  # zero-width 等
               (0x202A, 0x202E),  # bidi embedding/override
               (0x2060, 0x2060),  # word joiner
