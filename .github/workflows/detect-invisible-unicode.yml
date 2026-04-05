@@ -32,17 +32,17 @@ jobs:
           echo "Exclude regex: ${exclude_regex}"
           export EXCLUDE_REGEX="${exclude_regex}"
 
-          python3 - << 'PY'
-          import os, re, subprocess, sys, json
+            python3 - << 'PY'
+            import os, re, subprocess, sys, json
 
-          exclude_regex = re.compile(os.environ.get("EXCLUDE_REGEX", ""))
-          # 主に問題になりやすい不可視・制御系（必要なら増やせます）
-          # - Zero-width: U+200B..U+200F, U+FEFF
-          # - Bidi controls: U+202A..U+202E, U+2066..U+2069
-          # - Soft hyphen: U+00AD（見えにくい）
-          # - Word joiner: U+2060
-          # - Mongolian vowel separator: U+180E（古いが混入検知したい場合）
-          SUSPECT_RANGES = [
+            exclude_regex = re.compile(os.environ.get("EXCLUDE_REGEX", ""))
+            # 主に問題になりやすい不可視・制御系（必要なら増やせます）
+            # - Zero-width: U+200B..U+200F, U+FEFF
+            # - Bidi controls: U+202A..U+202E, U+2066..U+2069
+            # - Soft hyphen: U+00AD（見えにくい）
+            # - Word joiner: U+2060
+            # - Mongolian vowel separator: U+180E（古いが混入検知したい場合）
+            SUSPECT_RANGES = [
               (0x200B, 0x200F),  # zero-width 等
               (0x202A, 0x202E),  # bidi embedding/override
               (0x2060, 0x2060),  # word joiner
@@ -51,16 +51,16 @@ jobs:
               (0xFEFF, 0xFEFF),  # BOM (zero width no-break space)
               (0xFFFF, 0xFFFF),  # noncharacter
               (0x180E, 0x180E),  # Mongolian vowel separator
-          ]
+            ]
 
-          def has_suspect_chars(s: str):
+            def has_suspect_chars(s: str):
               hits = []
               for i, ch in enumerate(s):
-                  cp = ord(ch)
-                  for a, b in SUSPECT_RANGES:
-                      if a <= cp <= b:
-                          hits.append((i, cp))
-                          break
+                cp = ord(ch)
+                for a, b in SUSPECT_RANGES:
+                  if a <= cp <= b:
+                    hits.append((i, cp))
+                    break
               return hits
 
             # GitHub Actions のイベント JSON（GITHUB_EVENT_PATH）や環境変数から SHA を決定する
@@ -100,49 +100,49 @@ jobs:
 
             diff_files = subprocess.check_output(
               ["git", "diff", "--name-only", "--diff-filter=ACMR", base_sha, head_sha],
-              text=True
+              text=True,
             ).splitlines()
 
-          failures = []
-          for path in diff_files:
+            failures = []
+            for path in diff_files:
               if exclude_regex.pattern and exclude_regex.search(path):
-                  continue
+                continue
 
               # バイナリはスキップ（diffで判別しきれないので、ここでは拡張子や読み取り失敗で回避）
               try:
-                  with open(path, "rb") as f:
-                      data = f.read()
+                with open(path, "rb") as f:
+                  data = f.read()
               except FileNotFoundError:
-                  # リネーム等でワークツリーに無い場合は無視
-                  continue
+                # リネーム等でワークツリーに無い場合は無視
+                continue
 
               # 簡易バイナリ判定: NUL があればバイナリ寄りなのでスキップ
               if b"\x00" in data:
-                  continue
+                continue
 
               try:
-                  text = data.decode("utf-8")
+                text = data.decode("utf-8")
               except UnicodeDecodeError:
-                  # UTF-8 で読めないものは対象外（必要ならここを厳格化）
-                  continue
+                # UTF-8 で読めないものは対象外（必要ならここを厳格化）
+                continue
 
               hits = has_suspect_chars(text)
               if hits:
-                  # どのコードポイントがあるか集計して出す
-                  cps = sorted(set(cp for _, cp in hits))
-                  failures.append((path, cps))
+                # どのコードポイントがあるか集計して出す
+                cps = sorted(set(cp for _, cp in hits))
+                failures.append((path, cps))
 
-          if failures:
+            if failures:
               print("Found suspicious invisible/bidi control characters:")
               for path, cps in failures:
-                  cps_str = ", ".join(f"U+{cp:04X}" for cp in cps)
-                  print(f"- {path}: {cps_str}")
+                cps_str = ", ".join(f"U+{cp:04X}" for cp in cps)
+                print(f"- {path}: {cps_str}")
               print("")
               print("Failing the check. Remove these characters or justify in review.")
               sys.exit(1)
 
-          print("OK: no suspicious invisible/bidi control characters found in changed files.")
-          PY
+            print("OK: no suspicious invisible/bidi control characters found in changed files.")
+            PY
         env:
           EXCLUDE_REGEX: '(^dist/|^build/|^vendor/|^\.git/|package-lock\.json$|pnpm-lock\.yaml$|yarn\.lock$|\.min\.(js|css)$)'
           
