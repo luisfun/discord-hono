@@ -4,10 +4,14 @@ updates:
     directory: '/'
     schedule:
       interval: 'monthly'
+    cooldown:
+      default-days: 1
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
       interval: 'monthly'
+    cooldown:
+      default-days: 1
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-patch', 'version-update:semver-minor']
