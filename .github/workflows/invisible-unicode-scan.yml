@@ -1,0 +1,72 @@
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  invisible-unicode-full-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Scan repo for invisible/bidi control characters
+        run: |
+          python3 - <<'PY'
+          import os, sys
+
+          # 検知したい代表的な不可視/紛らわしい制御文字レンジ
+          RANGES = [
+              (0x200B, 0x200F),  # zero-width 等
+              (0x202A, 0x202E),  # bidi embedding/override
+              (0x2060, 0x2060),  # word joiner
+              (0x2066, 0x2069),  # bidi isolate
+              (0x00AD, 0x00AD),  # soft hyphen
+              (0xFEFF, 0xFEFF),  # BOM (zero width no-break space)
+              (0xFFFF, 0xFFFF),  # noncharacter
+          ]
+
+          # 必要に応じて調整（生成物・依存lock・バイナリ系など）
+          SKIP_DIRS = {".git", "node_modules", "dist", "build", "vendor", ".venv"}
+          SKIP_FILES = {"package-lock.json", "yarn.lock", "pnpm-lock.yaml"}
+
+          def is_suspect(ch: str) -> bool:
+              cp = ord(ch)
+              return any(a <= cp <= b for a, b in RANGES)
+
+          bad = []  # (path, line_no, col_no, codepoint)
+          for root, dirs, files in os.walk("."):
+              dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+              for fn in files:
+                  if fn in SKIP_FILES:
+                      continue
+                  path = os.path.join(root, fn)
+
+                  try:
+                      data = open(path, "rb").read()
+                  except OSError:
+                      continue
+
+                  # 雑にバイナリ除外（NUL含むならスキップ）
+                  if b"\x00" in data:
+                      continue
+
+                  try:
+                      text = data.decode("utf-8")
+                  except UnicodeDecodeError:
+                      continue
+
+                  for i, line in enumerate(text.splitlines(), start=1):
+                      for j, ch in enumerate(line, start=1):
+                          if is_suspect(ch):
+                              bad.append((path, i, j, ord(ch)))
+
+          if bad:
+              print("Found suspicious invisible/bidi control characters:")
+              for path, line, col, cp in bad[:2000]:
+                  print(f"- {path}:{line}:{col} U+{cp:04X}")
+              if len(bad) > 2000:
+                  print(f"... ({len(bad)-2000} more)")
+              sys.exit(1)
+
+          print("OK: no suspicious invisible/bidi control characters found.")
+          PY
