@@ -1,0 +1,141 @@
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  detect-invisible-unicode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Detect invisible / bidi control characters in changed files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # PR と push のどちらでも動くように「比較対象(base)」を決める
+          if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          else
+            # push の場合: 直前コミットとの比較（新規ブランチなどで before が空の時は HEAD^ を使う）
+            BASE_SHA="${{ github.event.before }}"
+            HEAD_SHA="${{ github.sha }}"
+            if [[ -z "${BASE_SHA}" || "${BASE_SHA}" == "0000000000000000000000000000000000000000" ]]; then
+              BASE_SHA="$(git rev-parse "${HEAD_SHA}^" 2>/dev/null || true)"
+            fi
+          fi
+
+          if [[ -z "${BASE_SHA}" ]]; then
+            echo "Base SHA is empty; skipping (cannot compute diff)."
+            exit 0
+          fi
+
+          echo "Diff range: ${BASE_SHA}..${HEAD_SHA}"
+
+          # 変更されたファイル一覧（追加/変更/リネームのみ）。削除は除外。
+          mapfile -t files < <(git diff -z --name-only --diff-filter=ACMR "${BASE_SHA}" "${HEAD_SHA}")
+
+          if (( ${#files[@]} == 0 )); then
+            echo "No changed files."
+            exit 0
+          fi
+
+          # 走査対象から除外したいもの（必要に応じて調整）
+          # - lockfile / minified / 生成物 / バイナリになりがちな拡張子 など
+          exclude_regex='(^dist/|^build/|^vendor/|^\.git/|package-lock\.json$|pnpm-lock\.yaml$|yarn\.lock$|\.min\.(js|css)$)'
+          echo "Exclude regex: ${exclude_regex}"
+
+          python3 - << 'PY'
+          import os, re, subprocess, sys
+
+          exclude_regex = re.compile(os.environ.get("EXCLUDE_REGEX", ""))
+          # 主に問題になりやすい不可視・制御系（必要なら増やせます）
+          # - Zero-width: U+200B..U+200F, U+FEFF
+          # - Bidi controls: U+202A..U+202E, U+2066..U+2069
+          # - Soft hyphen: U+00AD（見えにくい）
+          # - Word joiner: U+2060
+          # - Mongolian vowel separator: U+180E（古いが混入検知したい場合）
+          SUSPECT_RANGES = [
+              (0x200B, 0x200F),  # zero-width 等
+              (0x202A, 0x202E),  # bidi embedding/override
+              (0x2060, 0x2060),  # word joiner
+              (0x2066, 0x2069),  # bidi isolate
+              (0x00AD, 0x00AD),  # soft hyphen
+              (0xFEFF, 0xFEFF),  # BOM (zero width no-break space)
+              (0xFFFF, 0xFFFF),  # noncharacter
+              (0x180E, 0x180E),  # Mongolian vowel separator
+          ]
+
+          def has_suspect_chars(s: str):
+              hits = []
+              for i, ch in enumerate(s):
+                  cp = ord(ch)
+                  for a, b in SUSPECT_RANGES:
+                      if a <= cp <= b:
+                          hits.append((i, cp))
+                          break
+              return hits
+
+          # bash側で作った files 配列を git から再取得（安定）
+          base_sha = os.environ["BASE_SHA"]
+          head_sha = os.environ["HEAD_SHA"]
+          diff_files = subprocess.check_output(
+              ["git", "diff", "--name-only", "--diff-filter=ACMR", base_sha, head_sha],
+              text=True
+          ).splitlines()
+
+          failures = []
+          for path in diff_files:
+              if exclude_regex.pattern and exclude_regex.search(path):
+                  continue
+
+              # バイナリはスキップ（diffで判別しきれないので、ここでは拡張子や読み取り失敗で回避）
+              try:
+                  with open(path, "rb") as f:
+                      data = f.read()
+              except FileNotFoundError:
+                  # リネーム等でワークツリーに無い場合は無視
+                  continue
+
+              # 簡易バイナリ判定: NUL があればバイナリ寄りなのでスキップ
+              if b"\x00" in data:
+                  continue
+
+              try:
+                  text = data.decode("utf-8")
+              except UnicodeDecodeError:
+                  # UTF-8 で読めないものは対象外（必要ならここを厳格化）
+                  continue
+
+              hits = has_suspect_chars(text)
+              if hits:
+                  # どのコードポイントがあるか集計して出す
+                  cps = sorted(set(cp for _, cp in hits))
+                  failures.append((path, cps))
+
+          if failures:
+              print("Found suspicious invisible/bidi control characters:")
+              for path, cps in failures:
+                  cps_str = ", ".join(f"U+{cp:04X}" for cp in cps)
+                  print(f"- {path}: {cps_str}")
+              print("")
+              print("Failing the check. Remove these characters or justify in review.")
+              sys.exit(1)
+
+          print("OK: no suspicious invisible/bidi control characters found in changed files.")
+          PY
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          EXCLUDE_REGEX: '(^dist/|^build/|^vendor/|^\.git/|package-lock\.json$|pnpm-lock\.yaml$|yarn\.lock$|\.min\.(js|css)$)'
+          
