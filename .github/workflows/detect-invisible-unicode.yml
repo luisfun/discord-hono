@@ -116,15 +116,31 @@ jobs:
               # リネーム等でワークツリーに無い場合は無視
               continue
 
-            # 簡易バイナリ判定: NUL があればバイナリ寄りなのでスキップ
-            if b"\x00" in data:
-              continue
-
+            # Attempt to decode file contents.
+            # UTF-16/UTF-32 text files contain NUL bytes, so don't skip just because of NUL.
+            # Strategy:
+            #  - Try UTF-8 first.
+            #  - If UTF-8 fails, try common alternatives: utf-8-sig, utf-16, utf-32.
+            #  - If decoding still fails, treat this as an error and fail the job so reviewers can inspect the file.
+            text = None
+            decode_attempts = []
             try:
               text = data.decode("utf-8")
+              decode_attempts.append("utf-8")
             except UnicodeDecodeError:
-              # UTF-8 で読めないものは対象外（必要ならここを厳格化）
-              continue
+              for enc in ("utf-8-sig", "utf-16", "utf-32"):
+                try:
+                  text = data.decode(enc)
+                  decode_attempts.append(enc)
+                  break
+                except UnicodeDecodeError:
+                  decode_attempts.append(enc)
+
+            if text is None:
+              has_nul = b"\x00" in data
+              print(f"ERROR: could not decode {path} as UTF-8/UTF-16/UTF-32. NUL bytes present: {has_nul}. Tried: {', '.join(decode_attempts)}")
+              print("Failing the check. Ensure text files use UTF-8/UTF-16/UTF-32 or remove binary files from the commit.")
+              sys.exit(1)
 
             hits = has_suspect_chars(text)
             if hits:
