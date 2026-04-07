@@ -23,6 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      checks: write
       id-token: write
       pull-requests: write
     steps:
@@ -31,9 +32,11 @@ jobs:
         with:
           node-version: 'lts/*'
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Install safe-chain
+        run: curl -fsSL https://github.com/AikidoSec/safe-chain/releases/latest/download/install-safe-chain.sh | sh -s -- --ci
+
       - run: |
-          npm i -g npm@latest @aikidosec/safe-chain@latest
-          safe-chain setup-ci
           npm ci
           git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
@@ -45,6 +48,12 @@ jobs:
         run: |
           npm run test
           npm run build
+
+      - name: Create check-run 'test' for branch-protection
+        uses: LouisBrunner/checks-action@937cbbcde3259005b50746dc91cde29098aac2ff # v3.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: test
 
       - name: Version upgrade
         run: npm version ${{ github.event.inputs.version_type }}
