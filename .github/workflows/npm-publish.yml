@@ -49,14 +49,6 @@ jobs:
           npm run test
           npm run build
 
-      - name: Create check-run 'test' for branch-protection
-        uses: LouisBrunner/checks-action@937cbbcde3259005b50746dc91cde29098aac2ff # v3.1.0
-        if: always()
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: test
-          conclusion: ${{ job.status }}
-
       - name: Version upgrade
         run: npm version ${{ github.event.inputs.version_type }}
 
