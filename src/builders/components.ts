@@ -106,7 +106,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @returns {this}
    */
   custom_value(e: T extends 'Link' | 'SKU' ? undefined : string): this {
-    return this.#assign('custom_id', ['Link', 'SKU'], { custom_id: this.#keyStr + CUSTOM_ID_SEPARATOR + e })
+    return this.#assign('custom_value', ['Link', 'SKU'], { custom_id: this.#keyStr + CUSTOM_ID_SEPARATOR + e })
   }
   /**
    * available: ALL

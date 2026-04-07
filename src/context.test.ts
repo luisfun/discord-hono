@@ -105,7 +105,7 @@ describe('Context', () => {
     version: 1,
     data: {
       id: 'command-id',
-      name: 'test-command',
+      name: key,
       type: 1,
       options: [
         {
@@ -159,6 +159,7 @@ describe('Context', () => {
     token: 'token',
     version: 1,
     data: {
+      custom_id: key,
       // @ts-expect-error: library-specific value
       custom_value: 'button-1',
       component_type: 2, // BUTTON
@@ -205,7 +206,7 @@ describe('Context', () => {
     version: 1,
     data: {
       id: 'command-id',
-      name: 'test-command',
+      name: key,
       type: 1,
       options: [
         {
@@ -232,6 +233,7 @@ describe('Context', () => {
     token: 'token',
     version: 1,
     data: {
+      custom_id: key,
       // @ts-expect-error: library-specific value
       custom_value: 'modal-1',
       components: [
