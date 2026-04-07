@@ -6,14 +6,12 @@ import type {
   APIApplicationCommandInteractionDataStringOption,
   APICommandAutocompleteInteractionResponseCallbackData,
   APIInteraction,
-  APIInteractionDataResolved,
   APIInteractionResponse,
   APIInteractionResponseCallbackData,
   APIInteractionResponseDeferredChannelMessageWithSource,
   APIInteractionResponseDeferredMessageUpdate,
   APIInteractionResponseLaunchActivity,
   APIMessage,
-  APIMessageApplicationCommandInteractionDataResolved,
   APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
   RESTPatchAPIInteractionOriginalResponseJSONBody,
@@ -24,6 +22,7 @@ import type {
   AutocompleteContext,
   CommandContext,
   ComponentContext,
+  ContextRef,
   CronContext,
   CronEvent,
   CustomCallbackData,
@@ -53,16 +52,6 @@ type SubKey = {
   string: string
 }
 
-type ResolvedCategory = keyof APIInteractionDataResolved | keyof APIMessageApplicationCommandInteractionDataResolved
-type ResolvedReturnType<T extends ResolvedCategory> = T extends keyof APIInteractionDataResolved
-  ? NonNullable<APIInteractionDataResolved[T]>[string]
-  : T extends keyof APIMessageApplicationCommandInteractionDataResolved
-    ? APIMessageApplicationCommandInteractionDataResolved[T][string]
-    : never
-type RetypedResolved = {
-  [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined>
-}
-
 export class Context<
   E extends Env,
   This extends CommandContext | ComponentContext | AutocompleteContext | ModalContext | CronContext,
@@ -70,8 +59,8 @@ export class Context<
   #env: E['Bindings']
   #executionCtx: ExecutionCtx
   #discord: DiscordEnv
-  #key: string
   #var = new Map()
+  #ref: ContextRef
   #rest: ReturnType<typeof createRest> | undefined = undefined
   // interaction
   #interaction: APIInteraction | CronEvent
@@ -92,8 +81,13 @@ export class Context<
     this.#env = env
     this.#executionCtx = executionCtx
     this.#discord = discord
-    this.#key = key
     this.#interaction = interaction
+    this.#ref = { key }
+    if ('data' in interaction) {
+      const { data } = interaction
+      for (const k of ['custom_value', 'target_id', 'values'] as const) if (k in data) this.#ref[k] = (data as any)[k]
+      if ('resolved' in data) this.#ref = { ...this.#ref, ...data.resolved }
+    }
     switch (interaction.type) {
       case 2:
       case 4: {
@@ -121,20 +115,12 @@ export class Context<
           }
         break
       }
-      // @ts-expect-error
-      // biome-ignore lint: case 5 extracts custom_id in the same way as case 3.
       case 5: {
         const modalRows = interaction.data?.components
         if (modalRows)
           // @ts-expect-error
           for (const row of modalRows) for (const modal of row.components) this.set(modal.custom_id, modal.value)
       }
-      case 3:
-        // with case 5
-        ;(this as ComponentContext | ModalContext).set('custom_id', interaction.data?.custom_id)
-        // not case 5, select only
-        // @ts-expect-error
-        if ('values' in interaction.data) this.set(key, interaction.data.values)
     }
   }
 
@@ -151,12 +137,6 @@ export class Context<
   get executionCtx(): ExecutionContext {
     if (!this.#executionCtx) throw newError('c.executionCtx', 'not found')
     return this.#executionCtx
-  }
-  /**
-   * Handler triggered string
-   */
-  get key(): string {
-    return this.#key
   }
   /**
    * @param {string} key
@@ -183,6 +163,14 @@ export class Context<
     ContextVariableMap & (IsAny<E['Variables']> extends true ? Record<string, any> : E['Variables'])
   > {
     return Object.fromEntries(this.#var)
+  }
+
+  /**
+   * Quick reference
+   * @beta This may include breaking changes
+   */
+  get ref(): Readonly<ContextRef> {
+    return this.#ref
   }
 
   /**
@@ -354,17 +342,5 @@ export class Context<
   resAutocomplete(data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData): Response {
     this.#throwIfNotAllowType([4])
     return Response.json({ type: 8, data: toJSON(data) } satisfies APIApplicationCommandAutocompleteResponse)
-  }
-
-  /**
-   * Get Resolved Data
-   * @beta This may include breaking changes
-   * @returns resolved object
-   */
-  get resolved(): RetypedResolved {
-    this.#throwIfNotAllowType([2, 3, 4, 5])
-    // if(!('data' in this.#interaction && 'resolved' in this.#interaction.data)) return undefined
-    // @ts-expect-error: Simplified notation, no type guard performed
-    return this.#interaction?.data?.resolved ?? {}
   }
 }

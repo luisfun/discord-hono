@@ -23,7 +23,7 @@ describe('Components Builder', () => {
               type: 2,
               label: 'Click Me',
               style: 1,
-              custom_id: `test_button${CUSTOM_ID_SEPARATOR}`,
+              custom_id: 'test_button',
             },
           ],
         },
@@ -62,7 +62,7 @@ describe('Components Builder', () => {
         type: 2,
         label: 'Click Me',
         style: 1,
-        custom_id: `test_button${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_button',
       })
     })
 
@@ -73,7 +73,7 @@ describe('Components Builder', () => {
         type: 2,
         label: 'Click Me',
         style: 2,
-        custom_id: `test_button${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_button',
       })
     })
 
@@ -105,7 +105,7 @@ describe('Components Builder', () => {
         type: 2,
         label: 'Click Me',
         style: 1,
-        custom_id: `test_button${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_button',
         emoji: { name: '👍' },
       })
     })
@@ -117,13 +117,13 @@ describe('Components Builder', () => {
         type: 2,
         label: 'Click Me',
         style: 1,
-        custom_id: `test_button${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_button',
         emoji: { name: '👍' },
       })
     })
 
     it('should add custom_id suffix', () => {
-      const button = new Button('test_button', 'Click Me').custom_id('suffix')
+      const button = new Button('test_button', 'Click Me').custom_value('suffix')
 
       expect(button.toJSON()).toEqual({
         type: 2,
@@ -140,7 +140,7 @@ describe('Components Builder', () => {
         type: 2,
         label: 'Click Me',
         style: 1,
-        custom_id: `test_button${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_button',
         disabled: true,
       })
     })
@@ -152,7 +152,7 @@ describe('Components Builder', () => {
         type: 2,
         label: 'Changed',
         style: 1,
-        custom_id: `test_button${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_button',
       })
     })
   })
@@ -163,7 +163,7 @@ describe('Components Builder', () => {
 
       expect(select.toJSON()).toEqual({
         type: 3,
-        custom_id: `test_select${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_select',
       })
     })
 
@@ -172,7 +172,7 @@ describe('Components Builder', () => {
 
       expect(select.toJSON()).toEqual({
         type: 5,
-        custom_id: `test_select${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_select',
       })
     })
 
@@ -181,7 +181,7 @@ describe('Components Builder', () => {
 
       expect(select.toJSON()).toEqual({
         type: 3,
-        custom_id: `test_select${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_select',
         options: [{ label: 'Option 1', value: 'option1' }],
       })
     })
@@ -191,7 +191,7 @@ describe('Components Builder', () => {
 
       expect(select.toJSON()).toEqual({
         type: 8,
-        custom_id: `test_select${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_select',
         channel_types: [0, 1],
       })
     })
@@ -201,7 +201,7 @@ describe('Components Builder', () => {
 
       expect(select.toJSON()).toEqual({
         type: 3,
-        custom_id: `test_select${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_select',
         placeholder: 'Choose an option',
       })
     })
@@ -211,7 +211,7 @@ describe('Components Builder', () => {
 
       expect(select.toJSON()).toEqual({
         type: 5,
-        custom_id: `test_select${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_select',
         default_values: [{ id: '123456789', type: 'user' }],
       })
     })
@@ -221,7 +221,7 @@ describe('Components Builder', () => {
 
       expect(select.toJSON()).toEqual({
         type: 3,
-        custom_id: `test_select${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_select',
         min_values: 1,
         max_values: 3,
       })
@@ -232,13 +232,13 @@ describe('Components Builder', () => {
 
       expect(select.toJSON()).toEqual({
         type: 3,
-        custom_id: `test_select${CUSTOM_ID_SEPARATOR}`,
+        custom_id: 'test_select',
         disabled: true,
       })
     })
 
     it('should add custom_id suffix', () => {
-      const select = new Select('test_select').custom_id('suffix')
+      const select = new Select('test_select').custom_value('suffix')
 
       expect(select.toJSON()).toEqual({
         type: 3,

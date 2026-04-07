@@ -53,7 +53,7 @@ const buttonStyleNum = {
 type ButtonStyle = keyof typeof buttonStyleNum
 export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButtonComponent> {
   #style: ButtonStyle
-  #uniqueStr = ''
+  #keyStr = ''
   #assign(method: string, doNotStyle: ButtonStyle[], obj: Partial<APIButtonComponent>): this {
     if (doNotStyle.includes(this.#style)) {
       warnBuilder('Button', this.#style, method)
@@ -63,7 +63,7 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
   }
   /**
    * [Button Structure](https://discord.com/developers/docs/interactions/message-components#button-object)
-   * @param {string} str Basic: unique_id, Link: URL, SKU: sku_id
+   * @param {string} str Basic: custom_id, Link: URL, SKU: sku_id
    * @param {string} label The label to be displayed on the button. max 80 characters - Ignore: SKU
    * @param {"Primary" | "Secondary" | "Success" | "Danger" | "Link" | "SKU"} [button_style="Primary"]
    */
@@ -73,7 +73,6 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
     button_style: T = 'Primary' as T,
   ) {
     const style = buttonStyleNum[button_style] || 1
-    const custom_id = str + CUSTOM_ID_SEPARATOR
     const isArrayLabels = isArray(labels)
     const label: string = isArrayLabels ? labels[1] : (labels as string)
     let obj: APIButtonComponent
@@ -86,11 +85,11 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
         break
       default:
         ifThrowHasSemicolon(str)
-        obj = { type: 2, label, style, custom_id }
+        obj = { type: 2, label, style, custom_id: str }
     }
     super(obj)
     this.#style = button_style
-    this.#uniqueStr = custom_id
+    this.#keyStr = str
     if (isArrayLabels) this.emoji(labels[0] as T extends 'SKU' ? undefined : string | APIMessageComponentEmoji)
   }
   /**
@@ -106,8 +105,8 @@ export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButton
    * @param {string} e
    * @returns {this}
    */
-  custom_id(e: T extends 'Link' | 'SKU' ? undefined : string): this {
-    return this.#assign('custom_id', ['Link', 'SKU'], { custom_id: this.#uniqueStr + e })
+  custom_value(e: T extends 'Link' | 'SKU' ? undefined : string): this {
+    return this.#assign('custom_value', ['Link', 'SKU'], { custom_id: this.#keyStr + CUSTOM_ID_SEPARATOR + e })
   }
   /**
    * available: ALL
@@ -148,7 +147,7 @@ type SelectComponent =
   | APIChannelSelectComponent
 export class Select<K extends string, T extends SelectType = 'String'> extends Builder<SelectComponent> {
   #type: SelectType
-  #uniqueStr = ''
+  #keyStr = ''
   #assign(method: string, doType: SelectType[], obj: Partial<SelectComponent>): this {
     if (!doType.includes(this.#type)) {
       warnBuilder('Select', this.#type, method)
@@ -158,11 +157,11 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
   }
   /**
    * [Select Structure](https://discord.com/developers/docs/interactions/message-components#select-menu-object)
-   * @param {string} unique_id
+   * @param {string} custom_id
    * @param {"String" | "User" | "Role" | "Mentionable" | "Channel"} [selectType="String"]
    */
-  constructor(unique_id: K, select_type: T = 'String' as T) {
-    ifThrowHasSemicolon(unique_id)
+  constructor(custom_id: K, select_type: T = 'String' as T) {
+    ifThrowHasSemicolon(custom_id)
     const typeNum = {
       String: 3,
       User: 5,
@@ -170,18 +169,17 @@ export class Select<K extends string, T extends SelectType = 'String'> extends B
       Mentionable: 7,
       Channel: 8,
     } as const
-    const custom_id = unique_id + CUSTOM_ID_SEPARATOR
     super({ type: typeNum[select_type], custom_id } as SelectComponent)
     this.#type = select_type
-    this.#uniqueStr = custom_id
+    this.#keyStr = custom_id
   }
   /**
    * available: ALL
    * @param {string} e
    * @returns {this}
    */
-  custom_id(e: string): this {
-    return this.a({ custom_id: this.#uniqueStr + e })
+  custom_value(e: string): this {
+    return this.a({ custom_id: this.#keyStr + CUSTOM_ID_SEPARATOR + e })
   }
   /**
    * required: String

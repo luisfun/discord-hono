@@ -2,6 +2,8 @@ import type { EmbedBuilder } from '@discordjs/builders'
 import type {
   APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandInteraction,
+  APIInteractionDataResolved,
+  APIMessageApplicationCommandInteractionDataResolved,
   APIMessageComponentButtonInteraction,
   APIMessageComponentInteraction,
   APIMessageComponentSelectMenuInteraction,
@@ -21,6 +23,10 @@ import type { Embed } from './builders/embed'
 import type { Poll } from './builders/poll'
 import type { Context } from './context'
 
+////////// Utils //////////
+
+export type ExcludeMethods<T, K extends keyof T> = { [P in keyof T as P extends K ? never : P]: T[P] }
+
 ////////// Env //////////
 
 export type Env = {
@@ -38,7 +44,33 @@ export type DiscordEnv = {
 
 ////////// Context //////////
 
-export type ExcludeMethods<T, K extends keyof T> = { [P in keyof T as P extends K ? never : P]: T[P] }
+type ResolvedCategory = keyof APIInteractionDataResolved | keyof APIMessageApplicationCommandInteractionDataResolved
+type ResolvedReturnType<T extends ResolvedCategory> = T extends keyof APIInteractionDataResolved
+  ? NonNullable<APIInteractionDataResolved[T]>[string]
+  : T extends keyof APIMessageApplicationCommandInteractionDataResolved
+    ? APIMessageApplicationCommandInteractionDataResolved[T][string]
+    : never
+type RetypedResolved = {
+  [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined>
+}
+
+type CommandRef = RetypedResolved & {
+  key: string
+  target_id?: string
+}
+type ComponentRef = RetypedResolved & {
+  key: string
+  custom_value?: string
+  values?: string[]
+}
+type ModalRef = {
+  key: string
+  custom_value?: string
+}
+type CronRef = {
+  key: string
+}
+export type ContextRef = CommandRef & ComponentRef & ModalRef & CronRef
 
 export type ComponentType = Button<any> | Select<any, any> //'Button' | 'Select'
 // biome-ignore format: ternary operator
@@ -49,23 +81,23 @@ type ComponentInteraction<T extends ComponentType> =
 
 export type CommandContext<E extends Env = any> = ExcludeMethods<
   Context<E, CommandContext<E>>,
-  'update' | 'focused' | 'resAutocomplete' | 'interaction'
-> & { interaction: APIApplicationCommandInteraction }
+  'update' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
+> & { interaction: Readonly<APIApplicationCommandInteraction>; ref: Readonly<CommandRef> }
 
 export type ComponentContext<E extends Env = any, T extends ComponentType = any> = ExcludeMethods<
-  Context<E & { Variables: { custom_id?: string } }, ComponentContext<E, T>>,
-  'sub' | 'focused' | 'resAutocomplete' | 'interaction'
-> & { interaction: ComponentInteraction<T> }
+  Context<E, ComponentContext<E, T>>,
+  'sub' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
+> & { interaction: Readonly<ComponentInteraction<T>>; ref: Readonly<ComponentRef> }
 
 export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
   Context<E, AutocompleteContext<E>>,
-  'flags' | 'res' | 'resDefer' | 'resActivity' | 'followup' | 'resModal' | 'update' | 'interaction'
-> & { interaction: APIApplicationCommandAutocompleteInteraction }
+  'flags' | 'res' | 'resDefer' | 'resActivity' | 'followup' | 'resModal' | 'update' | 'interaction' | 'ref'
+> & { interaction: Readonly<APIApplicationCommandAutocompleteInteraction>; ref: Readonly<CommandRef> }
 
 export type ModalContext<E extends Env = any> = ExcludeMethods<
-  Context<E & { Variables: { custom_id?: string } }, ModalContext<E>>,
-  'sub' | 'resModal' | 'focused' | 'resAutocomplete' | 'interaction'
-> & { interaction: APIModalSubmitInteraction }
+  Context<E, ModalContext<E>>,
+  'sub' | 'resModal' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
+> & { interaction: Readonly<APIModalSubmitInteraction>; ref: Readonly<ModalRef> }
 
 export type CronContext<E extends Env = any> = ExcludeMethods<
   Context<E, CronContext<E>>,
@@ -80,8 +112,8 @@ export type CronContext<E extends Env = any> = ExcludeMethods<
   | 'focused'
   | 'resAutocomplete'
   | 'interaction'
-  | 'resolved'
-> & { interaction: CronEvent }
+  | 'ref'
+> & { interaction: Readonly<CronEvent>; ref: Readonly<CronRef> }
 
 ////////// Handler //////////
 
