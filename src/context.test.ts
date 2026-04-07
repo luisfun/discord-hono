@@ -50,7 +50,7 @@ describe('Context', () => {
     const ctx = new Context(env, executionCtx, discordEnv, key, cronEvent)
     expect(ctx.env).toEqual(env)
     expect(ctx.executionCtx).toEqual(executionCtx)
-    expect(ctx.key).toEqual(key)
+    expect(ctx.ref.key).toEqual(key)
     expect(ctx.interaction).toEqual(cronEvent)
   })
 
@@ -159,7 +159,8 @@ describe('Context', () => {
     token: 'token',
     version: 1,
     data: {
-      custom_id: 'button-1',
+      // @ts-expect-error: library-specific value
+      custom_value: 'button-1',
       component_type: 2, // BUTTON
     },
     guild_id: 'guild-id',
@@ -224,7 +225,6 @@ describe('Context', () => {
   }
 
   // Mock modal interaction
-  // @ts-expect-error
   const modalInteraction: APIModalSubmitInteraction = {
     id: 'interaction-id',
     application_id: 'app-id',
@@ -232,7 +232,8 @@ describe('Context', () => {
     token: 'token',
     version: 1,
     data: {
-      custom_id: 'modal-1',
+      // @ts-expect-error: library-specific value
+      custom_value: 'modal-1',
       components: [
         {
           type: 1,
@@ -276,14 +277,8 @@ describe('Context', () => {
   })
 
   it('should handle component interactions', () => {
-    const ctx = new Context<{ Variables: { custom_id: string } }, any>(
-      env,
-      executionCtx,
-      discordEnv,
-      key,
-      componentInteraction,
-    )
-    expect(ctx.get('custom_id')).toEqual('button-1')
+    const ctx = new Context(env, executionCtx, discordEnv, key, componentInteraction)
+    expect(ctx.ref.custom_value).toEqual('button-1')
   })
 
   it('should handle autocomplete interactions', () => {
@@ -294,14 +289,14 @@ describe('Context', () => {
   })
 
   it('should handle modal interactions', () => {
-    const ctx = new Context<{ Variables: { custom_id: string; 'input-1': string } }, any>(
+    const ctx = new Context<{ Variables: { 'input-1': string } }, any>(
       env,
       executionCtx,
       discordEnv,
       key,
       modalInteraction,
     )
-    expect(ctx.get('custom_id')).toEqual('modal-1')
+    expect(ctx.ref.custom_value).toEqual('modal-1')
     expect(ctx.get('input-1')).toEqual('input value')
   })
 

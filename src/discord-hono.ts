@@ -142,7 +142,9 @@ export class DiscordHono<E extends Env = Env> {
             case 5: {
               const id = interaction.data.custom_id
               const key = id.split(CUSTOM_ID_SEPARATOR)[0] ?? ''
-              interaction.data.custom_id = id.slice(key.length + 1)
+              interaction.data.custom_id = key
+              // @ts-expect-error: Add library-specific value
+              interaction.data.custom_value = id.slice(key.length + 1)
               return key
             }
           }
