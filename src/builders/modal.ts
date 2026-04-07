@@ -16,16 +16,16 @@ type ExtractTextInputsObject<T extends any[]> = MergeObjects<{
 }>
 
 export class Modal<_V extends {} = {}> {
-  #uniqueStr: string
+  #keyStr: string
   #data: APIModalInteractionResponseCallbackData
   /**
-   * @param {string} unique_id
+   * @param {string} custom_id
    * @param {string} title
    */
-  constructor(unique_id: string, title: string) {
-    ifThrowHasSemicolon(unique_id)
-    this.#uniqueStr = unique_id + CUSTOM_ID_SEPARATOR
-    this.#data = { title, custom_id: this.#uniqueStr, components: [] }
+  constructor(custom_id: string, title: string) {
+    ifThrowHasSemicolon(custom_id)
+    this.#keyStr = custom_id
+    this.#data = { title, custom_id, components: [] }
   }
   /**
    * export json data
@@ -38,8 +38,8 @@ export class Modal<_V extends {} = {}> {
    * @param {string} e
    * @returns {this}
    */
-  custom_id(e: string): this {
-    this.#data.custom_id = this.#uniqueStr + e
+  custom_value(e: string): this {
+    this.#data.custom_id = this.#keyStr + CUSTOM_ID_SEPARATOR + e
     return this
   }
   /**

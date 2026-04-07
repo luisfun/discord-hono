@@ -7,18 +7,18 @@ describe('Modal', () => {
     const modal = new Modal('test', 'Test Modal')
     expect(modal.toJSON()).toEqual({
       title: 'Test Modal',
-      custom_id: `test${CUSTOM_ID_SEPARATOR}`,
+      custom_id: 'test',
       components: [],
     })
   })
 
-  it('should throw an error if unique_id contains separator', () => {
+  it('should throw an error if custom_id contains separator', () => {
     expect(() => new Modal(`test${CUSTOM_ID_SEPARATOR}id`, 'Test')).toThrow(`Don't use "${CUSTOM_ID_SEPARATOR}"`)
   })
 
-  it('should update custom_id', () => {
+  it('should update custom_value', () => {
     const modal = new Modal('test', 'Test Modal')
-    modal.custom_id('newId')
+    modal.custom_value('newId')
     expect(modal.toJSON().custom_id).toBe(`test${CUSTOM_ID_SEPARATOR}newId`)
   })
 
