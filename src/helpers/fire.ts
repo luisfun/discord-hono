@@ -12,6 +12,7 @@ interface FireOptions {
 /**
  * Registers a fetch event listener that delegates to the provided app's fetch method.
  * @param app An object with a fetch method that handles incoming requests.
+ * @param options Optional configuration for environment variables and execution context.
  * @beta
  * @example
  * ```ts
