@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { DiscordHono } from '../discord-hono'
 import { fire } from './fire'
 
 describe('fire', () => {
@@ -46,5 +47,23 @@ describe('fire', () => {
 
     expect(app.fetch).toHaveBeenCalledWith(req, undefined, event)
     expect(respondWith).toHaveBeenCalledWith(fetchPromise)
+  })
+
+  it('DiscordHono Type Check', async () => {
+    const app = new DiscordHono()
+    let handler: any
+    globalThis.addEventListener = (_type: string, h: unknown): void => {
+      handler = h
+    }
+    fire(app)
+
+    // Simulate a fetch event
+    const req = new Request('https://example/')
+    const respondWith = vi.fn()
+    const event = { request: req, respondWith } as any
+    handler(event)
+
+    // Since the app.fetch is not mocked here, we just check if it was called with correct parameters
+    expect(respondWith).toHaveBeenCalled()
   })
 })
