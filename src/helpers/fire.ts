@@ -1,11 +1,11 @@
 import type { ExecutionContext, FetchEventLike } from '../types'
 
 interface FetchModule {
-  fetch(req: Request, env?: unknown, ctx?: ExecutionContext): Promise<Response>
+  fetch(req: Request, env?: unknown, ctx?: ExecutionContext): Response | Promise<Response>
 }
 
 interface FireOptions {
-  env?: unknown | ((env: FetchEventLike) => unknown)
+  env?: unknown | ((event: FetchEventLike) => unknown)
   executionCtx?: ExecutionContext | ((event: FetchEventLike) => ExecutionContext)
 }
 
