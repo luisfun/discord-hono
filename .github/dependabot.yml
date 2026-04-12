@@ -5,13 +5,21 @@ updates:
     schedule:
       interval: 'monthly'
     cooldown:
-      default-days: 1
+      default-days: 2
+    groups:
+      github-actions:
+        patterns:
+          - "*"
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
       interval: 'monthly'
     cooldown:
-      default-days: 1
+      default-days: 2
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-patch', 'version-update:semver-minor']
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
