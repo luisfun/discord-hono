@@ -14,6 +14,9 @@ Unless instructed otherwise, exclude the following files from security checks:
 - Third-party code (e.g., `node_modules/**`)
 - Various output files (e.g., `dist/**`, `coverage/**`)
 
+## Excluded code
+Code containing a comment like `// security-ignore: <reason>` should have security checks for that block skipped.
+
 ## Required checks
 - Prototype pollution (places where `__proto__`, `constructor`, or `prototype` are set from user input, or usage of deep-merge libraries)
 - Arbitrary code execution (usage of `eval`, `new Function`, or passing string arguments to `setTimeout`/`setInterval`)

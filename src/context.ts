@@ -86,7 +86,7 @@ export class Context<
     if ('data' in interaction) {
       const { data } = interaction
       for (const k of ['custom_value', 'target_id', 'values'] as const) if (k in data) this.#ref[k] = (data as any)[k]
-      // `data.resolved` is raw data from the Discord API, and the risk of prototype pollution is low.
+      // security-ignore: `data.resolved` is raw data from the Discord API, and the risk of prototype pollution is low.
       if ('resolved' in data) this.#ref = { ...this.#ref, ...data.resolved }
     }
     switch (interaction.type) {
