@@ -135,7 +135,7 @@ export type Verify = (
 ) => Promise<boolean> | boolean
 export type InitOptions<E extends Env> = {
   verify?: Verify
-  discordEnv?: (env: E['Bindings']) => DiscordEnv | DiscordEnv
+  discordEnv?: DiscordEnv | ((env: E['Bindings'] | undefined) => DiscordEnv)
 }
 
 ////////// CronEvent //////////
