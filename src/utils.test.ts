@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, test, vi } from 'vitest'
 import { Components, Embed } from '.'
-import { formData, messageFlags, newError, prepareData, queryStringify, toJSON } from './utils'
+import { formData, isProto, messageFlags, newError, prepareData, queryStringify, toJSON } from './utils'
 
 describe('toJSON function', () => {
   it('should return the result of toJSON method if it exists', () => {
@@ -178,5 +178,20 @@ describe('messageFlags', () => {
     expect(messageFlags('SUPPRESS_EMBEDS', 'SUPPRESS_NOTIFICATIONS', 'IS_COMPONENTS_V2')).toBe(
       (1 << 2) | (1 << 12) | (1 << 15),
     )
+  })
+})
+
+describe('isProto', () => {
+  it('should return true for blocked prototype-pollution keys', () => {
+    expect(isProto('__proto__')).toBe(true)
+    expect(isProto('constructor')).toBe(true)
+    expect(isProto('prototype')).toBe(true)
+  })
+
+  it('should return false for typical keys', () => {
+    expect(isProto('key')).toBe(false)
+    expect(isProto('option1')).toBe(false)
+    expect(isProto('')).toBe(false)
+    expect(isProto(undefined)).toBe(false)
   })
 })

@@ -39,12 +39,13 @@ export class DiscordHono<E extends Env = Env> {
   #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
   #map = new Map<string, AnyHandler<E, HandlerNumber>>()
   #set<N extends HandlerNumber>(num: N, key: string, value: AnyHandler<E, N>): this {
-    this.#map.set(`${num}${key}`, value)
+    this.#map.set(`${num}:${key}`, value)
     return this
   }
   #get<N extends HandlerNumber>(num: N, key: string): AnyHandler<E, N> {
-    const handler = this.#map.get(`${num}${key}`) ?? this.#map.get(`${num}`)
+    const handler = this.#map.get(`${num}:${key}`) ?? this.#map.get(`${num}:`)
     if (handler) return handler as AnyHandler<E, N>
+    // The absence of a handler is often caused by a developer's registration mistake, so return 500 instead of 404.
     throw newError('DiscordHono', 'handler')
   }
   /**

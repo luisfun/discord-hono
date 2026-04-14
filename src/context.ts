@@ -34,7 +34,7 @@ import type {
   ModalContext,
   TypedResponse,
 } from './types'
-import { formData, type MessageFlag, messageFlags, newError, prepareData, toJSON } from './utils'
+import { formData, isProto, type MessageFlag, messageFlags, newError, prepareData, toJSON } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -86,6 +86,7 @@ export class Context<
     if ('data' in interaction) {
       const { data } = interaction
       for (const k of ['custom_value', 'target_id', 'values'] as const) if (k in data) this.#ref[k] = (data as any)[k]
+      // security-ignore: `data.resolved` is raw data from the Discord API, and the risk of prototype pollution is low.
       if ('resolved' in data) this.#ref = { ...this.#ref, ...data.resolved }
     }
     switch (interaction.type) {
@@ -145,6 +146,7 @@ export class Context<
   set<Key extends keyof E['Variables']>(key: Key, value: E['Variables'][Key]): void
   set<Key extends keyof ContextVariableMap>(key: Key, value: ContextVariableMap[Key]): void
   set(key: string, value: unknown): void {
+    if (isProto(key)) throw newError('c.set', 'Key: prototype-pollution')
     this.#var.set(key, value)
   }
   /**
