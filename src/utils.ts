@@ -58,3 +58,6 @@ export const queryStringify = (query: Record<string, unknown> | undefined): '' |
 export const isString = (value: unknown): value is string => typeof value === 'string' // || value instanceof String
 export const isArray = (value: unknown): value is unknown[] => Array.isArray(value)
 // export const toArray = <T>(value: T | T[]) => (isArray(value) ? value : [value])
+
+export const isProto = (value: unknown): boolean =>
+  value === '__proto__' || value === 'constructor' || value === 'prototype'

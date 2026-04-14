@@ -26,7 +26,7 @@ Perform additional checks at your discretion as needed.
 
 ## Output format
 ```format
-severity (Critical/High/Medium/Low)
+severity (**Critical**/**High**/**Medium**/**Low**)
 {file:line-range}
 Summary
 Remediation suggestion
