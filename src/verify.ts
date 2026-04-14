@@ -20,7 +20,7 @@ export const verify = async (
 ): Promise<boolean> => {
   if (!body || !signature || !timestamp) return false
   const subtle: SubtleCrypto | undefined = globalThis.crypto?.subtle
-  if (subtle === undefined) throw newError('verify', 'crypto')
+  if (!subtle) throw newError('verify', 'crypto')
   return await subtle.verify(
     { name: 'Ed25519' },
     await subtle.importKey('raw', hex2bin(publicKey), { name: 'Ed25519' }, false, ['verify']),
