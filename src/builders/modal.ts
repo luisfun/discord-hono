@@ -1,5 +1,10 @@
-import type { APIModalInteractionResponseCallbackData, APITextInputComponent } from 'discord-api-types/v10'
+import type {
+  APIModalInteractionResponseCallbackComponent,
+  APIModalInteractionResponseCallbackData,
+  APITextInputComponent,
+} from 'discord-api-types/v10'
 import { CUSTOM_ID_SEPARATOR, toJSON } from '../utils'
+import type { Select } from './components'
 import { Builder, ifThrowHasSemicolon, type MergeObjects } from './utils'
 
 type ExtractTextInputArgs<T> =
@@ -15,9 +20,19 @@ type ExtractTextInputsObject<T extends any[]> = MergeObjects<{
   [I in keyof T]: T[I] extends TextInput<any, any> ? ExtractTextInputArgs<T[I]> : never
 }>
 
-export class Modal<_V extends {} = {}> {
+type ExtractSelectArgs<T> = T extends Select<infer K, infer _> ? { [P in K]: string } : never
+
+type ExtractSelectsObject<T extends any[]> = MergeObjects<{
+  [I in keyof T]: T[I] extends Select<any, any> ? ExtractSelectArgs<T[I]> : never
+}>
+
+export class Modal<V extends {} = {}> {
   #keyStr: string
   #data: APIModalInteractionResponseCallbackData
+  #push(e: APIModalInteractionResponseCallbackComponent): this {
+    this.#data.components.push(e)
+    return this
+  }
   /**
    * @param {string} custom_id
    * @param {string} title
@@ -43,15 +58,29 @@ export class Modal<_V extends {} = {}> {
     return this
   }
   /**
+   * Action Row (Text Input)
    * @param {...(TextInput | APITextInputComponent)} e
    * @returns {this}
    */
-  row<O extends (TextInput<any, any> | APITextInputComponent)[]>(...e: O): Modal<ExtractTextInputsObject<O>> {
-    this.#data.components.push({
-      type: 1,
-      components: e.map(toJSON),
-    })
-    return this
+  row<O extends (TextInput<any, any> | APITextInputComponent)[]>(...e: O): Modal<V & ExtractTextInputsObject<O>> {
+    return this.#push({ type: 1, components: e.map(toJSON) })
+  }
+  /**
+   * Component
+   * @param {string} label
+   * @param {Select<any, any>} e
+   * @returns {this}
+   */
+  component<O extends Select<any, any>>(label: string, e: O): Modal<V & ExtractSelectsObject<[O]>> {
+    return this.#push({ type: 18, label, component: toJSON(e) })
+  }
+  /**
+   * Text Display
+   * @param {string} e
+   * @returns {this}
+   */
+  text(e: string): this {
+    return this.#push({ type: 10, content: e })
   }
   /**
    * Overwrite title
