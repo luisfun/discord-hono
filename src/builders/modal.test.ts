@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CUSTOM_ID_SEPARATOR } from '../utils'
+import { Select } from './components'
 import { Modal, TextInput } from './modal'
 
 describe('Modal', () => {
@@ -34,6 +35,55 @@ describe('Modal', () => {
     const modal = new Modal('test', 'Test Modal')
     modal.title('New Title')
     expect(modal.toJSON().title).toBe('New Title')
+  })
+
+  it('should add a select component row', () => {
+    const modal = new Modal('test', 'Test Modal')
+    const select = new Select('color')
+    modal.component('Choose a color', select)
+    expect(modal.toJSON().components).toEqual([
+      {
+        type: 18,
+        label: 'Choose a color',
+        component: { type: 3, custom_id: 'color' },
+      },
+    ])
+  })
+
+  it('should add a select component with options', () => {
+    const modal = new Modal('test', 'Test Modal')
+    const select = new Select('color').options({ label: 'Red', value: 'red' }, { label: 'Blue', value: 'blue' })
+    modal.component('Choose a color', select)
+    expect(modal.toJSON().components[0]).toEqual({
+      type: 18,
+      label: 'Choose a color',
+      component: {
+        type: 3,
+        custom_id: 'color',
+        options: [
+          { label: 'Red', value: 'red' },
+          { label: 'Blue', value: 'blue' },
+        ],
+      },
+    })
+  })
+
+  it('should add a text display row', () => {
+    const modal = new Modal('test', 'Test Modal')
+    modal.text('Some descriptive text')
+    expect(modal.toJSON().components).toEqual([{ type: 10, content: 'Some descriptive text' }])
+  })
+
+  it('should mix row(), component(), and text() together', () => {
+    const modal = new Modal('test', 'Test Modal')
+    const textInput = new TextInput('name', 'Your Name')
+    const select = new Select('role')
+    modal.row(textInput).component('Pick your role', select).text('Footer note')
+    const components = modal.toJSON().components
+    expect(components).toHaveLength(3)
+    expect(components[0]).toMatchObject({ type: 1 })
+    expect(components[1]).toMatchObject({ type: 18, label: 'Pick your role' })
+    expect(components[2]).toMatchObject({ type: 10, content: 'Footer note' })
   })
 })
 
