@@ -1,5 +1,6 @@
 import type {
   APIApplicationCommandAutocompleteResponse,
+  APIApplicationCommandInteractionDataBasicOption,
   APIApplicationCommandInteractionDataIntegerOption,
   APIApplicationCommandInteractionDataNumberOption,
   APIApplicationCommandInteractionDataOption,
@@ -107,20 +108,24 @@ export class Context<
           }
         }
         if (options)
-          for (const e of options) {
+          for (const e of options as APIApplicationCommandInteractionDataBasicOption[]) {
             const { type } = e
             // string | integer | number
             if ((type === 3 || type === 4 || type === 10) && e.focused) this.#focused = e
-            // @ts-expect-error
-            this.set(e.name, e.value)
+            this.set<any>(e.name, e.value)
           }
         break
       }
       case 5: {
         const modalRows = interaction.data?.components
         if (modalRows)
-          // @ts-expect-error
-          for (const row of modalRows) for (const modal of row.components) this.set(modal.custom_id, modal.value)
+          for (const row of modalRows) {
+            if ('components' in row) for (const modal of row.components) this.set<any>(modal.custom_id, modal.value)
+            if ('component' in row) {
+              const component = row.component
+              this.set<any>(component.custom_id, 'value' in component ? component.value : component.values)
+            }
+          }
       }
     }
   }

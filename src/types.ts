@@ -63,7 +63,7 @@ type ComponentRef = RetypedResolved & {
   custom_value?: string
   values?: string[]
 }
-type ModalRef = {
+type ModalRef = RetypedResolved & {
   key: string
   custom_value?: string
 }

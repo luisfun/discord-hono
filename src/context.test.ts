@@ -257,6 +257,46 @@ describe('Context', () => {
     guild_locale: Locale.EnglishUS,
   }
 
+  // Mock modal interaction with a select component row (single value)
+  const modalSelectSingleInteraction: APIModalSubmitInteraction = {
+    ...modalInteraction,
+    data: {
+      custom_id: key,
+      // @ts-expect-error: library-specific value
+      custom_value: 'modal-select-1',
+      components: [
+        {
+          type: 18, // ComponentType.Label
+          component: {
+            type: 3, // ComponentType.StringSelect
+            custom_id: 'color',
+            values: ['red'],
+          },
+        },
+      ],
+    },
+  }
+
+  // Mock modal interaction with a select component row (multi values)
+  const modalSelectMultiInteraction: APIModalSubmitInteraction = {
+    ...modalInteraction,
+    data: {
+      custom_id: key,
+      // @ts-expect-error: library-specific value
+      custom_value: 'modal-select-2',
+      components: [
+        {
+          type: 18, // ComponentType.Label
+          component: {
+            type: 3, // ComponentType.StringSelect
+            custom_id: 'colors',
+            values: ['red', 'blue'],
+          },
+        },
+      ],
+    },
+  }
+
   it('should handle command interactions', () => {
     const ctx = new Context<{ Variables: { option1: string } }, any>(
       env,
@@ -300,6 +340,30 @@ describe('Context', () => {
     )
     expect(ctx.ref.custom_value).toEqual('modal-1')
     expect(ctx.get('input-1')).toEqual('input value')
+  })
+
+  it('should handle modal interactions with select component (single value)', () => {
+    const ctx = new Context<{ Variables: { color: string[] } }, any>(
+      env,
+      executionCtx,
+      discordEnv,
+      key,
+      modalSelectSingleInteraction,
+    )
+    expect(ctx.ref.custom_value).toEqual('modal-select-1')
+    expect(ctx.get('color')).toEqual(['red'])
+  })
+
+  it('should handle modal interactions with select component (multiple values)', () => {
+    const ctx = new Context<{ Variables: { colors: string[] } }, any>(
+      env,
+      executionCtx,
+      discordEnv,
+      key,
+      modalSelectMultiInteraction,
+    )
+    expect(ctx.ref.custom_value).toEqual('modal-select-2')
+    expect(ctx.get('colors')).toEqual(['red', 'blue'])
   })
 
   it('should set flags correctly', async () => {
