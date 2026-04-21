@@ -24,6 +24,7 @@ import type {
   SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
 import type { ExcludeMethods } from '../types'
+import { CUSTOM_ID_SEPARATOR } from '../utils'
 
 /**
  * @see https://discord-api-types.dev/api/discord-api-types-v10/interface/APIBaseComponent
@@ -73,9 +74,11 @@ type ComponentObject<T extends ComponentType> = T extends ComponentType.ActionRo
                                         ? APICheckboxComponent
                                         : never
 
-type AddCustomValue<T> = 'custom_id' extends keyof T
-  ? T & { custom_value?: T['custom_id'] }
-  : T;
+type AddCustomValue<T> = T extends any
+  ? 'custom_id' extends keyof T
+    ? T & { custom_value?: T['custom_id'] }
+    : T
+  : never
 
 export const componentType = {
   ActionRow: 1,
@@ -102,22 +105,33 @@ export const componentType = {
 
 export class Component<T extends ComponentType> {
   #obj: AddCustomValue<ComponentObject<T>>
-  constructor(type: T, init: AddCustomValue<ExcludeMethods<ComponentObject<T>, 'type'>>) {
+  constructor(type: T, init: ExcludeMethods<AddCustomValue<ComponentObject<T>>, 'type'>) {
     // @ts-expect-error
     this.#obj = { ...init, type }
     return new Proxy(this, {
-      get(target, prop, receiver) {
+      get(target, prop) {
         if (prop === 'toJSON') {
-          return () => target.#obj
+          return function toJSON(): ComponentObject<T> {
+            // @ts-expect-error: short code for custom_id + custom_value
+            const { custom_value, ...rest } = target.#obj
+            // @ts-expect-error
+            return { ...rest, custom_id: (rest.custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '') }
+          }
         }
-        return Reflect.get(target, prop, receiver)
+        return Reflect.get(target, prop)
       },
+      set(target, prop, value) {
+        target.#obj[prop as keyof ExcludeMethods<AddCustomValue<ComponentObject<T>>, 'type'>] = value
+        return true
+      }
     })
   }
 }
 
-const test1 = new Component(componentType.ActionRow, { components: [], custom_value: 'test' })
+const test1 = new Component(componentType.ActionRow, { components: [] })
 const test2 = new Component(componentType.Button, { custom_id: 'test', style: 1, custom_value: 'test' })
+test2.custom_id = 'test2'
+test2.toJSON()
 
 /*
 export const ComponentC = {
