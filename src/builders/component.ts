@@ -118,11 +118,12 @@ export class Component<T extends ComponentType> {
             return { ...rest, custom_id: (rest.custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '') }
           }
         }
+        if (prop in target.#obj) return Reflect.get(target.#obj, prop)
         return Reflect.get(target, prop)
       },
       set(target, prop, value) {
-        target.#obj[prop as keyof ExcludeMethods<AddCustomValue<ComponentObject<T>>, 'type'>] = value
-        return true
+        if (prop === 'type' || prop === 'toJSON') return false
+        return Reflect.set(target.#obj, prop, value)
       }
     })
   }
