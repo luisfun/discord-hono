@@ -20,6 +20,7 @@ import type {
   APITextDisplayComponent,
   APITextInputComponent,
   APIThumbnailComponent,
+  ButtonStyle,
   ComponentType,
   SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
@@ -32,7 +33,7 @@ import { CUSTOM_ID_SEPARATOR } from '../utils'
 type ComponentObject<T extends ComponentType> = T extends ComponentType.ActionRow
   ? APIActionRowComponent<APIComponentInActionRow>
   : T extends ComponentType.Button
-    ? APIButtonComponentWithCustomId | APIButtonComponentWithURL | APIButtonComponentWithSKUId
+    ? ComponentButtonObject<ButtonStyle>
     : T extends ComponentType.StringSelect
       ? APIStringSelectComponent
       : T extends ComponentType.TextInput
@@ -73,6 +74,17 @@ type ComponentObject<T extends ComponentType> = T extends ComponentType.ActionRo
                                       : T extends ComponentType.Checkbox
                                         ? APICheckboxComponent
                                         : never
+type ComponentButtonObject<S extends ButtonStyle> = S extends
+  | ButtonStyle.Primary
+  | ButtonStyle.Secondary
+  | ButtonStyle.Success
+  | ButtonStyle.Danger
+  ? APIButtonComponentWithCustomId
+  : S extends ButtonStyle.Link
+    ? APIButtonComponentWithURL
+    : S extends ButtonStyle.Premium
+      ? APIButtonComponentWithSKUId
+      : never
 
 type AddCustomValue<T> = T extends any
   ? 'custom_id' extends keyof T
@@ -103,7 +115,7 @@ export const componentType = {
   Checkbox: 23,
 } as const
 
-export class Component<T extends ComponentType> {
+class ComponentClass<T extends ComponentType> {
   #obj: AddCustomValue<ComponentObject<T>>
   constructor(type: T, init: ExcludeMethods<AddCustomValue<ComponentObject<T>>, 'type'>) {
     // @ts-expect-error
@@ -115,33 +127,52 @@ export class Component<T extends ComponentType> {
             // @ts-expect-error: short code for custom_id + custom_value
             const { custom_value, ...rest } = target.#obj
             // @ts-expect-error
-            return { ...rest, custom_id: (rest.custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '') }
+            return {
+              ...rest,
+              // @ts-expect-error
+              custom_id: (rest.custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : ''),
+            }
           }
         }
-        if (prop in target.#obj) return Reflect.get(target.#obj, prop)
-        return Reflect.get(target, prop)
+        return Reflect.get(target.#obj, prop)
       },
       set(target, prop, value) {
         if (prop === 'type' || prop === 'toJSON') return false
         return Reflect.set(target.#obj, prop, value)
-      }
+      },
     })
   }
 }
 
-const test1 = new Component(componentType.ActionRow, { components: [] })
-const test2 = new Component(componentType.Button, { custom_id: 'test', style: 1, custom_value: 'test' })
-test2.custom_id = 'test2'
-test2.toJSON()
+type ComponentInstance<T extends ComponentType> = ComponentClass<T> &
+  ExcludeMethods<AddCustomValue<ComponentObject<T>>, 'type'> & {
+    toJSON(): ComponentObject<T>
+  }
+type ComponentButtonInstance<S extends ButtonStyle> = ComponentClass<ComponentType.Button> &
+  ExcludeMethods<AddCustomValue<ComponentButtonObject<S>>, 'type'> & {
+    toJSON(): ComponentButtonObject<S>
+  }
+
+export const Component = ComponentClass as {
+  new <S extends ButtonStyle>(
+    type: ComponentType.Button,
+    init: ExcludeMethods<AddCustomValue<ComponentButtonObject<S>>, 'type' | 'style'> & { style: S },
+  ): ComponentButtonInstance<S>
+  new <T extends ComponentType>(
+    type: T,
+    init: ExcludeMethods<AddCustomValue<ComponentObject<T>>, 'type'>,
+  ): ComponentInstance<T>
+}
 
 /*
-export const ComponentC = {
-  create<T extends ComponentType>(type: T, obj: ExcludeMethods<ComponentObject<T>, "type">): ComponentObject<T> {
-    return { ...obj, type }
-  }
-}
+const test1 = new Component(componentType.ActionRow, { components: [] })
+test1.toJSON()
+const test2 = new Component(componentType.Button, { style: 1, custom_id: 'test', custom_value: 'test' })
+test2.style = 4
+test2.custom_value = 'test2'
+const test3 = new Component(componentType.Button, { style: 6, sku_id: 'test' })
+const test4 = new Component(componentType.TextInput, { style: 1, custom_id: 'test' })
+test4.custom_value = 'test2'
+const test5 = new Component(componentType.StringSelect, { custom_id: 'test', options: [] })
 */
-
-export namespace Component {
-  export type ActionRow = ComponentObject<ComponentType.ActionRow>
-}
+//const cc = (...args: any[]) => new Component(...args)
