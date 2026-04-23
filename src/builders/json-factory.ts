@@ -7,7 +7,7 @@ import { CUSTOM_ID_SEPARATOR, isProto, newError } from '../utils'
  * これにより作成されたfactoryは、型情報として、{ type: 1, custom_id: 'test' }を持つ
  */
 
-type JsonFactory<T extends Record<string, unknown>> = {
+export type JsonFactory<T extends {}> = {
   toJSON(): T
 } & {
   [K in keyof Required<T>]: (value: Exclude<Required<T>[K], undefined>) => JsonFactory<T>
@@ -24,6 +24,7 @@ export const jsonFactory = <T extends {}>(initial: T): JsonFactory<T> => {
             const { custom_value, ...rest } = data
             return {
               ...rest,
+              // biome-ignore lint/complexity/useLiteralKeys: Not sure if custom_id exists
               custom_id: (rest['custom_id'] ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : ''),
             } as unknown as T
           }
