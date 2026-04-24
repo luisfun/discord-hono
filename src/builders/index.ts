@@ -5,6 +5,3 @@ export { Content, Layout } from './components-v2'
 export * from './embed'
 export * from './modal'
 export * from './poll'
-
-// test
-export * from './json-factory'

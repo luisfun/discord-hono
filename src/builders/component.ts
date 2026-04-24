@@ -1,3 +1,6 @@
+// biome-ignore-all lint/nursery/useExplicitType: 一時的 PR時に削除
+// biome-ignore-all lint/correctness/noUnusedVariables: 一時的 PR時に削除
+
 import type {
   APIActionRowComponent,
   APIBaseAutoPopulatedSelectMenuComponent,
@@ -24,12 +27,12 @@ import type {
   ComponentType,
   SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
-import { type JsonFactory, jsonFactory } from './json-factory'
+import { jsonFactory } from './json-factory'
 
 /**
  * @see https://discord-api-types.dev/api/discord-api-types-v10/interface/APIBaseComponent
  */
-type ComponentObject =
+type APIComponent =
   | APIActionRowComponent<APIComponentInActionRow>
   | APIButtonComponentWithCustomId
   | APIButtonComponentWithURL
@@ -64,6 +67,16 @@ type AddCustomValue<T> = T extends any
     : T
   : never
 
+type ComponentObject<I extends AddCustomValue<APIComponent>> = Extract<
+  AddCustomValue<APIComponent>,
+  ComponentType.Button extends I['type']
+    ? {
+        type: I['type']
+        style: 'style' extends keyof I ? (I['style'] extends NomalButtonStyle ? NomalButtonStyle : I['style']) : never
+      }
+    : { type: I['type'] }
+>
+
 export const componentType = {
   ActionRow: 1,
   Button: 2,
@@ -87,23 +100,12 @@ export const componentType = {
   Checkbox: 23,
 } as const
 
-export const createComponent = jsonFactory as unknown as <const I extends AddCustomValue<ComponentObject>>(
-  init: I,
-) => JsonFactory<
-  Extract<
-    AddCustomValue<ComponentObject>,
-    ComponentType.Button extends I['type']
-      ? {
-          type: I['type']
-          style: 'style' extends keyof I ? (I['style'] extends NomalButtonStyle ? NomalButtonStyle : I['style']) : never
-        }
-      : { type: I['type'] }
-  >
->
+export const createComponent = <const I extends ComponentObject<I>>(init: I) =>
+  jsonFactory<ComponentObject<I>>(init, ['type', 'style', 'custom_id'])
 
 //const test1 = createComponent({ type: componentType.ActionRow, components: [] }).toJSON()
-//const test2 = createComponent({ type: componentType.Button, style: 1, custom_id: 'test' })
-//const test3 = createComponent({ type: componentType.Button, style: 6, sku_id: 'test' })
+const test2 = createComponent({ type: componentType.Button, style: 1, custom_id: 'test', error_key: 'test' })
+const test3 = createComponent({ type: componentType.Button, style: 6, sku_id: 'test' })
 //const test4 = createComponent({ type: componentType.TextInput, style: 1, custom_id: 'test' })
 //  .custom_value('test2')
 //  .required(true)
