@@ -1,31 +1,42 @@
-import { bench, boxplot, compact, run, summary } from 'mitata'
+// @ts-check
 
-var CUSTOM_ID_SEPARATOR = ';'
+// biome-ignore-all lint/complexity/useLiteralKeys: Not sure if custom_id exists
+
+// biome-ignore-all lint/correctness/noUnresolvedImports: Ignore for local processing
+import { CUSTOM_ID_SEPARATOR } from 'discord-hono'
+import { bench, boxplot, run, summary } from 'mitata'
+
+// @ts-expect-error
 var isProto = prop => prop === '__proto__' || prop === 'constructor' || prop === 'prototype'
+// @ts-expect-error
 var newError = (funcName, message) => new Error(`[${funcName}] ${message}`)
-var _protoNames = proto => Object.getOwnPropertyNames(proto)
-var protoSet = /* @__PURE__ */ new Set([
-  //  ...protoNames(Object.prototype),
-  //  ...protoNames(Function.prototype),
-  //  ...protoNames(Promise.prototype),
-])
-var isUnstableProto = prop => protoSet.has(prop)
+
+// @ts-expect-error
+var attachToJSON = initial => ({
+  ...initial,
+  toJSON() {
+    const { custom_id, custom_value, toJSON: toJSON3, ...rest } = this
+    if (custom_id || custom_value)
+      rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
+    return rest
+  },
+})
+
+// @ts-expect-error
 var jsonFactory = initial => {
-  const data = initial
+  const data = { ...initial }
   const proxy = new Proxy(
     {},
     {
       get(_, prop) {
-        if (typeof prop === 'symbol' || isProto(prop) || isUnstableProto(prop))
-          throw newError('jsonFactory', `Invalid key: ${String(prop)}`)
+        if (typeof prop !== 'string' || isProto(prop)) throw newError('jsonFactory', `Invalid key: ${String(prop)}`)
         if (prop === 'toJSON') {
-          const { custom_value, ...rest } = data
-          return () => ({
-            ...rest,
-            // biome-ignore lint/complexity/useLiteralKeys: Not sure if custom_id exists
-            custom_id: (rest['custom_id'] ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : ''),
-          })
+          const { custom_id, custom_value, ...rest } = data
+          if (custom_id || custom_value)
+            rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
+          return () => rest
         }
+        // @ts-expect-error
         return value => {
           data[prop] = value
           return proxy
@@ -35,88 +46,28 @@ var jsonFactory = initial => {
   )
   return proxy
 }
-var jsonFactoryWithKeys = (initial, keys) => {
-  const data = initial
-  const proxy = new Proxy(
-    {},
-    {
-      get(_, prop) {
-        if (typeof prop === 'symbol' || isProto(prop) || isUnstableProto(prop))
-          throw newError('jsonFactory', `Invalid key: ${String(prop)}`)
-        if (prop === 'toJSON') {
-          const { custom_value, ...rest } = data
-          return () => ({
-            ...rest,
-            // biome-ignore lint/complexity/useLiteralKeys: Not sure if custom_id exists
-            custom_id: (rest['custom_id'] ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : ''),
-          })
-        }
-        if (keys.includes(prop)) {
-          return value => {
-            data[prop] = value
-            return proxy
-          }
-        }
-        throw newError('jsonFactory', `Invalid key: ${prop}`)
-      },
-    },
-  )
-  return proxy
-}
+
+// @ts-expect-error
 var jsonFactoryOnProto = (initial, keys) => {
   const data = { ...initial }
   const builder = {
     toJSON() {
-      const { custom_value, ...rest } = data
-      return {
-        ...rest,
-        // biome-ignore lint/complexity/useLiteralKeys: Not sure if custom_id exists
-        custom_id: (rest['custom_id'] ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : ''),
-      }
+      const { custom_id, custom_value, ...rest } = data
+      if (custom_id || custom_value)
+        rest.custom_id = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
+      return rest
     },
   }
+  // @ts-expect-error
   keys.forEach(k => {
-    if (isProto(k) || isUnstableProto(k)) return
+    if (isProto(k)) return
+    // @ts-expect-error
     builder[k] = v => {
       data[k] = v
       return builder
     }
   })
   return builder
-}
-var makePrototypeForKeys = keys => {
-  const proto = {}
-  keys.forEach(k => {
-    if (isProto(k)) return
-    proto[k] = function (v) {
-      this.__data[k] = v
-      return this
-    }
-  })
-  proto.toJSON = function () {
-    const { custom_value, ...rest } = this.__data
-    return { ...rest, custom_id: (rest.custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '') }
-  }
-  return proto
-}
-var protoCache = /* @__PURE__ */ new Map()
-var factoryWithSharedProto = (initial, keys) => {
-  const signature = keys.join('|')
-  let proto = protoCache.get(signature)
-  if (!proto) {
-    proto = makePrototypeForKeys(keys)
-    protoCache.set(signature, proto)
-  }
-  const inst = Object.create(proto)
-  inst.__data = { ...initial }
-  return inst
-}
-function objectToJSON() {
-  const { custom_value, ...rest } = this
-  return {
-    ...rest,
-    custom_id: (rest.custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : ''),
-  }
 }
 
 const keys = [
@@ -137,7 +88,6 @@ const keys = [
   'required',
   'min_length',
   'max_length',
-  'required',
   'value',
   'default_values',
   'channel_types',
@@ -158,30 +108,23 @@ const keys = [
 ]
 
 const benchItems = [
+  { ver: 'attachToJSON', func: attachToJSON },
   { ver: 'Proxy', func: jsonFactory },
-  { ver: 'ProxyWithKeys', func: jsonFactoryWithKeys },
   { ver: 'OnProto', func: jsonFactoryOnProto },
-  { ver: 'SharedProto', func: factoryWithSharedProto },
 ]
 
+const forCount = [10, 10]
+
 const benchmarks = () => {
-  bench('Baseline', async () => {
-    for (let i = 0; i < 10; i++) {
-      const result = { type: i, custom_id: `test${i}`, toJSON: objectToJSON }
-      for (let j = 0; j < 10; j++) {
-        result[keys.at((j % keys.length) - 1)] = `test-value${j}`
-      }
-      result.toJSON()
-    }
-  }).gc(false) // Feels more stable than the default (once) when set to false
   for (const { ver, func } of benchItems) {
     bench(ver, async () => {
-      for (let i = 0; i < 10; i++) {
-        // @ts-expect-error
+      for (let i = 0; i < forCount[0]; i++) {
         const result = func({ type: i, custom_id: `test${i}` }, keys)
-        for (let j = 0; j < 10; j++) {
+        for (let j = 0; j < forCount[1]; j++) {
           // @ts-expect-error
-          result[keys.at((j % keys.length) - 1)](`test-value${j}`).toJSON()
+          if (ver === 'attachToJSON') result[keys.at(j % (keys.length - 1))] = `test-value${j}`
+          // @ts-expect-error
+          else result[keys.at(j % (keys.length - 1))](`test-value${j}`)
         }
         result.toJSON()
       }

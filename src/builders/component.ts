@@ -102,44 +102,7 @@ export const componentType = {
 
 export const createComponent = <const I extends ComponentObject<I>>(
   init: I & Record<Exclude<keyof I, keyof ComponentObject<I>>, never>,
-) =>
-  jsonFactory<ComponentObject<I>>(init, [
-    'id',
-    'custom_id',
-    'custom_value',
-    'components',
-    'style',
-    'label',
-    'emoji',
-    'sku_id',
-    'url',
-    'disabled',
-    'options',
-    'placeholder',
-    'min_values',
-    'max_values',
-    'required',
-    'min_length',
-    'max_length',
-    'required',
-    'value',
-    'default_values',
-    'channel_types',
-    'accessory',
-    'content',
-    'media',
-    'description',
-    'spoiler',
-    'items',
-    'file',
-    'name',
-    'size',
-    'divider',
-    'spacing',
-    'accent_color',
-    'component',
-    'default',
-  ])
+) => jsonFactory<ComponentObject<I>>(init)
 
 //const test1 = createComponent({ type: componentType.ActionRow, components: [] }).toJSON()
 //const test2 = createComponent({ type: componentType.Button, style: 1, custom_id: 'test', error_key: 'test', custom_value: 'test' })
@@ -149,3 +112,16 @@ export const createComponent = <const I extends ComponentObject<I>>(
 //  .required(true)
 //  .toJSON()
 //const test5 = createComponent({ type: componentType.StringSelect, custom_id: 'test', options: [] })
+
+export const createActionRow = (components: APIComponentInActionRow[]) => createComponent({ type: 1, components })
+//const testActionRow = createActionRow([createComponent({ type: 2, style: 1, custom_id: 'test' }).toJSON()])
+
+export const createButton = <T extends string>(custom_id: T, style: NomalButtonStyle = 1) =>
+  createComponent({ type: 2, style, custom_id })
+export const createButtonLink = (url: string) => createComponent({ type: 2, style: 5, url })
+export const createButtonPremium = (sku_id: string) => createComponent({ type: 2, style: 6, sku_id })
+//const testButton = createButton('test')
+
+export const createStringSelect = <T extends string>(custom_id: T, options: APIStringSelectComponent['options']) =>
+  createComponent({ type: 3, custom_id, options })
+//const testStringSelect = createStringSelect('test', [{ label: 'Option 1', value: 'option1' }])
