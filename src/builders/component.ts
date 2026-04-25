@@ -100,12 +100,50 @@ export const componentType = {
   Checkbox: 23,
 } as const
 
-export const createComponent = <const I extends ComponentObject<I>>(init: I) =>
-  jsonFactory<ComponentObject<I>>(init, ['type', 'style', 'custom_id'])
+export const createComponent = <const I extends ComponentObject<I>>(
+  init: I & Record<Exclude<keyof I, keyof ComponentObject<I>>, never>,
+) =>
+  jsonFactory<ComponentObject<I>>(init, [
+    'id',
+    'custom_id',
+    'custom_value',
+    'components',
+    'style',
+    'label',
+    'emoji',
+    'sku_id',
+    'url',
+    'disabled',
+    'options',
+    'placeholder',
+    'min_values',
+    'max_values',
+    'required',
+    'min_length',
+    'max_length',
+    'required',
+    'value',
+    'default_values',
+    'channel_types',
+    'accessory',
+    'content',
+    'media',
+    'description',
+    'spoiler',
+    'items',
+    'file',
+    'name',
+    'size',
+    'divider',
+    'spacing',
+    'accent_color',
+    'component',
+    'default',
+  ])
 
 //const test1 = createComponent({ type: componentType.ActionRow, components: [] }).toJSON()
-const test2 = createComponent({ type: componentType.Button, style: 1, custom_id: 'test', error_key: 'test' })
-const test3 = createComponent({ type: componentType.Button, style: 6, sku_id: 'test' })
+//const test2 = createComponent({ type: componentType.Button, style: 1, custom_id: 'test', error_key: 'test', custom_value: 'test' })
+//const test3 = createComponent({ type: componentType.Button, style: 6, sku_id: 'test' })
 //const test4 = createComponent({ type: componentType.TextInput, style: 1, custom_id: 'test' })
 //  .custom_value('test2')
 //  .required(true)

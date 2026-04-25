@@ -3,11 +3,11 @@ import { bench, boxplot, compact, run, summary } from 'mitata'
 var CUSTOM_ID_SEPARATOR = ';'
 var isProto = prop => prop === '__proto__' || prop === 'constructor' || prop === 'prototype'
 var newError = (funcName, message) => new Error(`[${funcName}] ${message}`)
-var protoNames = proto => Object.getOwnPropertyNames(proto)
+var _protoNames = proto => Object.getOwnPropertyNames(proto)
 var protoSet = /* @__PURE__ */ new Set([
-  ...protoNames(Object.prototype),
-  ...protoNames(Function.prototype),
-  ...protoNames(Promise.prototype),
+  //  ...protoNames(Object.prototype),
+  //  ...protoNames(Function.prototype),
+  //  ...protoNames(Promise.prototype),
 ])
 var isUnstableProto = prop => protoSet.has(prop)
 var jsonFactory = initial => {
@@ -111,6 +111,51 @@ var factoryWithSharedProto = (initial, keys) => {
   inst.__data = { ...initial }
   return inst
 }
+function objectToJSON() {
+  const { custom_value, ...rest } = this
+  return {
+    ...rest,
+    custom_id: (rest.custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : ''),
+  }
+}
+
+const keys = [
+  'id',
+  'custom_id',
+  'custom_value',
+  'components',
+  'style',
+  'label',
+  'emoji',
+  'sku_id',
+  'url',
+  'disabled',
+  'options',
+  'placeholder',
+  'min_values',
+  'max_values',
+  'required',
+  'min_length',
+  'max_length',
+  'required',
+  'value',
+  'default_values',
+  'channel_types',
+  'accessory',
+  'content',
+  'media',
+  'description',
+  'spoiler',
+  'items',
+  'file',
+  'name',
+  'size',
+  'divider',
+  'spacing',
+  'accent_color',
+  'component',
+  'default',
+]
 
 const benchItems = [
   { ver: 'Proxy', func: jsonFactory },
@@ -120,21 +165,31 @@ const benchItems = [
 ]
 
 const benchmarks = () => {
+  bench('Baseline', async () => {
+    for (let i = 0; i < 10; i++) {
+      const result = { type: i, custom_id: `test${i}`, toJSON: objectToJSON }
+      for (let j = 0; j < 10; j++) {
+        result[keys.at((j % keys.length) - 1)] = `test-value${j}`
+      }
+      result.toJSON()
+    }
+  }).gc(false) // Feels more stable than the default (once) when set to false
   for (const { ver, func } of benchItems) {
     bench(ver, async () => {
       for (let i = 0; i < 10; i++) {
         // @ts-expect-error
-        const result = func({ type: i, custom_id: `test${i}` }, ['type', 'custom_id', 'custom_value'])
+        const result = func({ type: i, custom_id: `test${i}` }, keys)
         for (let j = 0; j < 10; j++) {
           // @ts-expect-error
-          result.custom_value(`test-value${j}`).toJSON()
+          result[keys.at((j % keys.length) - 1)](`test-value${j}`).toJSON()
         }
+        result.toJSON()
       }
     }).gc(false) // Feels more stable than the default (once) when set to false
   }
 }
 
-compact(benchmarks) // warm-up
+//compact(benchmarks) // warm-up
 boxplot(() => summary(benchmarks))
 
 await run()

@@ -15,7 +15,16 @@ type JsonFactory<T extends Record<string, unknown>> = {
   [K in keyof Required<T>]: (value: Exclude<Required<T>[K], undefined>) => JsonFactory<T>
 }
 
-export const jsonFactory = <T extends Record<string, unknown>>(initial: T, keys: (keyof T)[]): JsonFactory<T> => {
+export function toJSON<T>(): T {
+  // @ts-expect-error
+  const { custom_value, ...rest } = this
+  return {
+    ...rest,
+    custom_id: (rest.custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : ''),
+  }
+}
+
+export const jsonFactory = <T extends Record<string, unknown>>(initial: T, keys: string[]): JsonFactory<T> => {
   const data = { ...initial }
   const builder = {
     toJSON() {
@@ -28,7 +37,7 @@ export const jsonFactory = <T extends Record<string, unknown>>(initial: T, keys:
     },
   } as JsonFactory<T>
 
-  keys.forEach(k => {
+  keys.forEach((k: keyof T) => {
     if (isProto(k)) throw newError('jsonFactory', `Invalid key: ${String(k)}`)
     // @ts-expect-error
     builder[k] = (v: Exclude<Required<T>[typeof k], undefined>) => {

@@ -34,7 +34,7 @@ const benchmarks = () => {
   }
 }
 
-compact(benchmarks) // warm-up
+//compact(benchmarks) // warm-up
 boxplot(() => summary(benchmarks))
 
 await run()
