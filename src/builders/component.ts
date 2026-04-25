@@ -27,7 +27,8 @@ import type {
   ComponentType,
   SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
-import { jsonFactory } from './json-factory'
+import type { ExcludeMethods } from '../types'
+import { type JsonFactory, jsonFactory } from './json-factory'
 
 /**
  * @see https://discord-api-types.dev/api/discord-api-types-v10/interface/APIBaseComponent
@@ -100,9 +101,12 @@ export const componentType = {
   Checkbox: 23,
 } as const
 
-export const createComponent = <const I extends ComponentObject<I>>(
-  init: I & Record<Exclude<keyof I, keyof ComponentObject<I>>, never>,
-) => jsonFactory<ComponentObject<I>>(init)
+export const createComponent = <
+  const P extends AddCustomValue<APIComponent>,
+  C extends ComponentObject<P> = ComponentObject<P>,
+>(
+  init: P & Record<Exclude<keyof P, keyof C>, never>,
+) => jsonFactory(init) as JsonFactory<ExcludeMethods<C, 'type'>>
 
 //const test1 = createComponent({ type: componentType.ActionRow, components: [] }).toJSON()
 //const test2 = createComponent({ type: componentType.Button, style: 1, custom_id: 'test', error_key: 'test', custom_value: 'test' })

@@ -9,19 +9,20 @@ import { CUSTOM_ID_SEPARATOR, isProto, newError } from '../utils'
  * これにより作成されたfactoryは、型情報として、{ type: 1, custom_id: 'test' }を持つ
  */
 
-type JsonFactory<T extends Record<string, unknown>> = {
+export type JsonFactory<T extends Record<PropertyKey, unknown>> = {
   toJSON(): T
 } & {
   [K in keyof Required<T>]: (value: Exclude<Required<T>[K], undefined>) => JsonFactory<T>
 }
 
-export const jsonFactory = <T extends Record<string, unknown>>(initial: T): JsonFactory<T> => {
-  const data = { ...initial } as Record<string, unknown>
+export const jsonFactory = <T extends Record<PropertyKey, unknown>>(initial: T): JsonFactory<T> => {
+  const data = { ...initial } as Record<PropertyKey, unknown>
   const proxy = new Proxy(
     {},
     {
-      get(_, prop) {
-        if (typeof prop !== 'string' || isProto(prop)) throw newError('jsonFactory', `Invalid key: ${String(prop)}`)
+      get(target, prop) {
+        if (isProto(prop)) throw newError('jsonFactory', `Invalid key: ${String(prop)}`)
+        if (prop in Object.prototype) return Reflect.get(target, prop, proxy)
         if (prop === 'toJSON') {
           const { custom_id, custom_value, ...rest } = data
           if (custom_id || custom_value)
