@@ -27,8 +27,7 @@ import type {
   ComponentType,
   SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
-import type { ExcludeMethods } from '../types'
-import { type JsonFactory, jsonFactory } from './json-factory'
+import { type JsonBuilder, jsonBuilder } from './json-builder'
 
 /**
  * @see https://discord-api-types.dev/api/discord-api-types-v10/interface/APIBaseComponent
@@ -101,31 +100,41 @@ export const componentType = {
   Checkbox: 23,
 } as const
 
-export const createComponent = <
+export const componentBuilder = <
   const P extends AddCustomValue<APIComponent>,
   C extends ComponentObject<P> = ComponentObject<P>,
 >(
   init: P & Record<Exclude<keyof P, keyof C>, never>,
-) => jsonFactory(init) as JsonFactory<ExcludeMethods<C, 'type'>>
+) => jsonBuilder(init) as unknown as JsonBuilder<C, 'type' | 'custom_id'>
 
-//const test1 = createComponent({ type: componentType.ActionRow, components: [] }).toJSON()
-//const test2 = createComponent({ type: componentType.Button, style: 1, custom_id: 'test', error_key: 'test', custom_value: 'test' })
-//const test3 = createComponent({ type: componentType.Button, style: 6, sku_id: 'test' })
-//const test4 = createComponent({ type: componentType.TextInput, style: 1, custom_id: 'test' })
+//const test1 = componentBuilder({ type: componentType.ActionRow, components: [] }).toJSON()
+//const test2 = componentBuilder({ type: componentType.Button, style: 1, custom_id: 'test', error_key: 'test', custom_value: 'test' })
+//const test3 = componentBuilder({ type: componentType.Button, style: 6, sku_id: 'test' })
+//const test4 = componentBuilder({ type: componentType.TextInput, style: 1, custom_id: 'test' })
 //  .custom_value('test2')
 //  .required(true)
 //  .toJSON()
-//const test5 = createComponent({ type: componentType.StringSelect, custom_id: 'test', options: [] })
+//const test5 = componentBuilder({ type: componentType.StringSelect, custom_id: 'test', options: [] })
 
-export const createActionRow = (components: APIComponentInActionRow[]) => createComponent({ type: 1, components })
-//const testActionRow = createActionRow([createComponent({ type: 2, style: 1, custom_id: 'test' }).toJSON()])
+export const actionRowBuilder = <_ extends { type: 1; components: T }, T extends APIComponentInActionRow>(
+  components: T[],
+) => componentBuilder({ type: 1, components })
+//const testActionRow = actionRowBuilder([componentBuilder({ type: 2, style: 1, custom_id: 'test' }).toJSON()])
 
-export const createButton = <T extends string>(custom_id: T, style: NomalButtonStyle = 1) =>
-  createComponent({ type: 2, style, custom_id })
-export const createButtonLink = (url: string) => createComponent({ type: 2, style: 5, url })
-export const createButtonPremium = (sku_id: string) => createComponent({ type: 2, style: 6, sku_id })
-//const testButton = createButton('test')
+export const buttonBuilder = <_ extends { type: 2; style: NomalButtonStyle; custom_id: T }, T extends string>(
+  custom_id: T,
+  style: NomalButtonStyle = 1,
+) => componentBuilder({ type: 2, style, custom_id })
+export const buttonLinkBuilder = (url: string) => componentBuilder({ type: 2, style: 5, url })
+export const buttonPremiumBuilder = (sku_id: string) => componentBuilder({ type: 2, style: 6, sku_id })
+//const testButton = buttonBuilder('test')
 
-export const createStringSelect = <T extends string>(custom_id: T, options: APIStringSelectComponent['options']) =>
-  createComponent({ type: 3, custom_id, options })
-//const testStringSelect = createStringSelect('test', [{ label: 'Option 1', value: 'option1' }])
+export const stringSelectBuilder = <
+  _ extends { type: 3; custom_id: T; options: O },
+  T extends string,
+  O extends APIStringSelectComponent['options'],
+>(
+  custom_id: T,
+  options: O,
+) => componentBuilder({ type: 3, custom_id, options })
+//const testStringSelect = stringSelectBuilder('test', [{ label: 'Option 1', value: 'option1' }])
