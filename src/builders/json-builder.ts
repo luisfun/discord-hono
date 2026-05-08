@@ -11,37 +11,60 @@ import { CUSTOM_ID_SEPARATOR, isProto, newError } from '../utils'
 
 type RemoveCustomValue<T> = T extends any ? { [K in keyof T as K extends 'custom_value' ? never : K]: T[K] } : never
 
-type toJSONOptions = {
-  clone?: boolean
+type OptionalKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? K : never }[keyof T]
+
+export type JsonBuilderOptions = {
+  deepCopy?: boolean
 }
 
-export type JsonBuilder<T extends Record<PropertyKey, unknown>, E extends string = never> = {
-  toJSON(options?: toJSONOptions): RemoveCustomValue<T>
+// We would like to use 'T extends Record<PropertyKey, unknown>', but Record makes all properties required, so we use T extends object instead
+export type JsonBuilder<T extends object, E extends string = never> = {
+  toJSON(): RemoveCustomValue<T>
+  delete<K extends OptionalKeys<T>>(key: K): JsonBuilder<T, E>
+  //set<K extends Exclude<keyof T, E>>(key: K, value: T[K]): JsonBuilder<T, E>
 } & {
   [K in keyof Required<T> as K extends E ? never : K]: (value: Exclude<Required<T>[K], undefined>) => JsonBuilder<T, E>
 }
 
 export const jsonBuilder = <T extends Record<PropertyKey, unknown>, E extends string = never>(
   initial: T,
+  options?: JsonBuilderOptions,
 ): JsonBuilder<T, E> => {
-  const data = { ...initial } as Record<PropertyKey, unknown>
+  const data = options?.deepCopy
+    ? globalThis.structuredClone(initial)
+    : ({ ...initial } as Record<PropertyKey, unknown>)
   const proxy = new Proxy(
     {},
     {
       get(target, prop) {
-        if (isProto(prop)) throw newError('jsonBuilder', `Invalid key: ${String(prop)}`)
-        if (prop in Object.prototype) return Reflect.get(target, prop, proxy)
-        if (prop === 'toJSON') {
-          const { custom_id, custom_value, ...rest } = data
-          if (custom_id || custom_value)
-            // biome-ignore lint/complexity/useLiteralKeys: Not sure if custom_id exists
-            rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
-          return (options?: toJSONOptions) =>
-            (options?.clone ? globalThis.structuredClone(rest) : rest) as RemoveCustomValue<T>
-        }
-        return (value: unknown) => {
-          data[prop] = value
-          return proxy
+        switch (prop) {
+          case 'toJSON': {
+            const { custom_id, custom_value, ...rest } = data
+            if (custom_id || custom_value)
+              // biome-ignore lint/complexity/useLiteralKeys: Not sure if custom_id exists
+              rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
+            return () => (options?.deepCopy ? globalThis.structuredClone(rest) : rest) as RemoveCustomValue<T>
+          }
+          case 'delete':
+            return (key: Exclude<OptionalKeys<T>, E>) => {
+              delete data[key]
+              return proxy
+            }
+          /*
+          case 'set':
+            return (key: 'delete', value: T['delete']) => {
+              if (isProto(prop)) throw newError('jsonBuilder', `Invalid key: ${String(prop)}`)
+              data[key] = value
+              return proxy
+            }
+          */
+          default:
+            if (isProto(prop)) throw newError('jsonBuilder', `Invalid key: ${String(prop)}`)
+            if (prop in Object.prototype) return Reflect.get(target, prop, proxy)
+            return (value: unknown) => {
+              data[prop] = value
+              return proxy
+            }
         }
       },
     },

@@ -27,7 +27,7 @@ import type {
   ComponentType,
   SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
-import { type JsonBuilder, jsonBuilder } from './json-builder'
+import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
 
 /**
  * @see https://discord-api-types.dev/api/discord-api-types-v10/interface/APIBaseComponent
@@ -105,7 +105,8 @@ export const componentBuilder = <
   C extends ComponentObject<P> = ComponentObject<P>,
 >(
   init: P & Record<Exclude<keyof P, keyof C>, never>,
-) => jsonBuilder(init) as unknown as JsonBuilder<C, 'type' | 'custom_id'>
+  options?: JsonBuilderOptions,
+) => jsonBuilder(init, options) as unknown as JsonBuilder<C, 'type' | 'custom_id'>
 
 //const test1 = componentBuilder({ type: componentType.ActionRow, components: [] }).toJSON()
 //const test2 = componentBuilder({ type: componentType.Button, style: 1, custom_id: 'test', error_key: 'test', custom_value: 'test' })
@@ -118,16 +119,21 @@ export const componentBuilder = <
 
 export const actionRowBuilder = <_ extends { type: 1; components: T }, T extends APIComponentInActionRow>(
   components: T[],
-) => componentBuilder({ type: 1, components })
+  options?: JsonBuilderOptions,
+) => componentBuilder({ type: 1, components }, options)
 //const testActionRow = actionRowBuilder([componentBuilder({ type: 2, style: 1, custom_id: 'test' }).toJSON()])
 
 export const buttonBuilder = <_ extends { type: 2; style: NomalButtonStyle; custom_id: T }, T extends string>(
   custom_id: T,
   style: NomalButtonStyle = 1,
-) => componentBuilder({ type: 2, style, custom_id })
-export const buttonLinkBuilder = (url: string) => componentBuilder({ type: 2, style: 5, url })
-export const buttonPremiumBuilder = (sku_id: string) => componentBuilder({ type: 2, style: 6, sku_id })
+  options?: JsonBuilderOptions,
+) => componentBuilder({ type: 2, style, custom_id }, options)
+export const buttonLinkBuilder = (url: string, options?: JsonBuilderOptions) =>
+  componentBuilder({ type: 2, style: 5, url }, options) as JsonBuilder<APIButtonComponentWithURL, 'type' | 'style'>
+export const buttonPremiumBuilder = (sku_id: string, options?: JsonBuilderOptions) =>
+  componentBuilder({ type: 2, style: 6, sku_id }, options) as JsonBuilder<APIButtonComponentWithSKUId, 'type' | 'style'>
 //const testButton = buttonBuilder('test')
+//const testButtonLink = buttonLinkBuilder('https://example.com')
 
 export const stringSelectBuilder = <
   _ extends { type: 3; custom_id: T; options: O },
@@ -136,5 +142,6 @@ export const stringSelectBuilder = <
 >(
   custom_id: T,
   options: O,
-) => componentBuilder({ type: 3, custom_id, options })
+  builderOptions?: JsonBuilderOptions,
+) => componentBuilder({ type: 3, custom_id, options }, builderOptions)
 //const testStringSelect = stringSelectBuilder('test', [{ label: 'Option 1', value: 'option1' }])
