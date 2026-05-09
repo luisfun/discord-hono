@@ -130,7 +130,7 @@ export const actionRowBuilder = <
 >(
   components: T[],
   options?: JsonBuilderOptions,
-) => componentBuilder({ type: 1, components: components.map(toJSON) as APIComponentInActionRow[] }, options)
+) => componentBuilder({ type: 1, components: components.map(toJSON) }, options)
 //const testActionRow = actionRowBuilder([componentBuilder({ type: 2, style: 1, custom_id: 'test' }), buttonLinkBuilder('https://example.com')])
 
 export const buttonBuilder = <_ extends { type: 2; style: NomalButtonStyle; custom_id: T }, T extends string>(
