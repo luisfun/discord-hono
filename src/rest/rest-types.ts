@@ -426,7 +426,9 @@ import type {
 ///// Not supported yet /////
 // [Create Guild Sticker](https://discord.com/developers/docs/resources/sticker#create-guild-sticker) // https://discord-api-types.dev/search?q=RESTPostAPIGuildSticker
 
-type CouldNotFind = Record<string, unknown>
+interface CouldNotFind {
+  [key: string]: unknown
+}
 
 export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 
@@ -1407,7 +1409,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     never
   : never
 
-export type Rest = {
+export interface Rest {
   <M extends RestMethod, P extends RestPathNV<M>>(
     method: M,
     path: P,

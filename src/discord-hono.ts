@@ -18,7 +18,7 @@ import type {
 import { CUSTOM_ID_SEPARATOR, newError } from './utils'
 import { verify } from './verify'
 
-type DiscordEnvBindings = {
+interface DiscordEnvBindings {
   DISCORD_TOKEN?: string
   DISCORD_PUBLIC_KEY?: string
   DISCORD_APPLICATION_ID?: string

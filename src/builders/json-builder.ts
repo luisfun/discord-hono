@@ -13,7 +13,7 @@ type RemoveCustomValue<T> = T extends any ? { [K in keyof T as K extends 'custom
 
 type OptionalKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? K : never }[keyof T]
 
-export type JsonBuilderOptions = {
+export interface JsonBuilderOptions {
   deepCopy?: boolean
 }
 

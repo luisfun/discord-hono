@@ -47,7 +47,7 @@ type AutocompleteOption =
   | APIApplicationCommandInteractionDataIntegerOption
   | APIApplicationCommandInteractionDataNumberOption
 
-type SubKey = {
+interface SubKey {
   group: string
   command: string
   string: string
