@@ -18,20 +18,22 @@ export type JsonBuilderOptions = {
 }
 
 // We would like to use 'T extends Record<PropertyKey, unknown>', but Record makes all properties required, so we use T extends object instead
-export type JsonBuilder<T extends object, E extends string = never> = {
+export type JsonBuilder<I extends object, T extends object, E extends string = never> = {
   toJSON(): RemoveCustomValue<T>
-  delete<K extends OptionalKeys<T>>(key: K): JsonBuilder<T, E>
-  //set<K extends Exclude<keyof T, E>>(key: K, value: T[K]): JsonBuilder<T, E>
+  delete<K extends OptionalKeys<T>>(key: K): JsonBuilder<I, T, E>
+  //set<K extends Exclude<keyof T, E>>(key: K, value: T[K]): JsonBuilder<I, T, E>
 } & {
-  [K in keyof Required<T> as K extends E ? never : K]: (value: Exclude<Required<T>[K], undefined>) => JsonBuilder<T, E>
+  [K in keyof Required<T> as K extends E ? never : K]: (
+    value: Exclude<Required<T>[K], undefined>,
+  ) => JsonBuilder<I, T, E>
 }
 
-export const jsonBuilder = <T extends Record<PropertyKey, unknown>, E extends string = never>(
-  initial: T,
+export const jsonBuilder = <const I extends object, T extends Record<PropertyKey, unknown>, E extends string = never>(
+  initial: I,
   options?: JsonBuilderOptions,
-): JsonBuilder<T, E> => {
+): JsonBuilder<I, T, E> => {
   const data = options?.deepCopy
-    ? globalThis.structuredClone(initial)
+    ? (globalThis.structuredClone(initial) as Record<PropertyKey, unknown>)
     : ({ ...initial } as Record<PropertyKey, unknown>)
   const proxy = new Proxy(
     {},
@@ -68,7 +70,7 @@ export const jsonBuilder = <T extends Record<PropertyKey, unknown>, E extends st
         }
       },
     },
-  ) as JsonBuilder<T, E>
+  ) as JsonBuilder<I, T, E>
   return proxy
 }
 

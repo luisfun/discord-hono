@@ -30,11 +30,14 @@ import type {
 import { toJSON } from '../utils'
 import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
 
+type ExtendComponentInActionRow = APIComponentInActionRow | JsonBuilder<any, APIComponentInActionRow, any>
+
 /**
  * @see https://discord-api-types.dev/api/discord-api-types-v10/interface/APIBaseComponent
  */
 type APIComponent =
-  | APIActionRowComponent<APIComponentInActionRow>
+  // @ts-expect-error
+  | APIActionRowComponent<ExtendComponentInActionRow>
   | APIButtonComponentWithCustomId
   | APIButtonComponentWithURL
   | APIButtonComponentWithSKUId
@@ -107,13 +110,10 @@ export const componentType = {
  * @param options
  * @returns
  */
-export const componentBuilder = <
-  const P extends AddCustomValue<APIComponent>,
-  C extends ComponentObject<P> = ComponentObject<P>,
->(
-  init: P & Record<Exclude<keyof P, keyof C>, never>,
+export const componentBuilder = <I extends AddCustomValue<APIComponent>, E extends string = 'type' | 'custom_id'>(
+  init: I & Record<Exclude<keyof I, keyof ComponentObject<I>>, never>,
   options?: JsonBuilderOptions,
-) => jsonBuilder(init, options) as unknown as JsonBuilder<C, 'type' | 'custom_id'>
+) => jsonBuilder<I, ComponentObject<I>, E>(init, options)
 
 //const test1 = componentBuilder({ type: componentType.ActionRow, components: [] }).toJSON()
 //const test2 = componentBuilder({ type: componentType.Button, style: 1, custom_id: 'test', error_key: 'test', custom_value: 'test' })
@@ -124,14 +124,12 @@ export const componentBuilder = <
 //  .toJSON()
 //const test5 = componentBuilder({ type: componentType.StringSelect, custom_id: 'test', options: [] })
 
-export const actionRowBuilder = <
-  _ extends { type: 1; components: T },
-  T extends APIComponentInActionRow | JsonBuilder<APIComponentInActionRow, 'type' | 'custom_id' | 'style'>,
->(
+export const actionRowBuilder = <_ extends { type: 1; components: T }, T extends ExtendComponentInActionRow>(
   components: T[],
   options?: JsonBuilderOptions,
 ) => componentBuilder({ type: 1, components: components.map(toJSON) }, options)
-//const testActionRow = actionRowBuilder([componentBuilder({ type: 2, style: 1, custom_id: 'test' }), buttonLinkBuilder('https://example.com')])
+//const testActionRow = actionRowBuilder([componentBuilder({ type: 2, style: 2, custom_id: 'test' }), { type: 2, style: 1, custom_id: 'test' }])
+//const testActionRow = actionRowBuilder([]).components([componentBuilder({ type: 2, style: 1, custom_id: 'test' }), { type: 2, style: 1, custom_id: 'test' }])
 
 export const buttonBuilder = <_ extends { type: 2; style: NomalButtonStyle; custom_id: T }, T extends string>(
   custom_id: T,
@@ -139,12 +137,12 @@ export const buttonBuilder = <_ extends { type: 2; style: NomalButtonStyle; cust
   options?: JsonBuilderOptions,
 ) => componentBuilder({ type: 2, style, custom_id }, options)
 export const buttonLinkBuilder = (url: string, options?: JsonBuilderOptions) =>
-  componentBuilder({ type: 2, style: 5, url }, options) as JsonBuilder<APIButtonComponentWithURL, 'type' | 'style'>
+  componentBuilder<{ type: 2; style: 5; url: string }, 'type' | 'style'>({ type: 2, style: 5, url }, options)
 export const buttonPremiumBuilder = (sku_id: string, options?: JsonBuilderOptions) =>
-  componentBuilder({ type: 2, style: 6, sku_id }, options) as JsonBuilder<APIButtonComponentWithSKUId, 'type' | 'style'>
+  componentBuilder<{ type: 2; style: 6; sku_id: string }, 'type' | 'style'>({ type: 2, style: 6, sku_id }, options)
 //const testButton = buttonBuilder('test')
 //const testButtonLink = buttonLinkBuilder('https://example.com')
-//const testActionRow = actionRowBuilder([{ type: 2, style: 1, custom_id: 'test' }, buttonLinkBuilder('https://example.com')])
+//const testActionRow = actionRowBuilder([buttonLinkBuilder('https://example.com')]).components([buttonLinkBuilder('https://example.com')])
 
 export const stringSelectBuilder = <
   _ extends { type: 3; custom_id: T; options: O },
