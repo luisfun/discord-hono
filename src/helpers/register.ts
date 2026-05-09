@@ -1,5 +1,8 @@
 import type { SlashCommandBuilder } from '@discordjs/builders'
-import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
+import type {
+  RESTPostAPIApplicationCommandsJSONBody,
+  RESTPutAPIApplicationGuildCommandsJSONBody,
+} from 'discord-api-types/v10'
 import type { Command } from '../builders/command'
 import { createRest } from '../rest/rest'
 import { $applications$_$commands, $applications$_$guilds$_$commands } from '../rest/rest-path'
@@ -24,7 +27,13 @@ export const register = async (
   const rest = createRest(token)
   const json = commands.map(toJSON)
   let res: Response
-  if (guild_id) res = await rest('PUT', $applications$_$guilds$_$commands, [application_id, guild_id], json)
+  if (guild_id)
+    res = await rest(
+      'PUT',
+      $applications$_$guilds$_$commands,
+      [application_id, guild_id],
+      json as RESTPutAPIApplicationGuildCommandsJSONBody,
+    )
   else res = await rest('PUT', $applications$_$commands, [application_id], json)
 
   let logText = ''

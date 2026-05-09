@@ -14,7 +14,9 @@ export type MessageFlag = keyof typeof flagData
 export const messageFlags = (...flag: MessageFlag[]): number =>
   flag.reduce((result, f) => result | (1 << flagData[f]), 0)
 
-export const toJSON = (obj: object): any => ('toJSON' in obj && typeof obj.toJSON === 'function' ? obj.toJSON() : obj)
+export const toJSON = <T>(obj: T): T extends { toJSON(): infer R } ? R : T => {
+  return 'toJSON' in (obj as any) && typeof (obj as any).toJSON === 'function' ? (obj as any).toJSON() : (obj as any)
+}
 
 export const prepareData = <T extends Record<string, unknown>>(
   data: CustomCallbackData<T> | Record<string, unknown>[] | undefined,

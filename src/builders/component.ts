@@ -27,8 +27,8 @@ import type {
   ComponentType,
   SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
-import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
 import { toJSON } from '../utils'
+import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
 
 /**
  * @see https://discord-api-types.dev/api/discord-api-types-v10/interface/APIBaseComponent
@@ -124,7 +124,10 @@ export const componentBuilder = <
 //  .toJSON()
 //const test5 = componentBuilder({ type: componentType.StringSelect, custom_id: 'test', options: [] })
 
-export const actionRowBuilder = <_ extends { type: 1; components: T }, T extends APIComponentInActionRow | JsonBuilder<APIComponentInActionRow, "type" | "custom_id" | "style">>(
+export const actionRowBuilder = <
+  _ extends { type: 1; components: T },
+  T extends APIComponentInActionRow | JsonBuilder<APIComponentInActionRow, 'type' | 'custom_id' | 'style'>,
+>(
   components: T[],
   options?: JsonBuilderOptions,
 ) => componentBuilder({ type: 1, components: components.map(toJSON) as APIComponentInActionRow[] }, options)

@@ -1,6 +1,6 @@
 // biome-ignore-all lint/nursery/useExplicitType: 一時的 PR時に削除
 
-import { CUSTOM_ID_SEPARATOR, isProto, newError } from '../utils'
+import { CUSTOM_ID_SEPARATOR, isArray, isProto, newError, toJSON } from '../utils'
 
 /*
  * jsonBuilder
@@ -62,7 +62,7 @@ export const jsonBuilder = <T extends Record<PropertyKey, unknown>, E extends st
             if (isProto(prop)) throw newError('jsonBuilder', `Invalid key: ${String(prop)}`)
             if (prop in Object.prototype) return Reflect.get(target, prop, proxy)
             return (value: unknown) => {
-              data[prop] = value
+              data[prop] = isArray(value) ? value.map(toJSON) : toJSON(value)
               return proxy
             }
         }
