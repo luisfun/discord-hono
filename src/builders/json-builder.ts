@@ -1,5 +1,4 @@
-// biome-ignore-all lint/nursery/useExplicitType: 一時的 PR時に削除
-
+import type { Simplify } from '../types'
 import { CUSTOM_ID_SEPARATOR, isArray, isProto, newError, toJSON } from '../utils'
 
 /*
@@ -9,52 +8,62 @@ import { CUSTOM_ID_SEPARATOR, isArray, isProto, newError, toJSON } from '../util
  * これにより作成されたbuilderは、型情報として、{ type: 1, custom_id: 'test' }を持つ
  */
 
-type RemoveCustomValue<T> = T extends any ? { [K in keyof T as K extends 'custom_value' ? never : K]: T[K] } : never
-
 type OptionalKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? K : never }[keyof T]
+
+type ResolvedToJSON<V> = V extends Array<infer U> ? ResolvedToJSON<U>[] : V extends { toJSON(): infer R } ? R : V
+
+type CustomIdString<I, V> = V extends undefined
+  ? I
+  : `${Extract<I, string>}${typeof CUSTOM_ID_SEPARATOR}${Extract<V, string>}`
+
+type JoinedCustomId<T extends object> = Simplify<{
+  [K in keyof T as K extends 'custom_value' ? never : K]: K extends 'custom_id'
+    ? CustomIdString<T[K], T extends { custom_value?: any } ? T['custom_value'] : undefined>
+    : T[K]
+}>
 
 export interface JsonBuilderOptions {
   deepCopy?: boolean
 }
 
-// We would like to use 'T extends Record<PropertyKey, unknown>', but Record makes all properties required, so we use T extends object instead
-export type JsonBuilder<I extends object, T extends object, E extends string = never> = {
-  toJSON(): RemoveCustomValue<T>
-  delete<K extends OptionalKeys<T>>(key: K): JsonBuilder<I, T, E>
-  //set<K extends Exclude<keyof T, E>>(key: K, value: T[K]): JsonBuilder<I, T, E>
+export type JsonBuilder<T extends object, M extends object, E extends string = never> = {
+  toJSON(): 'custom_value' extends keyof M ? JoinedCustomId<T> : T
+  delete<K extends OptionalKeys<M>>(key: K): JsonBuilder<{ [P in keyof T as P extends K ? never : P]: T[P] }, M, E>
+  //set<K extends Exclude<keyof M, E>>(key: K, value: M[K]): JsonBuilder<T & { [P in K]: M[K] }, M, E>
 } & {
-  [K in keyof Required<T> as K extends E ? never : K]: (
-    value: Exclude<Required<T>[K], undefined>,
-  ) => JsonBuilder<I, T, E>
+  [K in keyof Required<M> as K extends E ? never : K]: <V extends Exclude<Required<M>[K], undefined>>(
+    value: V,
+  ) => JsonBuilder<{ [P in keyof T | K]: P extends K ? ResolvedToJSON<V> : P extends keyof T ? T[P] : never }, M, E>
 }
 
-export const jsonBuilder = <const I extends object, T extends Record<PropertyKey, unknown>, E extends string = never>(
-  initial: I,
+export const jsonBuilder = <const T extends object, M extends object, E extends string = never>(
+  initial: T,
   options?: JsonBuilderOptions,
-): JsonBuilder<I, T, E> => {
-  const data = options?.deepCopy
-    ? (globalThis.structuredClone(initial) as Record<PropertyKey, unknown>)
-    : ({ ...initial } as Record<PropertyKey, unknown>)
+): JsonBuilder<T, M, E> => {
+  const data = (options?.deepCopy ? globalThis.structuredClone(initial) : { ...initial }) as Record<
+    PropertyKey,
+    unknown
+  >
   const proxy = new Proxy(
     {},
     {
-      get(target, prop) {
+      get(target: {}, prop: string | symbol): unknown {
         switch (prop) {
           case 'toJSON': {
             const { custom_id, custom_value, ...rest } = data
             if (custom_id || custom_value)
               // biome-ignore lint/complexity/useLiteralKeys: Not sure if custom_id exists
               rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
-            return () => (options?.deepCopy ? globalThis.structuredClone(rest) : rest) as RemoveCustomValue<T>
+            return () => (options?.deepCopy ? globalThis.structuredClone(rest) : rest)
           }
           case 'delete':
-            return (key: Exclude<OptionalKeys<T>, E>) => {
+            return (key: PropertyKey) => {
               delete data[key]
               return proxy
             }
           /*
           case 'set':
-            return (key: 'delete', value: T['delete']) => {
+            return (key: keyof M, value: M[keyof M]) => {
               if (isProto(prop)) throw newError('jsonBuilder', `Invalid key: ${String(prop)}`)
               data[key] = value
               return proxy
@@ -70,7 +79,7 @@ export const jsonBuilder = <const I extends object, T extends Record<PropertyKey
         }
       },
     },
-  ) as JsonBuilder<I, T, E>
+  ) as JsonBuilder<T, M, E>
   return proxy
 }
 

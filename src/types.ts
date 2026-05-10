@@ -25,6 +25,8 @@ import type { Context } from './context'
 
 ////////// Utils //////////
 
+export type Simplify<T> = { [K in keyof T]: T[K] } & {}
+
 export type ExcludeMethods<T, K extends keyof T> = { [P in keyof T as P extends K ? never : P]: T[P] }
 
 ////////// Env //////////

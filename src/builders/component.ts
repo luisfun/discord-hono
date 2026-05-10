@@ -131,18 +131,24 @@ export const actionRowBuilder = <_ extends { type: 1; components: T }, T extends
 //const testActionRow = actionRowBuilder([componentBuilder({ type: 2, style: 2, custom_id: 'test' }), { type: 2, style: 1, custom_id: 'test' }])
 //const testActionRow = actionRowBuilder([]).components([componentBuilder({ type: 2, style: 1, custom_id: 'test' }), { type: 2, style: 1, custom_id: 'test' }])
 
-export const buttonBuilder = <_ extends { type: 2; style: NomalButtonStyle; custom_id: T }, T extends string>(
+export const buttonBuilder = <
+  _ extends { type: 2; style: NomalButtonStyle; custom_id: T },
+  T extends string,
+  S extends NomalButtonStyle = 1,
+>(
   custom_id: T,
-  style: NomalButtonStyle = 1,
+  style: S = 1 as S,
   options?: JsonBuilderOptions,
 ) => componentBuilder({ type: 2, style, custom_id }, options)
 export const buttonLinkBuilder = (url: string, options?: JsonBuilderOptions) =>
   componentBuilder<{ type: 2; style: 5; url: string }, 'type' | 'style'>({ type: 2, style: 5, url }, options)
 export const buttonPremiumBuilder = (sku_id: string, options?: JsonBuilderOptions) =>
   componentBuilder<{ type: 2; style: 6; sku_id: string }, 'type' | 'style'>({ type: 2, style: 6, sku_id }, options)
-//const testButton = buttonBuilder('test')
+//const testButton = buttonBuilder('test').custom_value('test2').delete('custom_value') //.toJSON()
 //const testButtonLink = buttonLinkBuilder('https://example.com')
-//const testActionRow = actionRowBuilder([buttonLinkBuilder('https://example.com')]).components([buttonLinkBuilder('https://example.com')])
+//const testActionRow = actionRowBuilder([buttonLinkBuilder('https://example.com')]).components([
+//  buttonBuilder('id', 3).style(2).custom_value('value').disabled(true),
+//])
 
 export const stringSelectBuilder = <
   _ extends { type: 3; custom_id: T; options: O },
