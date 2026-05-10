@@ -16,18 +16,18 @@ type CustomIdString<I, V> = V extends undefined
   ? I
   : `${Extract<I, string>}${typeof CUSTOM_ID_SEPARATOR}${Extract<V, string>}`
 
-type JoinedCustomId<T extends object> = Simplify<{
+type JoinedCustomId<T extends object> = {
   [K in keyof T as K extends 'custom_value' ? never : K]: K extends 'custom_id'
     ? CustomIdString<T[K], T extends { custom_value?: any } ? T['custom_value'] : undefined>
     : T[K]
-}>
+}
 
 export interface JsonBuilderOptions {
   deepCopy?: boolean
 }
 
 export type JsonBuilder<T extends object, M extends object, E extends string = never> = {
-  toJSON(): 'custom_value' extends keyof M ? JoinedCustomId<T> : T
+  toJSON(): 'custom_value' extends keyof M ? Simplify<JoinedCustomId<T>> : T
   delete<K extends OptionalKeys<M>>(key: K): JsonBuilder<{ [P in keyof T as P extends K ? never : P]: T[P] }, M, E>
   //set<K extends Exclude<keyof M, E>>(key: K, value: M[K]): JsonBuilder<T & { [P in K]: M[K] }, M, E>
 } & {

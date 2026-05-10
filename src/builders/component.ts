@@ -146,9 +146,7 @@ export const buttonPremiumBuilder = (sku_id: string, options?: JsonBuilderOption
   componentBuilder<{ type: 2; style: 6; sku_id: string }, 'type' | 'style'>({ type: 2, style: 6, sku_id }, options)
 //const testButton = buttonBuilder('test').custom_value('test2').delete('custom_value') //.toJSON()
 //const testButtonLink = buttonLinkBuilder('https://example.com')
-//const testActionRow = actionRowBuilder([buttonLinkBuilder('https://example.com')]).components([
-//  buttonBuilder('id', 3).style(2).custom_value('value').disabled(true),
-//])
+//const testActionRow = actionRowBuilder([buttonLinkBuilder('https://example.com')]).components([buttonBuilder('id', 3).style(2).custom_value('value').disabled(true)])
 
 export const stringSelectBuilder = <
   _ extends { type: 3; custom_id: T; options: O },
