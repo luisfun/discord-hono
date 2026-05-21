@@ -27,7 +27,7 @@ import type {
   ComponentType,
   SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
-import { toJSON } from '../utils'
+import { isArray, isString, toJSON } from '../utils'
 import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
 
 type ExtendComponentInActionRow = APIComponentInActionRow | JsonBuilder<any, APIComponentInActionRow, any>
@@ -124,29 +124,82 @@ export const componentBuilder = <I extends AddCustomValue<APIComponent>, E exten
 //  .toJSON()
 //const test5 = componentBuilder({ type: componentType.StringSelect, custom_id: 'test', options: [] })
 
-export const actionRowBuilder = <_ extends { type: 1; components: T }, T extends ExtendComponentInActionRow>(
-  components: T[],
-  options?: JsonBuilderOptions,
-) => componentBuilder({ type: 1, components: components.map(toJSON) }, options)
+export const actionRowBuilder = <T extends ExtendComponentInActionRow>(components: T[], options?: JsonBuilderOptions) =>
+  componentBuilder({ type: 1, components: components.map(toJSON) }, options)
 //const testActionRow = actionRowBuilder([componentBuilder({ type: 2, style: 2, custom_id: 'test' }), { type: 2, style: 1, custom_id: 'test' }])
 //const testActionRow = actionRowBuilder([]).components([componentBuilder({ type: 2, style: 1, custom_id: 'test' }), { type: 2, style: 1, custom_id: 'test' }])
 
-export const buttonBuilder = <
-  _ extends { type: 2; style: NomalButtonStyle; custom_id: T },
-  T extends string,
-  S extends NomalButtonStyle = 1,
->(
-  custom_id: T,
-  style: S = 1 as S,
+export function buttonBuilder<C extends string, S extends NomalButtonStyle = 1>(
+  custom_id: C,
+  label?: undefined,
+  style?: S,
   options?: JsonBuilderOptions,
-) => componentBuilder({ type: 2, style, custom_id }, options)
-export const buttonLinkBuilder = (url: string, options?: JsonBuilderOptions) =>
-  componentBuilder<{ type: 2; style: 5; url: string }, 'type' | 'style'>({ type: 2, style: 5, url }, options)
-export const buttonPremiumBuilder = (sku_id: string, options?: JsonBuilderOptions) =>
-  componentBuilder<{ type: 2; style: 6; sku_id: string }, 'type' | 'style'>({ type: 2, style: 6, sku_id }, options)
-//const testButton = buttonBuilder('test').custom_value('test2').delete('custom_value') //.toJSON()
-//const testButtonLink = buttonLinkBuilder('https://example.com')
-//const testActionRow = actionRowBuilder([buttonLinkBuilder('https://example.com')]).components([buttonBuilder('id', 3).style(2).custom_value('value').disabled(true)])
+): JsonBuilder<
+  { type: 2; style: S; custom_id: C },
+  APIButtonComponentWithCustomId & { custom_value?: string },
+  'custom_id' | 'type'
+>
+export function buttonBuilder<C extends string, L extends string, S extends NomalButtonStyle = 1>(
+  custom_id: C,
+  label: L,
+  style?: S,
+  options?: JsonBuilderOptions,
+): JsonBuilder<
+  { type: 2; style: S; custom_id: C; label: L },
+  APIButtonComponentWithCustomId & { custom_value?: string },
+  'custom_id' | 'type'
+>
+export function buttonBuilder<C extends string, E extends string, L extends string, S extends NomalButtonStyle = 1>(
+  custom_id: C,
+  label: [E, L],
+  style?: S,
+  options?: JsonBuilderOptions,
+): JsonBuilder<
+  { type: 2; style: S; custom_id: C; label: L; emoji: { name: E } },
+  APIButtonComponentWithCustomId & { custom_value?: string },
+  'custom_id' | 'type'
+>
+export function buttonBuilder(
+  custom_id: string,
+  label: string | [string, string] | undefined = undefined,
+  style: NomalButtonStyle = 1,
+  options?: JsonBuilderOptions,
+) {
+  const builder = componentBuilder({ type: 2, style, custom_id }, options)
+  if (isString(label)) builder.label(label)
+  else if (isArray(label)) builder.label(label[1]).emoji({ name: label[0] })
+  return builder
+}
+
+export function buttonLinkBuilder<U extends string>(
+  url: U,
+  label?: undefined,
+  options?: JsonBuilderOptions,
+): JsonBuilder<{ type: 2; style: 5; url: U }, APIButtonComponentWithURL, 'type' | 'style'>
+export function buttonLinkBuilder<U extends string, L extends string>(
+  url: U,
+  label: L,
+  options?: JsonBuilderOptions,
+): JsonBuilder<{ type: 2; style: 5; url: U; label: L }, APIButtonComponentWithURL, 'type' | 'style'>
+export function buttonLinkBuilder<U extends string, E extends string, L extends string>(
+  url: U,
+  label: [E, L],
+  options?: JsonBuilderOptions,
+): JsonBuilder<{ type: 2; style: 5; url: U; label: L; emoji: { name: E } }, APIButtonComponentWithURL, 'type' | 'style'>
+export function buttonLinkBuilder(url: string, label: string | [string, string] | undefined = undefined, options?: JsonBuilderOptions) {
+  const builder = componentBuilder<{ type: 2; style: 5; url: string }, 'type' | 'style'>({ type: 2, style: 5, url }, options)
+  if (isString(label)) builder.label(label)
+  else if (isArray(label)) builder.label(label[1]).emoji({ name: label[0] })
+  return builder
+}
+
+export const buttonPremiumBuilder = <S extends string>(sku_id: S, options?: JsonBuilderOptions) =>
+  componentBuilder<{ type: 2; style: 6; sku_id: S }, 'type' | 'style'>({ type: 2, style: 6, sku_id }, options)
+
+//const testButton = buttonBuilder('test', ['🔥', 'Fire']).custom_value('test2').delete('custom_value') //.toJSON()
+//const testButtonLink = buttonLinkBuilder('https://example.com', ['🔗', 'Link'])
+//const testButtonPremium = buttonPremiumBuilder('test_sku_id')
+//const testActionRow = actionRowBuilder([buttonLinkBuilder('https://example.com')]).components([buttonBuilder('id', 'Btn', 3).style(2).custom_value('value').disabled(true)])
 
 export const stringSelectBuilder = <
   _ extends { type: 3; custom_id: T; options: O },
