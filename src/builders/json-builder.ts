@@ -1,12 +1,10 @@
+/**
+ * Security considerations
+ * - Consider restricting the methods accepted by jsonBuilder not only with type constraints but also by enforcing an allowlist
+ */
+
 import type { Simplify } from '../types'
 import { CUSTOM_ID_SEPARATOR, isArray, isProto, newError, toJSON } from '../utils'
-
-/*
- * jsonBuilder
- * const builder = jsonBuilder({ type: 1, custom_id: 'test' })
- * jsonBuilderの引数は、特定の型でガードレールがかけられている
- * これにより作成されたbuilderは、型情報として、{ type: 1, custom_id: 'test' }を持つ
- */
 
 type OptionalKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? K : never }[keyof T]
 
@@ -22,10 +20,25 @@ type JoinedCustomId<T extends object> = {
     : T[K]
 }
 
+/**
+ * {@label JsonBuilderOptions}
+ */
 export interface JsonBuilderOptions {
+  /**
+  * - true: Copy using globalThis.structuredClone
+  * - false: Copy using spread syntax
+   * @defaultValue false
+   */
   deepCopy?: boolean
 }
 
+/**
+ * @typeParam T - Input type or constraints for the input
+ * @typeParam M - Type constraints expected from toJSON (used for method typings)
+ * @typeParam E - Keys to exclude from M when generating methods
+ *
+ * {@label JsonBuilder}
+ */
 export type JsonBuilder<T extends object, M extends object, E extends string = never> = {
   toJSON(): 'custom_value' extends keyof M ? Simplify<JoinedCustomId<T>> : T
   delete<K extends OptionalKeys<M>>(key: K): JsonBuilder<{ [P in keyof T as P extends K ? never : P]: T[P] }, M, E>
@@ -36,6 +49,19 @@ export type JsonBuilder<T extends object, M extends object, E extends string = n
   ) => JsonBuilder<{ [P in keyof T | K]: P extends K ? ResolvedToJSON<V> : P extends keyof T ? T[P] : never }, M, E>
 }
 
+/**
+ * Core function to construct JSON using a chainable (fluent) API
+ *
+ * @typeParam {@link JsonBuilder}
+ * @param initial - initial value for the JSON
+ * @param options - {@link JsonBuilderOptions}
+ * @returns a proxy object that supports chainable method calls
+ *
+ * @remarks
+ * - toJSON: Method that generates the JSON object
+ * - delete: Method that deletes a specific key
+ * - others: Methods that accept arbitrary keys and values based on the type constraints defined in M
+ */
 export const jsonBuilder = <const T extends object, M extends object, E extends string = never>(
   initial: T,
   options?: JsonBuilderOptions,
@@ -82,29 +108,3 @@ export const jsonBuilder = <const T extends object, M extends object, E extends 
   ) as JsonBuilder<T, M, E>
   return proxy
 }
-
-/* 利用のされかた
-jsonBuilderは、他のビルダークラスの基底クラスとして利用されることを想定している
-createComponentの実態をjsonBuilderとし、型情報を付与することで、ComponentBuilderクラスのようなビルダークラスを作成することができる
-
-const builder = jsonBuilder({ type: 1, custom_id: 'test' })
-builder.custom_value('test-value')
-builder.key_name(['value1', 'value2']) // 型で許可されているキーならなんでも受け入れる
-const json = builder.toJSON() // toJSONは、builderに保持されている値を元に、特定のルールに従ってJSONオブジェクトを生成する
-
-builder.key_not_defined('value') // 型で許可されていないキーはTSエラーを出力
-*/
-/*
-type AttachToJSON<T extends Record<string, unknown>> = { toJSON(): T } & T
-
-export const attachToJSON = <T extends Record<string, unknown>>(initial: T): AttachToJSON<T> => ({
-  ...initial,
-  toJSON() {
-    const { custom_id, custom_value, toJSON, ...rest } = this
-    if (custom_id || custom_value)
-      // biome-ignore lint/complexity/useLiteralKeys: Not sure if custom_id exists
-      rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
-    return rest as T
-  },
-})
-*/
