@@ -25,8 +25,8 @@ type JoinedCustomId<T extends object> = {
  */
 export interface JsonBuilderOptions {
   /**
-  * - true: Copy using globalThis.structuredClone
-  * - false: Copy using spread syntax
+   * - true: Copy using globalThis.structuredClone
+   * - false: Copy using spread syntax
    * @defaultValue false
    */
   deepCopy?: boolean
