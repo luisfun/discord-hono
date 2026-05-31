@@ -23,6 +23,7 @@ import type {
   APITextDisplayComponent,
   APITextInputComponent,
   APIThumbnailComponent,
+  APIUnfurledMediaItem,
   ButtonStyle,
   ComponentType,
   SelectMenuDefaultValueType,
@@ -31,27 +32,33 @@ import type {
 import { isArray, isString, toJSON } from '../utils'
 import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
 
-type ExtendComponentInActionRow =
+type TemplatedUnfurledMediaItem = Omit<APIUnfurledMediaItem, 'url'> & {
+  url: `${'http' | 'https' | 'attachment'}://${string}`
+}
+
+type ExtendedComponentInActionRow =
   | APIComponentInActionRow
   | JsonBuilder<APIComponentInActionRow, APIComponentInActionRow, any>
 
-type ExtendSectionComponent =
-  | APISectionComponent
-  | (Omit<APISectionComponent, 'components' | 'accessory'> & {
-      components:
-        | APISectionComponent['components']
-        | JsonBuilder<APISectionComponent['components'][number], APISectionComponent['components'][number], any>[]
-      accessory:
-        | APISectionComponent['accessory']
-        | JsonBuilder<APISectionComponent['accessory'], APISectionComponent['accessory'], any>
-    })
+type ExtendedSectionComponent = Omit<APISectionComponent, 'components' | 'accessory'> & {
+  components:
+    | APISectionComponent['components']
+    | JsonBuilder<APISectionComponent['components'][number], APISectionComponent['components'][number], any>[]
+  accessory:
+    | APISectionComponent['accessory']
+    | JsonBuilder<APISectionComponent['accessory'], APISectionComponent['accessory'], any>
+}
+
+type ExtendedThumbnailComponent = Omit<APIThumbnailComponent, 'media'> & {
+  media: TemplatedUnfurledMediaItem | JsonBuilder<TemplatedUnfurledMediaItem, TemplatedUnfurledMediaItem, any>
+}
 
 /**
  * @see https://discord-api-types.dev/api/discord-api-types-v10/interface/APIBaseComponent
  */
 type APIComponent =
   // @ts-expect-error
-  | APIActionRowComponent<ExtendComponentInActionRow>
+  | APIActionRowComponent<ExtendedComponentInActionRow>
   | APIButtonComponentWithCustomId
   | APIButtonComponentWithURL
   | APIButtonComponentWithSKUId
@@ -64,9 +71,9 @@ type APIComponent =
       SelectMenuDefaultValueType.User | SelectMenuDefaultValueType.Role
     >
   | APIChannelSelectComponent
-  | ExtendSectionComponent
+  | ExtendedSectionComponent
   | APITextDisplayComponent
-  | APIThumbnailComponent
+  | ExtendedThumbnailComponent
   | APIMediaGalleryComponent
   | APIFileComponent
   | APISeparatorComponent
@@ -156,7 +163,7 @@ export const componentBuilder = <I extends AddCustomValue<APIComponent>, E exten
 //  .toJSON()
 //const test5 = componentBuilder({ type: componentType.StringSelect, custom_id: 'test', options: [] })
 
-export const actionRowBuilder = <T extends ExtendComponentInActionRow>(
+export const actionRowBuilder = <T extends ExtendedComponentInActionRow>(
   components: T[],
   builderOptions?: JsonBuilderOptions,
 ) => componentBuilder({ type: 1, components: components.map(toJSON) }, builderOptions)
@@ -324,8 +331,8 @@ export const channelSelectBuilder = <C extends string>(custom_id: C, builderOpti
 //const testChannelSelect = channelSelectBuilder('test')
 
 export const sectionBuilder = <
-  C extends ExtendSectionComponent['components'][number],
-  A extends ExtendSectionComponent['accessory'],
+  C extends ExtendedSectionComponent['components'][number],
+  A extends ExtendedSectionComponent['accessory'],
 >(
   components: C[],
   accessory: A,
@@ -338,3 +345,22 @@ export const textDisplayBuilder = <C extends string>(content: C, builderOptions?
   componentBuilder({ type: 10, content }, builderOptions)
 //const testTextDisplay = textDisplayBuilder('This is a text display component.')
 //const testSection = sectionBuilder([textDisplayBuilder('Test'), textDisplayBuilder('Second')], buttonBuilder('test', 'Button'))
+
+export const thumbnailBuilder = <M extends ExtendedThumbnailComponent['media']>(
+  media: M,
+  builderOptions?: JsonBuilderOptions,
+) => componentBuilder({ type: 11, media: toJSON(media) }, builderOptions)
+//const testThumbnail = thumbnailBuilder({ url: 'https://example.com/image.png'})
+
+/**
+ * Component Media Item Builder
+ * @param url
+ * @param builderOptions
+ * @returns
+ */
+export const unfurledMediaItemBuilder = <U extends TemplatedUnfurledMediaItem['url']>(
+  url: U,
+  builderOptions?: JsonBuilderOptions,
+) => jsonBuilder<{ url: U }, TemplatedUnfurledMediaItem>({ url }, builderOptions)
+//const testMedia = unfurledMediaItemBuilder('htps://example.com/image.png')
+//const testThumbnail = thumbnailBuilder(unfurledMediaItemBuilder('https://example.com/image.png'))
