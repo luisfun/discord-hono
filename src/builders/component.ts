@@ -1,6 +1,3 @@
-// biome-ignore-all lint/nursery/useExplicitType: temporary, remove in PR
-// biome-ignore-all lint/correctness/noUnusedVariables: temporary, remove in PR
-
 import type {
   APIActionRowComponent,
   APIBaseAutoPopulatedSelectMenuComponent,
@@ -35,6 +32,9 @@ import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-b
 type TemplatedUnfurledMediaItem = Omit<APIUnfurledMediaItem, 'url'> & {
   url: `${'http' | 'https' | 'attachment'}://${string}`
 }
+type TemplatedUnfurledMediaItemOnlyAttachment = Omit<APIUnfurledMediaItem, 'url'> & {
+  url: `attachment://${string}`
+}
 
 type ExtendedComponentInActionRow =
   | APIComponentInActionRow
@@ -51,6 +51,16 @@ type ExtendedSectionComponent = Omit<APISectionComponent, 'components' | 'access
 
 type ExtendedThumbnailComponent = Omit<APIThumbnailComponent, 'media'> & {
   media: TemplatedUnfurledMediaItem | JsonBuilder<TemplatedUnfurledMediaItem, TemplatedUnfurledMediaItem, any>
+}
+
+type ExtendedMediaGalleryComponent = Omit<APIMediaGalleryComponent, 'items'> & {
+  items: TemplatedUnfurledMediaItem[] | JsonBuilder<TemplatedUnfurledMediaItem, TemplatedUnfurledMediaItem, any>[]
+}
+
+type ExtendedFileComponent = Omit<APIFileComponent, 'file'> & {
+  file:
+    | TemplatedUnfurledMediaItemOnlyAttachment
+    | JsonBuilder<TemplatedUnfurledMediaItemOnlyAttachment, TemplatedUnfurledMediaItemOnlyAttachment, any>
 }
 
 /**
@@ -74,8 +84,8 @@ type APIComponent =
   | ExtendedSectionComponent
   | APITextDisplayComponent
   | ExtendedThumbnailComponent
-  | APIMediaGalleryComponent
-  | APIFileComponent
+  | ExtendedMediaGalleryComponent
+  | ExtendedFileComponent
   | APISeparatorComponent
   | APIContainerComponent
   | APILabelComponent
@@ -142,6 +152,8 @@ export const textInputStyle = {
   Short: 1,
   Paragraph: 2,
 } as const
+
+// biome-ignore-start lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
 
 /**
  * Accepts raw JSON or the result of a builder's toJSON().
@@ -352,6 +364,16 @@ export const thumbnailBuilder = <M extends ExtendedThumbnailComponent['media']>(
 ) => componentBuilder({ type: 11, media: toJSON(media) }, builderOptions)
 //const testThumbnail = thumbnailBuilder({ url: 'https://example.com/image.png'})
 
+export const mediaGalleryBuilder = <I extends ExtendedMediaGalleryComponent['items'][number]>(
+  items: I[],
+  builderOptions?: JsonBuilderOptions,
+) => componentBuilder({ type: 12, items: items.map(toJSON) }, builderOptions)
+//const testMediaGallery = mediaGalleryBuilder([{ url: 'https://example.com/image1.png' }, { url: 'https://example.com/image2.png' }])
+
+export const fileBuilder = <F extends ExtendedFileComponent['file']>(file: F, builderOptions?: JsonBuilderOptions) =>
+  componentBuilder({ type: 13, file: toJSON(file) }, builderOptions)
+//const testFile = fileBuilder({ url: 'attachment://file.png' })
+
 /**
  * Component Media Item Builder
  * @param url
@@ -364,3 +386,13 @@ export const unfurledMediaItemBuilder = <U extends TemplatedUnfurledMediaItem['u
 ) => jsonBuilder<{ url: U }, TemplatedUnfurledMediaItem>({ url }, builderOptions)
 //const testMedia = unfurledMediaItemBuilder('htps://example.com/image.png')
 //const testThumbnail = thumbnailBuilder(unfurledMediaItemBuilder('https://example.com/image.png'))
+
+//export const unfurledMediaItemOnlyAttachmentBuilder = unfurledMediaItemBuilder as <
+//  U extends TemplatedUnfurledMediaItemOnlyAttachment['url'],
+//>(
+//  url: U,
+//  builderOptions?: JsonBuilderOptions,
+//) => JsonBuilder<{ url: U }, TemplatedUnfurledMediaItemOnlyAttachment>
+//const testFile = fileBuilder(unfurledMediaItemOnlyAttachmentBuilder('attachment://file.png'))
+
+// biome-ignore-end lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
