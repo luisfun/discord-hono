@@ -187,7 +187,7 @@ export const componentType = {
   RadioGroup: 21,
   CheckboxGroup: 22,
   Checkbox: 23,
-} as const
+} as const satisfies Record<string, ComponentType>
 
 export const buttonStyle = {
   Primary: 1,
@@ -196,22 +196,16 @@ export const buttonStyle = {
   Danger: 4,
   Link: 5,
   Premium: 6,
-} as const
+} as const satisfies Record<string, ButtonStyle>
 
 export const textInputStyle = {
   Short: 1,
   Paragraph: 2,
-} as const
+} as const satisfies Record<string, TextInputStyle>
 
 // biome-ignore-start lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
 
-/**
- * Accepts raw JSON or the result of a builder's toJSON().
- * @param init
- * @param options
- * @returns
- */
-export const componentBuilder = <I extends AddCustomValue<APIComponent>, E extends string = 'type' | 'custom_id'>(
+const componentBuilder = <I extends AddCustomValue<APIComponent>, E extends string = 'type' | 'custom_id'>(
   init: I & Record<Exclude<keyof I, keyof ComponentObject<I>>, never>,
   options?: JsonBuilderOptions,
 ) => jsonBuilder<I, ComponentObject<I>, E>(init, options)
