@@ -33,49 +33,50 @@ import type {
 import { isArray, isString, toJSON } from '../utils'
 import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
 
-type TemplatedUnfurledMediaItem = Omit<APIUnfurledMediaItem, 'url'> & {
-  url: `${'http' | 'https' | 'attachment'}://${string}`
-}
-type TemplatedUnfurledMediaItemOnlyAttachment = Omit<APIUnfurledMediaItem, 'url'> & {
-  url: `attachment://${string}`
-}
+type WebUrl = `${'http' | 'https'}://${string}`
+type AttachmentUrl = `attachment://${string}`
+
+type TemplatedUnfurledMediaItem<U extends APIUnfurledMediaItem['url'] = WebUrl | AttachmentUrl> = Omit<
+  APIUnfurledMediaItem,
+  'url'
+> & { url: U }
+type ExtendedUnfurledMediaItem =
+  | TemplatedUnfurledMediaItem
+  | JsonBuilder<TemplatedUnfurledMediaItem, TemplatedUnfurledMediaItem, any>
 
 type ExtendedComponentInActionRow =
   | APIComponentInActionRow
   | JsonBuilder<APIComponentInActionRow, APIComponentInActionRow, any>
 
 type ExtendedSectionComponent = Omit<APISectionComponent, 'components' | 'accessory'> & {
-  components:
-    | APISectionComponent['components']
-    | JsonBuilder<APISectionComponent['components'][number], APISectionComponent['components'][number], any>[]
+  components: (
+    | APISectionComponent['components'][number]
+    | JsonBuilder<APISectionComponent['components'][number], APISectionComponent['components'][number], any>
+  )[]
   accessory:
     | APISectionComponent['accessory']
     | JsonBuilder<APISectionComponent['accessory'], APISectionComponent['accessory'], any>
 }
 
-type ExtendedThumbnailComponent = Omit<APIThumbnailComponent, 'media'> & {
-  media: TemplatedUnfurledMediaItem | JsonBuilder<TemplatedUnfurledMediaItem, TemplatedUnfurledMediaItem, any>
-}
+type ExtendedThumbnailComponent = Omit<APIThumbnailComponent, 'media'> & { media: ExtendedUnfurledMediaItem }
 
-type ExtendedMediaGalleryItem = Omit<APIMediaGalleryItem, 'media'> & {
-  media: TemplatedUnfurledMediaItem | JsonBuilder<TemplatedUnfurledMediaItem, TemplatedUnfurledMediaItem, any>
-}
 type TemplatedMediaGalleryItem = Omit<APIMediaGalleryItem, 'media'> & { media: TemplatedUnfurledMediaItem }
+type ExtendedMediaGalleryItem = Omit<APIMediaGalleryItem, 'media'> & { media: ExtendedUnfurledMediaItem }
 
-type ExtendedMediaGalleryComponent = Omit<APIMediaGalleryComponent, 'items'> & {
-  items: (TemplatedMediaGalleryItem | JsonBuilder<TemplatedMediaGalleryItem, TemplatedMediaGalleryItem, any>)[]
-}
 type TemplatedMediaGalleryComponent = Omit<APIMediaGalleryComponent, 'items'> & {
   items: TemplatedMediaGalleryItem[]
 }
+type ExtendedMediaGalleryComponent = Omit<APIMediaGalleryComponent, 'items'> & {
+  items: (TemplatedMediaGalleryItem | JsonBuilder<TemplatedMediaGalleryItem, TemplatedMediaGalleryItem, any>)[]
+}
 
+type TemplatedFileComponent = Omit<APIFileComponent, 'file'> & {
+  file: TemplatedUnfurledMediaItem<AttachmentUrl>
+}
 type ExtendedFileComponent = Omit<APIFileComponent, 'file'> & {
   file:
-    | TemplatedUnfurledMediaItemOnlyAttachment
-    | JsonBuilder<TemplatedUnfurledMediaItemOnlyAttachment, TemplatedUnfurledMediaItemOnlyAttachment, any>
-}
-type TemplatedFileComponent = Omit<APIFileComponent, 'file'> & {
-  file: TemplatedUnfurledMediaItemOnlyAttachment
+    | TemplatedUnfurledMediaItem<AttachmentUrl>
+    | JsonBuilder<TemplatedUnfurledMediaItem<AttachmentUrl>, TemplatedUnfurledMediaItem<AttachmentUrl>, any>
 }
 
 /**
