@@ -7,13 +7,17 @@ import type {
   APIChannelSelectComponent,
   APICheckboxComponent,
   APICheckboxGroupComponent,
+  APICheckboxGroupOption,
   APIComponentInActionRow,
+  APIComponentInMessageActionRow,
   APIContainerComponent,
   APIFileComponent,
   APIFileUploadComponent,
   APILabelComponent,
   APIMediaGalleryComponent,
+  APIMediaGalleryItem,
   APIRadioGroupComponent,
+  APIRadioGroupOption,
   APISectionComponent,
   APISeparatorComponent,
   APIStringSelectComponent,
@@ -53,8 +57,16 @@ type ExtendedThumbnailComponent = Omit<APIThumbnailComponent, 'media'> & {
   media: TemplatedUnfurledMediaItem | JsonBuilder<TemplatedUnfurledMediaItem, TemplatedUnfurledMediaItem, any>
 }
 
+type ExtendedMediaGalleryItem = Omit<APIMediaGalleryItem, 'media'> & {
+  media: TemplatedUnfurledMediaItem | JsonBuilder<TemplatedUnfurledMediaItem, TemplatedUnfurledMediaItem, any>
+}
+type TemplatedMediaGalleryItem = Omit<APIMediaGalleryItem, 'media'> & { media: TemplatedUnfurledMediaItem }
+
 type ExtendedMediaGalleryComponent = Omit<APIMediaGalleryComponent, 'items'> & {
-  items: TemplatedUnfurledMediaItem[] | JsonBuilder<TemplatedUnfurledMediaItem, TemplatedUnfurledMediaItem, any>[]
+  items: (TemplatedMediaGalleryItem | JsonBuilder<TemplatedMediaGalleryItem, TemplatedMediaGalleryItem, any>)[]
+}
+type TemplatedMediaGalleryComponent = Omit<APIMediaGalleryComponent, 'items'> & {
+  items: TemplatedMediaGalleryItem[]
 }
 
 type ExtendedFileComponent = Omit<APIFileComponent, 'file'> & {
@@ -62,13 +74,50 @@ type ExtendedFileComponent = Omit<APIFileComponent, 'file'> & {
     | TemplatedUnfurledMediaItemOnlyAttachment
     | JsonBuilder<TemplatedUnfurledMediaItemOnlyAttachment, TemplatedUnfurledMediaItemOnlyAttachment, any>
 }
+type TemplatedFileComponent = Omit<APIFileComponent, 'file'> & {
+  file: TemplatedUnfurledMediaItemOnlyAttachment
+}
 
 /**
+ * @see https://docs.discord.com/developers/components/reference#container-container-child-components
+ * @see https://discord-api-types.dev/api/discord-api-types-v10#APIComponentInContainer
+ */
+type TemplatedComponentInContainer =
+  | APIActionRowComponent<APIComponentInMessageActionRow>
+  | APITextDisplayComponent
+  | APISectionComponent
+  | TemplatedMediaGalleryComponent
+  | APISeparatorComponent
+  | TemplatedFileComponent
+
+type ExtendedContainerComponent = Omit<APIContainerComponent, 'components'> & {
+  components: (
+    | TemplatedComponentInContainer
+    | JsonBuilder<TemplatedComponentInContainer, TemplatedComponentInContainer, any>
+  )[]
+}
+
+type ExtendedLabelComponent = Omit<APILabelComponent, 'component'> & {
+  component:
+    | APILabelComponent['component']
+    | JsonBuilder<APILabelComponent['component'], APILabelComponent['component'], any>
+}
+
+type ExtendedRadioGroupComponent = Omit<APIRadioGroupComponent, 'options'> & {
+  options: (APIRadioGroupOption | JsonBuilder<APIRadioGroupOption, APIRadioGroupOption, any>)[]
+}
+
+type ExtendedCheckboxGroupComponent = Omit<APICheckboxGroupComponent, 'options'> & {
+  options: (APICheckboxGroupOption | JsonBuilder<APICheckboxGroupOption, APICheckboxGroupOption, any>)[]
+}
+
+/**
+ * @see https://docs.discord.com/developers/components/reference#component-object
  * @see https://discord-api-types.dev/api/discord-api-types-v10/interface/APIBaseComponent
  */
 type APIComponent =
-  // @ts-expect-error
-  | APIActionRowComponent<ExtendedComponentInActionRow>
+  // @ts-expect-erro
+  | APIActionRowComponent<APIComponentInActionRow>
   | APIButtonComponentWithCustomId
   | APIButtonComponentWithURL
   | APIButtonComponentWithSKUId
@@ -81,11 +130,11 @@ type APIComponent =
       SelectMenuDefaultValueType.User | SelectMenuDefaultValueType.Role
     >
   | APIChannelSelectComponent
-  | ExtendedSectionComponent
+  | APISectionComponent
   | APITextDisplayComponent
-  | ExtendedThumbnailComponent
-  | ExtendedMediaGalleryComponent
-  | ExtendedFileComponent
+  | APIThumbnailComponent
+  | APIMediaGalleryComponent
+  | APIFileComponent
   | APISeparatorComponent
   | APIContainerComponent
   | APILabelComponent
@@ -368,14 +417,72 @@ export const mediaGalleryBuilder = <I extends ExtendedMediaGalleryComponent['ite
   items: I[],
   builderOptions?: JsonBuilderOptions,
 ) => componentBuilder({ type: 12, items: items.map(toJSON) }, builderOptions)
-//const testMediaGallery = mediaGalleryBuilder([{ url: 'https://example.com/image1.png' }, { url: 'https://example.com/image2.png' }])
+//const testMediaGallery1 = mediaGalleryBuilder([{ media: { url: 'https://example.com/image1.png' } }, { media: { url: 'https://example.com/image2.png' } }])
 
+/**
+ * Component File Builder
+ * @param file MediaItem with a URL consisting only of `attachment://`
+ * @param builderOptions
+ * @returns
+ */
 export const fileBuilder = <F extends ExtendedFileComponent['file']>(file: F, builderOptions?: JsonBuilderOptions) =>
   componentBuilder({ type: 13, file: toJSON(file) }, builderOptions)
 //const testFile = fileBuilder({ url: 'attachment://file.png' })
 
+export const separatorBuilder = (builderOptions?: JsonBuilderOptions) => componentBuilder({ type: 14 }, builderOptions)
+
+export const containerBuilder = <C extends ExtendedContainerComponent['components'][number]>(
+  components: C[],
+  builderOptions?: JsonBuilderOptions,
+) => componentBuilder({ type: 17, components: components.map(toJSON) }, builderOptions)
+/*
+const testContainer = containerBuilder([
+  sectionBuilder(
+    [textDisplayBuilder('Section 1'), textDisplayBuilder('Section 2')],
+    thumbnailBuilder({ url: 'https://example.com/image.png' }),
+  ),
+  separatorBuilder(),
+  mediaGalleryBuilder([{ url: 'https://example.com/image1.png' }, { url: 'https://example.com/image2.png' }]),
+  fileBuilder({ url: 'attachment://file.png' }),
+])
+*/
+
+export const labelBuilder = <L extends string, C extends ExtendedLabelComponent['component']>(
+  label: L,
+  component: C,
+  builderOptions?: JsonBuilderOptions,
+) => componentBuilder({ type: 18, label, component: toJSON(component) }, builderOptions)
+//const testLabel = labelBuilder('Label', textInputBuilder('test', 'Input'))
+
+export const fileUploadBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
+  componentBuilder({ type: 19, custom_id }, builderOptions)
+//const testFileUpload = fileUploadBuilder('test')
+
+export const radioGroupBuilder = <C extends string, O extends ExtendedRadioGroupComponent['options'][number]>(
+  custom_id: C,
+  options: O[],
+  builderOptions?: JsonBuilderOptions,
+) => componentBuilder({ type: 21, custom_id, options: options.map(toJSON) }, builderOptions)
+
+export const checkboxGroupBuilder = <C extends string, O extends ExtendedCheckboxGroupComponent['options'][number]>(
+  custom_id: C,
+  options: O[],
+  builderOptions?: JsonBuilderOptions,
+) => componentBuilder({ type: 22, custom_id, options: options.map(toJSON) }, builderOptions)
+
+export const checkboxBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
+  componentBuilder({ type: 23, custom_id }, builderOptions)
+
+// Child Component
+
+export const mediaGalleryItemBuilder = <M extends ExtendedMediaGalleryItem['media']>(
+  media: M,
+  builderOptions?: JsonBuilderOptions,
+) => jsonBuilder<{ media: ReturnType<typeof toJSON<M>> }, APIMediaGalleryItem>({ media: toJSON(media) }, builderOptions)
+//const testMediaGalleryItem = mediaGalleryItemBuilder({ url: 'https://example.com/image.png' })
+
 /**
- * Component Media Item Builder
+ * Component: Unfurled Media Item Builder
  * @param url
  * @param builderOptions
  * @returns
@@ -384,15 +491,29 @@ export const unfurledMediaItemBuilder = <U extends TemplatedUnfurledMediaItem['u
   url: U,
   builderOptions?: JsonBuilderOptions,
 ) => jsonBuilder<{ url: U }, TemplatedUnfurledMediaItem>({ url }, builderOptions)
-//const testMedia = unfurledMediaItemBuilder('htps://example.com/image.png')
+//const testUMI = unfurledMediaItemBuilder('htps://example.com/image.png')
 //const testThumbnail = thumbnailBuilder(unfurledMediaItemBuilder('https://example.com/image.png'))
+//const testMediaItem = mediaGalleryItemBuilder(unfurledMediaItemBuilder('https://example.com/image.png'))
+//const testMediaGallery = mediaGalleryBuilder([testMediaItem])
+//const testFile = fileBuilder(unfurledMediaItemBuilder('attachment://file.png'))
 
-//export const unfurledMediaItemOnlyAttachmentBuilder = unfurledMediaItemBuilder as <
-//  U extends TemplatedUnfurledMediaItemOnlyAttachment['url'],
-//>(
-//  url: U,
-//  builderOptions?: JsonBuilderOptions,
-//) => JsonBuilder<{ url: U }, TemplatedUnfurledMediaItemOnlyAttachment>
-//const testFile = fileBuilder(unfurledMediaItemOnlyAttachmentBuilder('attachment://file.png'))
+export const radioGroupOptionBuilder = <L extends APIRadioGroupOption['label'], V extends APIRadioGroupOption['value']>(
+  label: L,
+  value: V,
+  builderOptions?: JsonBuilderOptions,
+) => jsonBuilder<{ label: L; value: V }, APIRadioGroupOption>({ label, value }, builderOptions)
+//const testRadioOption = radioGroupOptionBuilder('Option 1', 'option1')
+//const testRadioGroup = radioGroupBuilder('test', [radioGroupOptionBuilder('Option 1', 'option1'), radioGroupOptionBuilder('Option 2', 'option2')])
+
+export const checkboxGroupOptionBuilder = <
+  L extends APICheckboxGroupOption['label'],
+  V extends APICheckboxGroupOption['value'],
+>(
+  label: L,
+  value: V,
+  builderOptions?: JsonBuilderOptions,
+) => jsonBuilder<{ label: L; value: V }, APICheckboxGroupOption>({ label, value }, builderOptions)
+//const testCheckboxOption = checkboxGroupOptionBuilder('Option 1', 'option1')
+//const testCheckboxGroup = checkboxGroupBuilder('test', [checkboxGroupOptionBuilder('Option 1', 'option1'), checkboxGroupOptionBuilder('Option 2', 'option2')])
 
 // biome-ignore-end lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
