@@ -1,3 +1,5 @@
+// biome-ignore-all lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
+
 import type {
   APIActionRowComponent,
   APIBaseAutoPopulatedSelectMenuComponent,
@@ -117,7 +119,6 @@ type ExtendedCheckboxGroupComponent = Omit<APICheckboxGroupComponent, 'options'>
  * @see https://discord-api-types.dev/api/discord-api-types-v10/interface/APIBaseComponent
  */
 type APIComponent =
-  // @ts-expect-erro
   | APIActionRowComponent<APIComponentInActionRow>
   | APIButtonComponentWithCustomId
   | APIButtonComponentWithURL
@@ -144,6 +145,19 @@ type APIComponent =
   | APICheckboxGroupComponent
   | APICheckboxComponent
 
+type ExtendedOnlyAPIComponent =
+  // @ts-expect-error
+  | APIActionRowComponent<ExtendedComponentInActionRow>
+  | ExtendedSectionComponent
+  | ExtendedThumbnailComponent
+  | ExtendedMediaGalleryComponent
+  | ExtendedFileComponent
+  | ExtendedContainerComponent
+  | ExtendedLabelComponent
+  | ExtendedRadioGroupComponent
+  | ExtendedCheckboxGroupComponent
+type ExtendedAPIComponent = ExtendedOnlyAPIComponent | Exclude<APIComponent, { type: ExtendedOnlyAPIComponent['type'] }>
+
 type InteractionButtonStyle = ButtonStyle.Primary | ButtonStyle.Secondary | ButtonStyle.Success | ButtonStyle.Danger
 
 type AddCustomValue<T> = T extends any
@@ -153,7 +167,7 @@ type AddCustomValue<T> = T extends any
   : never
 
 type ComponentObject<I extends AddCustomValue<APIComponent>> = Extract<
-  AddCustomValue<APIComponent>,
+  AddCustomValue<ExtendedAPIComponent>,
   ComponentType.Button extends I['type']
     ? {
         type: I['type']
@@ -203,8 +217,6 @@ export const textInputStyle = {
   Paragraph: 2,
 } as const satisfies Record<string, TextInputStyle>
 
-// biome-ignore-start lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
-
 const componentBuilder = <I extends AddCustomValue<APIComponent>, E extends string = 'type' | 'custom_id'>(
   init: I & Record<Exclude<keyof I, keyof ComponentObject<I>>, never>,
   options?: JsonBuilderOptions,
@@ -212,7 +224,7 @@ const componentBuilder = <I extends AddCustomValue<APIComponent>, E extends stri
 
 //const test1 = componentBuilder({ type: componentType.ActionRow, components: [] }).toJSON()
 //const test2 = componentBuilder({ type: componentType.Button, style: 1, custom_id: 'test', error_key: 'test', custom_value: 'test' })
-//const test3 = componentBuilder({ type: componentType.Button, style: 6, sku_id: 'test' })
+//const test3 = componentBuilder({ type: componentType.Button, style: buttonStyle.Premium, sku_id: 'test' })
 //const test4 = componentBuilder({ type: componentType.TextInput, style: 1, custom_id: 'test' })
 //  .custom_value('test2')
 //  .required(true)
@@ -321,10 +333,10 @@ export const linkButtonBuilder: LinkButtonBuilder = (
 export const premiumButtonBuilder = <S extends string>(sku_id: S, builderOptions?: JsonBuilderOptions) =>
   componentBuilder<{ type: 2; style: 6; sku_id: S }, 'type' | 'style'>({ type: 2, style: 6, sku_id }, builderOptions)
 
-//const testButton = buttonBuilder('test', ['🔥', 'Fire']).custom_value('test2').delete('custom_value') //.toJSON()
+//const testButton = buttonBuilder('test', ['🔥', 'Fire']).custom_value('test2')//.delete('custom_value') //.toJSON()
 //const testLinkButton = linkButtonBuilder('https://example.com', ['🔗', 'Link'])
 //const testPremiumButton = premiumButtonBuilder('test_sku_id')
-//const testActionRow = actionRowBuilder([linkButtonBuilder('https://example.com')])//.components([buttonBuilder('id', 'Btn', 3).style(2).custom_value('value').disabled(true)])
+//const testActionRow = actionRowBuilder([linkButtonBuilder('https://example.com')]).components([buttonBuilder('id', 'Btn', 3).style(2).custom_value('value').disabled(true)])
 
 export const stringSelectBuilder = <C extends string, O extends APIStringSelectComponent['options']>(
   custom_id: C,
@@ -510,5 +522,3 @@ export const checkboxGroupOptionBuilder = <
 ) => jsonBuilder<{ label: L; value: V }, APICheckboxGroupOption>({ label, value }, builderOptions)
 //const testCheckboxOption = checkboxGroupOptionBuilder('Option 1', 'option1')
 //const testCheckboxGroup = checkboxGroupBuilder('test', [checkboxGroupOptionBuilder('Option 1', 'option1'), checkboxGroupOptionBuilder('Option 2', 'option2')])
-
-// biome-ignore-end lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
