@@ -231,6 +231,12 @@ const componentBuilder = <I extends AddCustomValue<APIComponent>, E extends stri
 //  .toJSON()
 //const test5 = componentBuilder({ type: componentType.StringSelect, custom_id: 'test', options: [] })
 
+/**
+ * Component Action Row
+ * @param components
+ * @param builderOptions
+ * @returns
+ */
 export const actionRowBuilder = <T extends ExtendedComponentInActionRow>(
   components: T[],
   builderOptions?: JsonBuilderOptions,
@@ -278,6 +284,14 @@ interface ButtonBuilderInit {
   emoji: { name: string }
 }
 
+/**
+ * Component Button
+ * @param custom_id
+ * @param label
+ * @param style
+ * @param builderOptions
+ * @returns
+ */
 export const buttonBuilder: ButtonBuilder = (
   custom_id: string,
   label: string | [string, string] | undefined = undefined,
@@ -319,6 +333,13 @@ interface LinkButtonBuilderInit {
   emoji: { name: string }
 }
 
+/**
+ * Component Link Button
+ * @param url
+ * @param label
+ * @param builderOptions
+ * @returns
+ */
 export const linkButtonBuilder: LinkButtonBuilder = (
   url: string,
   label: string | [string, string] | undefined = undefined,
@@ -330,6 +351,12 @@ export const linkButtonBuilder: LinkButtonBuilder = (
   return builder
 }
 
+/**
+ * Component Premium Button
+ * @param sku_id
+ * @param builderOptions
+ * @returns
+ */
 export const premiumButtonBuilder = <S extends string>(sku_id: S, builderOptions?: JsonBuilderOptions) =>
   componentBuilder<{ type: 2; style: 6; sku_id: S }, 'type' | 'style'>({ type: 2, style: 6, sku_id }, builderOptions)
 
@@ -338,6 +365,13 @@ export const premiumButtonBuilder = <S extends string>(sku_id: S, builderOptions
 //const testPremiumButton = premiumButtonBuilder('test_sku_id')
 //const testActionRow = actionRowBuilder([linkButtonBuilder('https://example.com')]).components([buttonBuilder('id', 'Btn', 3).style(2).custom_value('value').disabled(true)])
 
+/**
+ * Component String Select
+ * @param custom_id
+ * @param options
+ * @param builderOptions
+ * @returns
+ */
 export const stringSelectBuilder = <C extends string, O extends APIStringSelectComponent['options']>(
   custom_id: C,
   options: O,
@@ -370,6 +404,14 @@ interface TextInputBuilderInit {
   label: string
 }
 
+/**
+ * Component Text Input
+ * @param custom_id
+ * @param label
+ * @param style
+ * @param builderOptions
+ * @returns
+ */
 export const textInputBuilder: TextInputBuilder = (
   custom_id: string,
   label: string | undefined = undefined,
@@ -382,22 +424,53 @@ export const textInputBuilder: TextInputBuilder = (
   )
 //const testTextInput = textInputBuilder('test').label('Text Input').style(2).toJSON()
 
+/**
+ * Component User Select
+ * @param custom_id
+ * @param builderOptions
+ * @returns
+ */
 export const userSelectBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
   componentBuilder({ type: 5, custom_id }, builderOptions)
 //const testUserSelect = userSelectBuilder('test')
 
+/**
+ * Component Role Select
+ * @param custom_id
+ * @param builderOptions
+ * @returns
+ */
 export const roleSelectBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
   componentBuilder({ type: 6, custom_id }, builderOptions)
 //const testRoleSelect = roleSelectBuilder('test')
 
+/**
+ * Component Mentionable Select
+ * @param custom_id
+ * @param builderOptions
+ * @returns
+ */
 export const mentionableSelectBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
   componentBuilder({ type: 7, custom_id }, builderOptions)
 //const testMentionableSelect = mentionableSelectBuilder('test')
 
+/**
+ * Component Channel Select
+ * @param custom_id
+ * @param builderOptions
+ * @returns
+ */
 export const channelSelectBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
   componentBuilder({ type: 8, custom_id }, builderOptions)
 //const testChannelSelect = channelSelectBuilder('test')
 
+/**
+ * Component Section
+ * @param components
+ * @param accessory
+ * @param builderOptions
+ * @returns
+ */
 export const sectionBuilder = <
   C extends ExtendedSectionComponent['components'][number],
   A extends ExtendedSectionComponent['accessory'],
@@ -409,17 +482,35 @@ export const sectionBuilder = <
 //const testSection = sectionBuilder([{ type: 10, content: 'Test' }], { type: 11, media: { url: 'Test' } })
 //const testActionRow = actionRowBuilder([testSection])
 
+/**
+ * Component Text Display
+ * @param content
+ * @param builderOptions
+ * @returns
+ */
 export const textDisplayBuilder = <C extends string>(content: C, builderOptions?: JsonBuilderOptions) =>
   componentBuilder({ type: 10, content }, builderOptions)
 //const testTextDisplay = textDisplayBuilder('This is a text display component.')
 //const testSection = sectionBuilder([textDisplayBuilder('Test'), textDisplayBuilder('Second')], buttonBuilder('test', 'Button'))
 
+/**
+ * Component Thumbnail
+ * @param media
+ * @param builderOptions
+ * @returns
+ */
 export const thumbnailBuilder = <M extends ExtendedThumbnailComponent['media']>(
   media: M,
   builderOptions?: JsonBuilderOptions,
 ) => componentBuilder({ type: 11, media: toJSON(media) }, builderOptions)
 //const testThumbnail = thumbnailBuilder({ url: 'https://example.com/image.png'})
 
+/**
+ * Component Media Gallery
+ * @param items
+ * @param builderOptions
+ * @returns
+ */
 export const mediaGalleryBuilder = <I extends ExtendedMediaGalleryComponent['items'][number]>(
   items: I[],
   builderOptions?: JsonBuilderOptions,
@@ -427,7 +518,7 @@ export const mediaGalleryBuilder = <I extends ExtendedMediaGalleryComponent['ite
 //const testMediaGallery1 = mediaGalleryBuilder([{ media: { url: 'https://example.com/image1.png' } }, { media: { url: 'https://example.com/image2.png' } }])
 
 /**
- * Component File Builder
+ * Component File
  * @param file MediaItem with a URL consisting only of `attachment://`
  * @param builderOptions
  * @returns
@@ -436,8 +527,19 @@ export const fileBuilder = <F extends ExtendedFileComponent['file']>(file: F, bu
   componentBuilder({ type: 13, file: toJSON(file) }, builderOptions)
 //const testFile = fileBuilder({ url: 'attachment://file.png' })
 
+/**
+ * Component Separator
+ * @param builderOptions
+ * @returns
+ */
 export const separatorBuilder = (builderOptions?: JsonBuilderOptions) => componentBuilder({ type: 14 }, builderOptions)
 
+/**
+ * Component Container
+ * @param components
+ * @param builderOptions
+ * @returns
+ */
 export const containerBuilder = <C extends ExtendedContainerComponent['components'][number]>(
   components: C[],
   builderOptions?: JsonBuilderOptions,
@@ -454,6 +556,13 @@ const testContainer = containerBuilder([
 ])
 */
 
+/**
+ * Component Label
+ * @param label
+ * @param component
+ * @param builderOptions
+ * @returns
+ */
 export const labelBuilder = <L extends string, C extends ExtendedLabelComponent['component']>(
   label: L,
   component: C,
@@ -461,27 +570,59 @@ export const labelBuilder = <L extends string, C extends ExtendedLabelComponent[
 ) => componentBuilder({ type: 18, label, component: toJSON(component) }, builderOptions)
 //const testLabel = labelBuilder('Label', textInputBuilder('test', 'Input'))
 
+/**
+ * Component File Upload
+ * @param custom_id
+ * @param builderOptions
+ * @returns
+ */
 export const fileUploadBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
   componentBuilder({ type: 19, custom_id }, builderOptions)
 //const testFileUpload = fileUploadBuilder('test')
 
+/**
+ * Component Radio Group
+ * @param custom_id
+ * @param options
+ * @param builderOptions
+ * @returns
+ */
 export const radioGroupBuilder = <C extends string, O extends ExtendedRadioGroupComponent['options'][number]>(
   custom_id: C,
   options: O[],
   builderOptions?: JsonBuilderOptions,
 ) => componentBuilder({ type: 21, custom_id, options: options.map(toJSON) }, builderOptions)
 
+/**
+ * Component Checkbox Group
+ * @param custom_id
+ * @param options
+ * @param builderOptions
+ * @returns
+ */
 export const checkboxGroupBuilder = <C extends string, O extends ExtendedCheckboxGroupComponent['options'][number]>(
   custom_id: C,
   options: O[],
   builderOptions?: JsonBuilderOptions,
 ) => componentBuilder({ type: 22, custom_id, options: options.map(toJSON) }, builderOptions)
 
+/**
+ * Component Checkbox
+ * @param custom_id
+ * @param builderOptions
+ * @returns
+ */
 export const checkboxBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
   componentBuilder({ type: 23, custom_id }, builderOptions)
 
 // Child Component
 
+/**
+ * Child Component Media Gallery Item
+ * @param media
+ * @param builderOptions
+ * @returns
+ */
 export const mediaGalleryItemBuilder = <M extends ExtendedMediaGalleryItem['media']>(
   media: M,
   builderOptions?: JsonBuilderOptions,
@@ -489,7 +630,7 @@ export const mediaGalleryItemBuilder = <M extends ExtendedMediaGalleryItem['medi
 //const testMediaGalleryItem = mediaGalleryItemBuilder({ url: 'https://example.com/image.png' })
 
 /**
- * Component: Unfurled Media Item Builder
+ * Child Component Unfurled Media Item
  * @param url
  * @param builderOptions
  * @returns
@@ -504,6 +645,13 @@ export const unfurledMediaItemBuilder = <U extends TemplatedUnfurledMediaItem['u
 //const testMediaGallery = mediaGalleryBuilder([testMediaItem])
 //const testFile = fileBuilder(unfurledMediaItemBuilder('attachment://file.png'))
 
+/**
+ * Child Component Radio Group Option
+ * @param label
+ * @param value
+ * @param builderOptions
+ * @returns
+ */
 export const radioGroupOptionBuilder = <L extends APIRadioGroupOption['label'], V extends APIRadioGroupOption['value']>(
   label: L,
   value: V,
@@ -512,6 +660,13 @@ export const radioGroupOptionBuilder = <L extends APIRadioGroupOption['label'], 
 //const testRadioOption = radioGroupOptionBuilder('Option 1', 'option1')
 //const testRadioGroup = radioGroupBuilder('test', [radioGroupOptionBuilder('Option 1', 'option1'), radioGroupOptionBuilder('Option 2', 'option2')])
 
+/**
+ * Child Component Checkbox Group Option
+ * @param label
+ * @param value
+ * @param builderOptions
+ * @returns
+ */
 export const checkboxGroupOptionBuilder = <
   L extends APICheckboxGroupOption['label'],
   V extends APICheckboxGroupOption['value'],

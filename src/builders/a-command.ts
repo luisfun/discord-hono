@@ -105,54 +105,117 @@ export const subCommandGroupBuilder = <N extends string, D extends string>(
   builderOptions?: JsonBuilderOptions,
 ) => commandOptionBuilder({ type: 2, name, description }, builderOptions)
 
+/**
+ * Command Option
+ * @param name
+ * @param description
+ * @param builderOptions
+ * @returns
+ */
 export const stringOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) => commandOptionBuilder({ type: 3, name, description }, builderOptions)
 
+/**
+ * Command Option
+ * @param name
+ * @param description
+ * @param builderOptions
+ * @returns
+ */
 export const integerOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) => commandOptionBuilder({ type: 4, name, description }, builderOptions)
 
+/**
+ * Command Option
+ * @param name
+ * @param description
+ * @param builderOptions
+ * @returns
+ */
 export const booleanOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) => commandOptionBuilder({ type: 5, name, description }, builderOptions)
 
+/**
+ * Command Option
+ * @param name
+ * @param description
+ * @param builderOptions
+ * @returns
+ */
 export const userOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) => commandOptionBuilder({ type: 6, name, description }, builderOptions)
 
+/**
+ * Command Option
+ * @param name
+ * @param description
+ * @param builderOptions
+ * @returns
+ */
 export const channelOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) => commandOptionBuilder({ type: 7, name, description }, builderOptions)
 
+/**
+ * Command Option
+ * @param name
+ * @param description
+ * @param builderOptions
+ * @returns
+ */
 export const roleOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) => commandOptionBuilder({ type: 8, name, description }, builderOptions)
 
+/**
+ * Command Option
+ * @param name
+ * @param description
+ * @param builderOptions
+ * @returns
+ */
 export const mentionableOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) => commandOptionBuilder({ type: 9, name, description }, builderOptions)
 
+/**
+ * Command Option
+ * @param name
+ * @param description
+ * @param builderOptions
+ * @returns
+ */
 export const numberOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) => commandOptionBuilder({ type: 10, name, description }, builderOptions)
 
+/**
+ * Command Option
+ * @param name
+ * @param description
+ * @param builderOptions
+ * @returns
+ */
 export const attachmentOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
@@ -162,6 +225,8 @@ export const attachmentOptionBuilder = <N extends string, D extends string>(
 /*
 const testCommand = slashCommandBuilder('test', 'A test command').options([
   subCommandBuilder('sub1', 'A subcommand').options([stringOptionBuilder('option1', 'A string option')]),
-  subCommandGroupBuilder('group1', 'A subcommand group').options([subCommandBuilder('sub2', 'Another subcommand')]),
+  subCommandGroupBuilder('group1', 'A subcommand group').options([
+    subCommandBuilder('sub2', 'Another subcommand').options([numberOptionBuilder('option2', 'A number option')]),
+  ]),
 ])
 */
