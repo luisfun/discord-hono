@@ -10,7 +10,6 @@ import type {
   RESTPostAPIApplicationCommandsJSONBody,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from 'discord-api-types/v10'
-//import { isArray, isString, toJSON } from '../utils'
 import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
 
 export const commandType = {
