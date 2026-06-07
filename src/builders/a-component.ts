@@ -544,17 +544,6 @@ export const containerBuilder = <C extends ExtendedContainerComponent['component
   components: C[],
   builderOptions?: JsonBuilderOptions,
 ) => componentBuilder({ type: 17, components: components.map(toJSON) }, builderOptions)
-/*
-const testContainer = containerBuilder([
-  sectionBuilder(
-    [textDisplayBuilder('Section 1'), textDisplayBuilder('Section 2')],
-    thumbnailBuilder({ url: 'https://example.com/image.png' }),
-  ),
-  separatorBuilder(),
-  mediaGalleryBuilder([{ url: 'https://example.com/image1.png' }, { url: 'https://example.com/image2.png' }]),
-  fileBuilder({ url: 'attachment://file.png' }),
-])
-*/
 
 /**
  * Component Label
@@ -644,6 +633,20 @@ export const unfurledMediaItemBuilder = <U extends TemplatedUnfurledMediaItem['u
 //const testMediaItem = mediaGalleryItemBuilder(unfurledMediaItemBuilder('https://example.com/image.png'))
 //const testMediaGallery = mediaGalleryBuilder([testMediaItem])
 //const testFile = fileBuilder(unfurledMediaItemBuilder('attachment://file.png'))
+/*
+const testContainer = containerBuilder([
+  sectionBuilder(
+    [textDisplayBuilder('Section 1'), textDisplayBuilder('Section 2')],
+    thumbnailBuilder({ url: 'https://example.com/image.png' }),
+  ),
+  separatorBuilder(),
+  mediaGalleryBuilder([
+    mediaGalleryItemBuilder({ url: 'https://example.com/image1.png' }),
+    mediaGalleryItemBuilder({ url: 'https://example.com/image2.png' }),
+  ]),
+  fileBuilder({ url: 'attachment://file.png' }),
+])
+*/
 
 /**
  * Child Component Radio Group Option

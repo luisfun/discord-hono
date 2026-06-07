@@ -2,7 +2,12 @@
 
 import type {
   APIEmbed,
-  EmbedType,
+  APIEmbedAuthor,
+  APIEmbedField,
+  APIEmbedFooter,
+  APIEmbedImage,
+  APIEmbedProvider,
+  APIEmbedVideo,
 } from 'discord-api-types/v10'
 import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
 
@@ -14,8 +19,52 @@ export const embedType = {
   Article: 'article',
   Link: 'link',
   PollResult: 'poll_result',
-} as const satisfies Record<string, EmbedType>
+  //  AutoModerationMessage: "auto_moderation_message",
+} as const // satisfies Record<string, APIEmbed['type']>
 
-export const embedBuilder = (builderOptions?: JsonBuilderOptions) => jsonBuilder<{}, APIEmbed>( {}, builderOptions )
+type ExtendedEmbed = Omit<
+  APIEmbed,
+  'type' | 'footer' | 'image' | 'thumbnail' | 'video' | 'provider' | 'author' | 'fields'
+> & {
+  type?: (typeof embedType)[keyof typeof embedType]
+  footer?: APIEmbedFooter | JsonBuilder<APIEmbedFooter, APIEmbedFooter, any>
+  image?: APIEmbedImage | JsonBuilder<APIEmbedImage, APIEmbedImage, any>
+  thumbnail?: APIEmbedImage | JsonBuilder<APIEmbedImage, APIEmbedImage, any>
+  video?: APIEmbedVideo | JsonBuilder<APIEmbedVideo, APIEmbedVideo, any>
+  provider?: APIEmbedProvider | JsonBuilder<APIEmbedProvider, APIEmbedProvider, any>
+  author?: APIEmbedAuthor | JsonBuilder<APIEmbedAuthor, APIEmbedAuthor, any>
+  fields?: (APIEmbedField | JsonBuilder<APIEmbedField, APIEmbedField, any>)[]
+}
 
-const testEmbed = embedBuilder().type('rich')//.title('Test Embed').description('This is a test embed').color(0xff0000).url('https://example.com').timestamp(new Date().toISOString()).footer({ text: 'Footer text' }).toJSON()
+export const embedBuilder = (builderOptions?: JsonBuilderOptions) => jsonBuilder<{}, ExtendedEmbed>({}, builderOptions)
+
+export const embedFooterBuilder = <T extends string>(text: T, builderOptions?: JsonBuilderOptions) =>
+  jsonBuilder<{ text: T }, APIEmbedFooter>({ text }, builderOptions)
+
+export const embedImageBuilder = <U extends string>(url: U, builderOptions?: JsonBuilderOptions) =>
+  jsonBuilder<{ url: U }, APIEmbedImage>({ url }, builderOptions)
+
+export const embedVideoBuilder = (builderOptions?: JsonBuilderOptions) =>
+  jsonBuilder<{}, APIEmbedVideo>({}, builderOptions)
+
+export const embedProviderBuilder = (builderOptions?: JsonBuilderOptions) =>
+  jsonBuilder<{}, APIEmbedProvider>({}, builderOptions)
+
+export const embedAuthorBuilder = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
+  jsonBuilder<{ name: N }, APIEmbedAuthor>({ name }, builderOptions)
+
+export const embedFieldBuilder = <N extends string, V extends string>(
+  name: N,
+  value: V,
+  builderOptions?: JsonBuilderOptions,
+) => jsonBuilder<{ name: N; value: V }, APIEmbedField>({ name, value }, builderOptions)
+
+/*
+const _testEmbed = embedBuilder()
+  .type(embedType.Rich)
+  .title('Test Embed')
+  .footer(embedFooterBuilder('Footer Text'))
+  .image(embedImageBuilder('https://example.com/image.png'))
+  .author(embedAuthorBuilder('Author Name'))
+  .fields([embedFieldBuilder('Field 1', 'Value 1'), embedFieldBuilder('Field 2', 'Value 2')])
+*/
