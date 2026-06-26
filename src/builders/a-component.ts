@@ -33,7 +33,7 @@ import type {
   TextInputStyle,
 } from 'discord-api-types/v10'
 import { isArray, isString, toJSON } from '../utils'
-import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
+import { type AddCustomValue, type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
 
 type WebUrl = `${'http' | 'https'}://${string}`
 type AttachmentUrl = `attachment://${string}`
@@ -159,12 +159,6 @@ type ExtendedOnlyAPIComponent =
 type ExtendedAPIComponent = ExtendedOnlyAPIComponent | Exclude<APIComponent, { type: ExtendedOnlyAPIComponent['type'] }>
 
 type InteractionButtonStyle = ButtonStyle.Primary | ButtonStyle.Secondary | ButtonStyle.Success | ButtonStyle.Danger
-
-type AddCustomValue<T> = T extends any
-  ? 'custom_id' extends keyof T
-    ? T & { custom_value?: T['custom_id'] }
-    : T
-  : never
 
 type ComponentObject<I extends AddCustomValue<APIComponent>> = Extract<
   AddCustomValue<ExtendedAPIComponent>,

@@ -6,6 +6,12 @@
 import type { Simplify } from '../types'
 import { CUSTOM_ID_SEPARATOR, isArray, isProto, newError, toJSON } from '../utils'
 
+export type AddCustomValue<T> = T extends any
+  ? 'custom_id' extends keyof T
+    ? T & { custom_value?: T['custom_id'] }
+    : T
+  : never
+
 type OptionalKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? K : never }[keyof T]
 
 type ResolvedToJSON<V> = V extends Array<infer U> ? ResolvedToJSON<U>[] : V extends { toJSON(): infer R } ? R : V
