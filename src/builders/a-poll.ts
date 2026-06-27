@@ -52,8 +52,8 @@ export const pollBuilder = <const Q extends PollMediaContext, const A extends Po
     'custom_id'
   >(
     {
-      question: toJSON(pollMediaBuilder(question)),
-      answers: answers.map(a => toJSON(pollAnswerBuilder(pollMediaBuilder(a)))),
+      question: toJSON(pollMediaBuilder(question, builderOptions)),
+      answers: answers.map(a => toJSON(pollAnswerBuilder(pollMediaBuilder(a, builderOptions), builderOptions))),
     },
     builderOptions,
   )
