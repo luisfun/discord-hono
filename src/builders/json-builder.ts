@@ -49,6 +49,7 @@ export type JsonBuilder<T extends object, M extends object, E extends string = n
   toJSON(): 'custom_value' extends keyof M ? Simplify<JoinedCustomId<T>> : T
   delete<K extends OptionalKeys<M>>(key: K): JsonBuilder<{ [P in keyof T as P extends K ? never : P]: T[P] }, M, E>
   //set<K extends Exclude<keyof M, E>>(key: K, value: M[K]): JsonBuilder<T & { [P in K]: M[K] }, M, E>
+  clone(): JsonBuilder<T, M, E>
 } & {
   [K in keyof Required<M> as K extends E ? never : K]: <V extends Exclude<Required<M>[K], undefined>>(
     value: V,
@@ -101,6 +102,8 @@ export const jsonBuilder = <const T extends object, M extends object, E extends 
               return proxy
             }
           */
+          case 'clone':
+            return () => jsonBuilder(globalThis.structuredClone(data), options)
           default:
             if (isProto(prop)) throw newError('jsonBuilder', `Invalid key: ${String(prop)}`)
             if (prop in Object.prototype) return Reflect.get(target, prop, proxy)

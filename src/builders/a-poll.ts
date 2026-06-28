@@ -18,7 +18,8 @@ type ExtendedPollMedia = APIPollMedia | JsonBuilder<APIPollMedia, APIPollMedia, 
 
 type ExtendedPollAnswer = APIBasePollAnswer | JsonBuilder<APIBasePollAnswer, APIBasePollAnswer, any>
 
-type ExtendedPoll = Omit<RESTAPIPoll, 'answers'> & {
+type ExtendedPoll = Omit<RESTAPIPoll, 'question' | 'answers'> & {
+  question: ExtendedPollMedia
   answers: ExtendedPollAnswer[]
 }
 
