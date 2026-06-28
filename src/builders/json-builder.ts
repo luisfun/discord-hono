@@ -31,11 +31,12 @@ type JoinedCustomId<T extends object> = {
  */
 export interface JsonBuilderOptions {
   /**
+   * Specifies how to handle data for initial value copying and toJSON output.
    * - true: Copy using globalThis.structuredClone
    * - false: Copy using spread syntax
    * @defaultValue false
    */
-  deepCopy?: boolean
+  clone?: boolean
 }
 
 /**
@@ -49,6 +50,9 @@ export type JsonBuilder<T extends object, M extends object, E extends string = n
   toJSON(): 'custom_value' extends keyof M ? Simplify<JoinedCustomId<T>> : T
   delete<K extends OptionalKeys<M>>(key: K): JsonBuilder<{ [P in keyof T as P extends K ? never : P]: T[P] }, M, E>
   //set<K extends Exclude<keyof M, E>>(key: K, value: M[K]): JsonBuilder<T & { [P in K]: M[K] }, M, E>
+  /**
+   * Copies the retained data using globalThis.structuredClone and returns a new jsonBuilder.
+   */
   clone(): JsonBuilder<T, M, E>
 } & {
   [K in keyof Required<M> as K extends E ? never : K]: <V extends Exclude<Required<M>[K], undefined>>(
@@ -67,16 +71,14 @@ export type JsonBuilder<T extends object, M extends object, E extends string = n
  * @remarks
  * - toJSON: Method that generates the JSON object
  * - delete: Method that deletes a specific key
+ * - clone: Method that creates a new jsonBuilder with the same data
  * - others: Methods that accept arbitrary keys and values based on the type constraints defined in M
  */
 export const jsonBuilder = <const T extends object, M extends object, E extends string = never>(
   initial: T,
   options?: JsonBuilderOptions,
 ): JsonBuilder<T, M, E> => {
-  const data = (options?.deepCopy ? globalThis.structuredClone(initial) : { ...initial }) as Record<
-    PropertyKey,
-    unknown
-  >
+  const data = (options?.clone ? globalThis.structuredClone(initial) : { ...initial }) as Record<PropertyKey, unknown>
   const proxy = new Proxy(
     {},
     {
@@ -87,7 +89,7 @@ export const jsonBuilder = <const T extends object, M extends object, E extends 
             if (custom_id || custom_value)
               // biome-ignore lint/complexity/useLiteralKeys: Not sure if custom_id exists
               rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
-            return () => (options?.deepCopy ? globalThis.structuredClone(rest) : rest)
+            return () => (options?.clone ? globalThis.structuredClone(rest) : rest)
           }
           case 'delete':
             return (key: PropertyKey) => {
