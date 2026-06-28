@@ -35,7 +35,7 @@ import type {
   ModalContext,
   TypedResponse,
 } from './types'
-import { formData, isProto, type MessageFlag, messageFlags, newError, prepareData, toJSON } from './utils'
+import { formData, isArray, isProto, type MessageFlag, messageFlags, newError, prepareData, toJSON } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -343,11 +343,19 @@ export class Context<
   }
 
   /**
-   * @param {Autocomplete | APICommandAutocompleteInteractionResponseCallbackData} data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
+   * @param {Autocomplete | APICommandAutocompleteInteractionResponseCallbackData | APIApplicationCommandOptionChoice<string | number>[]} data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
    * @returns {Response}
    */
-  resAutocomplete(data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData): Response {
+  resAutocomplete(
+    data:
+      | Autocomplete
+      | APICommandAutocompleteInteractionResponseCallbackData
+      | Required<APICommandAutocompleteInteractionResponseCallbackData>['choices'],
+  ): Response {
     this.#throwIfNotAllowType([4])
-    return Response.json({ type: 8, data: toJSON(data) } satisfies APIApplicationCommandAutocompleteResponse)
+    const responseData: APICommandAutocompleteInteractionResponseCallbackData = isArray(data)
+      ? { choices: data }
+      : toJSON(data)
+    return Response.json({ type: 8, data: responseData } satisfies APIApplicationCommandAutocompleteResponse)
   }
 }
