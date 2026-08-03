@@ -14,7 +14,9 @@ export type AddCustomValue<T> = T extends any
 
 type OptionalKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? K : never }[keyof T]
 
-type ResolvedToJSON<V> = V extends Array<infer U> ? ResolvedToJSON<U>[] : V extends { toJSON(): infer R } ? R : V
+type ResolvedToJSON<V> = V extends (infer U)[] ? ResolvedToJSON<U>[] : V extends { toJSON(): infer R } ? R : V
+
+export type JsonSerializable<V> = V extends (infer U)[] ? JsonSerializable<U>[] : { toJSON(): V } | V
 
 type CustomIdString<I, V> = V extends undefined
   ? I
@@ -55,7 +57,7 @@ export type JsonBuilder<T extends object, M extends object, E extends string = n
    */
   clone(): JsonBuilder<T, M, E>
 } & {
-  [K in keyof Required<M> as K extends E ? never : K]: <V extends Exclude<Required<M>[K], undefined>>(
+  [K in keyof Required<M> as K extends E ? never : K]: <V extends JsonSerializable<Exclude<Required<M>[K], undefined>>>(
     value: V,
   ) => JsonBuilder<{ [P in keyof T | K]: P extends K ? ResolvedToJSON<V> : P extends keyof T ? T[P] : never }, M, E>
 }

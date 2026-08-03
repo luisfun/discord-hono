@@ -2,7 +2,7 @@
 
 import type { APIBasePollAnswer, APIPollMedia, RESTAPIPoll } from 'discord-api-types/v10'
 import { isArray, isString, type ToJSON, toJSON } from '../utils'
-import { type AddCustomValue, type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
+import { type AddCustomValue, type JsonBuilderOptions, type JsonSerializable, jsonBuilder } from './json-builder'
 
 type PollMediaContext = string | [emoji: string] | [emoji: string, text: string]
 
@@ -14,15 +14,6 @@ type PollMediaJson<T extends PollMediaContext> = T extends string
       ? { text: U; emoji: { id: null; name: E } }
       : never
 
-type ExtendedPollMedia = APIPollMedia | JsonBuilder<APIPollMedia, APIPollMedia, any>
-
-type ExtendedPollAnswer = APIBasePollAnswer | JsonBuilder<APIBasePollAnswer, APIBasePollAnswer, any>
-
-type ExtendedPoll = Omit<RESTAPIPoll, 'question' | 'answers'> & {
-  question: ExtendedPollMedia
-  answers: ExtendedPollAnswer[]
-}
-
 export const pollMediaBuilder = <const T extends PollMediaContext>(text: T, builderOptions?: JsonBuilderOptions) => {
   const builder = jsonBuilder<PollMediaJson<T>, APIPollMedia>({} as PollMediaJson<T>, builderOptions)
   const emj = isArray(text) ? text[0] : undefined
@@ -33,11 +24,13 @@ export const pollMediaBuilder = <const T extends PollMediaContext>(text: T, buil
 }
 //const pollMediaTest = pollMediaBuilder(['😀', 'Test Text'])
 
-export const pollAnswerBuilder = <M extends ExtendedPollMedia>(poll_media: M, builderOptions?: JsonBuilderOptions) =>
-  jsonBuilder<{ poll_media: ToJSON<M> }, APIBasePollAnswer>({ poll_media: toJSON(poll_media) }, builderOptions)
+export const pollAnswerBuilder = <M extends JsonSerializable<APIPollMedia>>(
+  poll_media: M,
+  builderOptions?: JsonBuilderOptions,
+) => jsonBuilder<{ poll_media: ToJSON<M> }, APIBasePollAnswer>({ poll_media: toJSON(poll_media) }, builderOptions)
 
-type PollMediaBuilderResult<T extends PollMediaContext> = JsonBuilder<PollMediaJson<T>, APIPollMedia, never>
-type PollAnswerBuilderResult<M extends ExtendedPollMedia> = ReturnType<typeof pollAnswerBuilder<M>>
+type PollMediaBuilderResult<T extends PollMediaContext> = ReturnType<typeof pollMediaBuilder<T>> //JsonBuilder<PollMediaJson<T>, APIPollMedia, never>
+type PollAnswerBuilderResult<M extends JsonSerializable<APIPollMedia>> = ReturnType<typeof pollAnswerBuilder<M>>
 
 export const pollBuilder = <const Q extends PollMediaContext, const A extends PollMediaContext>(
   question: Q,
@@ -49,7 +42,7 @@ export const pollBuilder = <const Q extends PollMediaContext, const A extends Po
       question: ToJSON<PollMediaBuilderResult<Q>>
       answers: ToJSON<PollAnswerBuilderResult<PollMediaBuilderResult<A>>>[]
     },
-    AddCustomValue<ExtendedPoll>,
+    AddCustomValue<RESTAPIPoll>,
     'custom_id'
   >(
     {
@@ -59,3 +52,5 @@ export const pollBuilder = <const Q extends PollMediaContext, const A extends Po
     builderOptions,
   )
 //const pollTest = pollBuilder('question', ['Test', ['🔥', 'Hono']])
+//  .question(pollMediaBuilder('aaa'))
+//  .answers([pollAnswerBuilder(pollMediaBuilder('bbb')), pollAnswerBuilder(pollMediaBuilder(['🔥', 'Hono']))])

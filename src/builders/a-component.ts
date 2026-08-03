@@ -32,8 +32,8 @@ import type {
   SelectMenuDefaultValueType,
   TextInputStyle,
 } from 'discord-api-types/v10'
-import { isArray, isString, toJSON } from '../utils'
-import { type AddCustomValue, type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
+import { isArray, isString, type ToJSON, toJSON } from '../utils'
+import { type AddCustomValue, type JsonBuilderOptions, type JsonSerializable, jsonBuilder } from './json-builder'
 
 type WebUrl = `${'http' | 'https'}://${string}`
 type AttachmentUrl = `attachment://${string}`
@@ -42,43 +42,17 @@ type TemplatedUnfurledMediaItem<U extends APIUnfurledMediaItem['url'] = WebUrl |
   APIUnfurledMediaItem,
   'url'
 > & { url: U }
-type ExtendedUnfurledMediaItem =
-  | TemplatedUnfurledMediaItem
-  | JsonBuilder<TemplatedUnfurledMediaItem, TemplatedUnfurledMediaItem, any>
 
-type ExtendedComponentInActionRow =
-  | APIComponentInActionRow
-  | JsonBuilder<APIComponentInActionRow, APIComponentInActionRow, any>
-
-type ExtendedSectionComponent = Omit<APISectionComponent, 'components' | 'accessory'> & {
-  components: (
-    | APISectionComponent['components'][number]
-    | JsonBuilder<APISectionComponent['components'][number], APISectionComponent['components'][number], any>
-  )[]
-  accessory:
-    | APISectionComponent['accessory']
-    | JsonBuilder<APISectionComponent['accessory'], APISectionComponent['accessory'], any>
-}
-
-type ExtendedThumbnailComponent = Omit<APIThumbnailComponent, 'media'> & { media: ExtendedUnfurledMediaItem }
+type TemplatedThumbnailComponent = Omit<APIThumbnailComponent, 'media'> & { media: TemplatedUnfurledMediaItem }
 
 type TemplatedMediaGalleryItem = Omit<APIMediaGalleryItem, 'media'> & { media: TemplatedUnfurledMediaItem }
-type ExtendedMediaGalleryItem = Omit<APIMediaGalleryItem, 'media'> & { media: ExtendedUnfurledMediaItem }
 
 type TemplatedMediaGalleryComponent = Omit<APIMediaGalleryComponent, 'items'> & {
   items: TemplatedMediaGalleryItem[]
 }
-type ExtendedMediaGalleryComponent = Omit<APIMediaGalleryComponent, 'items'> & {
-  items: (TemplatedMediaGalleryItem | JsonBuilder<TemplatedMediaGalleryItem, TemplatedMediaGalleryItem, any>)[]
-}
 
 type TemplatedFileComponent = Omit<APIFileComponent, 'file'> & {
   file: TemplatedUnfurledMediaItem<AttachmentUrl>
-}
-type ExtendedFileComponent = Omit<APIFileComponent, 'file'> & {
-  file:
-    | TemplatedUnfurledMediaItem<AttachmentUrl>
-    | JsonBuilder<TemplatedUnfurledMediaItem<AttachmentUrl>, TemplatedUnfurledMediaItem<AttachmentUrl>, any>
 }
 
 /**
@@ -92,87 +66,11 @@ type TemplatedComponentInContainer =
   | TemplatedMediaGalleryComponent
   | APISeparatorComponent
   | TemplatedFileComponent
-
-type ExtendedContainerComponent = Omit<APIContainerComponent, 'components'> & {
-  components: (
-    | TemplatedComponentInContainer
-    | JsonBuilder<TemplatedComponentInContainer, TemplatedComponentInContainer, any>
-  )[]
+type TemplatedContainerComponent = Omit<APIContainerComponent, 'components'> & {
+  components: TemplatedComponentInContainer[]
 }
-
-type ExtendedLabelComponent = Omit<APILabelComponent, 'component'> & {
-  component:
-    | APILabelComponent['component']
-    | JsonBuilder<APILabelComponent['component'], APILabelComponent['component'], any>
-}
-
-type ExtendedRadioGroupComponent = Omit<APIRadioGroupComponent, 'options'> & {
-  options: (APIRadioGroupOption | JsonBuilder<APIRadioGroupOption, APIRadioGroupOption, any>)[]
-}
-
-type ExtendedCheckboxGroupComponent = Omit<APICheckboxGroupComponent, 'options'> & {
-  options: (APICheckboxGroupOption | JsonBuilder<APICheckboxGroupOption, APICheckboxGroupOption, any>)[]
-}
-
-/**
- * @see https://docs.discord.com/developers/components/reference#component-object
- * @see https://discord-api-types.dev/api/discord-api-types-v10/interface/APIBaseComponent
- */
-type APIComponent =
-  | APIActionRowComponent<APIComponentInActionRow>
-  | APIButtonComponentWithCustomId
-  | APIButtonComponentWithURL
-  | APIButtonComponentWithSKUId
-  | APIStringSelectComponent
-  | APITextInputComponent
-  | APIBaseAutoPopulatedSelectMenuComponent<ComponentType.UserSelect, SelectMenuDefaultValueType.User>
-  | APIBaseAutoPopulatedSelectMenuComponent<ComponentType.RoleSelect, SelectMenuDefaultValueType.Role>
-  | APIBaseAutoPopulatedSelectMenuComponent<
-      ComponentType.MentionableSelect,
-      SelectMenuDefaultValueType.User | SelectMenuDefaultValueType.Role
-    >
-  | APIChannelSelectComponent
-  | APISectionComponent
-  | APITextDisplayComponent
-  | APIThumbnailComponent
-  | APIMediaGalleryComponent
-  | APIFileComponent
-  | APISeparatorComponent
-  | APIContainerComponent
-  | APILabelComponent
-  | APIFileUploadComponent
-  | APIRadioGroupComponent
-  | APICheckboxGroupComponent
-  | APICheckboxComponent
-
-type ExtendedOnlyAPIComponent =
-  // @ts-expect-error
-  | APIActionRowComponent<ExtendedComponentInActionRow>
-  | ExtendedSectionComponent
-  | ExtendedThumbnailComponent
-  | ExtendedMediaGalleryComponent
-  | ExtendedFileComponent
-  | ExtendedContainerComponent
-  | ExtendedLabelComponent
-  | ExtendedRadioGroupComponent
-  | ExtendedCheckboxGroupComponent
-type ExtendedAPIComponent = ExtendedOnlyAPIComponent | Exclude<APIComponent, { type: ExtendedOnlyAPIComponent['type'] }>
 
 type InteractionButtonStyle = ButtonStyle.Primary | ButtonStyle.Secondary | ButtonStyle.Success | ButtonStyle.Danger
-
-type ComponentObject<I extends AddCustomValue<APIComponent>> = Extract<
-  AddCustomValue<ExtendedAPIComponent>,
-  ComponentType.Button extends I['type']
-    ? {
-        type: I['type']
-        style: 'style' extends keyof I
-          ? I['style'] extends InteractionButtonStyle
-            ? InteractionButtonStyle
-            : I['style']
-          : never
-      }
-    : { type: I['type'] }
->
 
 export const componentType = {
   ActionRow: 1,
@@ -211,72 +109,31 @@ export const textInputStyle = {
   Paragraph: 2,
 } as const satisfies Record<string, TextInputStyle>
 
-const componentBuilder = <I extends AddCustomValue<APIComponent>, E extends string = 'type' | 'custom_id'>(
-  init: I & Record<Exclude<keyof I, keyof ComponentObject<I>>, never>,
-  options?: JsonBuilderOptions,
-) => jsonBuilder<I, ComponentObject<I>, E>(init, options)
-
-//const test1 = componentBuilder({ type: componentType.ActionRow, components: [] }).toJSON()
-//const test2 = componentBuilder({ type: componentType.Button, style: 1, custom_id: 'test', error_key: 'test', custom_value: 'test' })
-//const test3 = componentBuilder({ type: componentType.Button, style: buttonStyle.Premium, sku_id: 'test' })
-//const test4 = componentBuilder({ type: componentType.TextInput, style: 1, custom_id: 'test' })
-//  .custom_value('test2')
-//  .required(true)
-//  .toJSON()
-//const test5 = componentBuilder({ type: componentType.StringSelect, custom_id: 'test', options: [] })
-
 /**
  * Component Action Row
  * @param components
  * @param builderOptions
  * @returns
  */
-export const actionRowBuilder = <T extends ExtendedComponentInActionRow>(
+export const actionRowBuilder = <T extends JsonSerializable<APIComponentInActionRow>>(
   components: T[],
   builderOptions?: JsonBuilderOptions,
-) => componentBuilder({ type: 1, components: components.map(toJSON) }, builderOptions)
-//const testActionRow = actionRowBuilder([componentBuilder({ type: 2, style: 2, custom_id: 'test' }), { type: 2, style: 1, custom_id: 'test' }])
-//const testActionRow = actionRowBuilder([]).components([componentBuilder({ type: 2, style: 1, custom_id: 'test' }), { type: 2, style: 1, custom_id: 'test' }])
+) =>
+  jsonBuilder<{ type: 1; components: ToJSON<T>[] }, APIActionRowComponent<APIComponentInActionRow>, 'type'>(
+    { type: 1, components: components.map(toJSON) },
+    builderOptions,
+  )
+//const testActionRow = actionRowBuilder([{ type: 2, style: 2, custom_id: 'test' }, { type: 2, style: 1, custom_id: 'test' }])
+//const testActionRow = actionRowBuilder([]).components([{ type: 2, style: 1, custom_id: 'test' }, { type: 2, style: 1, custom_id: 'test' }])
 
-interface ButtonBuilder {
-  <C extends string, S extends InteractionButtonStyle = 1>(
-    custom_id: C,
-    label?: undefined,
-    style?: S,
-    builderOptions?: JsonBuilderOptions,
-  ): JsonBuilder<
-    { type: 2; style: S; custom_id: C },
-    AddCustomValue<APIButtonComponentWithCustomId>,
-    'type' | 'custom_id'
-  >
-  <C extends string, L extends string, S extends InteractionButtonStyle = 1>(
-    custom_id: C,
-    label: L,
-    style?: S,
-    builderOptions?: JsonBuilderOptions,
-  ): JsonBuilder<
-    { type: 2; style: S; custom_id: C; label: L },
-    AddCustomValue<APIButtonComponentWithCustomId>,
-    'type' | 'custom_id'
-  >
-  <C extends string, E extends string, L extends string, S extends InteractionButtonStyle = 1>(
-    custom_id: C,
-    label: [emoji: E, label: L],
-    style?: S,
-    builderOptions?: JsonBuilderOptions,
-  ): JsonBuilder<
-    { type: 2; style: S; custom_id: C; label: L; emoji: { name: E } },
-    AddCustomValue<APIButtonComponentWithCustomId>,
-    'type' | 'custom_id'
-  >
-}
-interface ButtonBuilderInit {
-  type: 2
-  style: InteractionButtonStyle
-  custom_id: string
-  label: string
-  emoji: { name: string }
-}
+type ButtonContext = undefined | string | [emoji: string, label: string]
+type ButtonJson<C extends string, T extends ButtonContext, S extends InteractionButtonStyle = 1> = T extends undefined
+  ? { type: 2; style: S; custom_id: C }
+  : T extends string
+    ? { type: 2; style: S; custom_id: C; label: T }
+    : T extends [emoji: infer E extends string, label: infer L extends string]
+      ? { type: 2; style: S; custom_id: C; label: L; emoji: { name: E } }
+      : never
 
 /**
  * Component Button
@@ -286,46 +143,35 @@ interface ButtonBuilderInit {
  * @param builderOptions
  * @returns
  */
-export const buttonBuilder: ButtonBuilder = (
-  custom_id: string,
-  label: string | [string, string] | undefined = undefined,
-  style: InteractionButtonStyle = 1,
+export const buttonBuilder = <
+  C extends string,
+  const T extends ButtonContext = undefined,
+  S extends InteractionButtonStyle = 1,
+>(
+  custom_id: C,
+  label: T = undefined as T,
+  style: S = 1 as S,
   builderOptions?: JsonBuilderOptions,
 ) => {
-  const builder = componentBuilder({ type: 2, style, custom_id } as ButtonBuilderInit, builderOptions)
+  const builder = jsonBuilder<
+    ButtonJson<C, T, S>,
+    AddCustomValue<APIButtonComponentWithCustomId>,
+    'type' | 'custom_id'
+  >({ type: 2, style, custom_id } as ButtonJson<C, T, S>, builderOptions)
   if (isString(label)) builder.label(label)
   else if (isArray(label)) builder.label(label[1]).emoji({ name: label[0] })
   return builder
 }
+//const testButton = buttonBuilder('test', ['🔥', 'Fire']).custom_value('test2')//.delete('custom_value') //.toJSON()
 
-interface LinkButtonBuilder {
-  <U extends string>(
-    url: U,
-    label?: undefined,
-    builderOptions?: JsonBuilderOptions,
-  ): JsonBuilder<{ type: 2; style: 5; url: U }, APIButtonComponentWithURL, 'type' | 'style'>
-  <U extends string, L extends string>(
-    url: U,
-    label: L,
-    builderOptions?: JsonBuilderOptions,
-  ): JsonBuilder<{ type: 2; style: 5; url: U; label: L }, APIButtonComponentWithURL, 'type' | 'style'>
-  <U extends string, E extends string, L extends string>(
-    url: U,
-    label: [emoji: E, label: L],
-    builderOptions?: JsonBuilderOptions,
-  ): JsonBuilder<
-    { type: 2; style: 5; url: U; label: L; emoji: { name: E } },
-    APIButtonComponentWithURL,
-    'type' | 'style'
-  >
-}
-interface LinkButtonBuilderInit {
-  type: 2
-  style: 5
-  url: string
-  label: string
-  emoji: { name: string }
-}
+type LinkButtonContext = undefined | string | [emoji: string, label: string]
+type LinkButtonJson<U extends string, T extends LinkButtonContext> = T extends undefined
+  ? { type: 2; style: 5; url: U }
+  : T extends string
+    ? { type: 2; style: 5; url: U; label: T }
+    : T extends [emoji: infer E extends string, label: infer L extends string]
+      ? { type: 2; style: 5; url: U; label: L; emoji: { name: E } }
+      : never
 
 /**
  * Component Link Button
@@ -334,16 +180,20 @@ interface LinkButtonBuilderInit {
  * @param builderOptions
  * @returns
  */
-export const linkButtonBuilder: LinkButtonBuilder = (
-  url: string,
-  label: string | [string, string] | undefined = undefined,
+export const linkButtonBuilder = <U extends string, const T extends LinkButtonContext = undefined>(
+  url: U,
+  label: T = undefined as T,
   builderOptions?: JsonBuilderOptions,
 ) => {
-  const builder = componentBuilder({ type: 2, style: 5, url } as LinkButtonBuilderInit, builderOptions)
+  const builder = jsonBuilder<LinkButtonJson<U, T>, APIButtonComponentWithURL, 'type' | 'style'>(
+    { type: 2, style: 5, url } as LinkButtonJson<U, T>,
+    builderOptions,
+  )
   if (isString(label)) builder.label(label)
   else if (isArray(label)) builder.label(label[1]).emoji({ name: label[0] })
   return builder
 }
+//const testLinkButton = linkButtonBuilder('https://example.com', ['🔗', 'Link'])
 
 /**
  * Component Premium Button
@@ -352,12 +202,44 @@ export const linkButtonBuilder: LinkButtonBuilder = (
  * @returns
  */
 export const premiumButtonBuilder = <S extends string>(sku_id: S, builderOptions?: JsonBuilderOptions) =>
-  componentBuilder<{ type: 2; style: 6; sku_id: S }, 'type' | 'style'>({ type: 2, style: 6, sku_id }, builderOptions)
-
-//const testButton = buttonBuilder('test', ['🔥', 'Fire']).custom_value('test2')//.delete('custom_value') //.toJSON()
-//const testLinkButton = linkButtonBuilder('https://example.com', ['🔗', 'Link'])
+  jsonBuilder<{ type: 2; style: 6; sku_id: S }, APIButtonComponentWithSKUId, 'type' | 'style'>(
+    { type: 2, style: 6, sku_id },
+    builderOptions,
+  )
 //const testPremiumButton = premiumButtonBuilder('test_sku_id')
+
 //const testActionRow = actionRowBuilder([linkButtonBuilder('https://example.com')]).components([buttonBuilder('id', 'Btn', 3).style(2).custom_value('value').disabled(true)])
+
+type StringSelectOptionContext = string | [emoji: string, label: string]
+type StringSelectOptionJson<V extends string, T extends StringSelectOptionContext> = T extends string
+  ? { label: T; value: V }
+  : T extends [emoji: infer E extends string, label: infer L extends string]
+    ? { label: L; value: V; emoji: { name: E } }
+    : never
+
+export const stringSelectOptionBuilder = <V extends string, const L extends StringSelectOptionContext>(
+  value: V,
+  label: L,
+) => {
+  const builder = jsonBuilder<StringSelectOptionJson<V, L>, APIStringSelectComponent['options'][number]>({
+    value,
+  } as StringSelectOptionJson<V, L>)
+  if (isString(label)) builder.label(label)
+  else if (isArray(label)) builder.label(label[1]).emoji({ name: label[0] })
+  return builder
+}
+//const testStringSelectOption = stringSelectOptionBuilder('option1', ['🔥', 'Option'])
+
+interface StringSelectOptionInput {
+  0: string
+  1: StringSelectOptionContext
+}
+type StringSelectOptionJsonFromInput<I extends StringSelectOptionInput> = I extends readonly [
+  infer V extends string,
+  infer L extends StringSelectOptionContext,
+]
+  ? ToJSON<ReturnType<typeof stringSelectOptionBuilder<V, L>>>
+  : never
 
 /**
  * Component String Select
@@ -366,37 +248,31 @@ export const premiumButtonBuilder = <S extends string>(sku_id: S, builderOptions
  * @param builderOptions
  * @returns
  */
-export const stringSelectBuilder = <C extends string, O extends APIStringSelectComponent['options']>(
+export const stringSelectBuilder = <C extends string, const O extends StringSelectOptionInput>(
   custom_id: C,
-  options: O,
+  options: O[],
   builderOptions?: JsonBuilderOptions,
-) => componentBuilder({ type: 3, custom_id, options }, builderOptions)
-//const testStringSelect = stringSelectBuilder('test', [{ label: 'Option 1', value: 'option1' }])
-
-interface TextInputBuilder {
-  <C extends string, S extends TextInputStyle = 1>(
-    custom_id: C,
-    label?: undefined,
-    style?: S,
-    builderOptions?: JsonBuilderOptions,
-  ): JsonBuilder<{ type: 4; custom_id: C; style: S }, AddCustomValue<APITextInputComponent>, 'type' | 'custom_id'>
-  <C extends string, L extends string, S extends TextInputStyle = 1>(
-    custom_id: C,
-    label: L,
-    style?: S,
-    builderOptions?: JsonBuilderOptions,
-  ): JsonBuilder<
-    { type: 4; custom_id: C; style: S; label: L },
-    AddCustomValue<APITextInputComponent>,
+) =>
+  jsonBuilder<
+    { type: 3; custom_id: C; options: StringSelectOptionJsonFromInput<O>[] },
+    AddCustomValue<APIStringSelectComponent>,
     'type' | 'custom_id'
-  >
-}
-interface TextInputBuilderInit {
-  type: 4
-  custom_id: string
-  style: TextInputStyle
-  label: string
-}
+  >(
+    {
+      type: 3,
+      custom_id,
+      options: options.map(o => toJSON(stringSelectOptionBuilder(o[0], o[1]))) as StringSelectOptionJsonFromInput<O>[],
+    },
+    builderOptions,
+  )
+//const testStringSelect = stringSelectBuilder('test', [['value1', 'Option 1'], ['value2', ['🔥', 'Option 2']]]).options([stringSelectOptionBuilder('option1', ['🔥', 'Option 1']), stringSelectOptionBuilder('option2', 'Option 2')])
+
+type TextInputContext = undefined | string
+type TextInputJson<C extends string, L extends TextInputContext, S extends TextInputStyle = 1> = L extends undefined
+  ? { type: 4; custom_id: C; style: S }
+  : L extends string
+    ? { type: 4; custom_id: C; style: S; label: L }
+    : never
 
 /**
  * Component Text Input
@@ -406,17 +282,24 @@ interface TextInputBuilderInit {
  * @param builderOptions
  * @returns
  */
-export const textInputBuilder: TextInputBuilder = (
-  custom_id: string,
-  label: string | undefined = undefined,
-  style: TextInputStyle = 1,
+export const textInputBuilder = <
+  C extends string,
+  L extends TextInputContext = undefined,
+  S extends TextInputStyle = 1,
+>(
+  custom_id: C,
+  label: L = undefined as L,
+  style: S = 1 as S,
   builderOptions?: JsonBuilderOptions,
-) =>
-  componentBuilder(
-    (label ? { type: 4, custom_id, style, label } : { type: 4, custom_id, style }) as TextInputBuilderInit,
+) => {
+  const builder = jsonBuilder<TextInputJson<C, L, S>, AddCustomValue<APITextInputComponent>, 'type' | 'custom_id'>(
+    { type: 4, custom_id, style } as TextInputJson<C, L, S>,
     builderOptions,
   )
-//const testTextInput = textInputBuilder('test').label('Text Input').style(2).toJSON()
+  if (isString(label)) builder.label(label)
+  return builder
+}
+//const testTextInput = textInputBuilder('id', 'Text').label('Text Input').style(2).toJSON()
 
 /**
  * Component User Select
@@ -425,7 +308,11 @@ export const textInputBuilder: TextInputBuilder = (
  * @returns
  */
 export const userSelectBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
-  componentBuilder({ type: 5, custom_id }, builderOptions)
+  jsonBuilder<
+    { type: 5; custom_id: C },
+    AddCustomValue<APIBaseAutoPopulatedSelectMenuComponent<ComponentType.UserSelect, SelectMenuDefaultValueType.User>>,
+    'type' | 'custom_id'
+  >({ type: 5, custom_id }, builderOptions)
 //const testUserSelect = userSelectBuilder('test')
 
 /**
@@ -435,7 +322,11 @@ export const userSelectBuilder = <C extends string>(custom_id: C, builderOptions
  * @returns
  */
 export const roleSelectBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
-  componentBuilder({ type: 6, custom_id }, builderOptions)
+  jsonBuilder<
+    { type: 6; custom_id: C },
+    AddCustomValue<APIBaseAutoPopulatedSelectMenuComponent<ComponentType.RoleSelect, SelectMenuDefaultValueType.Role>>,
+    'type' | 'custom_id'
+  >({ type: 6, custom_id }, builderOptions)
 //const testRoleSelect = roleSelectBuilder('test')
 
 /**
@@ -445,7 +336,16 @@ export const roleSelectBuilder = <C extends string>(custom_id: C, builderOptions
  * @returns
  */
 export const mentionableSelectBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
-  componentBuilder({ type: 7, custom_id }, builderOptions)
+  jsonBuilder<
+    { type: 7; custom_id: C },
+    AddCustomValue<
+      APIBaseAutoPopulatedSelectMenuComponent<
+        ComponentType.MentionableSelect,
+        SelectMenuDefaultValueType.User | SelectMenuDefaultValueType.Role
+      >
+    >,
+    'type' | 'custom_id'
+  >({ type: 7, custom_id }, builderOptions)
 //const testMentionableSelect = mentionableSelectBuilder('test')
 
 /**
@@ -455,7 +355,10 @@ export const mentionableSelectBuilder = <C extends string>(custom_id: C, builder
  * @returns
  */
 export const channelSelectBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
-  componentBuilder({ type: 8, custom_id }, builderOptions)
+  jsonBuilder<{ type: 8; custom_id: C }, AddCustomValue<APIChannelSelectComponent>, 'type' | 'custom_id'>(
+    { type: 8, custom_id },
+    builderOptions,
+  )
 //const testChannelSelect = channelSelectBuilder('test')
 
 /**
@@ -466,15 +369,18 @@ export const channelSelectBuilder = <C extends string>(custom_id: C, builderOpti
  * @returns
  */
 export const sectionBuilder = <
-  C extends ExtendedSectionComponent['components'][number],
-  A extends ExtendedSectionComponent['accessory'],
+  const C extends JsonSerializable<APISectionComponent['components'][number]>,
+  const A extends JsonSerializable<APISectionComponent['accessory']>,
 >(
   components: C[],
   accessory: A,
   builderOptions?: JsonBuilderOptions,
-) => componentBuilder({ type: 9, components: components.map(toJSON), accessory: toJSON(accessory) }, builderOptions)
+) =>
+  jsonBuilder<{ type: 9; components: ToJSON<C>[]; accessory: ToJSON<A> }, AddCustomValue<APISectionComponent>, 'type'>(
+    { type: 9, components: components.map(toJSON), accessory: toJSON(accessory) },
+    builderOptions,
+  )
 //const testSection = sectionBuilder([{ type: 10, content: 'Test' }], { type: 11, media: { url: 'Test' } })
-//const testActionRow = actionRowBuilder([testSection])
 
 /**
  * Component Text Display
@@ -483,7 +389,10 @@ export const sectionBuilder = <
  * @returns
  */
 export const textDisplayBuilder = <C extends string>(content: C, builderOptions?: JsonBuilderOptions) =>
-  componentBuilder({ type: 10, content }, builderOptions)
+  jsonBuilder<{ type: 10; content: C }, AddCustomValue<APITextDisplayComponent>, 'type'>(
+    { type: 10, content },
+    builderOptions,
+  )
 //const testTextDisplay = textDisplayBuilder('This is a text display component.')
 //const testSection = sectionBuilder([textDisplayBuilder('Test'), textDisplayBuilder('Second')], buttonBuilder('test', 'Button'))
 
@@ -493,10 +402,14 @@ export const textDisplayBuilder = <C extends string>(content: C, builderOptions?
  * @param builderOptions
  * @returns
  */
-export const thumbnailBuilder = <M extends ExtendedThumbnailComponent['media']>(
+export const thumbnailBuilder = <M extends JsonSerializable<TemplatedThumbnailComponent['media']>>(
   media: M,
   builderOptions?: JsonBuilderOptions,
-) => componentBuilder({ type: 11, media: toJSON(media) }, builderOptions)
+) =>
+  jsonBuilder<{ type: 11; media: ToJSON<M> }, AddCustomValue<TemplatedThumbnailComponent>, 'type'>(
+    { type: 11, media: toJSON(media) },
+    builderOptions,
+  )
 //const testThumbnail = thumbnailBuilder({ url: 'https://example.com/image.png'})
 
 /**
@@ -505,10 +418,14 @@ export const thumbnailBuilder = <M extends ExtendedThumbnailComponent['media']>(
  * @param builderOptions
  * @returns
  */
-export const mediaGalleryBuilder = <I extends ExtendedMediaGalleryComponent['items'][number]>(
+export const mediaGalleryBuilder = <I extends JsonSerializable<TemplatedMediaGalleryComponent['items'][number]>>(
   items: I[],
   builderOptions?: JsonBuilderOptions,
-) => componentBuilder({ type: 12, items: items.map(toJSON) }, builderOptions)
+) =>
+  jsonBuilder<{ type: 12; items: ToJSON<I>[] }, AddCustomValue<TemplatedMediaGalleryComponent>, 'type'>(
+    { type: 12, items: items.map(toJSON) },
+    builderOptions,
+  )
 //const testMediaGallery1 = mediaGalleryBuilder([{ media: { url: 'https://example.com/image1.png' } }, { media: { url: 'https://example.com/image2.png' } }])
 
 /**
@@ -517,8 +434,14 @@ export const mediaGalleryBuilder = <I extends ExtendedMediaGalleryComponent['ite
  * @param builderOptions
  * @returns
  */
-export const fileBuilder = <F extends ExtendedFileComponent['file']>(file: F, builderOptions?: JsonBuilderOptions) =>
-  componentBuilder({ type: 13, file: toJSON(file) }, builderOptions)
+export const fileBuilder = <F extends JsonSerializable<TemplatedFileComponent['file']>>(
+  file: F,
+  builderOptions?: JsonBuilderOptions,
+) =>
+  jsonBuilder<{ type: 13; file: ToJSON<F> }, AddCustomValue<TemplatedFileComponent>, 'type'>(
+    { type: 13, file: toJSON(file) },
+    builderOptions,
+  )
 //const testFile = fileBuilder({ url: 'attachment://file.png' })
 
 /**
@@ -526,7 +449,8 @@ export const fileBuilder = <F extends ExtendedFileComponent['file']>(file: F, bu
  * @param builderOptions
  * @returns
  */
-export const separatorBuilder = (builderOptions?: JsonBuilderOptions) => componentBuilder({ type: 14 }, builderOptions)
+export const separatorBuilder = (builderOptions?: JsonBuilderOptions) =>
+  jsonBuilder<{ type: 14 }, APISeparatorComponent, 'type'>({ type: 14 }, builderOptions)
 
 /**
  * Component Container
@@ -534,10 +458,14 @@ export const separatorBuilder = (builderOptions?: JsonBuilderOptions) => compone
  * @param builderOptions
  * @returns
  */
-export const containerBuilder = <C extends ExtendedContainerComponent['components'][number]>(
+export const containerBuilder = <C extends JsonSerializable<TemplatedContainerComponent['components'][number]>>(
   components: C[],
   builderOptions?: JsonBuilderOptions,
-) => componentBuilder({ type: 17, components: components.map(toJSON) }, builderOptions)
+) =>
+  jsonBuilder<{ type: 17; components: ToJSON<C>[] }, AddCustomValue<TemplatedContainerComponent>, 'type'>(
+    { type: 17, components: components.map(toJSON) },
+    builderOptions,
+  )
 
 /**
  * Component Label
@@ -546,11 +474,15 @@ export const containerBuilder = <C extends ExtendedContainerComponent['component
  * @param builderOptions
  * @returns
  */
-export const labelBuilder = <L extends string, C extends ExtendedLabelComponent['component']>(
+export const labelBuilder = <L extends string, C extends JsonSerializable<APILabelComponent['component']>>(
   label: L,
   component: C,
   builderOptions?: JsonBuilderOptions,
-) => componentBuilder({ type: 18, label, component: toJSON(component) }, builderOptions)
+) =>
+  jsonBuilder<{ type: 18; label: L; component: ToJSON<C> }, AddCustomValue<APILabelComponent>, 'type'>(
+    { type: 18, label, component: toJSON(component) },
+    builderOptions,
+  )
 //const testLabel = labelBuilder('Label', textInputBuilder('test', 'Input'))
 
 /**
@@ -560,7 +492,10 @@ export const labelBuilder = <L extends string, C extends ExtendedLabelComponent[
  * @returns
  */
 export const fileUploadBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
-  componentBuilder({ type: 19, custom_id }, builderOptions)
+  jsonBuilder<{ type: 19; custom_id: C }, AddCustomValue<APIFileUploadComponent>, 'type' | 'custom_id'>(
+    { type: 19, custom_id },
+    builderOptions,
+  )
 //const testFileUpload = fileUploadBuilder('test')
 
 /**
@@ -570,11 +505,19 @@ export const fileUploadBuilder = <C extends string>(custom_id: C, builderOptions
  * @param builderOptions
  * @returns
  */
-export const radioGroupBuilder = <C extends string, O extends ExtendedRadioGroupComponent['options'][number]>(
+export const radioGroupBuilder = <
+  C extends string,
+  O extends JsonSerializable<APIRadioGroupComponent['options'][number]>,
+>(
   custom_id: C,
   options: O[],
   builderOptions?: JsonBuilderOptions,
-) => componentBuilder({ type: 21, custom_id, options: options.map(toJSON) }, builderOptions)
+) =>
+  jsonBuilder<
+    { type: 21; custom_id: C; options: ToJSON<O>[] },
+    AddCustomValue<APIRadioGroupComponent>,
+    'type' | 'custom_id'
+  >({ type: 21, custom_id, options: options.map(toJSON) }, builderOptions)
 
 /**
  * Component Checkbox Group
@@ -583,11 +526,19 @@ export const radioGroupBuilder = <C extends string, O extends ExtendedRadioGroup
  * @param builderOptions
  * @returns
  */
-export const checkboxGroupBuilder = <C extends string, O extends ExtendedCheckboxGroupComponent['options'][number]>(
+export const checkboxGroupBuilder = <
+  C extends string,
+  O extends JsonSerializable<APICheckboxGroupComponent['options'][number]>,
+>(
   custom_id: C,
   options: O[],
   builderOptions?: JsonBuilderOptions,
-) => componentBuilder({ type: 22, custom_id, options: options.map(toJSON) }, builderOptions)
+) =>
+  jsonBuilder<
+    { type: 22; custom_id: C; options: ToJSON<O>[] },
+    AddCustomValue<APICheckboxGroupComponent>,
+    'type' | 'custom_id'
+  >({ type: 22, custom_id, options: options.map(toJSON) }, builderOptions)
 
 /**
  * Component Checkbox
@@ -596,7 +547,10 @@ export const checkboxGroupBuilder = <C extends string, O extends ExtendedCheckbo
  * @returns
  */
 export const checkboxBuilder = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
-  componentBuilder({ type: 23, custom_id }, builderOptions)
+  jsonBuilder<{ type: 23; custom_id: C }, AddCustomValue<APICheckboxComponent>, 'type' | 'custom_id'>(
+    { type: 23, custom_id },
+    builderOptions,
+  )
 
 // Child Component
 
@@ -606,10 +560,10 @@ export const checkboxBuilder = <C extends string>(custom_id: C, builderOptions?:
  * @param builderOptions
  * @returns
  */
-export const mediaGalleryItemBuilder = <M extends ExtendedMediaGalleryItem['media']>(
+export const mediaGalleryItemBuilder = <M extends JsonSerializable<TemplatedMediaGalleryItem['media']>>(
   media: M,
   builderOptions?: JsonBuilderOptions,
-) => jsonBuilder<{ media: ReturnType<typeof toJSON<M>> }, APIMediaGalleryItem>({ media: toJSON(media) }, builderOptions)
+) => jsonBuilder<{ media: ToJSON<M> }, APIMediaGalleryItem>({ media: toJSON(media) }, builderOptions)
 //const testMediaGalleryItem = mediaGalleryItemBuilder({ url: 'https://example.com/image.png' })
 
 /**

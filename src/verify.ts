@@ -4,7 +4,7 @@
 
 import { newError } from './utils'
 
-const hex2bin =
+const hex2bin: (hex: string) => Uint8Array<ArrayBuffer> =
   // @ts-expect-error // ES2025
   Uint8Array.fromHex ??
   ((hex: string): Uint8Array<ArrayBuffer> => {

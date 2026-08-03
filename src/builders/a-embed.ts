@@ -9,7 +9,7 @@ import type {
   APIEmbedProvider,
   APIEmbedVideo,
 } from 'discord-api-types/v10'
-import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
+import { type JsonBuilderOptions, jsonBuilder } from './json-builder'
 
 export const embedType = {
   Rich: 'rich',
@@ -22,21 +22,11 @@ export const embedType = {
   //  AutoModerationMessage: "auto_moderation_message",
 } as const // satisfies Record<string, APIEmbed['type']>
 
-type ExtendedEmbed = Omit<
-  APIEmbed,
-  'type' | 'footer' | 'image' | 'thumbnail' | 'video' | 'provider' | 'author' | 'fields'
-> & {
+type FixedEmbed = Omit<APIEmbed, 'type'> & {
   type?: (typeof embedType)[keyof typeof embedType]
-  footer?: APIEmbedFooter | JsonBuilder<APIEmbedFooter, APIEmbedFooter, any>
-  image?: APIEmbedImage | JsonBuilder<APIEmbedImage, APIEmbedImage, any>
-  thumbnail?: APIEmbedImage | JsonBuilder<APIEmbedImage, APIEmbedImage, any>
-  video?: APIEmbedVideo | JsonBuilder<APIEmbedVideo, APIEmbedVideo, any>
-  provider?: APIEmbedProvider | JsonBuilder<APIEmbedProvider, APIEmbedProvider, any>
-  author?: APIEmbedAuthor | JsonBuilder<APIEmbedAuthor, APIEmbedAuthor, any>
-  fields?: (APIEmbedField | JsonBuilder<APIEmbedField, APIEmbedField, any>)[]
 }
 
-export const embedBuilder = (builderOptions?: JsonBuilderOptions) => jsonBuilder<{}, ExtendedEmbed>({}, builderOptions)
+export const embedBuilder = (builderOptions?: JsonBuilderOptions) => jsonBuilder<{}, FixedEmbed>({}, builderOptions)
 
 export const embedFooterBuilder = <T extends string>(text: T, builderOptions?: JsonBuilderOptions) =>
   jsonBuilder<{ text: T }, APIEmbedFooter>({ text }, builderOptions)

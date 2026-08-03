@@ -1,16 +1,24 @@
 // biome-ignore-all lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
 
 import type {
-  APIApplicationCommandBasicOption,
-  APIApplicationCommandOption,
+  APIApplicationCommandAttachmentOption,
+  APIApplicationCommandBooleanOption,
+  APIApplicationCommandChannelOption,
+  APIApplicationCommandIntegerOption,
+  APIApplicationCommandMentionableOption,
+  APIApplicationCommandNumberOption,
+  APIApplicationCommandRoleOption,
+  APIApplicationCommandStringOption,
   APIApplicationCommandSubcommandGroupOption,
   APIApplicationCommandSubcommandOption,
+  APIApplicationCommandUserOption,
   ApplicationCommandOptionType,
   ApplicationCommandType,
-  RESTPostAPIApplicationCommandsJSONBody,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
+  RESTPostAPIContextMenuApplicationCommandsJSONBody,
+  RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody,
 } from 'discord-api-types/v10'
-import { type JsonBuilder, type JsonBuilderOptions, jsonBuilder } from './json-builder'
+import { type JsonBuilderOptions, jsonBuilder } from './json-builder'
 
 export const commandType = {
   ChatInput: 1,
@@ -33,76 +41,56 @@ export const commandOptionType = {
   Attachment: 11,
 } as const satisfies Record<string, ApplicationCommandOptionType>
 
-type ExtendedChatInputCommand = Omit<RESTPostAPIChatInputApplicationCommandsJSONBody, 'options'> & {
-  options: (APIApplicationCommandOption | JsonBuilder<APIApplicationCommandOption, APIApplicationCommandOption, any>)[]
-}
-
-type ExtendedCommand = ExtendedChatInputCommand | Extract<RESTPostAPIApplicationCommandsJSONBody, { type: number }>
-
-type CommandObject<I extends RESTPostAPIApplicationCommandsJSONBody> = Extract<
-  ExtendedCommand,
-  never extends I['type'] ? ExtendedChatInputCommand : { type: I['type'] }
->
-
-const commandBuilder = <I extends RESTPostAPIApplicationCommandsJSONBody, E extends string = 'type'>(
-  init: I & Record<Exclude<keyof I, keyof CommandObject<I>>, never>,
-  options?: JsonBuilderOptions,
-) => jsonBuilder<I, CommandObject<I>, E>(init, options)
-
 // Naming based on the TOC: https://docs.discord.com/developers/interactions/application-commands
 
 export const slashCommandBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) => commandBuilder({ name, description }, builderOptions)
+) =>
+  jsonBuilder<{ name: N; description: D }, RESTPostAPIChatInputApplicationCommandsJSONBody>(
+    { name, description },
+    builderOptions,
+  )
 //const testSlashCommand = slashCommandBuilder('test', 'A test command')
 
 export const userCommandBuilder = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  commandBuilder({ type: 2, name }, builderOptions)
+  jsonBuilder<{ type: 2; name: N }, RESTPostAPIContextMenuApplicationCommandsJSONBody>(
+    { type: 2, name },
+    builderOptions,
+  )
 
 export const messageCommandBuilder = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  commandBuilder({ type: 3, name }, builderOptions)
+  jsonBuilder<{ type: 3; name: N }, RESTPostAPIContextMenuApplicationCommandsJSONBody>(
+    { type: 3, name },
+    builderOptions,
+  )
 
 export const entryPointCommandBuilder = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  commandBuilder({ type: 4, name }, builderOptions)
-
-type ExtendedSubCommandOption = Omit<APIApplicationCommandSubcommandOption, 'options'> & {
-  options: (
-    | APIApplicationCommandBasicOption
-    | JsonBuilder<APIApplicationCommandBasicOption, APIApplicationCommandBasicOption, any>
-  )[]
-}
-type ExtendedSubCommandGroupOption = Omit<APIApplicationCommandSubcommandGroupOption, 'options'> & {
-  options: (
-    | APIApplicationCommandSubcommandOption
-    | JsonBuilder<APIApplicationCommandSubcommandOption, APIApplicationCommandSubcommandOption, any>
-  )[]
-}
-
-type ExtendedOnlyCommandOption = ExtendedSubCommandOption | ExtendedSubCommandGroupOption
-type ExtendedCommandOption =
-  | ExtendedOnlyCommandOption
-  | Exclude<APIApplicationCommandOption, { type: ExtendedOnlyCommandOption['type'] }>
-
-type CommandOptionObject<I extends APIApplicationCommandOption> = Extract<ExtendedCommandOption, { type: I['type'] }>
-
-const commandOptionBuilder = <I extends APIApplicationCommandOption>(
-  init: I & Record<Exclude<keyof I, keyof CommandOptionObject<I>>, never>,
-  options?: JsonBuilderOptions,
-) => jsonBuilder<I, CommandOptionObject<I>, 'type'>(init, options)
+  jsonBuilder<{ type: 4; name: N }, RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody>(
+    { type: 4, name },
+    builderOptions,
+  )
 
 export const subCommandBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) => commandOptionBuilder({ type: 1, name, description }, builderOptions)
+) =>
+  jsonBuilder<{ type: 1; name: N; description: D }, APIApplicationCommandSubcommandOption>(
+    { type: 1, name, description },
+    builderOptions,
+  )
 
 export const subCommandGroupBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) => commandOptionBuilder({ type: 2, name, description }, builderOptions)
+) =>
+  jsonBuilder<{ type: 2; name: N; description: D }, APIApplicationCommandSubcommandGroupOption>(
+    { type: 2, name, description },
+    builderOptions,
+  )
 
 /**
  * Command Option
@@ -115,7 +103,11 @@ export const stringOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) => commandOptionBuilder({ type: 3, name, description }, builderOptions)
+) =>
+  jsonBuilder<{ type: 3; name: N; description: D }, APIApplicationCommandStringOption>(
+    { type: 3, name, description },
+    builderOptions,
+  )
 
 /**
  * Command Option
@@ -128,7 +120,11 @@ export const integerOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) => commandOptionBuilder({ type: 4, name, description }, builderOptions)
+) =>
+  jsonBuilder<{ type: 4; name: N; description: D }, APIApplicationCommandIntegerOption>(
+    { type: 4, name, description },
+    builderOptions,
+  )
 
 /**
  * Command Option
@@ -141,7 +137,11 @@ export const booleanOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) => commandOptionBuilder({ type: 5, name, description }, builderOptions)
+) =>
+  jsonBuilder<{ type: 5; name: N; description: D }, APIApplicationCommandBooleanOption>(
+    { type: 5, name, description },
+    builderOptions,
+  )
 
 /**
  * Command Option
@@ -154,7 +154,11 @@ export const userOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) => commandOptionBuilder({ type: 6, name, description }, builderOptions)
+) =>
+  jsonBuilder<{ type: 6; name: N; description: D }, APIApplicationCommandUserOption>(
+    { type: 6, name, description },
+    builderOptions,
+  )
 
 /**
  * Command Option
@@ -167,7 +171,11 @@ export const channelOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) => commandOptionBuilder({ type: 7, name, description }, builderOptions)
+) =>
+  jsonBuilder<{ type: 7; name: N; description: D }, APIApplicationCommandChannelOption>(
+    { type: 7, name, description },
+    builderOptions,
+  )
 
 /**
  * Command Option
@@ -180,7 +188,11 @@ export const roleOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) => commandOptionBuilder({ type: 8, name, description }, builderOptions)
+) =>
+  jsonBuilder<{ type: 8; name: N; description: D }, APIApplicationCommandRoleOption>(
+    { type: 8, name, description },
+    builderOptions,
+  )
 
 /**
  * Command Option
@@ -193,7 +205,11 @@ export const mentionableOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) => commandOptionBuilder({ type: 9, name, description }, builderOptions)
+) =>
+  jsonBuilder<{ type: 9; name: N; description: D }, APIApplicationCommandMentionableOption>(
+    { type: 9, name, description },
+    builderOptions,
+  )
 
 /**
  * Command Option
@@ -206,7 +222,11 @@ export const numberOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) => commandOptionBuilder({ type: 10, name, description }, builderOptions)
+) =>
+  jsonBuilder<{ type: 10; name: N; description: D }, APIApplicationCommandNumberOption>(
+    { type: 10, name, description },
+    builderOptions,
+  )
 
 /**
  * Command Option
@@ -219,7 +239,11 @@ export const attachmentOptionBuilder = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) => commandOptionBuilder({ type: 11, name, description }, builderOptions)
+) =>
+  jsonBuilder<{ type: 11; name: N; description: D }, APIApplicationCommandAttachmentOption>(
+    { type: 11, name, description },
+    builderOptions,
+  )
 
 /*
 const testCommand = slashCommandBuilder('test', 'A test command').options([
