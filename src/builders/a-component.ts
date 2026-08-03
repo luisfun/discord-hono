@@ -210,13 +210,19 @@ export const premiumButtonBuilder = <S extends string>(sku_id: S, builderOptions
 
 //const testActionRow = actionRowBuilder([linkButtonBuilder('https://example.com')]).components([buttonBuilder('id', 'Btn', 3).style(2).custom_value('value').disabled(true)])
 
-type StringSelectOptionContext = string | [emoji: string, label: string]
+type StringSelectOptionContext = string | readonly [emoji: string, label: string]
 type StringSelectOptionJson<V extends string, T extends StringSelectOptionContext> = T extends string
   ? { label: T; value: V }
-  : T extends [emoji: infer E extends string, label: infer L extends string]
+  : T extends readonly [emoji: infer E extends string, label: infer L extends string]
     ? { label: L; value: V; emoji: { name: E } }
     : never
 
+/**
+ * Child Component String Select Option
+ * @param value
+ * @param label
+ * @returns
+ */
 export const stringSelectOptionBuilder = <V extends string, const L extends StringSelectOptionContext>(
   value: V,
   label: L,
