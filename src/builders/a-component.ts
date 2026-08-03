@@ -267,7 +267,7 @@ export const stringSelectBuilder = <C extends string, const O extends StringSele
     {
       type: 3,
       custom_id,
-      options: options.map(o => toJSON(stringSelectOptionBuilder(o[0], o[1]))) as StringSelectOptionJsonFromInput<O>[],
+      options: options.map(o => stringSelectOptionBuilder(o[0], o[1]).toJSON()) as StringSelectOptionJsonFromInput<O>[],
     },
     builderOptions,
   )
@@ -505,25 +505,83 @@ export const fileUploadBuilder = <C extends string>(custom_id: C, builderOptions
 //const testFileUpload = fileUploadBuilder('test')
 
 /**
+ * Child Component Radio Group Option
+ * @param value
+ * @param label
+ * @param builderOptions
+ * @returns
+ */
+export const radioGroupOptionBuilder = <V extends APIRadioGroupOption['value'], L extends APIRadioGroupOption['label']>(
+  value: V,
+  label: L,
+  builderOptions?: JsonBuilderOptions,
+) => jsonBuilder<{ value: V; label: L }, APIRadioGroupOption>({ value, label }, builderOptions)
+//const testRadioOption = radioGroupOptionBuilder('Option 1', 'option1')
+
+interface RadioGroupOptionInput {
+  0: string
+  1: string
+}
+type RadioGroupOptionJsonFromInput<I extends RadioGroupOptionInput> = I extends readonly [
+  infer V extends string,
+  infer L extends string,
+]
+  ? { label: L; value: V }
+  : never
+
+/**
  * Component Radio Group
  * @param custom_id
  * @param options
  * @param builderOptions
  * @returns
  */
-export const radioGroupBuilder = <
-  C extends string,
-  O extends JsonSerializable<APIRadioGroupComponent['options'][number]>,
->(
+export const radioGroupBuilder = <C extends string, const O extends RadioGroupOptionInput>(
   custom_id: C,
   options: O[],
   builderOptions?: JsonBuilderOptions,
 ) =>
   jsonBuilder<
-    { type: 21; custom_id: C; options: ToJSON<O>[] },
+    { type: 21; custom_id: C; options: RadioGroupOptionJsonFromInput<O>[] },
     AddCustomValue<APIRadioGroupComponent>,
     'type' | 'custom_id'
-  >({ type: 21, custom_id, options: options.map(toJSON) }, builderOptions)
+  >(
+    {
+      type: 21,
+      custom_id,
+      options: options.map(o => radioGroupOptionBuilder(o[0], o[1]).toJSON()) as RadioGroupOptionJsonFromInput<O>[],
+    },
+    builderOptions,
+  )
+//const testRadioGroup = radioGroupBuilder('test', [['value 1', 'V1'], ['value 2', 'Display 2']])
+
+/**
+ * Child Component Checkbox Group Option
+ * @param value
+ * @param label
+ * @param builderOptions
+ * @returns
+ */
+export const checkboxGroupOptionBuilder = <
+  V extends APICheckboxGroupOption['value'],
+  L extends APICheckboxGroupOption['label'],
+>(
+  value: V,
+  label: L,
+  builderOptions?: JsonBuilderOptions,
+) => jsonBuilder<{ value: V; label: L }, APICheckboxGroupOption>({ value, label }, builderOptions)
+//const testCheckboxOption = checkboxGroupOptionBuilder('Option 1', 'option1')
+
+interface CheckboxGroupOptionInput {
+  0: string
+  1: string
+}
+type CheckboxGroupOptionJsonFromInput<I extends CheckboxGroupOptionInput> = I extends readonly [
+  infer V extends string,
+  infer L extends string,
+]
+  ? { label: L; value: V }
+  : never
 
 /**
  * Component Checkbox Group
@@ -532,19 +590,26 @@ export const radioGroupBuilder = <
  * @param builderOptions
  * @returns
  */
-export const checkboxGroupBuilder = <
-  C extends string,
-  O extends JsonSerializable<APICheckboxGroupComponent['options'][number]>,
->(
+export const checkboxGroupBuilder = <C extends string, const O extends CheckboxGroupOptionInput>(
   custom_id: C,
   options: O[],
   builderOptions?: JsonBuilderOptions,
 ) =>
   jsonBuilder<
-    { type: 22; custom_id: C; options: ToJSON<O>[] },
+    { type: 22; custom_id: C; options: CheckboxGroupOptionJsonFromInput<O>[] },
     AddCustomValue<APICheckboxGroupComponent>,
     'type' | 'custom_id'
-  >({ type: 22, custom_id, options: options.map(toJSON) }, builderOptions)
+  >(
+    {
+      type: 22,
+      custom_id,
+      options: options.map(o =>
+        checkboxGroupOptionBuilder(o[0], o[1]).toJSON(),
+      ) as CheckboxGroupOptionJsonFromInput<O>[],
+    },
+    builderOptions,
+  )
+//const testCheckboxGroup = checkboxGroupBuilder('test', [['value 1', 'V1'], ['value 2', 'Display 2']])
 
 /**
  * Component Checkbox
@@ -601,36 +666,3 @@ const testContainer = containerBuilder([
   fileBuilder({ url: 'attachment://file.png' }),
 ])
 */
-
-/**
- * Child Component Radio Group Option
- * @param label
- * @param value
- * @param builderOptions
- * @returns
- */
-export const radioGroupOptionBuilder = <L extends APIRadioGroupOption['label'], V extends APIRadioGroupOption['value']>(
-  label: L,
-  value: V,
-  builderOptions?: JsonBuilderOptions,
-) => jsonBuilder<{ label: L; value: V }, APIRadioGroupOption>({ label, value }, builderOptions)
-//const testRadioOption = radioGroupOptionBuilder('Option 1', 'option1')
-//const testRadioGroup = radioGroupBuilder('test', [radioGroupOptionBuilder('Option 1', 'option1'), radioGroupOptionBuilder('Option 2', 'option2')])
-
-/**
- * Child Component Checkbox Group Option
- * @param label
- * @param value
- * @param builderOptions
- * @returns
- */
-export const checkboxGroupOptionBuilder = <
-  L extends APICheckboxGroupOption['label'],
-  V extends APICheckboxGroupOption['value'],
->(
-  label: L,
-  value: V,
-  builderOptions?: JsonBuilderOptions,
-) => jsonBuilder<{ label: L; value: V }, APICheckboxGroupOption>({ label, value }, builderOptions)
-//const testCheckboxOption = checkboxGroupOptionBuilder('Option 1', 'option1')
-//const testCheckboxGroup = checkboxGroupBuilder('test', [checkboxGroupOptionBuilder('Option 1', 'option1'), checkboxGroupOptionBuilder('Option 2', 'option2')])
