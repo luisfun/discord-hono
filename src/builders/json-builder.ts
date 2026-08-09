@@ -80,7 +80,8 @@ export const jsonBuilder = <const T extends object, M extends object, E extends 
   initial: T,
   options?: JsonBuilderOptions,
 ): JsonBuilder<T, M, E> => {
-  const data = (options?.clone ? globalThis.structuredClone(initial) : { ...initial }) as Record<PropertyKey, unknown>
+  const clone = globalThis.structuredClone // ?? (<T>(value: T) => JSON.parse(JSON.stringify(value)))
+  const data = (options?.clone ? clone(initial) : { ...initial }) as Record<PropertyKey, unknown>
   const proxy = new Proxy(
     {},
     {
@@ -91,7 +92,7 @@ export const jsonBuilder = <const T extends object, M extends object, E extends 
             if (custom_id || custom_value)
               // biome-ignore lint/complexity/useLiteralKeys: Not sure if custom_id exists
               rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
-            return () => (options?.clone ? globalThis.structuredClone(rest) : rest)
+            return () => (options?.clone ? clone(rest) : rest)
           }
           case 'delete':
             return (key: PropertyKey) => {
@@ -107,10 +108,11 @@ export const jsonBuilder = <const T extends object, M extends object, E extends 
             }
           */
           case 'clone':
-            return () => jsonBuilder(globalThis.structuredClone(data), options)
+            // If options.clone is true, leave it to the functionality of jsonBuilder.
+            return () => jsonBuilder(options?.clone ? data : clone(data), options)
           default:
             if (isProto(prop)) throw newError('jsonBuilder', `Invalid key: ${String(prop)}`)
-            if (prop in Object.prototype) return Reflect.get(target, prop, proxy)
+            if (typeof prop === 'symbol' || prop in Object.prototype) return Reflect.get(target, prop, proxy)
             return (value: unknown) => {
               data[prop] = isArray(value) ? value.map(toJSON) : toJSON(value)
               return proxy

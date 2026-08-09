@@ -5,7 +5,8 @@
 import { newError } from './utils'
 
 const hex2bin: (hex: string) => Uint8Array<ArrayBuffer> =
-  // @ts-expect-error // ES2025
+  // biome-ignore lint/suspicious/noTsIgnore: To prevent errors in GitHub Actions (supporting the latest Node.js).
+  // @ts-ignore: ES2025
   Uint8Array.fromHex ??
   ((hex: string): Uint8Array<ArrayBuffer> => {
     const len = hex.length
