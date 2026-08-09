@@ -9,7 +9,7 @@ import type {
   APIEmbedProvider,
   APIEmbedVideo,
 } from 'discord-api-types/v10'
-import { type JsonBuilderOptions, makeJsonBuilder } from './json-builder'
+import { createJsonBuilder, type JsonBuilderOptions } from './json-builder'
 
 export const embedType = {
   Rich: 'rich',
@@ -26,28 +26,28 @@ type FixedEmbed = Omit<APIEmbed, 'type'> & {
   type?: (typeof embedType)[keyof typeof embedType]
 }
 
-export const makeEmbed = (builderOptions?: JsonBuilderOptions) => makeJsonBuilder<{}, FixedEmbed>({}, builderOptions)
+export const makeEmbed = (builderOptions?: JsonBuilderOptions) => createJsonBuilder<{}, FixedEmbed>({}, builderOptions)
 
 export const makeEmbedFooter = <T extends string>(text: T, builderOptions?: JsonBuilderOptions) =>
-  makeJsonBuilder<{ text: T }, APIEmbedFooter>({ text }, builderOptions)
+  createJsonBuilder<{ text: T }, APIEmbedFooter>({ text }, builderOptions)
 
 export const makeEmbedImage = <U extends string>(url: U, builderOptions?: JsonBuilderOptions) =>
-  makeJsonBuilder<{ url: U }, APIEmbedImage>({ url }, builderOptions)
+  createJsonBuilder<{ url: U }, APIEmbedImage>({ url }, builderOptions)
 
 export const makeEmbedVideo = (builderOptions?: JsonBuilderOptions) =>
-  makeJsonBuilder<{}, APIEmbedVideo>({}, builderOptions)
+  createJsonBuilder<{}, APIEmbedVideo>({}, builderOptions)
 
 export const makeEmbedProvider = (builderOptions?: JsonBuilderOptions) =>
-  makeJsonBuilder<{}, APIEmbedProvider>({}, builderOptions)
+  createJsonBuilder<{}, APIEmbedProvider>({}, builderOptions)
 
 export const makeEmbedAuthor = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  makeJsonBuilder<{ name: N }, APIEmbedAuthor>({ name }, builderOptions)
+  createJsonBuilder<{ name: N }, APIEmbedAuthor>({ name }, builderOptions)
 
 export const makeEmbedField = <N extends string, V extends string>(
   name: N,
   value: V,
   builderOptions?: JsonBuilderOptions,
-) => makeJsonBuilder<{ name: N; value: V }, APIEmbedField>({ name, value }, builderOptions)
+) => createJsonBuilder<{ name: N; value: V }, APIEmbedField>({ name, value }, builderOptions)
 
 /*
 const _testEmbed = makeEmbed()

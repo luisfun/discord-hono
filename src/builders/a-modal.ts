@@ -5,7 +5,7 @@ import type {
   APIModalInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
 import { type ToJSON, toJSON } from '../utils'
-import { type AddCustomValue, type JsonBuilderOptions, type JsonSerializable, makeJsonBuilder } from './json-builder'
+import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions, type JsonSerializable } from './json-builder'
 
 export const makeModal = <
   I extends string,
@@ -17,7 +17,7 @@ export const makeModal = <
   components: C[],
   builderOptions?: JsonBuilderOptions,
 ) =>
-  makeJsonBuilder<
+  createJsonBuilder<
     { custom_id: I; title: T; components: ToJSON<C>[] },
     AddCustomValue<APIModalInteractionResponseCallbackData>,
     'custom_id'
