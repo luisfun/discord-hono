@@ -5,9 +5,9 @@ import type {
   APIModalInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
 import { type ToJSON, toJSON } from '../utils'
-import { type AddCustomValue, type JsonBuilderOptions, type JsonSerializable, jsonBuilder } from './json-builder'
+import { type AddCustomValue, type JsonBuilderOptions, type JsonSerializable, makeJsonBuilder } from './json-builder'
 
-export const modalBuilder = <
+export const makeModal = <
   I extends string,
   T extends string,
   C extends JsonSerializable<APIModalInteractionResponseCallbackComponent>,
@@ -17,19 +17,19 @@ export const modalBuilder = <
   components: C[],
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<
+  makeJsonBuilder<
     { custom_id: I; title: T; components: ToJSON<C>[] },
     AddCustomValue<APIModalInteractionResponseCallbackData>,
     'custom_id'
   >({ custom_id, title, components: components.map(toJSON) }, builderOptions)
 
 /*
-import { actionRowBuilder, labelBuilder, textInputBuilder } from './a-component'
+import { makeActionRow, makeLabel, makeTextInput } from './a-component'
 
-const modalTest = modalBuilder('custom_id', 'title', [
-  actionRowBuilder([textInputBuilder('id', 'label')]),
-  labelBuilder('label', textInputBuilder('id2', 'label2')),
+const modalTest = makeModal('custom_id', 'title', [
+  makeActionRow([makeTextInput('id', 'label')]),
+  makeLabel('label', makeTextInput('id2', 'label2')),
 ])
-  .components([labelBuilder('label3', textInputBuilder('id3', 'label3'))])
+  .components([makeLabel('label3', makeTextInput('id3', 'label3'))])
   .custom_value('custom_value')
 */

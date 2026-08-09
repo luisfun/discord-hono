@@ -9,7 +9,7 @@ import type {
   APIEmbedProvider,
   APIEmbedVideo,
 } from 'discord-api-types/v10'
-import { type JsonBuilderOptions, jsonBuilder } from './json-builder'
+import { type JsonBuilderOptions, makeJsonBuilder } from './json-builder'
 
 export const embedType = {
   Rich: 'rich',
@@ -26,35 +26,35 @@ type FixedEmbed = Omit<APIEmbed, 'type'> & {
   type?: (typeof embedType)[keyof typeof embedType]
 }
 
-export const embedBuilder = (builderOptions?: JsonBuilderOptions) => jsonBuilder<{}, FixedEmbed>({}, builderOptions)
+export const makeEmbed = (builderOptions?: JsonBuilderOptions) => makeJsonBuilder<{}, FixedEmbed>({}, builderOptions)
 
-export const embedFooterBuilder = <T extends string>(text: T, builderOptions?: JsonBuilderOptions) =>
-  jsonBuilder<{ text: T }, APIEmbedFooter>({ text }, builderOptions)
+export const makeEmbedFooter = <T extends string>(text: T, builderOptions?: JsonBuilderOptions) =>
+  makeJsonBuilder<{ text: T }, APIEmbedFooter>({ text }, builderOptions)
 
-export const embedImageBuilder = <U extends string>(url: U, builderOptions?: JsonBuilderOptions) =>
-  jsonBuilder<{ url: U }, APIEmbedImage>({ url }, builderOptions)
+export const makeEmbedImage = <U extends string>(url: U, builderOptions?: JsonBuilderOptions) =>
+  makeJsonBuilder<{ url: U }, APIEmbedImage>({ url }, builderOptions)
 
-export const embedVideoBuilder = (builderOptions?: JsonBuilderOptions) =>
-  jsonBuilder<{}, APIEmbedVideo>({}, builderOptions)
+export const makeEmbedVideo = (builderOptions?: JsonBuilderOptions) =>
+  makeJsonBuilder<{}, APIEmbedVideo>({}, builderOptions)
 
-export const embedProviderBuilder = (builderOptions?: JsonBuilderOptions) =>
-  jsonBuilder<{}, APIEmbedProvider>({}, builderOptions)
+export const makeEmbedProvider = (builderOptions?: JsonBuilderOptions) =>
+  makeJsonBuilder<{}, APIEmbedProvider>({}, builderOptions)
 
-export const embedAuthorBuilder = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  jsonBuilder<{ name: N }, APIEmbedAuthor>({ name }, builderOptions)
+export const makeEmbedAuthor = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
+  makeJsonBuilder<{ name: N }, APIEmbedAuthor>({ name }, builderOptions)
 
-export const embedFieldBuilder = <N extends string, V extends string>(
+export const makeEmbedField = <N extends string, V extends string>(
   name: N,
   value: V,
   builderOptions?: JsonBuilderOptions,
-) => jsonBuilder<{ name: N; value: V }, APIEmbedField>({ name, value }, builderOptions)
+) => makeJsonBuilder<{ name: N; value: V }, APIEmbedField>({ name, value }, builderOptions)
 
 /*
-const _testEmbed = embedBuilder()
+const _testEmbed = makeEmbed()
   .type(embedType.Rich)
   .title('Test Embed')
-  .footer(embedFooterBuilder('Footer Text'))
-  .image(embedImageBuilder('https://example.com/image.png'))
-  .author(embedAuthorBuilder('Author Name'))
-  .fields([embedFieldBuilder('Field 1', 'Value 1'), embedFieldBuilder('Field 2', 'Value 2')])
+  .footer(makeEmbedFooter('Footer Text'))
+  .image(makeEmbedImage('https://example.com/image.png'))
+  .author(makeEmbedAuthor('Author Name'))
+  .fields([makeEmbedField('Field 1', 'Value 1'), makeEmbedField('Field 2', 'Value 2')])
 */

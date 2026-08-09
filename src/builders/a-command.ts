@@ -18,7 +18,7 @@ import type {
   RESTPostAPIContextMenuApplicationCommandsJSONBody,
   RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody,
 } from 'discord-api-types/v10'
-import { type JsonBuilderOptions, jsonBuilder } from './json-builder'
+import { type JsonBuilderOptions, makeJsonBuilder } from './json-builder'
 
 export const commandType = {
   ChatInput: 1,
@@ -43,51 +43,51 @@ export const commandOptionType = {
 
 // Naming based on the TOC: https://docs.discord.com/developers/interactions/application-commands
 
-export const slashCommandBuilder = <N extends string, D extends string>(
+export const makeSlashCommand = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<{ name: N; description: D }, RESTPostAPIChatInputApplicationCommandsJSONBody>(
+  makeJsonBuilder<{ name: N; description: D }, RESTPostAPIChatInputApplicationCommandsJSONBody>(
     { name, description },
     builderOptions,
   )
-//const testSlashCommand = slashCommandBuilder('test', 'A test command')
+//const testSlashCommand = makeSlashCommand('test', 'A test command')
 
-export const userCommandBuilder = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  jsonBuilder<{ type: 2; name: N }, RESTPostAPIContextMenuApplicationCommandsJSONBody>(
+export const makeUserCommand = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
+  makeJsonBuilder<{ type: 2; name: N }, RESTPostAPIContextMenuApplicationCommandsJSONBody>(
     { type: 2, name },
     builderOptions,
   )
 
-export const messageCommandBuilder = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  jsonBuilder<{ type: 3; name: N }, RESTPostAPIContextMenuApplicationCommandsJSONBody>(
+export const makeMessageCommand = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
+  makeJsonBuilder<{ type: 3; name: N }, RESTPostAPIContextMenuApplicationCommandsJSONBody>(
     { type: 3, name },
     builderOptions,
   )
 
-export const entryPointCommandBuilder = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  jsonBuilder<{ type: 4; name: N }, RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody>(
+export const makeEntryPointCommand = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
+  makeJsonBuilder<{ type: 4; name: N }, RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody>(
     { type: 4, name },
     builderOptions,
   )
 
-export const subCommandBuilder = <N extends string, D extends string>(
+export const makeSubCommand = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<{ type: 1; name: N; description: D }, APIApplicationCommandSubcommandOption>(
+  makeJsonBuilder<{ type: 1; name: N; description: D }, APIApplicationCommandSubcommandOption>(
     { type: 1, name, description },
     builderOptions,
   )
 
-export const subCommandGroupBuilder = <N extends string, D extends string>(
+export const makeSubCommandGroup = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<{ type: 2; name: N; description: D }, APIApplicationCommandSubcommandGroupOption>(
+  makeJsonBuilder<{ type: 2; name: N; description: D }, APIApplicationCommandSubcommandGroupOption>(
     { type: 2, name, description },
     builderOptions,
   )
@@ -99,12 +99,12 @@ export const subCommandGroupBuilder = <N extends string, D extends string>(
  * @param builderOptions
  * @returns
  */
-export const stringOptionBuilder = <N extends string, D extends string>(
+export const makeStringOption = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<{ type: 3; name: N; description: D }, APIApplicationCommandStringOption>(
+  makeJsonBuilder<{ type: 3; name: N; description: D }, APIApplicationCommandStringOption>(
     { type: 3, name, description },
     builderOptions,
   )
@@ -116,12 +116,12 @@ export const stringOptionBuilder = <N extends string, D extends string>(
  * @param builderOptions
  * @returns
  */
-export const integerOptionBuilder = <N extends string, D extends string>(
+export const makeIntegerOption = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<{ type: 4; name: N; description: D }, APIApplicationCommandIntegerOption>(
+  makeJsonBuilder<{ type: 4; name: N; description: D }, APIApplicationCommandIntegerOption>(
     { type: 4, name, description },
     builderOptions,
   )
@@ -133,12 +133,12 @@ export const integerOptionBuilder = <N extends string, D extends string>(
  * @param builderOptions
  * @returns
  */
-export const booleanOptionBuilder = <N extends string, D extends string>(
+export const makeBooleanOption = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<{ type: 5; name: N; description: D }, APIApplicationCommandBooleanOption>(
+  makeJsonBuilder<{ type: 5; name: N; description: D }, APIApplicationCommandBooleanOption>(
     { type: 5, name, description },
     builderOptions,
   )
@@ -150,12 +150,12 @@ export const booleanOptionBuilder = <N extends string, D extends string>(
  * @param builderOptions
  * @returns
  */
-export const userOptionBuilder = <N extends string, D extends string>(
+export const makeUserOption = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<{ type: 6; name: N; description: D }, APIApplicationCommandUserOption>(
+  makeJsonBuilder<{ type: 6; name: N; description: D }, APIApplicationCommandUserOption>(
     { type: 6, name, description },
     builderOptions,
   )
@@ -167,12 +167,12 @@ export const userOptionBuilder = <N extends string, D extends string>(
  * @param builderOptions
  * @returns
  */
-export const channelOptionBuilder = <N extends string, D extends string>(
+export const makeChannelOption = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<{ type: 7; name: N; description: D }, APIApplicationCommandChannelOption>(
+  makeJsonBuilder<{ type: 7; name: N; description: D }, APIApplicationCommandChannelOption>(
     { type: 7, name, description },
     builderOptions,
   )
@@ -184,12 +184,12 @@ export const channelOptionBuilder = <N extends string, D extends string>(
  * @param builderOptions
  * @returns
  */
-export const roleOptionBuilder = <N extends string, D extends string>(
+export const makeRoleOption = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<{ type: 8; name: N; description: D }, APIApplicationCommandRoleOption>(
+  makeJsonBuilder<{ type: 8; name: N; description: D }, APIApplicationCommandRoleOption>(
     { type: 8, name, description },
     builderOptions,
   )
@@ -201,12 +201,12 @@ export const roleOptionBuilder = <N extends string, D extends string>(
  * @param builderOptions
  * @returns
  */
-export const mentionableOptionBuilder = <N extends string, D extends string>(
+export const makeMentionableOption = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<{ type: 9; name: N; description: D }, APIApplicationCommandMentionableOption>(
+  makeJsonBuilder<{ type: 9; name: N; description: D }, APIApplicationCommandMentionableOption>(
     { type: 9, name, description },
     builderOptions,
   )
@@ -218,12 +218,12 @@ export const mentionableOptionBuilder = <N extends string, D extends string>(
  * @param builderOptions
  * @returns
  */
-export const numberOptionBuilder = <N extends string, D extends string>(
+export const makeNumberOption = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<{ type: 10; name: N; description: D }, APIApplicationCommandNumberOption>(
+  makeJsonBuilder<{ type: 10; name: N; description: D }, APIApplicationCommandNumberOption>(
     { type: 10, name, description },
     builderOptions,
   )
@@ -235,12 +235,12 @@ export const numberOptionBuilder = <N extends string, D extends string>(
  * @param builderOptions
  * @returns
  */
-export const attachmentOptionBuilder = <N extends string, D extends string>(
+export const makeAttachmentOption = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  jsonBuilder<{ type: 11; name: N; description: D }, APIApplicationCommandAttachmentOption>(
+  makeJsonBuilder<{ type: 11; name: N; description: D }, APIApplicationCommandAttachmentOption>(
     { type: 11, name, description },
     builderOptions,
   )

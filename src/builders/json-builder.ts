@@ -76,7 +76,7 @@ export type JsonBuilder<T extends object, M extends object, E extends string = n
  * - clone: Method that creates a new jsonBuilder with the same data
  * - others: Methods that accept arbitrary keys and values based on the type constraints defined in M
  */
-export const jsonBuilder = <const T extends object, M extends object, E extends string = never>(
+export const makeJsonBuilder = <const T extends object, M extends object, E extends string = never>(
   initial: T,
   options?: JsonBuilderOptions,
 ): JsonBuilder<T, M, E> => {
@@ -109,7 +109,7 @@ export const jsonBuilder = <const T extends object, M extends object, E extends 
           */
           case 'clone':
             // If options.clone is true, leave it to the functionality of jsonBuilder.
-            return () => jsonBuilder(options?.clone ? data : clone(data), options)
+            return () => makeJsonBuilder(options?.clone ? data : clone(data), options)
           default:
             if (isProto(prop)) throw newError('jsonBuilder', `Invalid key: ${String(prop)}`)
             if (typeof prop === 'symbol' || prop in Object.prototype) return Reflect.get(target, prop, proxy)
