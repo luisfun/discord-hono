@@ -42,8 +42,7 @@ export const makePoll = <const Q extends PollMediaContext, const A extends PollM
       question: ToJSON<PollMediaBuilderResult<Q>>
       answers: ToJSON<PollAnswerBuilderResult<PollMediaBuilderResult<A>>>[]
     },
-    AddCustomValue<RESTAPIPoll>,
-    'custom_id'
+    AddCustomValue<RESTAPIPoll>
   >(
     {
       question: makePollMedia(question, builderOptions).toJSON(),

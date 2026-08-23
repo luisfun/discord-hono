@@ -4,6 +4,7 @@ import type {
   APIModalInteractionResponseCallbackComponent,
   APIModalInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
+import type { NoSemicolon } from '../types'
 import { type ToJSON, toJSON } from '../utils'
 import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions, type JsonSerializable } from './json-builder'
 
@@ -12,13 +13,13 @@ export const makeModal = <
   T extends string,
   C extends JsonSerializable<APIModalInteractionResponseCallbackComponent>,
 >(
-  custom_id: I,
+  custom_id: NoSemicolon<I>,
   title: T,
   components: C[],
   builderOptions?: JsonBuilderOptions,
 ) =>
   createJsonBuilder<
-    { custom_id: I; title: T; components: ToJSON<C>[] },
+    { custom_id: NoSemicolon<I>; title: T; components: ToJSON<C>[] },
     AddCustomValue<APIModalInteractionResponseCallbackData>,
     'custom_id'
   >({ custom_id, title, components: components.map(toJSON) }, builderOptions)

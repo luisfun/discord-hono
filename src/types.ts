@@ -29,6 +29,8 @@ export type Simplify<T> = { [K in keyof T]: T[K] } & {}
 
 export type ExcludeMethods<T, K extends keyof T> = { [P in keyof T as P extends K ? never : P]: T[P] }
 
+export type NoSemicolon<S extends string> = S extends `${string};${string}` ? never : S
+
 ////////// Env //////////
 
 export interface Env {

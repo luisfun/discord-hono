@@ -32,6 +32,7 @@ import type {
   SelectMenuDefaultValueType,
   TextInputStyle,
 } from 'discord-api-types/v10'
+import type { NoSemicolon } from '../types'
 import { isArray, isString, type ToJSON, toJSON } from '../utils'
 import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions, type JsonSerializable } from './json-builder'
 
@@ -128,11 +129,11 @@ export const makeActionRow = <T extends JsonSerializable<APIComponentInActionRow
 
 type ButtonContext = undefined | string | [emoji: string, label: string]
 type ButtonJson<C extends string, T extends ButtonContext, S extends InteractionButtonStyle = 1> = T extends undefined
-  ? { type: 2; style: S; custom_id: C }
+  ? { type: 2; style: S; custom_id: NoSemicolon<C> }
   : T extends string
-    ? { type: 2; style: S; custom_id: C; label: T }
+    ? { type: 2; style: S; custom_id: NoSemicolon<C>; label: T }
     : T extends [emoji: infer E extends string, label: infer L extends string]
-      ? { type: 2; style: S; custom_id: C; label: L; emoji: { name: E } }
+      ? { type: 2; style: S; custom_id: NoSemicolon<C>; label: L; emoji: { name: E } }
       : never
 
 /**
@@ -148,7 +149,7 @@ export const makeButton = <
   const T extends ButtonContext = undefined,
   S extends InteractionButtonStyle = 1,
 >(
-  custom_id: C,
+  custom_id: NoSemicolon<C>,
   label: T = undefined as T,
   style: S = 1 as S,
   builderOptions?: JsonBuilderOptions,
@@ -157,12 +158,12 @@ export const makeButton = <
     ButtonJson<C, T, S>,
     AddCustomValue<APIButtonComponentWithCustomId>,
     'type' | 'custom_id'
-  >({ type: 2, style, custom_id } as ButtonJson<C, T, S>, builderOptions)
+  >({ type: 2, style, custom_id } as ButtonJson<NoSemicolon<C>, T, S>, builderOptions)
   if (isString(label)) builder.label(label)
   else if (isArray(label)) builder.label(label[1]).emoji({ name: label[0] })
   return builder
 }
-//const testButton = makeButton('test', ['🔥', 'Fire']).custom_value('test2')//.delete('custom_value') //.toJSON()
+//const testButton = makeButton('test', ['🔥', 'Fire']).custom_value('test2') //.delete('custom_value') //.toJSON()
 
 type LinkButtonContext = undefined | string | [emoji: string, label: string]
 type LinkButtonJson<U extends string, T extends LinkButtonContext> = T extends undefined
@@ -255,12 +256,12 @@ type StringSelectOptionJsonFromInput<I extends StringSelectOptionInput> = I exte
  * @returns
  */
 export const makeStringSelect = <C extends string, const O extends StringSelectOptionInput>(
-  custom_id: C,
+  custom_id: NoSemicolon<C>,
   options: O[],
   builderOptions?: JsonBuilderOptions,
 ) =>
   createJsonBuilder<
-    { type: 3; custom_id: C; options: StringSelectOptionJsonFromInput<O>[] },
+    { type: 3; custom_id: NoSemicolon<C>; options: StringSelectOptionJsonFromInput<O>[] },
     AddCustomValue<APIStringSelectComponent>,
     'type' | 'custom_id'
   >(
@@ -275,9 +276,9 @@ export const makeStringSelect = <C extends string, const O extends StringSelectO
 
 type TextInputContext = undefined | string
 type TextInputJson<C extends string, L extends TextInputContext, S extends TextInputStyle = 1> = L extends undefined
-  ? { type: 4; custom_id: C; style: S }
+  ? { type: 4; custom_id: NoSemicolon<C>; style: S }
   : L extends string
-    ? { type: 4; custom_id: C; style: S; label: L }
+    ? { type: 4; custom_id: NoSemicolon<C>; style: S; label: L }
     : never
 
 /**
@@ -289,7 +290,7 @@ type TextInputJson<C extends string, L extends TextInputContext, S extends TextI
  * @returns
  */
 export const makeTextInput = <C extends string, L extends TextInputContext = undefined, S extends TextInputStyle = 1>(
-  custom_id: C,
+  custom_id: NoSemicolon<C>,
   label: L = undefined as L,
   style: S = 1 as S,
   builderOptions?: JsonBuilderOptions,
@@ -298,7 +299,7 @@ export const makeTextInput = <C extends string, L extends TextInputContext = und
     TextInputJson<C, L, S>,
     AddCustomValue<APITextInputComponent>,
     'type' | 'custom_id'
-  >({ type: 4, custom_id, style } as TextInputJson<C, L, S>, builderOptions)
+  >({ type: 4, custom_id, style } as TextInputJson<NoSemicolon<C>, L, S>, builderOptions)
   if (isString(label)) builder.label(label)
   return builder
 }
@@ -310,9 +311,9 @@ export const makeTextInput = <C extends string, L extends TextInputContext = und
  * @param builderOptions
  * @returns
  */
-export const makeUserSelect = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
+export const makeUserSelect = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) =>
   createJsonBuilder<
-    { type: 5; custom_id: C },
+    { type: 5; custom_id: NoSemicolon<C> },
     AddCustomValue<APIBaseAutoPopulatedSelectMenuComponent<ComponentType.UserSelect, SelectMenuDefaultValueType.User>>,
     'type' | 'custom_id'
   >({ type: 5, custom_id }, builderOptions)
@@ -324,9 +325,9 @@ export const makeUserSelect = <C extends string>(custom_id: C, builderOptions?: 
  * @param builderOptions
  * @returns
  */
-export const makeRoleSelect = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
+export const makeRoleSelect = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) =>
   createJsonBuilder<
-    { type: 6; custom_id: C },
+    { type: 6; custom_id: NoSemicolon<C> },
     AddCustomValue<APIBaseAutoPopulatedSelectMenuComponent<ComponentType.RoleSelect, SelectMenuDefaultValueType.Role>>,
     'type' | 'custom_id'
   >({ type: 6, custom_id }, builderOptions)
@@ -338,9 +339,12 @@ export const makeRoleSelect = <C extends string>(custom_id: C, builderOptions?: 
  * @param builderOptions
  * @returns
  */
-export const makeMentionableSelect = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
+export const makeMentionableSelect = <C extends string>(
+  custom_id: NoSemicolon<C>,
+  builderOptions?: JsonBuilderOptions,
+) =>
   createJsonBuilder<
-    { type: 7; custom_id: C },
+    { type: 7; custom_id: NoSemicolon<C> },
     AddCustomValue<
       APIBaseAutoPopulatedSelectMenuComponent<
         ComponentType.MentionableSelect,
@@ -357,11 +361,12 @@ export const makeMentionableSelect = <C extends string>(custom_id: C, builderOpt
  * @param builderOptions
  * @returns
  */
-export const makeChannelSelect = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
-  createJsonBuilder<{ type: 8; custom_id: C }, AddCustomValue<APIChannelSelectComponent>, 'type' | 'custom_id'>(
-    { type: 8, custom_id },
-    builderOptions,
-  )
+export const makeChannelSelect = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<
+    { type: 8; custom_id: NoSemicolon<C> },
+    AddCustomValue<APIChannelSelectComponent>,
+    'type' | 'custom_id'
+  >({ type: 8, custom_id }, builderOptions)
 //const testChannelSelect = makeChannelSelect('test')
 
 /**
@@ -401,36 +406,77 @@ export const makeTextDisplay = <C extends string>(content: C, builderOptions?: J
 //const testSection = makeSection([makeTextDisplay('Test'), makeTextDisplay('Second')], makeButton('test', 'Button'))
 
 /**
- * Component Thumbnail
+ * Child Component Media Gallery Item
  * @param media
  * @param builderOptions
  * @returns
  */
-export const makeThumbnail = <M extends JsonSerializable<TemplatedThumbnailComponent['media']>>(
+export const makeMediaGalleryItem = <M extends JsonSerializable<TemplatedMediaGalleryItem['media']>>(
   media: M,
   builderOptions?: JsonBuilderOptions,
-) =>
-  createJsonBuilder<{ type: 11; media: ToJSON<M> }, AddCustomValue<TemplatedThumbnailComponent>, 'type'>(
-    { type: 11, media: toJSON(media) },
-    builderOptions,
-  )
-//const testThumbnail = makeThumbnail({ url: 'https://example.com/image.png'})
+) => createJsonBuilder<{ media: ToJSON<M> }, APIMediaGalleryItem>({ media: toJSON(media) }, builderOptions)
+//const testMediaGalleryItem = makeMediaGalleryItem({ url: 'https://example.com/image.png' })
 
 /**
- * Component Media Gallery
- * @param items
+ * Child Component Unfurled Media Item
+ * @param url
  * @param builderOptions
  * @returns
  */
-export const makeMediaGallery = <I extends JsonSerializable<TemplatedMediaGalleryComponent['items'][number]>>(
-  items: I[],
+export const makeUnfurledMediaItem = <U extends TemplatedUnfurledMediaItem['url']>(
+  url: U,
+  builderOptions?: JsonBuilderOptions,
+) => createJsonBuilder<{ url: U }, TemplatedUnfurledMediaItem>({ url }, builderOptions)
+//const testUMI = makeUnfurledMediaItem('htps://example.com/image.png')
+
+type MediaGalleryItemBuilderResult<M extends JsonSerializable<TemplatedMediaGalleryItem['media']>> = ReturnType<
+  typeof makeMediaGalleryItem<M>
+>
+type UnfurledMediaItemBuilderResult<U extends TemplatedUnfurledMediaItem['url']> = ReturnType<
+  typeof makeUnfurledMediaItem<U>
+>
+
+/**
+ * Component Thumbnail
+ * @param url
+ * @param builderOptions
+ * @returns
+ */
+export const makeThumbnail = <U extends TemplatedUnfurledMediaItem['url']>(
+  url: U,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ type: 12; items: ToJSON<I>[] }, AddCustomValue<TemplatedMediaGalleryComponent>, 'type'>(
-    { type: 12, items: items.map(toJSON) },
+  createJsonBuilder<
+    { type: 11; media: ToJSON<UnfurledMediaItemBuilderResult<U>> },
+    AddCustomValue<TemplatedThumbnailComponent>,
+    'type'
+  >({ type: 11, media: makeUnfurledMediaItem(url, builderOptions).toJSON() }, builderOptions)
+//const testThumbnail = makeThumbnail('https://example.com/image.png')
+
+/**
+ * Component Media Gallery
+ * @param urls
+ * @param builderOptions
+ * @returns
+ */
+export const makeMediaGallery = <U extends TemplatedUnfurledMediaItem['url']>(
+  urls: U[],
+  builderOptions?: JsonBuilderOptions,
+) =>
+  createJsonBuilder<
+    { type: 12; items: ToJSON<MediaGalleryItemBuilderResult<UnfurledMediaItemBuilderResult<U>>>[] },
+    AddCustomValue<TemplatedMediaGalleryComponent>,
+    'type'
+  >(
+    {
+      type: 12,
+      items: urls.map(url => makeMediaGalleryItem(makeUnfurledMediaItem(url, builderOptions), builderOptions).toJSON()),
+    },
     builderOptions,
   )
-//const testMediaGallery1 = makeMediaGallery([{ media: { url: 'https://example.com/image1.png' } }, { media: { url: 'https://example.com/image2.png' } }])
+//const testMediaGallery1 = makeMediaGallery(['https://example.com/image1.png', 'https://example.com/image2.png'])
+//const testMediaItem = makeMediaGalleryItem(makeUnfurledMediaItem('https://example.com/image.png'))
+//const testFile = makeFile(makeUnfurledMediaItem('attachment://file.png'))
 
 /**
  * Component File
@@ -438,15 +484,13 @@ export const makeMediaGallery = <I extends JsonSerializable<TemplatedMediaGaller
  * @param builderOptions
  * @returns
  */
-export const makeFile = <F extends JsonSerializable<TemplatedFileComponent['file']>>(
-  file: F,
-  builderOptions?: JsonBuilderOptions,
-) =>
-  createJsonBuilder<{ type: 13; file: ToJSON<F> }, AddCustomValue<TemplatedFileComponent>, 'type'>(
-    { type: 13, file: toJSON(file) },
-    builderOptions,
-  )
-//const testFile = makeFile({ url: 'attachment://file.png' })
+export const makeFile = <U extends AttachmentUrl>(url: U, builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<
+    { type: 13; file: ToJSON<UnfurledMediaItemBuilderResult<U>> },
+    AddCustomValue<TemplatedFileComponent>,
+    'type'
+  >({ type: 13, file: makeUnfurledMediaItem(url, builderOptions).toJSON() }, builderOptions)
+//const testFile = makeFile('attachment://file.png')
 
 /**
  * Component Separator
@@ -495,11 +539,12 @@ export const makeLabel = <L extends string, C extends JsonSerializable<APILabelC
  * @param builderOptions
  * @returns
  */
-export const makeFileUpload = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
-  createJsonBuilder<{ type: 19; custom_id: C }, AddCustomValue<APIFileUploadComponent>, 'type' | 'custom_id'>(
-    { type: 19, custom_id },
-    builderOptions,
-  )
+export const makeFileUpload = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<
+    { type: 19; custom_id: NoSemicolon<C> },
+    AddCustomValue<APIFileUploadComponent>,
+    'type' | 'custom_id'
+  >({ type: 19, custom_id }, builderOptions)
 //const testFileUpload = makeFileUpload('test')
 
 /**
@@ -535,12 +580,12 @@ type RadioGroupOptionJsonFromInput<I extends RadioGroupOptionInput> = I extends 
  * @returns
  */
 export const makeRadioGroup = <C extends string, const O extends RadioGroupOptionInput>(
-  custom_id: C,
+  custom_id: NoSemicolon<C>,
   options: O[],
   builderOptions?: JsonBuilderOptions,
 ) =>
   createJsonBuilder<
-    { type: 21; custom_id: C; options: RadioGroupOptionJsonFromInput<O>[] },
+    { type: 21; custom_id: NoSemicolon<C>; options: RadioGroupOptionJsonFromInput<O>[] },
     AddCustomValue<APIRadioGroupComponent>,
     'type' | 'custom_id'
   >(
@@ -589,12 +634,12 @@ type CheckboxGroupOptionJsonFromInput<I extends CheckboxGroupOptionInput> = I ex
  * @returns
  */
 export const makeCheckboxGroup = <C extends string, const O extends CheckboxGroupOptionInput>(
-  custom_id: C,
+  custom_id: NoSemicolon<C>,
   options: O[],
   builderOptions?: JsonBuilderOptions,
 ) =>
   createJsonBuilder<
-    { type: 22; custom_id: C; options: CheckboxGroupOptionJsonFromInput<O>[] },
+    { type: 22; custom_id: NoSemicolon<C>; options: CheckboxGroupOptionJsonFromInput<O>[] },
     AddCustomValue<APICheckboxGroupComponent>,
     'type' | 'custom_id'
   >(
@@ -613,52 +658,21 @@ export const makeCheckboxGroup = <C extends string, const O extends CheckboxGrou
  * @param builderOptions
  * @returns
  */
-export const makeCheckbox = <C extends string>(custom_id: C, builderOptions?: JsonBuilderOptions) =>
-  createJsonBuilder<{ type: 23; custom_id: C }, AddCustomValue<APICheckboxComponent>, 'type' | 'custom_id'>(
-    { type: 23, custom_id },
-    builderOptions,
-  )
+export const makeCheckbox = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<
+    { type: 23; custom_id: NoSemicolon<C> },
+    AddCustomValue<APICheckboxComponent>,
+    'type' | 'custom_id'
+  >({ type: 23, custom_id }, builderOptions)
 
-// Child Component
-
-/**
- * Child Component Media Gallery Item
- * @param media
- * @param builderOptions
- * @returns
- */
-export const makeMediaGalleryItem = <M extends JsonSerializable<TemplatedMediaGalleryItem['media']>>(
-  media: M,
-  builderOptions?: JsonBuilderOptions,
-) => createJsonBuilder<{ media: ToJSON<M> }, APIMediaGalleryItem>({ media: toJSON(media) }, builderOptions)
-//const testMediaGalleryItem = makeMediaGalleryItem({ url: 'https://example.com/image.png' })
-
-/**
- * Child Component Unfurled Media Item
- * @param url
- * @param builderOptions
- * @returns
- */
-export const makeUnfurledMediaItem = <U extends TemplatedUnfurledMediaItem['url']>(
-  url: U,
-  builderOptions?: JsonBuilderOptions,
-) => createJsonBuilder<{ url: U }, TemplatedUnfurledMediaItem>({ url }, builderOptions)
-//const testUMI = makeUnfurledMediaItem('htps://example.com/image.png')
-//const testThumbnail = makeThumbnail(makeUnfurledMediaItem('https://example.com/image.png'))
-//const testMediaItem = makeMediaGalleryItem(makeUnfurledMediaItem('https://example.com/image.png'))
-//const testMediaGallery = makeMediaGallery([testMediaItem])
-//const testFile = makeFile(makeUnfurledMediaItem('attachment://file.png'))
 /*
-const testContainer = containerBuilder([
-  sectionBuilder(
-    [textDisplayBuilder('Section 1'), textDisplayBuilder('Section 2')],
-    thumbnailBuilder({ url: 'https://example.com/image.png' }),
+const testContainer = makeContainer([
+  makeSection(
+    [makeTextDisplay('Section 1'), makeTextDisplay('Section 2')],
+    makeThumbnail('https://example.com/image.png'),
   ),
-  separatorBuilder(),
-  mediaGalleryBuilder([
-    mediaGalleryItemBuilder({ url: 'https://example.com/image1.png' }),
-    mediaGalleryItemBuilder({ url: 'https://example.com/image2.png' }),
-  ]),
-  fileBuilder({ url: 'attachment://file.png' }),
+  makeSeparator(),
+  makeMediaGallery(['https://example.com/image1.png', 'https://example.com/image2.png']),
+  makeFile('attachment://file.png'),
 ])
 */
