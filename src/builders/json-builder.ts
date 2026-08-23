@@ -108,6 +108,8 @@ export const createJsonBuilder = <const T extends object, M extends object, E ex
           case 'clone':
             // If options.clone is true, leave it to the functionality of jsonBuilder.
             return () => createJsonBuilder(options?.clone ? data : clone(data), options)
+          case 'then':
+            return undefined
           default:
             if (isProto(prop)) throw newError('jsonBuilder', `Invalid key: ${String(prop)}`)
             if (typeof prop === 'symbol' || prop in Object.prototype) return Reflect.get(target, prop, proxy)
