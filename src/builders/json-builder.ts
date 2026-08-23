@@ -5,6 +5,7 @@
 
 import type { JsonSerializable, Simplify } from '../types'
 import { CUSTOM_ID_SEPARATOR, isArray, isProto, newError, toJSON } from '../utils'
+import { ifThrowHasSemicolon } from './utils'
 
 export type AddCustomValue<T> = T extends any
   ? 'custom_id' extends keyof T
@@ -87,9 +88,11 @@ export const createJsonBuilder = <const T extends object, M extends object, E ex
         switch (prop) {
           case 'toJSON': {
             const { custom_id, custom_value, ...rest } = data
-            if (custom_id || custom_value)
+            if (custom_id !== undefined) ifThrowHasSemicolon(String(custom_id))
+            if (custom_value !== undefined) ifThrowHasSemicolon(String(custom_value))
+            if (custom_id !== undefined || custom_value !== undefined)
               // biome-ignore lint/complexity/useLiteralKeys: Not sure if custom_id exists
-              rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
+              rest['custom_id'] = `${String(custom_id ?? '')}${custom_value === undefined ? '' : `${CUSTOM_ID_SEPARATOR}${String(custom_value)}`}`
             return () => (options?.clone ? clone(rest) : rest)
           }
           case 'delete':
