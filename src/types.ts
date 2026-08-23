@@ -1,4 +1,3 @@
-import type { EmbedBuilder } from '@discordjs/builders'
 import type {
   APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandInteraction,
@@ -19,24 +18,28 @@ import type {
   LayoutSection,
   LayoutSeparator,
 } from './builders/components-v2'
-import type { Embed } from './builders/embed'
-import type { Poll } from './builders/poll'
 import type { Context } from './context'
 
 ////////// Utils //////////
 
+export type Simplify<T> = { [K in keyof T]: T[K] } & {}
+
 export type ExcludeMethods<T, K extends keyof T> = { [P in keyof T as P extends K ? never : P]: T[P] }
+
+export type NoSemicolon<S extends string> = S extends `${string};${string}` ? never : S
+
+export type JsonSerializable<V> = V extends (infer U)[] ? JsonSerializable<U>[] : { toJSON(): V } | V
 
 ////////// Env //////////
 
-export type Env = {
+export interface Env {
   Bindings?: object
   Variables?: Record<string, unknown>
 }
 
 ////////// DiscordEnv //////////
 
-export type DiscordEnv = {
+export interface DiscordEnv {
   TOKEN?: string | undefined
   PUBLIC_KEY?: string | undefined
   APPLICATION_ID?: string | undefined
@@ -54,23 +57,23 @@ type RetypedResolved = {
   [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined>
 }
 
-type CommandRef = RetypedResolved & {
+interface CommandRef extends RetypedResolved {
   key: string
   target_id?: string
 }
-type ComponentRef = RetypedResolved & {
+interface ComponentRef extends RetypedResolved {
   key: string
   custom_value?: string
   values?: string[]
 }
-type ModalRef = RetypedResolved & {
+interface ModalRef extends RetypedResolved {
   key: string
   custom_value?: string
 }
-type CronRef = {
+interface CronRef {
   key: string
 }
-export type ContextRef = CommandRef & ComponentRef & ModalRef & CronRef
+export interface ContextRef extends CommandRef, ComponentRef, ModalRef, CronRef {}
 
 export type ComponentType = Button<any> | Select<any, any> //'Button' | 'Select'
 // biome-ignore format: ternary operator
@@ -133,7 +136,7 @@ export type Verify = (
   timestamp: string | null,
   publicKey: string,
 ) => Promise<boolean> | boolean
-export type InitOptions<E extends Env> = {
+export interface InitOptions<E extends Env> {
   verify?: Verify
   discordEnv?: DiscordEnv | ((env: E['Bindings'] | undefined) => DiscordEnv)
 }
@@ -141,7 +144,7 @@ export type InitOptions<E extends Env> = {
 ////////// CronEvent //////////
 // https://developers.cloudflare.com/workers/runtime-apis/handlers/scheduled/#syntax
 
-export type CronEvent = {
+export interface CronEvent {
   cron: string
   type: string
   scheduledTime: number
@@ -179,14 +182,14 @@ export type CustomCallbackData<T extends Record<string, unknown>> =
             | ContentFile
           )[]
         | T['components']
-      embeds?: (Embed | EmbedBuilder)[] | T['embeds']
-      poll?: Poll | T['poll']
+      embeds?: JsonSerializable<T['embeds']>
+      poll?: JsonSerializable<T['poll']>
     })
   | string
 
 ////////// FileData //////////
 
-type FileUnit = {
+interface FileUnit {
   blob: Blob
   name: string
 }
@@ -194,4 +197,6 @@ export type FileData = FileUnit | FileUnit[]
 
 ///////// TypedResponse //////////
 
-export type TypedResponse<T> = Omit<Response, 'json'> & { json(): Promise<T> }
+export interface TypedResponse<T> extends Omit<Response, 'json'> {
+  json(): Promise<T>
+}

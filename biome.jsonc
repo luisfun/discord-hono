@@ -15,10 +15,10 @@
   "linter": {
     "domains": {
       "project": "all",
-      "test": "all"
+      "test": "all",
+      "types": "all"
     },
     "rules": {
-      "recommended": true,
       "correctness": {
         "useImportExtensions": "off" // For simple coding purposes
       },
@@ -33,13 +33,14 @@
         "noReExportAll": "off" // For consistency in file separation
       },
       "suspicious": {
-        "noExplicitAny": "off", // Allow type any
         "noConsole": {
           "level": "on",
           "options": {
             "allow": ["assert", "error", "info", "warn"]
           }
-        }
+        },
+        "noExplicitAny": "off", // Allow type any
+        "noUnnecessaryConditions": "off" // Allow unnecessary conditions
       }
     }
   },

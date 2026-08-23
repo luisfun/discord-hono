@@ -36,7 +36,7 @@ type Var = {}
 
 type ExtractComponentVars<T> = T extends Select<infer K, infer _T2> ? { [P in K]: string[] } : {}
 
-type Factory<E extends Env> = {
+interface Factory<E extends Env> {
   discord(init?: InitOptions<E>): DiscordHonoExtends<E>
   command<V extends Var>(
     command: Command<V>,

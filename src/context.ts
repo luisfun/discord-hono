@@ -35,7 +35,7 @@ import type {
   ModalContext,
   TypedResponse,
 } from './types'
-import { formData, isProto, type MessageFlag, messageFlags, newError, prepareData, toJSON } from './utils'
+import { formData, isArray, isProto, type MessageFlag, messageFlags, newError, prepareData, toJSON } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
@@ -47,7 +47,7 @@ type AutocompleteOption =
   | APIApplicationCommandInteractionDataIntegerOption
   | APIApplicationCommandInteractionDataNumberOption
 
-type SubKey = {
+interface SubKey {
   group: string
   command: string
   string: string
@@ -84,7 +84,7 @@ export class Context<
     this.#discord = discord
     this.#interaction = interaction
     this.#ref = { key }
-    if ('data' in interaction) {
+    if ('data' in interaction && interaction.data) {
       const { data } = interaction
       for (const k of ['custom_value', 'target_id', 'values'] as const) if (k in data) this.#ref[k] = (data as any)[k]
       // security-ignore: `data.resolved` is raw data from the Discord API, and the risk of prototype pollution is low.
@@ -343,11 +343,19 @@ export class Context<
   }
 
   /**
-   * @param {Autocomplete | APICommandAutocompleteInteractionResponseCallbackData} data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
+   * @param {Autocomplete | APICommandAutocompleteInteractionResponseCallbackData | APIApplicationCommandOptionChoice<string | number>[]} data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
    * @returns {Response}
    */
-  resAutocomplete(data: Autocomplete | APICommandAutocompleteInteractionResponseCallbackData): Response {
+  resAutocomplete(
+    data:
+      | Autocomplete
+      | APICommandAutocompleteInteractionResponseCallbackData
+      | Required<APICommandAutocompleteInteractionResponseCallbackData>['choices'],
+  ): Response {
     this.#throwIfNotAllowType([4])
-    return Response.json({ type: 8, data: toJSON(data) } satisfies APIApplicationCommandAutocompleteResponse)
+    const responseData: APICommandAutocompleteInteractionResponseCallbackData = isArray(data)
+      ? { choices: data }
+      : toJSON(data)
+    return Response.json({ type: 8, data: responseData } satisfies APIApplicationCommandAutocompleteResponse)
   }
 }

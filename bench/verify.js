@@ -1,6 +1,6 @@
 // @ts-check
 
-import { bench, boxplot, compact, run, summary } from 'mitata'
+import { bench, boxplot, run, summary } from 'mitata'
 import pkg from '../package.json' with { type: 'json' }
 
 /**
@@ -34,7 +34,7 @@ const benchmarks = () => {
   }
 }
 
-compact(benchmarks) // warm-up
+//compact(benchmarks) // warm-up
 boxplot(() => summary(benchmarks))
 
 await run()
