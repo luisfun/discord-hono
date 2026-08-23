@@ -32,6 +32,7 @@ import type {
   ExecutionContext,
   FetchEventLike,
   FileData,
+  JsonSerializable,
   ModalContext,
   TypedResponse,
 } from './types'
@@ -312,7 +313,7 @@ export class Context<
    * )
    * ```
    */
-  resModal(data: Modal | APIModalInteractionResponseCallbackData): Response {
+  resModal(data: JsonSerializable<APIModalInteractionResponseCallbackData> | Modal): Response {
     this.#throwIfNotAllowType([2, 3])
     return Response.json({ type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse)
   }
