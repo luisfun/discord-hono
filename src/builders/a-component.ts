@@ -480,7 +480,7 @@ export const makeMediaGallery = <U extends TemplatedUnfurledMediaItem['url']>(
 
 /**
  * Component File
- * @param file MediaItem with a URL consisting only of `attachment://`
+ * @param url Attachment URL beginning with `attachment://`
  * @param builderOptions
  * @returns
  */

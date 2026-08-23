@@ -18,7 +18,6 @@ import type {
   LayoutSection,
   LayoutSeparator,
 } from './builders/components-v2'
-import type { Poll } from './builders/poll'
 import type { Context } from './context'
 
 ////////// Utils //////////
@@ -184,7 +183,7 @@ export type CustomCallbackData<T extends Record<string, unknown>> =
           )[]
         | T['components']
       embeds?: JsonSerializable<T['embeds']>
-      poll?: Poll | T['poll']
+      poll?: JsonSerializable<T['poll']>
     })
   | string
 

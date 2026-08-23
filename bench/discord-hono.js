@@ -3,7 +3,7 @@
 // biome-ignore-all lint/correctness/noUnresolvedImports: Ignore for local processing
 import { DiscordHono as DiscordHonoOld } from 'discord-hono'
 import { bench, boxplot, compact, run, summary } from 'mitata'
-import { Command, DiscordHono, Option, testCommandRequestInit, testVerifyTrue } from '../dist/index.js'
+import { Command, DiscordHono, Option, testCommandRequestInit, testVerifyTrue } from '../dist/index.mjs'
 import pkg from '../package.json' with { type: 'json' }
 
 const init = testCommandRequestInit(new Command('test', 'Test command').options(new Option('text', 'description')))
