@@ -84,7 +84,7 @@ export class Context<
     this.#discord = discord
     this.#interaction = interaction
     this.#ref = { key }
-    if ('data' in interaction) {
+    if ('data' in interaction && interaction.data) {
       const { data } = interaction
       for (const k of ['custom_value', 'target_id', 'values'] as const) if (k in data) this.#ref[k] = (data as any)[k]
       // security-ignore: `data.resolved` is raw data from the Discord API, and the risk of prototype pollution is low.
