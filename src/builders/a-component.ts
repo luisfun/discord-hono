@@ -34,7 +34,6 @@ import type {
 } from 'discord-api-types/v10'
 import type { JsonSerializable, NoSemicolon } from '../types'
 import { isArray, isString, type ToJSON, toJSON } from '../utils'
-import { ifThrowHasSemicolon } from './utils'
 import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions } from './json-builder'
 
 type WebUrl = `${'http' | 'https'}://${string}`
@@ -155,7 +154,6 @@ export const makeButton = <
   style: S = 1 as S,
   builderOptions?: JsonBuilderOptions,
 ) => {
-  ifThrowHasSemicolon(custom_id)
   const builder = createJsonBuilder<
     ButtonJson<C, T, S>,
     AddCustomValue<APIButtonComponentWithCustomId>,
@@ -261,9 +259,8 @@ export const makeStringSelect = <C extends string, const O extends StringSelectO
   custom_id: NoSemicolon<C>,
   options: O[],
   builderOptions?: JsonBuilderOptions,
-) => {
-  ifThrowHasSemicolon(custom_id)
-  return createJsonBuilder<
+) =>
+  createJsonBuilder<
     { type: 3; custom_id: NoSemicolon<C>; options: StringSelectOptionJsonFromInput<O>[] },
     AddCustomValue<APIStringSelectComponent>,
     'type' | 'custom_id'
@@ -275,7 +272,6 @@ export const makeStringSelect = <C extends string, const O extends StringSelectO
     },
     builderOptions,
   )
-}
 //const testStringSelect = makeStringSelect('test', [['value1', 'Option 1'], ['value2', ['🔥', 'Option 2']]]).options([makeStringSelectOption('option1', ['🔥', 'Option 1']), makeStringSelectOption('option2', 'Option 2')])
 
 type TextInputContext = undefined | string
@@ -299,7 +295,6 @@ export const makeTextInput = <C extends string, L extends TextInputContext = und
   style: S = 1 as S,
   builderOptions?: JsonBuilderOptions,
 ) => {
-  ifThrowHasSemicolon(custom_id)
   const builder = createJsonBuilder<
     TextInputJson<C, L, S>,
     AddCustomValue<APITextInputComponent>,
@@ -316,14 +311,12 @@ export const makeTextInput = <C extends string, L extends TextInputContext = und
  * @param builderOptions
  * @returns
  */
-export const makeUserSelect = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) => {
-  ifThrowHasSemicolon(custom_id)
-  return createJsonBuilder<
+export const makeUserSelect = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<
     { type: 5; custom_id: NoSemicolon<C> },
     AddCustomValue<APIBaseAutoPopulatedSelectMenuComponent<ComponentType.UserSelect, SelectMenuDefaultValueType.User>>,
     'type' | 'custom_id'
   >({ type: 5, custom_id }, builderOptions)
-}
 //const testUserSelect = makeUserSelect('test')
 
 /**
@@ -332,14 +325,12 @@ export const makeUserSelect = <C extends string>(custom_id: NoSemicolon<C>, buil
  * @param builderOptions
  * @returns
  */
-export const makeRoleSelect = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) => {
-  ifThrowHasSemicolon(custom_id)
-  return createJsonBuilder<
+export const makeRoleSelect = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<
     { type: 6; custom_id: NoSemicolon<C> },
     AddCustomValue<APIBaseAutoPopulatedSelectMenuComponent<ComponentType.RoleSelect, SelectMenuDefaultValueType.Role>>,
     'type' | 'custom_id'
   >({ type: 6, custom_id }, builderOptions)
-}
 //const testRoleSelect = makeRoleSelect('test')
 
 /**
@@ -351,9 +342,8 @@ export const makeRoleSelect = <C extends string>(custom_id: NoSemicolon<C>, buil
 export const makeMentionableSelect = <C extends string>(
   custom_id: NoSemicolon<C>,
   builderOptions?: JsonBuilderOptions,
-) => {
-  ifThrowHasSemicolon(custom_id)
-  return createJsonBuilder<
+) =>
+  createJsonBuilder<
     { type: 7; custom_id: NoSemicolon<C> },
     AddCustomValue<
       APIBaseAutoPopulatedSelectMenuComponent<
@@ -363,7 +353,6 @@ export const makeMentionableSelect = <C extends string>(
     >,
     'type' | 'custom_id'
   >({ type: 7, custom_id }, builderOptions)
-}
 //const testMentionableSelect = makeMentionableSelect('test')
 
 /**
@@ -372,14 +361,12 @@ export const makeMentionableSelect = <C extends string>(
  * @param builderOptions
  * @returns
  */
-export const makeChannelSelect = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) => {
-  ifThrowHasSemicolon(custom_id)
-  return createJsonBuilder<
+export const makeChannelSelect = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<
     { type: 8; custom_id: NoSemicolon<C> },
     AddCustomValue<APIChannelSelectComponent>,
     'type' | 'custom_id'
   >({ type: 8, custom_id }, builderOptions)
-}
 //const testChannelSelect = makeChannelSelect('test')
 
 /**
@@ -552,14 +539,12 @@ export const makeLabel = <L extends string, C extends JsonSerializable<APILabelC
  * @param builderOptions
  * @returns
  */
-export const makeFileUpload = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) => {
-  ifThrowHasSemicolon(custom_id)
-  return createJsonBuilder<
+export const makeFileUpload = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<
     { type: 19; custom_id: NoSemicolon<C> },
     AddCustomValue<APIFileUploadComponent>,
     'type' | 'custom_id'
   >({ type: 19, custom_id }, builderOptions)
-}
 //const testFileUpload = makeFileUpload('test')
 
 /**
@@ -598,9 +583,8 @@ export const makeRadioGroup = <C extends string, const O extends RadioGroupOptio
   custom_id: NoSemicolon<C>,
   options: O[],
   builderOptions?: JsonBuilderOptions,
-) => {
-  ifThrowHasSemicolon(custom_id)
-  return createJsonBuilder<
+) =>
+  createJsonBuilder<
     { type: 21; custom_id: NoSemicolon<C>; options: RadioGroupOptionJsonFromInput<O>[] },
     AddCustomValue<APIRadioGroupComponent>,
     'type' | 'custom_id'
@@ -612,7 +596,6 @@ export const makeRadioGroup = <C extends string, const O extends RadioGroupOptio
     },
     builderOptions,
   )
-}
 //const testRadioGroup = makeRadioGroup('test', [['value 1', 'V1'], ['value 2', 'Display 2']])
 
 /**
@@ -654,9 +637,8 @@ export const makeCheckboxGroup = <C extends string, const O extends CheckboxGrou
   custom_id: NoSemicolon<C>,
   options: O[],
   builderOptions?: JsonBuilderOptions,
-) => {
-  ifThrowHasSemicolon(custom_id)
-  return createJsonBuilder<
+) =>
+  createJsonBuilder<
     { type: 22; custom_id: NoSemicolon<C>; options: CheckboxGroupOptionJsonFromInput<O>[] },
     AddCustomValue<APICheckboxGroupComponent>,
     'type' | 'custom_id'
@@ -668,7 +650,6 @@ export const makeCheckboxGroup = <C extends string, const O extends CheckboxGrou
     },
     builderOptions,
   )
-}
 //const testCheckboxGroup = makeCheckboxGroup('test', [['value 1', 'V1'], ['value 2', 'Display 2']])
 
 /**
@@ -677,14 +658,12 @@ export const makeCheckboxGroup = <C extends string, const O extends CheckboxGrou
  * @param builderOptions
  * @returns
  */
-export const makeCheckbox = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) => {
-  ifThrowHasSemicolon(custom_id)
-  return createJsonBuilder<
+export const makeCheckbox = <C extends string>(custom_id: NoSemicolon<C>, builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<
     { type: 23; custom_id: NoSemicolon<C> },
     AddCustomValue<APICheckboxComponent>,
     'type' | 'custom_id'
   >({ type: 23, custom_id }, builderOptions)
-}
 
 /*
 const testContainer = makeContainer([

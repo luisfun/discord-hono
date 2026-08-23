@@ -6,7 +6,6 @@ import type {
 } from 'discord-api-types/v10'
 import type { JsonSerializable, NoSemicolon } from '../types'
 import { type ToJSON, toJSON } from '../utils'
-import { ifThrowHasSemicolon } from './utils'
 import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions } from './json-builder'
 
 export const makeModal = <
@@ -18,14 +17,12 @@ export const makeModal = <
   title: T,
   components: C[],
   builderOptions?: JsonBuilderOptions,
-) => {
-  ifThrowHasSemicolon(custom_id)
-  return createJsonBuilder<
+) =>
+  createJsonBuilder<
     { custom_id: NoSemicolon<I>; title: T; components: ToJSON<C>[] },
     AddCustomValue<APIModalInteractionResponseCallbackData>,
     'custom_id'
   >({ custom_id, title, components: components.map(toJSON) }, builderOptions)
-}
 
 /*
 import { makeActionRow, makeLabel, makeTextInput } from './a-component'

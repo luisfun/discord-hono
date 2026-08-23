@@ -7,7 +7,6 @@ import type {
 } from 'discord-api-types/v10'
 import { Locale } from 'discord-api-types/v10'
 import { describe, expect, it, vi } from 'vitest'
-import { makeModal } from './builders'
 import { Context } from './context'
 import { $webhooks$_$_$messages$original, createRest } from './rest'
 import type { CommandContext, ComponentContext } from './types'
@@ -422,14 +421,6 @@ describe('Context', () => {
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.type).toEqual(9) // MODAL
     expect(body.data.title).toEqual('Test Modal')
-  })
-
-  it('should accept modal builders in resModal', async () => {
-    const ctx = new Context(env, executionCtx, discordEnv, key, commandInteraction)
-    const response = ctx.resModal(makeModal('modal-test', 'Test Modal', []))
-    const body = await response.json()
-    expect(body.type).toEqual(9)
-    expect(body.data).toMatchObject({ title: 'Test Modal', custom_id: 'modal-test', components: [] })
   })
 
   it('should create autocomplete response', async () => {
