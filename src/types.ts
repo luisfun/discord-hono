@@ -1,4 +1,3 @@
-import type { EmbedBuilder } from '@discordjs/builders'
 import type {
   APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandInteraction,
@@ -19,7 +18,6 @@ import type {
   LayoutSection,
   LayoutSeparator,
 } from './builders/components-v2'
-import type { Embed } from './builders/embed'
 import type { Poll } from './builders/poll'
 import type { Context } from './context'
 
@@ -30,6 +28,8 @@ export type Simplify<T> = { [K in keyof T]: T[K] } & {}
 export type ExcludeMethods<T, K extends keyof T> = { [P in keyof T as P extends K ? never : P]: T[P] }
 
 export type NoSemicolon<S extends string> = S extends `${string};${string}` ? never : S
+
+export type JsonSerializable<V> = V extends (infer U)[] ? JsonSerializable<U>[] : { toJSON(): V } | V
 
 ////////// Env //////////
 
@@ -183,7 +183,7 @@ export type CustomCallbackData<T extends Record<string, unknown>> =
             | ContentFile
           )[]
         | T['components']
-      embeds?: (Embed | EmbedBuilder)[] | T['embeds']
+      embeds?: JsonSerializable<T['embeds']>
       poll?: Poll | T['poll']
     })
   | string

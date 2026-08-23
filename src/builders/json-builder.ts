@@ -3,7 +3,7 @@
  * - Consider restricting the methods accepted by jsonBuilder not only with type constraints but also by enforcing an allowlist
  */
 
-import type { Simplify } from '../types'
+import type { JsonSerializable, Simplify } from '../types'
 import { CUSTOM_ID_SEPARATOR, isArray, isProto, newError, toJSON } from '../utils'
 
 export type AddCustomValue<T> = T extends any
@@ -15,8 +15,6 @@ export type AddCustomValue<T> = T extends any
 type OptionalKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? K : never }[keyof T]
 
 type ResolvedToJSON<V> = V extends (infer U)[] ? ResolvedToJSON<U>[] : V extends { toJSON(): infer R } ? R : V
-
-export type JsonSerializable<V> = V extends (infer U)[] ? JsonSerializable<U>[] : { toJSON(): V } | V
 
 type CustomIdString<I, V> = V extends undefined
   ? I

@@ -1,22 +1,21 @@
-import type { SlashCommandBuilder } from '@discordjs/builders'
 import type {
   RESTPostAPIApplicationCommandsJSONBody,
   RESTPutAPIApplicationGuildCommandsJSONBody,
 } from 'discord-api-types/v10'
-import type { Command } from '../builders/command'
 import { createRest } from '../rest/rest'
 import { $applications$_$commands, $applications$_$guilds$_$commands } from '../rest/rest-path'
+import type { JsonSerializable } from '../types'
 import { newError, toJSON } from '../utils'
 
 /**
  * [Docs](https://discord-hono.luis.fun/rest-api/register/)
- * @param {(Command | SlashCommandBuilder | RESTPostAPIApplicationCommandsJSONBody)[]} commands
+ * @param {JsonSerializable<RESTPostAPIApplicationCommandsJSONBody[]>} commands
  * @param {string} application_id
  * @param {string} token
  * @param {string} [guild_id]
  */
 export const register = async (
-  commands: (Command | SlashCommandBuilder | RESTPostAPIApplicationCommandsJSONBody)[],
+  commands: JsonSerializable<RESTPostAPIApplicationCommandsJSONBody[]>,
   application_id: string | undefined,
   token: string | undefined,
   guild_id?: string | undefined,
@@ -55,3 +54,15 @@ export const register = async (
   }
   return logText
 }
+
+/*
+import { makeSlashCommand } from '../builders/a-command'
+import { SlashCommandBuilder } from '@discordjs/builders'
+
+const testRegister = async () => {
+  await register([makeSlashCommand('test', 'Test Command')], '', '', '')
+  await register([new SlashCommandBuilder().setName('test').setDescription('Test Command')], '', '', 'guild_id')
+}
+*/
+// Uncomment to test register function
+// testRegister()

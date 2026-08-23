@@ -1,8 +1,9 @@
 // biome-ignore-all lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
 
 import type { APIBasePollAnswer, APIPollMedia, RESTAPIPoll } from 'discord-api-types/v10'
+import type { JsonSerializable } from '../types'
 import { isArray, isString, type ToJSON, toJSON } from '../utils'
-import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions, type JsonSerializable } from './json-builder'
+import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions } from './json-builder'
 
 type PollMediaContext = string | [emoji: string] | [emoji: string, text: string]
 

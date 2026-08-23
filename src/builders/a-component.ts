@@ -32,9 +32,9 @@ import type {
   SelectMenuDefaultValueType,
   TextInputStyle,
 } from 'discord-api-types/v10'
-import type { NoSemicolon } from '../types'
+import type { JsonSerializable, NoSemicolon } from '../types'
 import { isArray, isString, type ToJSON, toJSON } from '../utils'
-import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions, type JsonSerializable } from './json-builder'
+import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions } from './json-builder'
 
 type WebUrl = `${'http' | 'https'}://${string}`
 type AttachmentUrl = `attachment://${string}`

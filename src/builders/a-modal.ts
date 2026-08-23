@@ -4,9 +4,9 @@ import type {
   APIModalInteractionResponseCallbackComponent,
   APIModalInteractionResponseCallbackData,
 } from 'discord-api-types/v10'
-import type { NoSemicolon } from '../types'
+import type { JsonSerializable, NoSemicolon } from '../types'
 import { type ToJSON, toJSON } from '../utils'
-import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions, type JsonSerializable } from './json-builder'
+import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions } from './json-builder'
 
 export const makeModal = <
   I extends string,
