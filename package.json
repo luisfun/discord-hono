@@ -55,7 +55,7 @@
     "vitest": "^4.1.11"
   },
   "peerDependencies": {
-    "discord-api-types": "^0.38.53"
+    "discord-api-types": "*"
   },
   "peerDependenciesMeta": {
     "discord-api-types": {
