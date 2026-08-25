@@ -33,7 +33,7 @@
   "scripts": {
     "fix": "biome check --write .",
     "fix:unsafe": "biome check --write --unsafe .",
-    "test": "biome check --write . && tsc && vitest run --coverage",
+    "test": "biome check . && tsc && vitest run --coverage",
     "build": "tsdown src/index.ts --format esm --dts --clean && attw -P . --ignore-rules cjs-resolves-to-esm",
     "bench:only": "node --expose-gc bench/discord-hono.js",
     "bench:verify": "node --expose-gc bench/verify.js",
