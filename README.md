@@ -10,7 +10,7 @@ Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors!
 ## Features
 
 - **Intuitive API** - Influenced by Hono, offering a familiar and easy-to-use interface
-- **Lightweight** - Zero dependencies, optimized for performance
+- **Lightweight** - Zero runtime dependencies, optimized for performance
 - **Type-Safe** - Native support for TypeScript
 
 ## Install

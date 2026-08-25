@@ -4,13 +4,16 @@
 
 import { newError } from './utils'
 
-// const hex2bin = Uint8Array.fromHex // ES2025
-const hex2bin = (hex: string): Uint8Array<ArrayBuffer> => {
-  const len = hex.length
-  const bin = new Uint8Array(len >> 1)
-  for (let i = 0; i < len; i += 2) bin[i >> 1] = parseInt(hex.slice(i, i + 2), 16)
-  return bin
-}
+const hex2bin: (hex: string) => Uint8Array<ArrayBuffer> =
+  // biome-ignore lint/suspicious/noTsIgnore: To prevent errors in GitHub Actions (supporting the latest Node.js).
+  // @ts-ignore: ES2025
+  Uint8Array.fromHex ??
+  ((hex: string): Uint8Array<ArrayBuffer> => {
+    const len = hex.length
+    const bin = new Uint8Array(len >> 1)
+    for (let i = 0; i < len; i += 2) bin[i >> 1] = parseInt(hex.slice(i, i + 2), 16)
+    return bin
+  })
 
 export const verify = async (
   body: string,

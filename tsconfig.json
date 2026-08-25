@@ -6,8 +6,7 @@
     "moduleResolution": "Bundler",
     "noEmit": true,
     "forceConsistentCasingInFileNames": true,
-    "erasableSyntaxOnly": true,
-    "ignoreDeprecations": "6.0" // dts builds fail with deprecation warnings, so ignore them for now
+    "erasableSyntaxOnly": true
   },
   "include": [".github/**/*", "src/**/*", "*"]
 }
