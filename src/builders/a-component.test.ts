@@ -11,6 +11,7 @@ import {
   makeFileUpload,
   makeLabel,
   makeLinkButton,
+  makeMediaGallery,
   makeMentionableSelect,
   makePremiumButton,
   makeRadioGroup,
@@ -63,6 +64,18 @@ describe('A-Component Builder', () => {
       })
     })
 
+    it('should create a button with emoji label', () => {
+      const button = makeButton('test_button', ['🔥', 'Button'])
+
+      expect(button.toJSON()).toEqual({
+        type: 2,
+        style: 1,
+        custom_id: 'test_button',
+        label: 'Button',
+        emoji: { name: '🔥' },
+      })
+    })
+
     it('should create a premium button', () => {
       const button = makePremiumButton('sku_123')
 
@@ -81,6 +94,20 @@ describe('A-Component Builder', () => {
         style: 1,
         custom_id: `test_button${CUSTOM_ID_SEPARATOR}suffix`,
         label: 'Click Me',
+      })
+    })
+  })
+
+  describe('Link Button', () => {
+    it('should create a link button with emoji label', () => {
+      const button = makeLinkButton('https://example.com', ['🔥', 'Link'])
+
+      expect(button.toJSON()).toEqual({
+        type: 2,
+        style: 5,
+        url: 'https://example.com',
+        label: 'Link',
+        emoji: { name: '🔥' },
       })
     })
   })
@@ -202,10 +229,14 @@ describe('A-Component Builder', () => {
     })
 
     it('should create a media gallery from urls', () => {
-      const gallery = makeThumbnail('attachment://image.png')
+      const gallery = makeMediaGallery(['https://example.com/image1.png', 'https://example.com/image2.png'])
+
       expect(gallery.toJSON()).toEqual({
-        type: 11,
-        media: { url: 'attachment://image.png' },
+        type: 12,
+        items: [
+          { media: { url: 'https://example.com/image1.png' } },
+          { media: { url: 'https://example.com/image2.png' } },
+        ],
       })
     })
 
