@@ -58,9 +58,15 @@ type ExtractOptionVar<T> = T extends { name: infer N extends string }
       : { [K in N]?: ExtractOptionValue<T> }
   : {}
 
+type ExtractNestedOptionVars<T> = T extends { options?: infer O }
+  ? O extends ReadonlyArray<infer U>
+    ? Simplify<UnionToIntersection<ExtractNestedOptionVars<U> | ExtractOptionVar<U>>>
+    : {}
+  : ExtractOptionVar<T>
+
 type ExtractCommandVars<T extends RESTPostAPIApplicationCommandsJSONBody> = T extends { options?: infer O }
   ? O extends ReadonlyArray<infer U>
-    ? Simplify<UnionToIntersection<ExtractOptionVar<U>>>
+    ? Simplify<UnionToIntersection<ExtractNestedOptionVars<U>>>
     : {}
   : {}
 
@@ -143,15 +149,24 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
   },
 })
 
-import { makeSlashCommand, makeStringOption, makeSubCommand } from '../builders/command'
+/*
+import { makeSlashCommand, makeStringOption, makeSubCommand, makeSubCommandGroup } from '../builders/command'
 
 const testFactory = createFactory()
-//const testCommand1 = testFactory.command({ name: 'test', description: 'A test command' } as const, c => c.res('ok'))
-const _testCommand2 = testFactory.command(
+//const testCommand1 = testFactory.command<any, {text: string}>({ name: 'test', description: 'A test command', options: [{ name: 'text', type: 3, description: 'A string option' }] }, c => c.res(`text1: ${c.var.text}`))
+//const testCommand1 = testFactory.command({ name: 'test', description: 'A test command', options: [{ name: 'text', type: 3, description: 'A string option' }] } as const, c => c.res(`text1: ${c.var.text}`))
+const testCommand2 = testFactory.command(
   makeSlashCommand('test2', 'Another test command').options([
-    // makeStringOption('text', 'A string option').required(true),
-    makeSubCommand('sub1', 'A subcommand').options([makeStringOption('text', 'A string option').required(true)]),
+    //makeStringOption('text', 'A string option'),
+    makeSubCommand('sub1', 'A subcommand').options([makeStringOption('text2', 'A string option').required(true)]),
+    makeSubCommandGroup('group1', 'A subcommand group').options([
+      makeSubCommand('sub2', 'Another subcommand').options([
+        makeStringOption('text', 'A string option').required(true),
+      ]),
+    ]),
   ]),
   //c => c.res('ok'),
-  c => c.res(`text: ${c.var.text}`),
+  c => c.res(`text1: ${c.var.text}`),
 )
+void testCommand2
+*/
