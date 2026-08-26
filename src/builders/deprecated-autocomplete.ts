@@ -1,3 +1,5 @@
+// biome-ignore-all lint/suspicious/noDeprecatedImports: Legacy
+
 import type { APICommandAutocompleteInteractionResponseCallbackData } from 'discord-api-types/v10'
 import { Builder } from './deprecated-utils'
 

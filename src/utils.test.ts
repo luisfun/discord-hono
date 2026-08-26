@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, test, vi } from 'vitest'
-import { Components, Embed } from '.'
+import { makeEmbed } from './builders'
 import { formData, isProto, messageFlags, newError, prepareData, queryStringify, toJSON } from './utils'
 
 describe('toJSON function', () => {
@@ -52,8 +52,8 @@ describe('prepareData', () => {
 
   it('should handle object input with both components and embeds', () => {
     const input = {
-      components: new Components(),
-      embeds: [new Embed()],
+      components: [],
+      embeds: [makeEmbed()],
     }
     const result = prepareData(input)
     expect(result).toEqual({

@@ -1,3 +1,5 @@
+// biome-ignore-all lint/suspicious/noDeprecatedImports: Legacy
+
 import type { APIPartialEmoji, RESTAPIPoll } from 'discord-api-types/v10'
 import { isArray, isString } from '../utils'
 import { Builder } from './deprecated-utils'

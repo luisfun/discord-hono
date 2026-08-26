@@ -1,3 +1,5 @@
+// biome-ignore-all lint/suspicious/noDeprecatedImports: Legacy
+
 import type {
   APIApplicationCommandBasicOption,
   APIApplicationCommandOption,
