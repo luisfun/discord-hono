@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { makePoll, makePollAnswer, makePollMedia } from './a-poll'
+import { makePoll, makePollAnswer, makePollMedia } from './poll'
 
 describe('a-poll builders', () => {
   it('should initialize with a question and answers', () => {

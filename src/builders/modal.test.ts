@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { CUSTOM_ID_SEPARATOR } from '../utils'
-import { makeActionRow, makeLabel, makeStringSelect, makeTextInput } from './a-component'
-import { makeModal } from './a-modal'
+import { makeActionRow, makeLabel, makeStringSelect, makeTextInput } from './component'
+import { makeModal } from './modal'
 
 describe('A-Modal Builder', () => {
   it('should create a modal with correct initial values', () => {

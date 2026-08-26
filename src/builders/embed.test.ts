@@ -8,7 +8,7 @@ import {
   makeEmbedImage,
   makeEmbedProvider,
   makeEmbedVideo,
-} from './a-embed'
+} from './embed'
 
 describe('a-embed builders', () => {
   it('should create an empty embed', () => {

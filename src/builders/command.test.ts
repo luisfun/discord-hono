@@ -17,7 +17,7 @@ import {
   makeSubCommandGroup,
   makeUserCommand,
   makeUserOption,
-} from './a-command'
+} from './command'
 
 describe('a-command builders', () => {
   it('creates a basic slash command', () => {

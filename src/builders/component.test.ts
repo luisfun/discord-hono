@@ -24,7 +24,7 @@ import {
   makeTextInput,
   makeThumbnail,
   makeUserSelect,
-} from './a-component'
+} from './component'
 
 describe('A-Component Builder', () => {
   describe('ActionRow', () => {
