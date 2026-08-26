@@ -1,11 +1,11 @@
 import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
 import { describe, expect, it } from 'vitest'
-import { Command } from '../builders'
+import { makeSlashCommand } from '../builders'
 import { testCommandRequestBodyJson, testCommandRequestInit } from './request'
 
 describe('testCommandRequestBody', () => {
   it('should return correct JSON string for Command object', () => {
-    const command = new Command('ping', 'ping')
+    const command = makeSlashCommand('ping', 'ping')
     const result = testCommandRequestBodyJson(command)
     expect(result).toEqual({
       type: 2,
@@ -33,7 +33,7 @@ describe('testCommandRequestBody', () => {
 
 describe('testCommandRequestInit', () => {
   it('should return correct RequestInit object', () => {
-    const command = new Command('hello', 'hello')
+    const command = makeSlashCommand('hello', 'hello')
     const result = testCommandRequestInit(command)
     expect(result.method).toBe('POST')
     expect(result.headers).toMatchObject({

@@ -1,15 +1,16 @@
-import type { APIApplicationCommandInteraction } from 'discord-api-types/v10'
-import type { Command } from '../builders'
+import type { APIApplicationCommandInteraction, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
+import type { JsonSerializable } from '../types'
+//import type { Command } from '../builders'
 import { newError, toJSON } from '../utils'
 
 /**
  * @alpha
  */
 export const testCommandRequestBodyJson = <V extends {}>(
-  command: Command<V> | ReturnType<Command['toJSON']>,
+  command: JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
   options?: V,
 ): APIApplicationCommandInteraction => {
-  const cmd: ReturnType<Command['toJSON']> = toJSON(command)
+  const cmd = toJSON(command)
   const supportOptionType = [3, 4, 5, 10] // STRING, INTEGER, BOOLEAN, NUMBER
   const interaction: APIApplicationCommandInteraction = {
     type: 2, // Command Number
@@ -49,7 +50,7 @@ export const testCommandRequestBodyJson = <V extends {}>(
  * @returns {RequestInit}
  */
 export const testCommandRequestInit = <V extends {}>(
-  command: Command<V> | ReturnType<Command['toJSON']>,
+  command: JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
   options?: V,
 ): RequestInit => ({
   method: 'POST',

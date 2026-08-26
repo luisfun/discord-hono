@@ -17,7 +17,6 @@ import type {
   APIModalInteractionResponseCallbackData,
   RESTPatchAPIInteractionOriginalResponseJSONBody,
 } from 'discord-api-types/v10'
-import type { Autocomplete, Modal } from './builders'
 import { $webhooks$_$_$messages$original, createRest } from './rest'
 import type {
   AutocompleteContext,
@@ -32,6 +31,7 @@ import type {
   ExecutionContext,
   FetchEventLike,
   FileData,
+  JsonSerializable,
   ModalContext,
   TypedResponse,
 } from './types'
@@ -312,7 +312,7 @@ export class Context<
    * )
    * ```
    */
-  resModal(data: Modal | APIModalInteractionResponseCallbackData): Response {
+  resModal(data: JsonSerializable<APIModalInteractionResponseCallbackData>): Response {
     this.#throwIfNotAllowType([2, 3])
     return Response.json({ type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse)
   }
@@ -348,8 +348,7 @@ export class Context<
    */
   resAutocomplete(
     data:
-      | Autocomplete
-      | APICommandAutocompleteInteractionResponseCallbackData
+      | JsonSerializable<APICommandAutocompleteInteractionResponseCallbackData>
       | Required<APICommandAutocompleteInteractionResponseCallbackData>['choices'],
   ): Response {
     this.#throwIfNotAllowType([4])
