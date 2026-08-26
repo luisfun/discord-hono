@@ -1,3 +1,5 @@
+// biome-ignore-all lint/suspicious/noDeprecatedImports: Legacy
+
 import { describe, expect, it } from 'vitest'
 import { CUSTOM_ID_SEPARATOR } from '../utils'
 import { Select } from './components'

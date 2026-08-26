@@ -1,6 +1,9 @@
 import type { APICommandAutocompleteInteractionResponseCallbackData } from 'discord-api-types/v10'
 import { Builder } from './utils'
 
+/**
+ * @deprecated
+ */
 export class Autocomplete extends Builder<APICommandAutocompleteInteractionResponseCallbackData> {
   #search: string
   constructor(search?: string | number) {

@@ -128,6 +128,9 @@ export type LayoutSeparator = ExcludeMethods<
 >
 export type LayoutContainer = ExcludeMethods<LayoutImpl<'Container'>, 'accessory' | 'divider' | 'spacing'>
 
+/**
+ * @deprecated Use `makeActionRow`, `makeSection`, `makeSeparator`, or `makeContainer` instead.
+ */
 export const Layout = LayoutImpl as {
   new (style: 'Action Row'): LayoutActionRow
   new (style: 'Section'): LayoutSection
@@ -223,6 +226,9 @@ type ContentThumbnail = ContentImpl<'Thumbnail'>
 export type ContentMediaGallery = ExcludeMethods<ContentImpl<'Media Gallery'>, 'description' | 'spoiler'>
 export type ContentFile = ExcludeMethods<ContentImpl<'File'>, 'description'>
 
+/**
+ * @deprecated Use `makeTextDisplay`, `makeThumbnail`, `makeMediaGallery`, or `makeFile` instead.
+ */
 export const Content = ContentImpl as {
   new (data: string, style?: 'Text Display'): ContentTextDisplay
   new (data: string | APIThumbnailComponent['media'], style: 'Thumbnail'): ContentThumbnail

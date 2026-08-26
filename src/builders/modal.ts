@@ -26,6 +26,9 @@ type ExtractSelectsObject<T extends any[]> = MergeObjects<{
   [I in keyof T]: T[I] extends Select<any, any> ? ExtractSelectArgs<T[I]> : never
 }>
 
+/**
+ * @deprecated Use `makeModal` instead.
+ */
 export class Modal<V extends {} = {}> {
   #keyStr: string
   #data: APIModalInteractionResponseCallbackData
@@ -93,6 +96,9 @@ export class Modal<V extends {} = {}> {
   }
 }
 
+/**
+ * @deprecated Use `makeTextInput` instead.
+ */
 export class TextInput<K extends string, _R extends boolean = false> extends Builder<APITextInputComponent> {
   /**
    * [Text Input Structure](https://discord.com/developers/docs/interactions/message-components#text-input-object)

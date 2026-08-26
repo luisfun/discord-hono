@@ -75,6 +75,9 @@ abstract class CommandBase<
   }
 }
 
+/**
+ * @deprecated Use `makeSlashCommand`, `makeUserCommand`, `makeMessageCommand`, or `makeEntryPointCommand` instead.
+ */
 export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicationCommandsJSONBody> {
   /**
    * @param {string} e
@@ -195,6 +198,9 @@ export class Command<_V extends {} = {}> extends CommandBase<RESTPostAPIApplicat
   }
 }
 
+/**
+ * @deprecated Use `makeSubCommandGroup` instead.
+ */
 export class SubGroup<_V extends {} = {}> extends CommandBase<APIApplicationCommandSubcommandGroupOption> {
   /**
    * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object)
@@ -216,6 +222,9 @@ export class SubGroup<_V extends {} = {}> extends CommandBase<APIApplicationComm
   }
 }
 
+/**
+ * @deprecated Use `makeSubCommand` instead.
+ */
 export class SubCommand<_V extends {} = {}> extends CommandBase<APIApplicationCommandSubcommandOption> {
   /**
    * [Command Structure](https://discord.com/developers/docs/interactions/application-commands#application-command-object)
@@ -247,6 +256,9 @@ type OptionType =
   | 'Role'
   | 'Mentionable'
   | 'Attachment'
+/**
+ * @deprecated Use `makeStringOption`, `makeIntegerOption`, `makeNumberOption`, `makeBooleanOption`, `makeUserOption`, `makeChannelOption`, `makeRoleOption`, `makeMentionableOption`, or `makeAttachmentOption` instead.
+ */
 export class Option<
   K extends string,
   T extends OptionType = 'String',

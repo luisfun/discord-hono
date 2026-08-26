@@ -16,6 +16,7 @@ import { Builder, ifThrowHasSemicolon, warnBuilder } from './utils'
 
 /**
  * [Message Components](https://discord.com/developers/docs/interactions/message-components)
+ * @deprecated Use `makeActionRow` instead.
  */
 export class Components {
   #components: APIActionRowComponent<APIComponentInMessageActionRow>[] = []
@@ -51,6 +52,10 @@ const buttonStyleNum = {
   SKU: 6,
 } as const
 type ButtonStyle = keyof typeof buttonStyleNum
+
+/**
+ * @deprecated Use `makeButton`, `makeLinkButton`, or `makePremiumButton` instead.
+ */
 export class Button<T extends ButtonStyle = 'Primary'> extends Builder<APIButtonComponent> {
   #style: ButtonStyle
   #keyStr = ''
@@ -145,6 +150,10 @@ type SelectComponent =
   | APIRoleSelectComponent
   | APIMentionableSelectComponent
   | APIChannelSelectComponent
+
+/**
+ * @deprecated Use `makeStringSelect`, `makeUserSelect`, `makeRoleSelect`, `makeMentionableSelect`, or `makeChannelSelect` instead.
+ */
 export class Select<K extends string, T extends SelectType = 'String'> extends Builder<SelectComponent> {
   #type: SelectType
   #keyStr = ''

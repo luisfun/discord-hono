@@ -9,6 +9,9 @@ const answersRemap = (
     poll_media: isArray(e) ? { emoji: isString(e[0]) ? { id: null, name: e[0] } : e[0], text: e[1] } : { text: e },
   }))
 
+/**
+ * @deprecated Use `makePoll` instead.
+ */
 export class Poll extends Builder<RESTAPIPoll> {
   constructor(question: string = '', ...answers: (string | [string | APIPartialEmoji, string])[]) {
     super({ question: { text: question }, answers: answersRemap(answers) })

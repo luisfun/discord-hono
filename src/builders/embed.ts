@@ -1,6 +1,9 @@
 import type { APIEmbed, APIEmbedField, EmbedType } from 'discord-api-types/v10'
 import { Builder } from './utils'
 
+/**
+ * @deprecated Use `makeEmbed` instead.
+ */
 export class Embed extends Builder<APIEmbed> {
   /**
    * [Embed Structure](https://discord.com/developers/docs/resources/message#embed-object)
