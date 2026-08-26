@@ -12,8 +12,8 @@ import type {
 } from 'discord-api-types/v10'
 import type { ExcludeMethods } from '../types'
 import { isArray, isString, toJSON } from '../utils'
-import type { Button, Select } from './components'
-import { Builder } from './utils'
+import type { Button, Select } from './deprecated-components'
+import { Builder } from './deprecated-utils'
 
 type LayoutStyle = 'Action Row' | 'Section' | 'Separator' | 'Container'
 // biome-ignore format: ternary operator

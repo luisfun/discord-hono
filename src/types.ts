@@ -8,7 +8,7 @@ import type {
   APIMessageComponentSelectMenuInteraction,
   APIModalSubmitInteraction,
 } from 'discord-api-types/v10'
-import type { Button, Components, Select } from './builders/components'
+import type { Button, Components, Select } from './builders/deprecated-components'
 import type {
   ContentFile,
   ContentMediaGallery,
@@ -17,7 +17,7 @@ import type {
   LayoutContainer,
   LayoutSection,
   LayoutSeparator,
-} from './builders/components-v2'
+} from './builders/deprecated-components-v2'
 import type { Context } from './context'
 
 ////////// Utils //////////

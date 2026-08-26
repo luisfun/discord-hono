@@ -1,7 +1,7 @@
 // biome-ignore-all lint/suspicious/noDeprecatedImports: Legacy
 
 import { describe, expect, it } from 'vitest'
-import { Poll } from './poll'
+import { Poll } from './deprecated-poll'
 
 describe('Poll', () => {
   it('should initialize with a question and answers', () => {

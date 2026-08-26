@@ -2,7 +2,7 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import { CUSTOM_ID_SEPARATOR } from '../utils'
-import { Button, Components, Select } from './components'
+import { Button, Components, Select } from './deprecated-components'
 
 describe('Components Builder', () => {
   describe('Components', () => {

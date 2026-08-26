@@ -12,7 +12,7 @@ import type {
   ChannelType,
 } from 'discord-api-types/v10'
 import { CUSTOM_ID_SEPARATOR, isArray, isString, toJSON } from '../utils'
-import { Builder, ifThrowHasSemicolon, warnBuilder } from './utils'
+import { Builder, ifThrowHasSemicolon, warnBuilder } from './deprecated-utils'
 
 /**
  * [Message Components](https://discord.com/developers/docs/interactions/message-components)

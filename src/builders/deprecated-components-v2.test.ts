@@ -1,7 +1,7 @@
 // biome-ignore-all lint/suspicious/noDeprecatedImports: Legacy
 
 import { describe, expect, it } from 'vitest'
-import { Content, Layout } from './components-v2'
+import { Content, Layout } from './deprecated-components-v2'
 
 describe('Layout', () => {
   describe('ActionRow', () => {

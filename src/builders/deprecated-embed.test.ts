@@ -2,7 +2,7 @@
 
 import type { APIEmbedField, EmbedType } from 'discord-api-types/v10'
 import { describe, expect, it } from 'vitest'
-import { Embed } from './embed'
+import { Embed } from './deprecated-embed'
 
 describe('Embed', () => {
   it('should create an empty embed', () => {

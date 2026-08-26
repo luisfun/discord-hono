@@ -2,7 +2,7 @@
 
 import type { APICommandAutocompleteInteractionResponseCallbackData } from 'discord-api-types/v10'
 import { describe, expect, it } from 'vitest'
-import { Autocomplete } from './autocomplete'
+import { Autocomplete } from './deprecated-autocomplete'
 
 describe('Autocomplete', () => {
   it('should filter choices based on search string', () => {

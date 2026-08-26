@@ -4,8 +4,8 @@ import type {
   APITextInputComponent,
 } from 'discord-api-types/v10'
 import { CUSTOM_ID_SEPARATOR, toJSON } from '../utils'
-import type { Select } from './components'
-import { Builder, ifThrowHasSemicolon, type MergeObjects } from './utils'
+import type { Select } from './deprecated-components'
+import { Builder, ifThrowHasSemicolon, type MergeObjects } from './deprecated-utils'
 
 type ExtractTextInputArgs<T> =
   T extends TextInput<infer K, infer R>

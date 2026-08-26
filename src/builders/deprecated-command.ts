@@ -13,7 +13,7 @@ import type {
   RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10'
 import { toJSON } from '../utils'
-import { Builder, type MergeObjects, warnBuilder } from './utils'
+import { Builder, type MergeObjects, warnBuilder } from './deprecated-utils'
 
 type ExtractOptionArgs<T> =
   T extends Option<infer K, infer T2, infer R>

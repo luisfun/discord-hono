@@ -1,6 +1,6 @@
-import type { Command } from '../builders/command'
-import type { Select } from '../builders/components'
-import type { Modal } from '../builders/modal'
+import type { Command } from '../builders/deprecated-command'
+import type { Select } from '../builders/deprecated-components'
+import type { Modal } from '../builders/deprecated-modal'
 import { DiscordHono } from '../discord-hono'
 import type {
   AutocompleteHandler,

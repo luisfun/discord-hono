@@ -1,5 +1,5 @@
 import type { APIEmbed, APIEmbedField, EmbedType } from 'discord-api-types/v10'
-import { Builder } from './utils'
+import { Builder } from './deprecated-utils'
 
 /**
  * @deprecated Use `makeEmbed` instead.

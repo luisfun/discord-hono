@@ -2,8 +2,8 @@
 
 import { describe, expect, it } from 'vitest'
 import { CUSTOM_ID_SEPARATOR } from '../utils'
-import { Select } from './components'
-import { Modal, TextInput } from './modal'
+import { Select } from './deprecated-components'
+import { Modal, TextInput } from './deprecated-modal'
 
 describe('Modal', () => {
   it('should create a modal with correct initial values', () => {
