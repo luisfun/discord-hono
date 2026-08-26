@@ -12,6 +12,7 @@ import type {
   InitOptions,
   JsonSerializable,
   ModalHandler,
+  Simplify,
 } from '../types'
 import { CUSTOM_ID_SEPARATOR, newError, toJSON } from '../utils'
 
@@ -37,6 +38,32 @@ class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
 
 type Var = {}
 
+type UnionToIntersection<T> = (T extends unknown ? (value: T) => void : never) extends (value: infer I) => void
+  ? I
+  : never
+
+type ExtractOptionValue<T> = T extends { type: 3 | 6 | 7 | 8 | 9 | 11 }
+  ? string
+  : T extends { type: 4 | 10 }
+    ? number
+    : T extends { type: 5 }
+      ? boolean
+      : never
+
+type ExtractOptionVar<T> = T extends { name: infer N extends string }
+  ? ExtractOptionValue<T> extends never
+    ? {}
+    : T extends { required: true }
+      ? { [K in N]: ExtractOptionValue<T> }
+      : { [K in N]?: ExtractOptionValue<T> }
+  : {}
+
+type ExtractCommandVars<T extends RESTPostAPIApplicationCommandsJSONBody> = T extends { options?: infer O }
+  ? O extends ReadonlyArray<infer U>
+    ? Simplify<UnionToIntersection<ExtractOptionVar<U>>>
+    : {}
+  : {}
+
 type JsonCommand<V extends Var = Var> = JsonSerializable<RESTPostAPIApplicationCommandsJSONBody> & {
   __commandVars?: V
 }
@@ -45,7 +72,7 @@ type ExtractComponentVars<T> = T extends Select<infer K, infer _T2> ? { [P in K]
 
 interface Factory<E extends Env> {
   discord(init?: InitOptions<E>): DiscordHonoExtends<E>
-  command<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var>(
+  command<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var = ExtractCommandVars<T>>(
     command: JsonSerializable<T>,
     handler: CommandHandler<E & { Variables?: V }>,
   ): { command: T; handler: CommandHandler<E> }
@@ -82,7 +109,7 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
     return new DiscordHonoExtends<E>(init)
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  command<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var>(
+  command<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var = ExtractCommandVars<T>>(
     command: JsonSerializable<T>,
     handler: CommandHandler<E & { Variables?: V }>,
   ) {
@@ -116,14 +143,15 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
   },
 })
 
-import { makeSlashCommand, makeStringOption } from '../builders/command'
+import { makeSlashCommand, makeStringOption, makeSubCommand } from '../builders/command'
 
 const testFactory = createFactory()
 //const testCommand1 = testFactory.command({ name: 'test', description: 'A test command' } as const, c => c.res('ok'))
 const _testCommand2 = testFactory.command(
   makeSlashCommand('test2', 'Another test command').options([
-    makeStringOption('text', 'A string option').required(true),
+    // makeStringOption('text', 'A string option').required(true),
+    makeSubCommand('sub1', 'A subcommand').options([makeStringOption('text', 'A string option').required(true)]),
   ]),
-  c => c.res('ok'),
-  //c => c.res(`text: ${c.var.text}`),
+  //c => c.res('ok'),
+  c => c.res(`text: ${c.var.text}`),
 )

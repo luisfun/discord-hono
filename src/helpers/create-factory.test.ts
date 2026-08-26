@@ -1,6 +1,7 @@
 import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
 import { describe, expect, expectTypeOf, it, vi } from 'vitest'
 import { Button, Command, Modal } from '../builders'
+import { makeSlashCommand, makeStringOption } from '../builders/command'
 import { DiscordHono } from '../discord-hono'
 import type { JsonSerializable } from '../types'
 import { createFactory } from './create-factory'
@@ -34,6 +35,20 @@ describe('createFactory', () => {
     })
 
     expect(result.command).toEqual(commandJson)
+  })
+
+  it('should infer Variables from command option names', () => {
+    const result = factory.command(
+      makeSlashCommand('test2', 'Another test command').options([
+        makeStringOption('text', 'A string option').required(true),
+      ]),
+      c => {
+        expectTypeOf(c.var.text).toEqualTypeOf<string>()
+        return c.res(`text: ${c.var.text}`)
+      },
+    )
+
+    expect(result.command.name).toBe('test2')
   })
 
   it('should create a component wrapper', () => {
