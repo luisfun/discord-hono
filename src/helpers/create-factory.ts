@@ -13,7 +13,6 @@ import type {
   InteractionComponent,
   JsonSerializable,
   ModalHandler,
-  SelectComponent,
   Simplify,
 } from '../types'
 import { CUSTOM_ID_SEPARATOR, newError, toJSON } from '../utils'
@@ -71,8 +70,6 @@ type ExtractCommandVars<T extends RESTPostAPIApplicationCommandsJSONBody> = T ex
     : {}
   : {}
 
-type ExtractComponentVars<T> = T extends SelectComponent ? { [P in K]: string[] } : {}
-
 type ExtractModalValue<T> = T extends { type: 4 | 21 | 23 }
   ? string
   : T extends { type: 3 | 5 | 6 | 7 | 8 | 19 | 22 }
@@ -101,9 +98,9 @@ interface Factory<E extends Env> {
     command: JsonSerializable<T>,
     handler: CommandHandler<E & { Variables?: V }>,
   ): { command: T; handler: CommandHandler<E> }
-  component<T extends InteractionComponent, V extends ExtractComponentVars<C>, C extends InteractionComponent>(
+  component<T extends InteractionComponent, C extends InteractionComponent>(
     component: JsonSerializable<T>,
-    handler: ComponentHandler<E & { Variables?: V }, C>,
+    handler: ComponentHandler<E, C>,
   ): { component: T; handler: ComponentHandler<E, C> }
   autocomplete<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var = ExtractCommandVars<T>>(
     command: JsonSerializable<T>,
@@ -141,9 +138,9 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
     return { command: toJSON(command) as T, handler: handler as CommandHandler<E> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  component<T extends InteractionComponent, V extends ExtractComponentVars<C>, C extends InteractionComponent>(
+  component<T extends InteractionComponent, C extends InteractionComponent>(
     component: JsonSerializable<T>,
-    handler: ComponentHandler<E & { Variables?: V }, C>,
+    handler: ComponentHandler<E, C>,
   ) {
     return { component: toJSON(component) as T, handler: handler as ComponentHandler<E, any> }
   },

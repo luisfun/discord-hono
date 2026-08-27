@@ -81,7 +81,7 @@ interface CronRef {
 }
 export interface ContextRef extends CommandRef, ComponentRef, ModalRef, CronRef {}
 
-export type SelectComponent =
+type SelectComponent =
   | APIStringSelectComponent
   | APIBaseAutoPopulatedSelectMenuComponent<ComponentType.UserSelect, SelectMenuDefaultValueType.User>
   | APIBaseAutoPopulatedSelectMenuComponent<ComponentType.RoleSelect, SelectMenuDefaultValueType.Role>
