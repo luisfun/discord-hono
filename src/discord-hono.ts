@@ -4,7 +4,6 @@ import type {
   AutocompleteHandler,
   CommandHandler,
   ComponentHandler,
-  ComponentType,
   CronContext,
   CronEvent,
   CronHandler,
@@ -12,6 +11,7 @@ import type {
   Env,
   ExecutionContext,
   InitOptions,
+  InteractionComponent,
   ModalHandler,
   Verify,
 } from './types'
@@ -81,7 +81,7 @@ export class DiscordHono<E extends Env = Env> {
    * @param handler
    * @returns {this}
    */
-  component<T extends ComponentType>(component_id: string, handler: ComponentHandler<E, T>): this {
+  component<T extends InteractionComponent>(component_id: string, handler: ComponentHandler<E, T>): this {
     return this.#set(3, component_id, handler)
   }
   /**

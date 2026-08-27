@@ -2,18 +2,18 @@ import type {
   APIModalInteractionResponseCallbackData,
   RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10'
-import type { Select } from '../builders/deprecated-components'
 import { DiscordHono } from '../discord-hono'
 import type {
   AutocompleteHandler,
   CommandHandler,
   ComponentHandler,
-  ComponentType,
   CronHandler,
   Env,
   InitOptions,
+  InteractionComponent,
   JsonSerializable,
   ModalHandler,
+  SelectComponent,
   Simplify,
 } from '../types'
 import { CUSTOM_ID_SEPARATOR, newError, toJSON } from '../utils'
@@ -71,7 +71,7 @@ type ExtractCommandVars<T extends RESTPostAPIApplicationCommandsJSONBody> = T ex
     : {}
   : {}
 
-type ExtractComponentVars<T> = T extends Select<infer K, infer _T2> ? { [P in K]: string[] } : {}
+type ExtractComponentVars<T> = T extends SelectComponent ? { [P in K]: string[] } : {}
 
 type ExtractModalValue<T> = T extends { type: 4 | 21 | 23 }
   ? string
@@ -101,10 +101,10 @@ interface Factory<E extends Env> {
     command: JsonSerializable<T>,
     handler: CommandHandler<E & { Variables?: V }>,
   ): { command: T; handler: CommandHandler<E> }
-  component<V extends ExtractComponentVars<C>, C extends ComponentType>(
-    component: C,
+  component<T extends InteractionComponent, V extends ExtractComponentVars<C>, C extends InteractionComponent>(
+    component: JsonSerializable<T>,
     handler: ComponentHandler<E & { Variables?: V }, C>,
-  ): { component: C; handler: ComponentHandler<E, C> }
+  ): { component: T; handler: ComponentHandler<E, C> }
   autocomplete<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var = ExtractCommandVars<T>>(
     command: JsonSerializable<T>,
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,
@@ -141,8 +141,11 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
     return { command: toJSON(command) as T, handler: handler as CommandHandler<E> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  component(component, handler) {
-    return { component, handler: handler as ComponentHandler<E, any> }
+  component<T extends InteractionComponent, V extends ExtractComponentVars<C>, C extends InteractionComponent>(
+    component: JsonSerializable<T>,
+    handler: ComponentHandler<E & { Variables?: V }, C>,
+  ) {
+    return { component: toJSON(component) as T, handler: handler as ComponentHandler<E, any> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
   autocomplete<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var = ExtractCommandVars<T>>(
@@ -175,14 +178,15 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
   },
 })
 
-/*
 import {
   makeActionRow,
+  makeButton,
   makeChannelSelect,
   makeLabel,
   makeModal,
   makeSlashCommand,
   makeStringOption,
+  makeStringSelect,
   makeSubCommand,
   makeSubCommandGroup,
   makeTextInput,
@@ -206,6 +210,11 @@ const testCommand2 = testFactory.command(
 )
 void testCommand2
 
+const testButton1 = testFactory.component(makeButton('testButton', 'A test button'), c => c.res('ok'))
+void testButton1
+const testSelect1 = testFactory.component(makeStringSelect('select', [['opt1', 'Option 1']]), c => c.res('ok'))
+void testSelect1
+
 const testModal1 = testFactory.modal(
   makeModal('testModal', 'A test modal', [
     makeActionRow([makeTextInput('text', 'A text input')]),
@@ -214,4 +223,3 @@ const testModal1 = testFactory.modal(
   c => c.res(`text1: ${c.var.text}, channel: ${c.var.channel}`),
 )
 void testModal1
-*/

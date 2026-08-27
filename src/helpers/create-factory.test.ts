@@ -1,4 +1,4 @@
-import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
+import type { APIButtonComponentWithCustomId, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
 import { describe, expect, expectTypeOf, it, vi } from 'vitest'
 import {
   Button,
@@ -73,7 +73,7 @@ describe('createFactory', () => {
   })
 
   it('should create a component wrapper', () => {
-    const componentMock = new Button('str', 'label')
+    const componentMock = new Button('str', 'label').toJSON() as APIButtonComponentWithCustomId
     const handlerMock = vi.fn()
     const result = factory.component(componentMock, handlerMock)
     expect(result).toEqual({ component: componentMock, handler: handlerMock })
@@ -120,7 +120,7 @@ describe('createFactory', () => {
   it('should load handlers into DiscordHono instance', () => {
     const app = factory.discord()
     const commandMock = new Command('name', 'description').toJSON()
-    const componentMock = new Button('str', 'label')
+    const componentMock = new Button('str', 'label').toJSON() as APIButtonComponentWithCustomId
     const modalMock = new Modal('unique_id', 'title')
     const handlerMock = vi.fn()
 

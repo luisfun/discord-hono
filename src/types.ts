@@ -1,14 +1,20 @@
 import type {
   APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandInteraction,
+  APIBaseAutoPopulatedSelectMenuComponent,
+  APIButtonComponentWithCustomId,
+  APIChannelSelectComponent,
   APIInteractionDataResolved,
   APIMessageApplicationCommandInteractionDataResolved,
   APIMessageComponentButtonInteraction,
   APIMessageComponentInteraction,
   APIMessageComponentSelectMenuInteraction,
   APIModalSubmitInteraction,
+  APIStringSelectComponent,
+  ComponentType,
+  SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
-import type { Button, Components, Select } from './builders/deprecated-components'
+import type { Components } from './builders/deprecated-components'
 import type {
   ContentFile,
   ContentMediaGallery,
@@ -75,11 +81,21 @@ interface CronRef {
 }
 export interface ContextRef extends CommandRef, ComponentRef, ModalRef, CronRef {}
 
-export type ComponentType = Button<any> | Select<any, any> //'Button' | 'Select'
+export type SelectComponent =
+  | APIStringSelectComponent
+  | APIBaseAutoPopulatedSelectMenuComponent<ComponentType.UserSelect, SelectMenuDefaultValueType.User>
+  | APIBaseAutoPopulatedSelectMenuComponent<ComponentType.RoleSelect, SelectMenuDefaultValueType.Role>
+  | APIBaseAutoPopulatedSelectMenuComponent<
+      ComponentType.MentionableSelect,
+      SelectMenuDefaultValueType.User | SelectMenuDefaultValueType.Role
+    >
+  | APIChannelSelectComponent
+export type InteractionComponent = APIButtonComponentWithCustomId | SelectComponent
+
 // biome-ignore format: ternary operator
-type ComponentInteraction<T extends ComponentType> =
-  T extends Button<any> ? APIMessageComponentButtonInteraction :
-  T extends Select<any, any> ? APIMessageComponentSelectMenuInteraction :
+type ComponentInteraction<T extends InteractionComponent> =
+  T extends APIButtonComponentWithCustomId ? APIMessageComponentButtonInteraction :
+  T extends SelectComponent ? APIMessageComponentSelectMenuInteraction :
   APIMessageComponentInteraction
 
 export type CommandContext<E extends Env = any> = ExcludeMethods<
@@ -87,7 +103,7 @@ export type CommandContext<E extends Env = any> = ExcludeMethods<
   'update' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
 > & { interaction: Readonly<APIApplicationCommandInteraction>; ref: Readonly<CommandRef> }
 
-export type ComponentContext<E extends Env = any, T extends ComponentType = any> = ExcludeMethods<
+export type ComponentContext<E extends Env = any, T extends InteractionComponent = any> = ExcludeMethods<
   Context<E, ComponentContext<E, T>>,
   'sub' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
 > & { interaction: Readonly<ComponentInteraction<T>>; ref: Readonly<ComponentRef> }
@@ -121,7 +137,7 @@ export type CronContext<E extends Env = any> = ExcludeMethods<
 ////////// Handler //////////
 
 export type CommandHandler<E extends Env> = (c: CommandContext<E>) => Promise<Response> | Response
-export type ComponentHandler<E extends Env, T extends ComponentType> = (
+export type ComponentHandler<E extends Env, T extends InteractionComponent> = (
   c: ComponentContext<E, T>,
 ) => Promise<Response> | Response
 export type AutocompleteHandler<E extends Env> = (c: AutocompleteContext<E>) => Promise<Response> | Response
