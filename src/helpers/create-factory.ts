@@ -183,4 +183,3 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
       .map(e => e.command as JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>)
   },
 })
-
