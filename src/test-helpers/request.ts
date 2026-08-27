@@ -1,6 +1,5 @@
 import type { APIApplicationCommandInteraction, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
 import type { JsonSerializable } from '../types'
-//import type { Command } from '../builders'
 import { newError, toJSON } from '../utils'
 
 /**
