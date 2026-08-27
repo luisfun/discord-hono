@@ -307,9 +307,9 @@ export class Context<
    * @returns {Response}
    * @example
    * ```ts
-   * return c.resModal(new Modal('unique-id', 'Title')
-   *   .row(new TextInput('custom_id', 'Label'))
-   * )
+   * return c.resModal(makeModal('unique-id', 'Title', [
+   *   makeActionRow([makeTextInput('custom_id', 'Label')])
+   * ]))
    * ```
    */
   resModal(data: JsonSerializable<APIModalInteractionResponseCallbackData>): Response {

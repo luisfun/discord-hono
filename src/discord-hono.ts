@@ -69,7 +69,7 @@ export class DiscordHono<E extends Env = Env> {
   }
 
   /**
-   * @param {string | RegExp} command Match the first argument of `Command`
+   * @param {string | RegExp} command Match the first argument of `makeXxxCommand`
    * @param handler
    * @returns {this}
    */
@@ -77,7 +77,7 @@ export class DiscordHono<E extends Env = Env> {
     return this.#set(2, command, handler)
   }
   /**
-   * @param {string | RegExp} component_id Match the first argument of `Button` or `Select`
+   * @param {string | RegExp} component_id Match the first argument of `makeButton` or `makeXxxSelect`
    * @param handler
    * @returns {this}
    */
@@ -85,7 +85,7 @@ export class DiscordHono<E extends Env = Env> {
     return this.#set(3, component_id, handler)
   }
   /**
-   * @param {string | RegExp} command Match the first argument of `Command`
+   * @param {string | RegExp} command Match the first argument of `makeXxxCommand`
    * @param autocomplete
    * @param handler
    * @returns {this}
@@ -94,7 +94,7 @@ export class DiscordHono<E extends Env = Env> {
     return (handler ? this.#set(2, command, handler) : this).#set(4, command, autocomplete)
   }
   /**
-   * @param {string | RegExp} modal_id Match the first argument of `Modal`
+   * @param {string | RegExp} modal_id Match the first argument of `makeModal`
    * @param handler
    * @returns {this}
    */
