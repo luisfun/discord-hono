@@ -98,10 +98,10 @@ interface Factory<E extends Env> {
     command: JsonSerializable<T>,
     handler: CommandHandler<E & { Variables?: V }>,
   ): { command: T; handler: CommandHandler<E> }
-  component<T extends InteractionComponent, C extends InteractionComponent>(
+  component<T extends InteractionComponent>(
     component: JsonSerializable<T>,
-    handler: ComponentHandler<E, C>,
-  ): { component: T; handler: ComponentHandler<E, C> }
+    handler: ComponentHandler<E, T>,
+  ): { component: T; handler: ComponentHandler<E, T> }
   autocomplete<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var = ExtractCommandVars<T>>(
     command: JsonSerializable<T>,
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,
@@ -138,10 +138,7 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
     return { command: toJSON(command) as T, handler: handler as CommandHandler<E> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  component<T extends InteractionComponent, C extends InteractionComponent>(
-    component: JsonSerializable<T>,
-    handler: ComponentHandler<E, C>,
-  ) {
+  component<T extends InteractionComponent>(component: JsonSerializable<T>, handler: ComponentHandler<E, T>) {
     return { component: toJSON(component) as T, handler: handler as ComponentHandler<E, any> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
@@ -175,6 +172,7 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
   },
 })
 
+/*
 import {
   makeActionRow,
   makeButton,
@@ -211,6 +209,8 @@ const testButton1 = testFactory.component(makeButton('testButton', 'A test butto
 void testButton1
 const testSelect1 = testFactory.component(makeStringSelect('select', [['opt1', 'Option 1']]), c => c.res('ok'))
 void testSelect1
+const testSelect2 = testFactory.component(makeChannelSelect('select2'), c => c.res('ok'))
+void testSelect2
 
 const testModal1 = testFactory.modal(
   makeModal('testModal', 'A test modal', [
@@ -220,3 +220,4 @@ const testModal1 = testFactory.modal(
   c => c.res(`text1: ${c.var.text}, channel: ${c.var.channel}`),
 )
 void testModal1
+*/

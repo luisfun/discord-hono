@@ -1,16 +1,16 @@
-import type { APIButtonComponentWithCustomId, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
+import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
 import { describe, expect, expectTypeOf, it, vi } from 'vitest'
 import {
-  Button,
-  Command,
-  Modal,
   makeActionRow,
+  makeButton,
   makeChannelSelect,
   makeLabel,
   makeModal,
+  makeSlashCommand,
+  makeStringOption,
+  makeSubCommand,
   makeTextInput,
 } from '../builders'
-import { makeSlashCommand, makeStringOption, makeSubCommand } from '../builders/command'
 import { DiscordHono } from '../discord-hono'
 import { createFactory } from './create-factory'
 
@@ -23,10 +23,10 @@ describe('createFactory', () => {
   })
 
   it('should create a command wrapper', () => {
-    const commandMock = new Command('name', 'description').toJSON()
+    const commandMock = makeSlashCommand('name', 'description')
     const handlerMock = vi.fn()
     const result = factory.command(commandMock, handlerMock)
-    expect(result).toEqual({ command: commandMock, handler: handlerMock })
+    expect(result).toEqual({ command: commandMock.toJSON(), handler: handlerMock })
   })
 
   it('should accept JsonSerializable commands while preserving Variables typing', () => {
@@ -73,22 +73,22 @@ describe('createFactory', () => {
   })
 
   it('should create a component wrapper', () => {
-    const componentMock = new Button('str', 'label').toJSON() as APIButtonComponentWithCustomId
+    const componentMock = makeButton('str', 'label')
     const handlerMock = vi.fn()
     const result = factory.component(componentMock, handlerMock)
-    expect(result).toEqual({ component: componentMock, handler: handlerMock })
+    expect(result).toEqual({ component: componentMock.toJSON(), handler: handlerMock })
   })
 
   it('should create an autocomplete wrapper', () => {
-    const commandMock = new Command('name', 'description').toJSON()
+    const commandMock = makeSlashCommand('name', 'description')
     const autocompleteMock = vi.fn()
     const handlerMock = vi.fn()
     const result = factory.autocomplete(commandMock, autocompleteMock, handlerMock)
-    expect(result).toEqual({ command: commandMock, autocomplete: autocompleteMock, handler: handlerMock })
+    expect(result).toEqual({ command: commandMock.toJSON(), autocomplete: autocompleteMock, handler: handlerMock })
   })
 
   it('should create a modal wrapper', () => {
-    const modalMock = new Modal('unique_id', 'title')
+    const modalMock = makeModal('unique_id', 'title', [])
     const handlerMock = vi.fn()
     const result = factory.modal(modalMock, handlerMock)
     expect(result).toEqual({ modal: modalMock.toJSON(), handler: handlerMock })
@@ -119,9 +119,9 @@ describe('createFactory', () => {
 
   it('should load handlers into DiscordHono instance', () => {
     const app = factory.discord()
-    const commandMock = new Command('name', 'description').toJSON()
-    const componentMock = new Button('str', 'label').toJSON() as APIButtonComponentWithCustomId
-    const modalMock = new Modal('unique_id', 'title')
+    const commandMock = makeSlashCommand('name', 'description')
+    const componentMock = makeButton('str', 'label')
+    const modalMock = makeModal('unique_id', 'title', [])
     const handlerMock = vi.fn()
 
     const handlers = [
@@ -150,9 +150,9 @@ describe('createFactory', () => {
   })
 
   it('should return a list of commands', () => {
-    const commandMock = new Command('name', 'description').toJSON()
+    const commandMock = makeSlashCommand('name', 'description')
     const handlers = [factory.command(commandMock, vi.fn())]
     const commands = factory.getCommands(handlers)
-    expect(commands).toEqual([commandMock])
+    expect(commands).toEqual([commandMock.toJSON()])
   })
 })
