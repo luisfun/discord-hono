@@ -1,4 +1,7 @@
-import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
+import type {
+  APIModalInteractionResponseCallbackData,
+  RESTPostAPIApplicationCommandsJSONBody,
+} from 'discord-api-types/v10'
 import type { Select } from '../builders/deprecated-components'
 import type { Modal } from '../builders/deprecated-modal'
 import { DiscordHono } from '../discord-hono'
@@ -86,10 +89,10 @@ interface Factory<E extends Env> {
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,
     handler: CommandHandler<E & { Variables?: V }>,
   ): { command: T; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E> }
-  modal<V extends Var>(
-    modal: Modal<V>,
+  modal<T extends APIModalInteractionResponseCallbackData, V extends Var>(
+    modal: JsonSerializable<T>,
     handler: ModalHandler<E & { Variables?: V }>,
-  ): { modal: Modal; handler: ModalHandler<E> }
+  ): { modal: T; handler: ModalHandler<E> }
   cron<V extends Var>(
     cron: string,
     handler: CronHandler<E & { Variables?: V }>,
@@ -133,8 +136,11 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
     }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  modal(modal, handler) {
-    return { modal, handler: handler as ModalHandler<E> }
+  modal<T extends APIModalInteractionResponseCallbackData, V extends Var>(
+    modal: JsonSerializable<T>,
+    handler: ModalHandler<E & { Variables?: V }>,
+  ) {
+    return { modal: toJSON(modal) as T, handler: handler as ModalHandler<E> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
   cron(cron, handler) {
@@ -148,8 +154,17 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
   },
 })
 
-/*
-import { makeSlashCommand, makeStringOption, makeSubCommand, makeSubCommandGroup } from '../builders/command'
+import {
+  makeActionRow,
+  makeChannelSelect,
+  makeLabel,
+  makeModal,
+  makeSlashCommand,
+  makeStringOption,
+  makeSubCommand,
+  makeSubCommandGroup,
+  makeTextInput,
+} from '../builders'
 
 const testFactory = createFactory()
 //const testCommand1 = testFactory.command<any, {text: string}>({ name: 'test', description: 'A test command', options: [{ name: 'text', type: 3, description: 'A string option' }] }, c => c.res(`text1: ${c.var.text}`))
@@ -168,4 +183,12 @@ const testCommand2 = testFactory.command(
   c => c.res(`text1: ${c.var.text}`),
 )
 void testCommand2
-*/
+
+const testModal1 = testFactory.modal(
+  makeModal('testModal', 'A test modal', [
+    makeActionRow([makeTextInput('text', 'A text input').required(true)]),
+    makeLabel('label1', makeChannelSelect('channel').required(true)),
+  ]),
+  c => c.res(`text1: ${c.var.text}, channel: ${c.var.channel}`),
+)
+void testModal1
