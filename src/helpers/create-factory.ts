@@ -13,6 +13,7 @@ import type {
   InteractionComponent,
   JsonSerializable,
   ModalHandler,
+  ResolvedToJSON,
   Simplify,
 } from '../types'
 import { CUSTOM_ID_SEPARATOR, newError, toJSON } from '../utils'
@@ -21,14 +22,16 @@ class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
   loader(handlers: Handler<E>[]): this {
     for (const elem of handlers) {
       if ('command' in elem) {
-        if ('autocomplete' in elem) this.autocomplete(elem.command.name, elem.autocomplete)
-        this.command(elem.command.name, elem.handler)
+        const command = toJSON(elem.command)
+        if ('autocomplete' in elem) this.autocomplete(command.name, elem.autocomplete)
+        this.command(command.name, elem.handler)
       } else if ('component' in elem) {
-        const json = toJSON(elem.component)
-        if ('custom_id' in json) this.component(json.custom_id.split(CUSTOM_ID_SEPARATOR)[0] ?? '', elem.handler)
+        const component = toJSON(elem.component)
+        if ('custom_id' in component)
+          this.component(component.custom_id.split(CUSTOM_ID_SEPARATOR)[0] ?? '', elem.handler)
       } else if ('modal' in elem) {
-        const json = toJSON(elem.modal)
-        this.modal(json.custom_id.split(CUSTOM_ID_SEPARATOR)[0] ?? '', elem.handler)
+        const modal = toJSON(elem.modal)
+        this.modal(modal.custom_id.split(CUSTOM_ID_SEPARATOR)[0] ?? '', elem.handler)
       } else if ('cron' in elem) this.cron(elem.cron, elem.handler)
       else throw newError('.loader(obj)', 'obj is Invalid')
     }
@@ -94,23 +97,26 @@ type ExtractModalVars<T> = T extends readonly (infer U)[]
 
 interface Factory<E extends Env> {
   discord(init?: InitOptions<E>): DiscordHonoExtends<E>
-  command<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var = ExtractCommandVars<T>>(
-    command: JsonSerializable<T>,
-    handler: CommandHandler<E & { Variables?: V }>,
-  ): { command: T; handler: CommandHandler<E> }
-  component<T extends InteractionComponent>(
-    component: JsonSerializable<T>,
-    handler: ComponentHandler<E, T>,
-  ): { component: T; handler: ComponentHandler<E, T> }
-  autocomplete<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var = ExtractCommandVars<T>>(
-    command: JsonSerializable<T>,
+  command<
+    T extends JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
+    V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
+  >(command: T, handler: CommandHandler<E & { Variables?: V }>): { command: T; handler: CommandHandler<E> }
+  component<T extends JsonSerializable<InteractionComponent>>(
+    component: T,
+    handler: ComponentHandler<E, ResolvedToJSON<T>>,
+  ): { component: T; handler: ComponentHandler<E, ResolvedToJSON<T>> }
+  autocomplete<
+    T extends JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
+    V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
+  >(
+    command: T,
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,
     handler: CommandHandler<E & { Variables?: V }>,
   ): { command: T; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E> }
-  modal<T extends APIModalInteractionResponseCallbackData, V extends Var = ExtractModalVars<T>>(
-    modal: JsonSerializable<T>,
-    handler: ModalHandler<E & { Variables?: V }>,
-  ): { modal: T; handler: ModalHandler<E> }
+  modal<
+    T extends JsonSerializable<APIModalInteractionResponseCallbackData>,
+    V extends Var = ExtractModalVars<ResolvedToJSON<T>>,
+  >(modal: T, handler: ModalHandler<E & { Variables?: V }>): { modal: T; handler: ModalHandler<E> }
   cron<V extends Var>(
     cron: string,
     handler: CronHandler<E & { Variables?: V }>,
@@ -131,34 +137,40 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
     return new DiscordHonoExtends<E>(init)
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  command<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var = ExtractCommandVars<T>>(
-    command: JsonSerializable<T>,
-    handler: CommandHandler<E & { Variables?: V }>,
+  command<
+    T extends JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
+    V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
+  >(command: T, handler: CommandHandler<E & { Variables?: V }>) {
+    return { command, handler: handler as CommandHandler<E> }
+  },
+  // biome-ignore lint/nursery/useExplicitType: omitted
+  component<T extends JsonSerializable<InteractionComponent>>(
+    component: T,
+    handler: ComponentHandler<E, ResolvedToJSON<T>>,
   ) {
-    return { command: toJSON(command) as T, handler: handler as CommandHandler<E> }
+    return { component, handler: handler as ComponentHandler<E, any> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  component<T extends InteractionComponent>(component: JsonSerializable<T>, handler: ComponentHandler<E, T>) {
-    return { component: toJSON(component) as T, handler: handler as ComponentHandler<E, any> }
-  },
-  // biome-ignore lint/nursery/useExplicitType: omitted
-  autocomplete<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var = ExtractCommandVars<T>>(
-    command: JsonSerializable<T>,
+  autocomplete<
+    T extends JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
+    V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
+  >(
+    command: T,
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,
     handler: CommandHandler<E & { Variables?: V }>,
   ) {
     return {
-      command: toJSON(command) as T,
+      command,
       autocomplete: autocomplete as AutocompleteHandler<E>,
       handler: handler as CommandHandler<E>,
     }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  modal<T extends APIModalInteractionResponseCallbackData, V extends Var = ExtractModalVars<T>>(
-    modal: JsonSerializable<T>,
-    handler: ModalHandler<E & { Variables?: V }>,
-  ) {
-    return { modal: toJSON(modal) as T, handler: handler as ModalHandler<E> }
+  modal<
+    T extends JsonSerializable<APIModalInteractionResponseCallbackData>,
+    V extends Var = ExtractModalVars<ResolvedToJSON<T>>,
+  >(modal: T, handler: ModalHandler<E & { Variables?: V }>) {
+    return { modal, handler: handler as ModalHandler<E> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
   cron(cron, handler) {

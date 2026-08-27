@@ -21,12 +21,11 @@ import {
 
 describe('a-command builders', () => {
   it('creates a basic slash command', () => {
-    const command = makeSlashCommand('test', 'Test command').type(commandType.ChatInput)
+    const command = makeSlashCommand('test', 'Test command')
 
     expect(command.toJSON()).toEqual({
       name: 'test',
       description: 'Test command',
-      type: commandType.ChatInput,
     })
   })
 

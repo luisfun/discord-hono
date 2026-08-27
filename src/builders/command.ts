@@ -48,26 +48,26 @@ export const makeSlashCommand = <N extends string, D extends string>(
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ name: N; description: D }, RESTPostAPIChatInputApplicationCommandsJSONBody>(
+  createJsonBuilder<{ name: N; description: D }, RESTPostAPIChatInputApplicationCommandsJSONBody, 'type'>(
     { name, description },
     builderOptions,
   )
 //const testSlashCommand = makeSlashCommand('test', 'A test command')
 
 export const makeUserCommand = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  createJsonBuilder<{ type: 2; name: N }, RESTPostAPIContextMenuApplicationCommandsJSONBody>(
+  createJsonBuilder<{ type: 2; name: N }, RESTPostAPIContextMenuApplicationCommandsJSONBody, 'type'>(
     { type: 2, name },
     builderOptions,
   )
 
 export const makeMessageCommand = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  createJsonBuilder<{ type: 3; name: N }, RESTPostAPIContextMenuApplicationCommandsJSONBody>(
+  createJsonBuilder<{ type: 3; name: N }, RESTPostAPIContextMenuApplicationCommandsJSONBody, 'type'>(
     { type: 3, name },
     builderOptions,
   )
 
 export const makeEntryPointCommand = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  createJsonBuilder<{ type: 4; name: N }, RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody>(
+  createJsonBuilder<{ type: 4; name: N }, RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody, 'type'>(
     { type: 4, name },
     builderOptions,
   )
@@ -77,7 +77,7 @@ export const makeSubCommand = <N extends string, D extends string>(
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ type: 1; name: N; description: D }, APIApplicationCommandSubcommandOption>(
+  createJsonBuilder<{ type: 1; name: N; description: D }, APIApplicationCommandSubcommandOption, 'type'>(
     { type: 1, name, description },
     builderOptions,
   )
@@ -87,7 +87,7 @@ export const makeSubCommandGroup = <N extends string, D extends string>(
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ type: 2; name: N; description: D }, APIApplicationCommandSubcommandGroupOption>(
+  createJsonBuilder<{ type: 2; name: N; description: D }, APIApplicationCommandSubcommandGroupOption, 'type'>(
     { type: 2, name, description },
     builderOptions,
   )
@@ -104,7 +104,7 @@ export const makeStringOption = <N extends string, D extends string>(
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ type: 3; name: N; description: D }, APIApplicationCommandStringOption>(
+  createJsonBuilder<{ type: 3; name: N; description: D }, APIApplicationCommandStringOption, 'type'>(
     { type: 3, name, description },
     builderOptions,
   )
@@ -121,7 +121,7 @@ export const makeIntegerOption = <N extends string, D extends string>(
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ type: 4; name: N; description: D }, APIApplicationCommandIntegerOption>(
+  createJsonBuilder<{ type: 4; name: N; description: D }, APIApplicationCommandIntegerOption, 'type'>(
     { type: 4, name, description },
     builderOptions,
   )
@@ -138,7 +138,7 @@ export const makeBooleanOption = <N extends string, D extends string>(
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ type: 5; name: N; description: D }, APIApplicationCommandBooleanOption>(
+  createJsonBuilder<{ type: 5; name: N; description: D }, APIApplicationCommandBooleanOption, 'type'>(
     { type: 5, name, description },
     builderOptions,
   )
@@ -155,7 +155,7 @@ export const makeUserOption = <N extends string, D extends string>(
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ type: 6; name: N; description: D }, APIApplicationCommandUserOption>(
+  createJsonBuilder<{ type: 6; name: N; description: D }, APIApplicationCommandUserOption, 'type'>(
     { type: 6, name, description },
     builderOptions,
   )
@@ -172,7 +172,7 @@ export const makeChannelOption = <N extends string, D extends string>(
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ type: 7; name: N; description: D }, APIApplicationCommandChannelOption>(
+  createJsonBuilder<{ type: 7; name: N; description: D }, APIApplicationCommandChannelOption, 'type'>(
     { type: 7, name, description },
     builderOptions,
   )
@@ -189,7 +189,7 @@ export const makeRoleOption = <N extends string, D extends string>(
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ type: 8; name: N; description: D }, APIApplicationCommandRoleOption>(
+  createJsonBuilder<{ type: 8; name: N; description: D }, APIApplicationCommandRoleOption, 'type'>(
     { type: 8, name, description },
     builderOptions,
   )
@@ -206,7 +206,7 @@ export const makeMentionableOption = <N extends string, D extends string>(
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ type: 9; name: N; description: D }, APIApplicationCommandMentionableOption>(
+  createJsonBuilder<{ type: 9; name: N; description: D }, APIApplicationCommandMentionableOption, 'type'>(
     { type: 9, name, description },
     builderOptions,
   )
@@ -223,7 +223,7 @@ export const makeNumberOption = <N extends string, D extends string>(
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ type: 10; name: N; description: D }, APIApplicationCommandNumberOption>(
+  createJsonBuilder<{ type: 10; name: N; description: D }, APIApplicationCommandNumberOption, 'type'>(
     { type: 10, name, description },
     builderOptions,
   )
@@ -240,7 +240,7 @@ export const makeAttachmentOption = <N extends string, D extends string>(
   description: D,
   builderOptions?: JsonBuilderOptions,
 ) =>
-  createJsonBuilder<{ type: 11; name: N; description: D }, APIApplicationCommandAttachmentOption>(
+  createJsonBuilder<{ type: 11; name: N; description: D }, APIApplicationCommandAttachmentOption, 'type'>(
     { type: 11, name, description },
     builderOptions,
   )

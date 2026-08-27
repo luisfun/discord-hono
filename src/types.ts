@@ -31,6 +31,8 @@ export type NoSemicolon<S extends string> = S extends `${string};${string}` ? ne
 
 export type JsonSerializable<V> = V extends (infer U)[] ? JsonSerializable<U>[] : { toJSON(): V } | V
 
+export type ResolvedToJSON<V> = V extends (infer U)[] ? ResolvedToJSON<U>[] : V extends { toJSON(): infer R } ? R : V
+
 ////////// Env //////////
 
 export interface Env {
