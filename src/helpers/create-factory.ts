@@ -3,7 +3,6 @@ import type {
   RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10'
 import type { Select } from '../builders/deprecated-components'
-import type { Modal } from '../builders/deprecated-modal'
 import { DiscordHono } from '../discord-hono'
 import type {
   AutocompleteHandler,
@@ -74,6 +73,28 @@ type ExtractCommandVars<T extends RESTPostAPIApplicationCommandsJSONBody> = T ex
 
 type ExtractComponentVars<T> = T extends Select<infer K, infer _T2> ? { [P in K]: string[] } : {}
 
+type ExtractModalValue<T> = T extends { type: 4 | 21 | 23 }
+  ? string
+  : T extends { type: 3 | 5 | 6 | 7 | 8 | 19 | 22 }
+    ? string[]
+    : never
+
+type ExtractModalKey<T> = T extends { custom_id: infer K extends string }
+  ? ExtractModalValue<T> extends never
+    ? {}
+    : T extends { required: true } // | { type: 3 | 5 | 6 | 7 | 8 | 19 | 22 }
+      ? { [P in K]: ExtractModalValue<T> }
+      : { [P in K]?: ExtractModalValue<T> }
+  : {}
+
+type ExtractModalVars<T> = T extends readonly (infer U)[]
+  ? Simplify<UnionToIntersection<ExtractModalVars<U>>>
+  : T extends { components: infer C }
+    ? ExtractModalVars<C>
+    : T extends { component: infer C }
+      ? ExtractModalVars<C>
+      : ExtractModalKey<T>
+
 interface Factory<E extends Env> {
   discord(init?: InitOptions<E>): DiscordHonoExtends<E>
   command<T extends RESTPostAPIApplicationCommandsJSONBody, V extends Var = ExtractCommandVars<T>>(
@@ -89,7 +110,7 @@ interface Factory<E extends Env> {
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,
     handler: CommandHandler<E & { Variables?: V }>,
   ): { command: T; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E> }
-  modal<T extends APIModalInteractionResponseCallbackData, V extends Var>(
+  modal<T extends APIModalInteractionResponseCallbackData, V extends Var = ExtractModalVars<T>>(
     modal: JsonSerializable<T>,
     handler: ModalHandler<E & { Variables?: V }>,
   ): { modal: T; handler: ModalHandler<E> }
@@ -136,7 +157,7 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
     }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  modal<T extends APIModalInteractionResponseCallbackData, V extends Var>(
+  modal<T extends APIModalInteractionResponseCallbackData, V extends Var = ExtractModalVars<T>>(
     modal: JsonSerializable<T>,
     handler: ModalHandler<E & { Variables?: V }>,
   ) {
@@ -154,6 +175,7 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
   },
 })
 
+/*
 import {
   makeActionRow,
   makeChannelSelect,
@@ -186,9 +208,10 @@ void testCommand2
 
 const testModal1 = testFactory.modal(
   makeModal('testModal', 'A test modal', [
-    makeActionRow([makeTextInput('text', 'A text input').required(true)]),
-    makeLabel('label1', makeChannelSelect('channel').required(true)),
+    makeActionRow([makeTextInput('text', 'A text input')]),
+    makeLabel('label1', makeChannelSelect('channel')),
   ]),
   c => c.res(`text1: ${c.var.text}, channel: ${c.var.channel}`),
 )
 void testModal1
+*/

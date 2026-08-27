@@ -1,6 +1,15 @@
 import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
 import { describe, expect, expectTypeOf, it, vi } from 'vitest'
-import { Button, Command, Modal } from '../builders'
+import {
+  Button,
+  Command,
+  Modal,
+  makeActionRow,
+  makeChannelSelect,
+  makeLabel,
+  makeModal,
+  makeTextInput,
+} from '../builders'
 import { makeSlashCommand, makeStringOption, makeSubCommand } from '../builders/command'
 import { DiscordHono } from '../discord-hono'
 import { createFactory } from './create-factory'
@@ -82,7 +91,23 @@ describe('createFactory', () => {
     const modalMock = new Modal('unique_id', 'title')
     const handlerMock = vi.fn()
     const result = factory.modal(modalMock, handlerMock)
-    expect(result).toEqual({ modal: modalMock, handler: handlerMock })
+    expect(result).toEqual({ modal: modalMock.toJSON(), handler: handlerMock })
+  })
+
+  it('should infer Variables from modal input ids', () => {
+    const result = factory.modal(
+      makeModal('testModal', 'A test modal', [
+        makeActionRow([makeTextInput('text', 'A text input').required(true)]),
+        makeLabel('label1', makeChannelSelect('channel').required(true)),
+      ]),
+      c => {
+        expectTypeOf(c.var.text).toEqualTypeOf<string>()
+        expectTypeOf(c.var.channel).toEqualTypeOf<string[]>()
+        return c.res(`text: ${c.var.text}, channel: ${c.var.channel}`)
+      },
+    )
+
+    expect(result.modal.custom_id).toBe('testModal')
   })
 
   it('should create a cron wrapper', () => {
