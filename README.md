@@ -2,7 +2,7 @@
 
 **This library enables you to easily build Discord bots on Cloudflare Workers**
 
-[📖 Documentation](https://discord-hono.luis.fun) │ [💥 Breaking Changes](https://discord-hono.luis.fun/migration-guides/v0/)
+[👉 Documentation](https://discord-hono.luis.fun) │ [💥 Breaking Changes](https://discord-hono.luis.fun/migration-guides/v0/)
 
 This project is influenced by [Hono](https://github.com/honojs/hono).  
 Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors!
