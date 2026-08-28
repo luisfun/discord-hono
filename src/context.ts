@@ -145,8 +145,8 @@ export class Context<
     return this.#executionCtx
   }
   /**
-   * @param {string} key
-   * @param {unknown} value
+   * @param key
+   * @param value
    */
   set<Key extends keyof E['Variables']>(key: Key, value: E['Variables'][Key]): void
   set<Key extends keyof ContextVariableMap>(key: Key, value: ContextVariableMap[Key]): void
@@ -155,8 +155,8 @@ export class Context<
     this.#var.set(key, value)
   }
   /**
-   * @param {string} key
-   * @returns {unknown}
+   * @param key
+   * @returns
    */
   get<Key extends keyof E['Variables']>(key: Key): E['Variables'][Key]
   get<Key extends keyof ContextVariableMap>(key: Key): ContextVariableMap[Key]
@@ -213,7 +213,7 @@ export class Context<
   /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
-   * @returns {Response}
+   * @returns
    */
   res(data: CustomCallbackData<APIInteractionResponseCallbackData>, file?: FileData): Response {
     this.#throwIfNotAllowType([2, 3, 5])
@@ -225,8 +225,8 @@ export class Context<
   }
   /**
    * ACK an interaction and edit a response later, the user sees a loading state
-   * @param {(c: This) => Promise<unknown>} handler
-   * @returns {Response}
+   * @param handler
+   * @returns
    * @example
    * ```ts
    * return c.resDefer(c => c.followup('Delayed Message'))
@@ -247,7 +247,7 @@ export class Context<
 
   /**
    * Launch the Activity associated with the app. Only available for apps with Activities enabled
-   * @returns {Response}
+   * @returns
    */
   resActivity(): Response {
     this.#throwIfNotAllowType([2, 3, 5])
@@ -303,8 +303,8 @@ export class Context<
 
   /**
    * Response for modal window display
-   * @param {Modal} data
-   * @returns {Response}
+   * @param data
+   * @returns
    * @example
    * ```ts
    * return c.resModal(makeModal('unique-id', 'Title', [
@@ -319,8 +319,8 @@ export class Context<
 
   /**
    * for components, change `c.res()` and `c.resDefer()` to a [Callback Type](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-type) that edits the original message
-   * @param {boolean} [bool=true]
-   * @returns {this}
+   * @param bool
+   * @returns
    * @example
    * ```ts
    * return c.update().res('Edit the original message')
@@ -343,8 +343,8 @@ export class Context<
   }
 
   /**
-   * @param {Autocomplete | APICommandAutocompleteInteractionResponseCallbackData | APIApplicationCommandOptionChoice<string | number>[]} data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
-   * @returns {Response}
+   * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
+   * @returns
    */
   resAutocomplete(
     data:

@@ -44,9 +44,9 @@ export const testCommandRequestBodyJson = <V extends {}>(
  * ✅ Command: name, type
  *
  * ✅ Options: STRING, INTEGER, BOOLEAN, NUMBER
- * @param {Command | ReturnType<Command['toJSON']>} command
- * @param {Record<string, unknown>} [options]
- * @returns {RequestInit}
+ * @param command
+ * @param options
+ * @returns
  */
 export const testCommandRequestInit = <V extends {}>(
   command: JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,

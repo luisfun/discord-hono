@@ -1,9 +1,9 @@
 /**
  * [Reference](https://discord.com/developers/docs/topics/rate-limits)
- * @param {() => ReturnType<typeof fetch>} fetchFunc
- * @param {number} retryCount
- * @param {number} [addDelay=0] Additional delay milliseconds
- * @returns {ReturnType<typeof fetch>}
+ * @param fetchFunc
+ * @param retryCount
+ * @param addDelay Additional delay milliseconds
+ * @returns
  */
 export const retry429 = (
   fetchFunc: () => ReturnType<typeof fetch>,

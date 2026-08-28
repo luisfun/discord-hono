@@ -4,10 +4,10 @@ import { formData, isArray, prepareData, queryStringify } from '../utils'
 
 /**
  * [Documentation](https://discord-hono.luis.fun/interactions/webhook/)
- * @param {string | [string] | [string, RestQuery<"POST", typeof $webhooks$_$_>]} url webhook url
- * @param {RestData<"POST", typeof $webhooks$_$_>} data [RESTPostAPIWebhookWithTokenJSONBody](https://discord-api-types.dev/api/next/discord-api-types-v10/interface/RESTPostAPIWebhookWithTokenJSONBody)
- * @param {RestFile<"POST", typeof $webhooks$_$_>} file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
- * @returns {RestResult<"POST", typeof $webhooks$_$_>}
+ * @param url webhook url
+ * @param data [RESTPostAPIWebhookWithTokenJSONBody](https://discord-api-types.dev/api/next/discord-api-types-v10/interface/RESTPostAPIWebhookWithTokenJSONBody)
+ * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
+ * @returns
  */
 export const webhook = (
   url: string | [string] | [string, RestQuery<'POST', typeof $webhooks$_$_>],

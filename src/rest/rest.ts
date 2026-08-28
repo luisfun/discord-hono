@@ -6,18 +6,18 @@ const API_VER = 'v10'
 
 /**
  * [Documentation](https://discord-hono.luis.fun/interactions/rest/)
- * @param {string} token
+ * @param token
  */
 export const createRest =
   (token: string | undefined): Rest =>
   /**
    * [Documentation](https://discord-hono.luis.fun/interactions/rest/)
-   * @param {RestMethod} method
-   * @param {RestPath<any>} path Official document path
-   * @param {(string | Record<string, any>)[]} variables Variable part of official document path
-   * @param {Record<string, any> | Record<string, any>[]} data
-   * @param {FileData} file
-   * @returns {Promise<Response>}
+   * @param method
+   * @param path Official document path
+   * @param variables Variable part of official document path
+   * @param data
+   * @param file
+   * @returns
    */
   <M extends RestMethod, P extends RestPath<M>>(
     method: M,
