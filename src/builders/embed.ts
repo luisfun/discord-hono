@@ -48,13 +48,3 @@ export const makeEmbedField = <N extends string, V extends string>(
   value: V,
   builderOptions?: JsonBuilderOptions,
 ) => createJsonBuilder<{ name: N; value: V }, APIEmbedField>({ name, value }, builderOptions)
-
-/*
-const _testEmbed = makeEmbed()
-  .type(embedType.Rich)
-  .title('Test Embed')
-  .footer(makeEmbedFooter('Footer Text'))
-  .image(makeEmbedImage('https://example.com/image.png'))
-  .author(makeEmbedAuthor('Author Name'))
-  .fields([makeEmbedField('Field 1', 'Value 1'), makeEmbedField('Field 2', 'Value 2')])
-*/

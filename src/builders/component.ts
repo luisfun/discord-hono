@@ -124,8 +124,6 @@ export const makeActionRow = <T extends JsonSerializable<APIComponentInActionRow
     { type: 1, components: components.map(toJSON) },
     builderOptions,
   )
-//const testActionRow = actionRowBuilder([{ type: 2, style: 2, custom_id: 'test' }, { type: 2, style: 1, custom_id: 'test' }])
-//const testActionRow = actionRowBuilder([]).components([{ type: 2, style: 1, custom_id: 'test' }, { type: 2, style: 1, custom_id: 'test' }])
 
 type ButtonContext = undefined | string | [emoji: string, label: string]
 type ButtonJson<C extends string, T extends ButtonContext, S extends InteractionButtonStyle = 1> = T extends undefined
@@ -163,7 +161,6 @@ export const makeButton = <
   else if (isArray(label)) builder.label(label[1]).emoji({ name: label[0] })
   return builder
 }
-//const testButton = makeButton('test', ['🔥', 'Fire']).custom_value('test2') //.delete('custom_value') //.toJSON()
 
 type LinkButtonContext = undefined | string | [emoji: string, label: string]
 type LinkButtonJson<U extends string, T extends LinkButtonContext> = T extends undefined
@@ -194,7 +191,6 @@ export const makeLinkButton = <U extends string, const T extends LinkButtonConte
   else if (isArray(label)) builder.label(label[1]).emoji({ name: label[0] })
   return builder
 }
-//const testLinkButton = makeLinkButton('https://example.com', ['🔗', 'Link'])
 
 /**
  * Component Premium Button
@@ -207,9 +203,6 @@ export const makePremiumButton = <S extends string>(sku_id: S, builderOptions?: 
     { type: 2, style: 6, sku_id },
     builderOptions,
   )
-//const testPremiumButton = makePremiumButton('test_sku_id')
-
-//const testActionRow = makeActionRow([makeLinkButton('https://example.com')]).components([makeButton('id', 'Btn', 3).style(2).custom_value('value').disabled(true)])
 
 type StringSelectOptionContext = string | readonly [emoji: string, label: string]
 type StringSelectOptionJson<V extends string, T extends StringSelectOptionContext> = T extends string
@@ -235,7 +228,6 @@ export const makeStringSelectOption = <V extends string, const L extends StringS
   else if (isArray(label)) builder.label(label[1]).emoji({ name: label[0] })
   return builder
 }
-//const testStringSelectOption = makeStringSelectOption('option1', ['🔥', 'Option'])
 
 interface StringSelectOptionInput {
   0: string
@@ -272,7 +264,6 @@ export const makeStringSelect = <C extends string, const O extends StringSelectO
     },
     builderOptions,
   )
-//const testStringSelect = makeStringSelect('test', [['value1', 'Option 1'], ['value2', ['🔥', 'Option 2']]]).options([makeStringSelectOption('option1', ['🔥', 'Option 1']), makeStringSelectOption('option2', 'Option 2')])
 
 type TextInputContext = undefined | string
 type TextInputJson<C extends string, L extends TextInputContext, S extends TextInputStyle = 1> = L extends undefined
@@ -303,7 +294,6 @@ export const makeTextInput = <C extends string, L extends TextInputContext = und
   if (isString(label)) builder.label(label)
   return builder
 }
-//const testTextInput = makeTextInput('id', 'Text').label('Text Input').style(2).toJSON()
 
 /**
  * Component User Select
@@ -317,7 +307,6 @@ export const makeUserSelect = <C extends string>(custom_id: NoSemicolon<C>, buil
     AddCustomValue<APIBaseAutoPopulatedSelectMenuComponent<ComponentType.UserSelect, SelectMenuDefaultValueType.User>>,
     'type' | 'custom_id'
   >({ type: 5, custom_id }, builderOptions)
-//const testUserSelect = makeUserSelect('test')
 
 /**
  * Component Role Select
@@ -331,7 +320,6 @@ export const makeRoleSelect = <C extends string>(custom_id: NoSemicolon<C>, buil
     AddCustomValue<APIBaseAutoPopulatedSelectMenuComponent<ComponentType.RoleSelect, SelectMenuDefaultValueType.Role>>,
     'type' | 'custom_id'
   >({ type: 6, custom_id }, builderOptions)
-//const testRoleSelect = makeRoleSelect('test')
 
 /**
  * Component Mentionable Select
@@ -353,7 +341,6 @@ export const makeMentionableSelect = <C extends string>(
     >,
     'type' | 'custom_id'
   >({ type: 7, custom_id }, builderOptions)
-//const testMentionableSelect = makeMentionableSelect('test')
 
 /**
  * Component Channel Select
@@ -367,7 +354,6 @@ export const makeChannelSelect = <C extends string>(custom_id: NoSemicolon<C>, b
     AddCustomValue<APIChannelSelectComponent>,
     'type' | 'custom_id'
   >({ type: 8, custom_id }, builderOptions)
-//const testChannelSelect = makeChannelSelect('test')
 
 /**
  * Component Section
@@ -389,7 +375,6 @@ export const makeSection = <
     AddCustomValue<APISectionComponent>,
     'type'
   >({ type: 9, components: components.map(toJSON), accessory: toJSON(accessory) }, builderOptions)
-//const testSection = makeSection([{ type: 10, content: 'Test' }], { type: 11, media: { url: 'Test' } })
 
 /**
  * Component Text Display
@@ -402,8 +387,6 @@ export const makeTextDisplay = <C extends string>(content: C, builderOptions?: J
     { type: 10, content },
     builderOptions,
   )
-//const testTextDisplay = makeTextDisplay('This is a text display component.')
-//const testSection = makeSection([makeTextDisplay('Test'), makeTextDisplay('Second')], makeButton('test', 'Button'))
 
 /**
  * Child Component Media Gallery Item
@@ -415,7 +398,6 @@ export const makeMediaGalleryItem = <M extends JsonSerializable<TemplatedMediaGa
   media: M,
   builderOptions?: JsonBuilderOptions,
 ) => createJsonBuilder<{ media: ToJSON<M> }, APIMediaGalleryItem>({ media: toJSON(media) }, builderOptions)
-//const testMediaGalleryItem = makeMediaGalleryItem({ url: 'https://example.com/image.png' })
 
 /**
  * Child Component Unfurled Media Item
@@ -427,7 +409,6 @@ export const makeUnfurledMediaItem = <U extends TemplatedUnfurledMediaItem['url'
   url: U,
   builderOptions?: JsonBuilderOptions,
 ) => createJsonBuilder<{ url: U }, TemplatedUnfurledMediaItem>({ url }, builderOptions)
-//const testUMI = makeUnfurledMediaItem('htps://example.com/image.png')
 
 type MediaGalleryItemBuilderResult<M extends JsonSerializable<TemplatedMediaGalleryItem['media']>> = ReturnType<
   typeof makeMediaGalleryItem<M>
@@ -451,7 +432,6 @@ export const makeThumbnail = <U extends TemplatedUnfurledMediaItem['url']>(
     AddCustomValue<TemplatedThumbnailComponent>,
     'type'
   >({ type: 11, media: makeUnfurledMediaItem(url, builderOptions).toJSON() }, builderOptions)
-//const testThumbnail = makeThumbnail('https://example.com/image.png')
 
 /**
  * Component Media Gallery
@@ -474,9 +454,6 @@ export const makeMediaGallery = <U extends TemplatedUnfurledMediaItem['url']>(
     },
     builderOptions,
   )
-//const testMediaGallery1 = makeMediaGallery(['https://example.com/image1.png', 'https://example.com/image2.png'])
-//const testMediaItem = makeMediaGalleryItem(makeUnfurledMediaItem('https://example.com/image.png'))
-//const testFile = makeFile(makeUnfurledMediaItem('attachment://file.png'))
 
 /**
  * Component File
@@ -490,7 +467,6 @@ export const makeFile = <U extends AttachmentUrl>(url: U, builderOptions?: JsonB
     AddCustomValue<TemplatedFileComponent>,
     'type'
   >({ type: 13, file: makeUnfurledMediaItem(url, builderOptions).toJSON() }, builderOptions)
-//const testFile = makeFile('attachment://file.png')
 
 /**
  * Component Separator
@@ -531,7 +507,6 @@ export const makeLabel = <L extends string, C extends JsonSerializable<APILabelC
     { type: 18, label, component: toJSON(component) },
     builderOptions,
   )
-//const testLabel = makeLabel('Label', textInputBuilder('test', 'Input'))
 
 /**
  * Component File Upload
@@ -545,7 +520,6 @@ export const makeFileUpload = <C extends string>(custom_id: NoSemicolon<C>, buil
     AddCustomValue<APIFileUploadComponent>,
     'type' | 'custom_id'
   >({ type: 19, custom_id }, builderOptions)
-//const testFileUpload = makeFileUpload('test')
 
 /**
  * Child Component Radio Group Option
@@ -559,7 +533,6 @@ export const makeRadioGroupOption = <V extends APIRadioGroupOption['value'], L e
   label: L,
   builderOptions?: JsonBuilderOptions,
 ) => createJsonBuilder<{ value: V; label: L }, APIRadioGroupOption>({ value, label }, builderOptions)
-//const testRadioOption = makeRadioGroupOption('Option 1', 'option1')
 
 interface RadioGroupOptionInput {
   0: string
@@ -596,7 +569,6 @@ export const makeRadioGroup = <C extends string, const O extends RadioGroupOptio
     },
     builderOptions,
   )
-//const testRadioGroup = makeRadioGroup('test', [['value 1', 'V1'], ['value 2', 'Display 2']])
 
 /**
  * Child Component Checkbox Group Option
@@ -613,7 +585,6 @@ export const makeCheckboxGroupOption = <
   label: L,
   builderOptions?: JsonBuilderOptions,
 ) => createJsonBuilder<{ value: V; label: L }, APICheckboxGroupOption>({ value, label }, builderOptions)
-//const testCheckboxOption = makeCheckboxGroupOption('Option 1', 'option1')
 
 interface CheckboxGroupOptionInput {
   0: string
@@ -650,7 +621,6 @@ export const makeCheckboxGroup = <C extends string, const O extends CheckboxGrou
     },
     builderOptions,
   )
-//const testCheckboxGroup = makeCheckboxGroup('test', [['value 1', 'V1'], ['value 2', 'Display 2']])
 
 /**
  * Component Checkbox
@@ -664,15 +634,3 @@ export const makeCheckbox = <C extends string>(custom_id: NoSemicolon<C>, builde
     AddCustomValue<APICheckboxComponent>,
     'type' | 'custom_id'
   >({ type: 23, custom_id }, builderOptions)
-
-/*
-const testContainer = makeContainer([
-  makeSection(
-    [makeTextDisplay('Section 1'), makeTextDisplay('Section 2')],
-    makeThumbnail('https://example.com/image.png'),
-  ),
-  makeSeparator(),
-  makeMediaGallery(['https://example.com/image1.png', 'https://example.com/image2.png']),
-  makeFile('attachment://file.png'),
-])
-*/

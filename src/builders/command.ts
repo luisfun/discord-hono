@@ -244,12 +244,3 @@ export const makeAttachmentOption = <N extends string, D extends string>(
     { type: 11, name, description },
     builderOptions,
   )
-
-/*
-const testCommand = slashCommandBuilder('test', 'A test command').options([
-  subCommandBuilder('sub1', 'A subcommand').options([stringOptionBuilder('option1', 'A string option')]),
-  subCommandGroupBuilder('group1', 'A subcommand group').options([
-    subCommandBuilder('sub2', 'Another subcommand').options([numberOptionBuilder('option2', 'A number option')]),
-  ]),
-])
-*/

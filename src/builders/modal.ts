@@ -23,14 +23,3 @@ export const makeModal = <
     AddCustomValue<APIModalInteractionResponseCallbackData>,
     'custom_id'
   >({ custom_id, title, components: components.map(toJSON) }, builderOptions)
-
-/*
-import { makeActionRow, makeLabel, makeTextInput } from './a-component'
-
-const modalTest = makeModal('custom_id', 'title', [
-  makeActionRow([makeTextInput('id', 'label')]),
-  makeLabel('label', makeTextInput('id2', 'label2')),
-])
-  .components([makeLabel('label3', makeTextInput('id3', 'label3'))])
-  .custom_value('custom_value')
-*/

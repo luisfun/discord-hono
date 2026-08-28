@@ -23,7 +23,6 @@ export const makePollMedia = <const T extends PollMediaContext>(text: T, builder
   if (txt) builder.text(txt)
   return builder
 }
-//const pollMediaTest = makePollMedia(['😀', 'Test Text'])
 
 export const makePollAnswer = <M extends JsonSerializable<APIPollMedia>>(
   poll_media: M,
@@ -51,6 +50,3 @@ export const makePoll = <const Q extends PollMediaContext, const A extends PollM
     },
     builderOptions,
   )
-//const pollTest = makePoll('question', ['Test', ['🔥', 'Hono']])
-//  .question(makePollMedia('aaa'))
-//  .answers([makePollAnswer(makePollMedia('bbb')), makePollAnswer(makePollMedia(['🔥', 'Hono']))])
