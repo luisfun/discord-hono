@@ -1,56 +1,52 @@
-import type { APIPartialEmoji, RESTAPIPoll } from 'discord-api-types/v10'
-import { isArray, isString } from '../utils'
-import { Builder } from './utils'
+// biome-ignore-all lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
 
-const answersRemap = (
-  answers: (string | [string | APIPartialEmoji, string])[],
-): { poll_media: { emoji?: APIPartialEmoji; text: string } }[] =>
-  answers.map(e => ({
-    poll_media: isArray(e) ? { emoji: isString(e[0]) ? { id: null, name: e[0] } : e[0], text: e[1] } : { text: e },
-  }))
+import type { APIBasePollAnswer, APIPollMedia, RESTAPIPoll } from 'discord-api-types/v10'
+import type { JsonSerializable } from '../types'
+import { isArray, isString, type ToJSON, toJSON } from '../utils'
+import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions } from './json-builder'
 
-export class Poll extends Builder<RESTAPIPoll> {
-  constructor(question: string = '', ...answers: (string | [string | APIPartialEmoji, string])[]) {
-    super({ question: { text: question }, answers: answersRemap(answers) })
-  }
-  /**
-   * overwrite question
-   * @param {string} question
-   * @returns {this}
-   */
-  question(question: string): this {
-    return this.a({ question: { text: question } })
-  }
-  /**
-   * overwrite answers
-   * @param {string | [string | APIPartialEmoji, string]} answers
-   * @returns {this}
-   */
-  answers(...answers: (string | [string | APIPartialEmoji, string])[]): this {
-    return this.a({ answers: answersRemap(answers) })
-  }
-  /**
-   * Number of hours the poll should be open for, up to 32 days. Defaults to 24
-   * @param {number} duration
-   * @returns {this}
-   */
-  duration(duration: number = 24): this {
-    return this.a({ duration })
-  }
-  /**
-   * Whether a user can select multiple answers.
-   * @param {boolean} allow_multiselect
-   * @returns {this}
-   */
-  allow_multiselect(allow_multiselect: boolean = true): this {
-    return this.a({ allow_multiselect })
-  }
-  /**
-   * https://discord.com/developers/docs/resources/poll#layout-type
-   * @param {number} layout_type
-   * @returns {this}
-   */
-  layout_type(layout_type: number): this {
-    return this.a({ layout_type })
-  }
+type PollMediaContext = string | [emoji: string] | [emoji: string, text: string]
+
+type PollMediaJson<T extends PollMediaContext> = T extends string
+  ? { text: T }
+  : T extends [infer E extends string]
+    ? { emoji: { id: null; name: E } }
+    : T extends [infer E extends string, infer U extends string]
+      ? { text: U; emoji: { id: null; name: E } }
+      : never
+
+export const makePollMedia = <const T extends PollMediaContext>(text: T, builderOptions?: JsonBuilderOptions) => {
+  const builder = createJsonBuilder<PollMediaJson<T>, APIPollMedia>({} as PollMediaJson<T>, builderOptions)
+  const emj = isArray(text) ? text[0] : undefined
+  const txt = isArray(text) ? text[1] : isString(text) ? text : undefined
+  if (emj) builder.emoji({ id: null, name: emj })
+  if (txt) builder.text(txt)
+  return builder
 }
+
+export const makePollAnswer = <M extends JsonSerializable<APIPollMedia>>(
+  poll_media: M,
+  builderOptions?: JsonBuilderOptions,
+) => createJsonBuilder<{ poll_media: ToJSON<M> }, APIBasePollAnswer>({ poll_media: toJSON(poll_media) }, builderOptions)
+
+type PollMediaBuilderResult<T extends PollMediaContext> = ReturnType<typeof makePollMedia<T>> //JsonBuilder<PollMediaJson<T>, APIPollMedia, never>
+type PollAnswerBuilderResult<M extends JsonSerializable<APIPollMedia>> = ReturnType<typeof makePollAnswer<M>>
+
+export const makePoll = <const Q extends PollMediaContext, const A extends PollMediaContext>(
+  question: Q,
+  answers: A[],
+  builderOptions?: JsonBuilderOptions,
+) =>
+  createJsonBuilder<
+    {
+      question: ToJSON<PollMediaBuilderResult<Q>>
+      answers: ToJSON<PollAnswerBuilderResult<PollMediaBuilderResult<A>>>[]
+    },
+    AddCustomValue<RESTAPIPoll>
+  >(
+    {
+      question: makePollMedia(question, builderOptions).toJSON(),
+      answers: answers.map(a => makePollAnswer(makePollMedia(a, builderOptions), builderOptions).toJSON()),
+    },
+    builderOptions,
+  )

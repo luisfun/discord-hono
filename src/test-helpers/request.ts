@@ -1,15 +1,15 @@
-import type { APIApplicationCommandInteraction } from 'discord-api-types/v10'
-import type { Command } from '../builders'
+import type { APIApplicationCommandInteraction, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
+import type { JsonSerializable } from '../types'
 import { newError, toJSON } from '../utils'
 
 /**
  * @alpha
  */
 export const testCommandRequestBodyJson = <V extends {}>(
-  command: Command<V> | ReturnType<Command['toJSON']>,
+  command: JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
   options?: V,
 ): APIApplicationCommandInteraction => {
-  const cmd: ReturnType<Command['toJSON']> = toJSON(command)
+  const cmd = toJSON(command)
   const supportOptionType = [3, 4, 5, 10] // STRING, INTEGER, BOOLEAN, NUMBER
   const interaction: APIApplicationCommandInteraction = {
     type: 2, // Command Number
@@ -44,12 +44,12 @@ export const testCommandRequestBodyJson = <V extends {}>(
  * ✅ Command: name, type
  *
  * ✅ Options: STRING, INTEGER, BOOLEAN, NUMBER
- * @param {Command | ReturnType<Command['toJSON']>} command
- * @param {Record<string, unknown>} [options]
- * @returns {RequestInit}
+ * @param command
+ * @param options
+ * @returns
  */
 export const testCommandRequestInit = <V extends {}>(
-  command: Command<V> | ReturnType<Command['toJSON']>,
+  command: JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
   options?: V,
 ): RequestInit => ({
   method: 'POST',

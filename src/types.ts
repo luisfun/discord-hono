@@ -1,23 +1,24 @@
 import type {
   APIApplicationCommandAutocompleteInteraction,
   APIApplicationCommandInteraction,
+  APIBaseAutoPopulatedSelectMenuComponent,
+  APIButtonComponentWithCustomId,
+  APIChannelSelectComponent,
   APIInteractionDataResolved,
   APIMessageApplicationCommandInteractionDataResolved,
+  APIMessageChannelSelectInteractionData,
   APIMessageComponentButtonInteraction,
   APIMessageComponentInteraction,
   APIMessageComponentSelectMenuInteraction,
+  APIMessageMentionableSelectInteractionData,
+  APIMessageRoleSelectInteractionData,
+  APIMessageStringSelectInteractionData,
+  APIMessageUserSelectInteractionData,
   APIModalSubmitInteraction,
+  APIStringSelectComponent,
+  ComponentType,
+  SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
-import type { Button, Components, Select } from './builders/components'
-import type {
-  ContentFile,
-  ContentMediaGallery,
-  ContentTextDisplay,
-  LayoutActionRow,
-  LayoutContainer,
-  LayoutSection,
-  LayoutSeparator,
-} from './builders/components-v2'
 import type { Context } from './context'
 
 ////////// Utils //////////
@@ -29,6 +30,8 @@ export type ExcludeMethods<T, K extends keyof T> = { [P in keyof T as P extends 
 export type NoSemicolon<S extends string> = S extends `${string};${string}` ? never : S
 
 export type JsonSerializable<V> = V extends (infer U)[] ? JsonSerializable<U>[] : { toJSON(): V } | V
+
+export type ResolvedToJSON<V> = V extends (infer U)[] ? ResolvedToJSON<U>[] : V extends { toJSON(): infer R } ? R : V
 
 ////////// Env //////////
 
@@ -75,11 +78,25 @@ interface CronRef {
 }
 export interface ContextRef extends CommandRef, ComponentRef, ModalRef, CronRef {}
 
-export type ComponentType = Button<any> | Select<any, any> //'Button' | 'Select'
+export type InteractionComponent =
+  | APIButtonComponentWithCustomId
+  | APIStringSelectComponent
+  | APIBaseAutoPopulatedSelectMenuComponent<ComponentType.UserSelect, SelectMenuDefaultValueType.User>
+  | APIBaseAutoPopulatedSelectMenuComponent<ComponentType.RoleSelect, SelectMenuDefaultValueType.Role>
+  | APIBaseAutoPopulatedSelectMenuComponent<
+      ComponentType.MentionableSelect,
+      SelectMenuDefaultValueType.User | SelectMenuDefaultValueType.Role
+    >
+  | APIChannelSelectComponent
+
 // biome-ignore format: ternary operator
-type ComponentInteraction<T extends ComponentType> =
-  T extends Button<any> ? APIMessageComponentButtonInteraction :
-  T extends Select<any, any> ? APIMessageComponentSelectMenuInteraction :
+type ComponentInteraction<T extends InteractionComponent> =
+  T extends APIButtonComponentWithCustomId ? APIMessageComponentButtonInteraction :
+  T extends APIStringSelectComponent ? Omit<APIMessageComponentSelectMenuInteraction, 'data'> & { data: APIMessageStringSelectInteractionData } :
+  T extends APIBaseAutoPopulatedSelectMenuComponent<ComponentType.UserSelect, SelectMenuDefaultValueType.User> ? Omit<APIMessageComponentSelectMenuInteraction, 'data'> & { data: APIMessageUserSelectInteractionData } :
+  T extends APIBaseAutoPopulatedSelectMenuComponent<ComponentType.RoleSelect, SelectMenuDefaultValueType.Role> ? Omit<APIMessageComponentSelectMenuInteraction, 'data'> & { data: APIMessageRoleSelectInteractionData } :
+  T extends APIBaseAutoPopulatedSelectMenuComponent<ComponentType.MentionableSelect, SelectMenuDefaultValueType.User | SelectMenuDefaultValueType.Role> ? Omit<APIMessageComponentSelectMenuInteraction, 'data'> & { data: APIMessageMentionableSelectInteractionData } :
+  T extends APIChannelSelectComponent ? Omit<APIMessageComponentSelectMenuInteraction, 'data'> & { data: APIMessageChannelSelectInteractionData } :
   APIMessageComponentInteraction
 
 export type CommandContext<E extends Env = any> = ExcludeMethods<
@@ -87,7 +104,7 @@ export type CommandContext<E extends Env = any> = ExcludeMethods<
   'update' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
 > & { interaction: Readonly<APIApplicationCommandInteraction>; ref: Readonly<CommandRef> }
 
-export type ComponentContext<E extends Env = any, T extends ComponentType = any> = ExcludeMethods<
+export type ComponentContext<E extends Env = any, T extends InteractionComponent = any> = ExcludeMethods<
   Context<E, ComponentContext<E, T>>,
   'sub' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
 > & { interaction: Readonly<ComponentInteraction<T>>; ref: Readonly<ComponentRef> }
@@ -121,7 +138,7 @@ export type CronContext<E extends Env = any> = ExcludeMethods<
 ////////// Handler //////////
 
 export type CommandHandler<E extends Env> = (c: CommandContext<E>) => Promise<Response> | Response
-export type ComponentHandler<E extends Env, T extends ComponentType> = (
+export type ComponentHandler<E extends Env, T extends InteractionComponent> = (
   c: ComponentContext<E, T>,
 ) => Promise<Response> | Response
 export type AutocompleteHandler<E extends Env> = (c: AutocompleteContext<E>) => Promise<Response> | Response
@@ -170,18 +187,7 @@ export abstract class FetchEventLike {
 
 export type CustomCallbackData<T extends Record<string, unknown>> =
   | (Omit<T, 'components' | 'embeds' | 'poll'> & {
-      components?:
-        | Components
-        | (
-            | LayoutActionRow
-            | LayoutSection
-            | LayoutSeparator
-            | LayoutContainer
-            | ContentTextDisplay
-            | ContentMediaGallery
-            | ContentFile
-          )[]
-        | T['components']
+      components?: JsonSerializable<T['components']>
       embeds?: JsonSerializable<T['embeds']>
       poll?: JsonSerializable<T['poll']>
     })

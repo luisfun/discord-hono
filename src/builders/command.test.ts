@@ -1,156 +1,167 @@
+import { describe, expect, it } from 'vitest'
 import {
-  ApplicationCommandType,
-  ApplicationIntegrationType,
-  ChannelType,
-  InteractionContextType,
-  Locale,
-} from 'discord-api-types/v10'
-import { describe, expect, it, vi } from 'vitest'
-import { Command, Option, SubCommand, SubGroup } from './command'
+  commandOptionType,
+  commandType,
+  makeAttachmentOption,
+  makeBooleanOption,
+  makeChannelOption,
+  makeEntryPointCommand,
+  makeIntegerOption,
+  makeMentionableOption,
+  makeMessageCommand,
+  makeNumberOption,
+  makeRoleOption,
+  makeSlashCommand,
+  makeStringOption,
+  makeSubCommand,
+  makeSubCommandGroup,
+  makeUserCommand,
+  makeUserOption,
+} from './command'
 
-describe('Command class', () => {
-  it('creates a basic command', () => {
-    const command = new Command('test', 'Test command')
+describe('a-command builders', () => {
+  it('creates a basic slash command', () => {
+    const command = makeSlashCommand('test', 'Test command')
+
     expect(command.toJSON()).toEqual({
       name: 'test',
       description: 'Test command',
     })
   })
 
-  it('sets command properties', () => {
-    const command = new Command('test', 'Test command')
-      .type(ApplicationCommandType.ChatInput)
-      .name_localizations({ [Locale.Japanese]: 'テスト' })
-      .description_localizations({ [Locale.Japanese]: 'テストコマンド' })
-      .default_member_permissions('0')
-      .dm_permission(false)
-      .nsfw()
-      .integration_types(ApplicationIntegrationType.GuildInstall)
-      .contexts(InteractionContextType.Guild)
+  it('creates context and entry point commands', () => {
+    const userCommand = makeUserCommand('user-info')
+    const messageCommand = makeMessageCommand('message-info')
+    const entryPointCommand = makeEntryPointCommand('entry-point')
 
-    expect(command.toJSON()).toMatchObject({
-      name: 'test',
-      description: 'Test command',
-      type: ApplicationCommandType.ChatInput,
-      name_localizations: { [Locale.Japanese]: 'テスト' },
-      description_localizations: { [Locale.Japanese]: 'テストコマンド' },
-      default_member_permissions: '0',
-      dm_permission: false,
-      nsfw: true,
-      integration_types: [ApplicationIntegrationType.GuildInstall],
-      contexts: [InteractionContextType.Guild],
+    expect(userCommand.toJSON()).toEqual({
+      type: commandType.User,
+      name: 'user-info',
+    })
+    expect(messageCommand.toJSON()).toEqual({
+      type: commandType.Message,
+      name: 'message-info',
+    })
+    expect(entryPointCommand.toJSON()).toEqual({
+      type: commandType.PrimaryEntryPoint,
+      name: 'entry-point',
     })
   })
 
-  it('adds options to command', () => {
-    const subCommand = new SubCommand('sub', 'Sub command')
-    const option = new Option('opt', 'Option', 'String')
-    const command = new Command('test', 'Test command').options(subCommand, option)
+  it('creates subcommands and subcommand groups with nested options', () => {
+    const option = makeStringOption('query', 'Search query').required(true).min_length(1).max_length(100)
+    const subCommand = makeSubCommand('search', 'Search something').options([option])
+    const subGroup = makeSubCommandGroup('content', 'Content actions').options([subCommand])
+    const command = makeSlashCommand('lookup', 'Lookup command').options([subGroup])
 
-    expect(command.toJSON().options).toHaveLength(2)
-    expect(command.toJSON().options?.[0]).toMatchObject(subCommand.toJSON())
-    expect(command.toJSON().options?.[1]).toMatchObject(option.toJSON())
-  })
-})
-
-describe('SubGroup class', () => {
-  it('creates a sub group', () => {
-    const subGroup = new SubGroup('group', 'Group description')
-    expect(subGroup.toJSON()).toMatchObject({
-      name: 'group',
-      description: 'Group description',
-      type: 2,
+    expect(command.toJSON()).toEqual({
+      name: 'lookup',
+      description: 'Lookup command',
+      options: [
+        {
+          type: commandOptionType.SubcommandGroup,
+          name: 'content',
+          description: 'Content actions',
+          options: [
+            {
+              type: commandOptionType.Subcommand,
+              name: 'search',
+              description: 'Search something',
+              options: [
+                {
+                  type: commandOptionType.String,
+                  name: 'query',
+                  description: 'Search query',
+                  required: true,
+                  min_length: 1,
+                  max_length: 100,
+                },
+              ],
+            },
+          ],
+        },
+      ],
     })
   })
 
-  it('adds sub commands to sub group', () => {
-    const subCommand = new SubCommand('sub', 'Sub command')
-    const subGroup = new SubGroup('group', 'Group description').options(subCommand)
+  it('accepts union-typed builders for shared option methods', () => {
+    const option: ReturnType<typeof makeStringOption> | ReturnType<typeof makeIntegerOption> = makeStringOption(
+      'name',
+      'Name',
+    )
 
-    expect(subGroup.toJSON().options).toHaveLength(1)
-    expect(subGroup.toJSON().options?.[0]).toMatchObject(subCommand.toJSON())
-  })
-})
+    const result = option.autocomplete(true)
 
-describe('SubCommand class', () => {
-  it('creates a sub command', () => {
-    const subCommand = new SubCommand('sub', 'Sub command')
-    expect(subCommand.toJSON()).toMatchObject({
-      name: 'sub',
-      description: 'Sub command',
-      type: 1,
-    })
-  })
-
-  it('adds options to sub command', () => {
-    const option = new Option('opt', 'Option', 'String')
-    const subCommand = new SubCommand('sub', 'Sub command').options(option)
-
-    expect(subCommand.toJSON().options).toHaveLength(1)
-    expect(subCommand.toJSON().options?.[0]).toMatchObject(option.toJSON())
-  })
-})
-
-describe('Option class', () => {
-  it('creates a string option', () => {
-    const option = new Option('opt', 'Option', 'String')
-    expect(option.toJSON()).toMatchObject({
-      name: 'opt',
-      description: 'Option',
-      type: 3,
-    })
-  })
-
-  it('sets option properties', () => {
-    const option = new Option('opt', 'Option', 'String').required().min_length(1).max_length(10).autocomplete()
-
-    expect(option.toJSON()).toMatchObject({
-      name: 'opt',
-      description: 'Option',
-      type: 3,
-      required: true,
-      min_length: 1,
-      max_length: 10,
+    expect(result.toJSON()).toMatchObject({
+      type: commandOptionType.String,
+      name: 'name',
+      description: 'Name',
       autocomplete: true,
     })
   })
 
-  it('sets channel types for channel option', () => {
-    const option = new Option('channel', 'Channel', 'Channel').channel_types(
-      ChannelType.GuildText,
-      ChannelType.GuildVoice,
-    )
+  it('creates option builders with the correct type metadata', () => {
+    const stringOption = makeStringOption('name', 'Name').required(true).autocomplete(true)
+    const integerOption = makeIntegerOption('count', 'Count').required(true).min_value(1).max_value(10)
+    const numberOption = makeNumberOption('ratio', 'Ratio').min_value(0).max_value(1)
+    const booleanOption = makeBooleanOption('enabled', 'Enabled')
+    const userOption = makeUserOption('owner', 'Owner')
+    const channelOption = makeChannelOption('channel', 'Channel')
+    const roleOption = makeRoleOption('staff-role', 'Staff role')
+    const mentionableOption = makeMentionableOption('mention', 'Mentionable target')
+    const attachmentOption = makeAttachmentOption('file', 'File attachment')
 
-    expect(option.toJSON()).toMatchObject({
+    expect(stringOption.toJSON()).toMatchObject({
+      type: commandOptionType.String,
+      name: 'name',
+      description: 'Name',
+      required: true,
+      autocomplete: true,
+    })
+    expect(integerOption.toJSON()).toMatchObject({
+      type: commandOptionType.Integer,
+      name: 'count',
+      description: 'Count',
+      required: true,
+      min_value: 1,
+      max_value: 10,
+    })
+    expect(numberOption.toJSON()).toMatchObject({
+      type: commandOptionType.Number,
+      name: 'ratio',
+      description: 'Ratio',
+      min_value: 0,
+      max_value: 1,
+    })
+    expect(booleanOption.toJSON()).toMatchObject({
+      type: commandOptionType.Boolean,
+      name: 'enabled',
+      description: 'Enabled',
+    })
+    expect(userOption.toJSON()).toMatchObject({
+      type: commandOptionType.User,
+      name: 'owner',
+      description: 'Owner',
+    })
+    expect(channelOption.toJSON()).toMatchObject({
+      type: commandOptionType.Channel,
       name: 'channel',
       description: 'Channel',
-      type: 7,
-      channel_types: [ChannelType.GuildText, ChannelType.GuildVoice],
     })
-  })
-
-  it('sets min and max values for number option', () => {
-    const option = new Option('num', 'Number', 'Number').min_value(0).max_value(100)
-
-    expect(option.toJSON()).toMatchObject({
-      name: 'num',
-      description: 'Number',
-      type: 10,
-      min_value: 0,
-      max_value: 100,
+    expect(roleOption.toJSON()).toMatchObject({
+      type: commandOptionType.Role,
+      name: 'staff-role',
+      description: 'Staff role',
     })
-  })
-
-  it('warns when using incompatible methods', () => {
-    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    // @ts-expect-error
-    const _option = new Option('str', 'String', 'String')
-      // @ts-expect-error
-      .min_value(0)
-      // @ts-expect-error
-      .channel_types(ChannelType.GuildText)
-
-    expect(consoleSpy).toHaveBeenCalledTimes(2)
-    consoleSpy.mockRestore()
+    expect(mentionableOption.toJSON()).toMatchObject({
+      type: commandOptionType.Mentionable,
+      name: 'mention',
+      description: 'Mentionable target',
+    })
+    expect(attachmentOption.toJSON()).toMatchObject({
+      type: commandOptionType.Attachment,
+      name: 'file',
+      description: 'File attachment',
+    })
   })
 })

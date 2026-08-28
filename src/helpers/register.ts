@@ -9,10 +9,10 @@ import { newError, toJSON } from '../utils'
 
 /**
  * [Docs](https://discord-hono.luis.fun/rest-api/register/)
- * @param {JsonSerializable<RESTPostAPIApplicationCommandsJSONBody[]>} commands
- * @param {string} application_id
- * @param {string} token
- * @param {string} [guild_id]
+ * @param commands
+ * @param application_id
+ * @param token
+ * @param guild_id
  */
 export const register = async (
   commands: JsonSerializable<RESTPostAPIApplicationCommandsJSONBody[]>,

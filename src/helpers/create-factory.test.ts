@@ -1,6 +1,18 @@
-import { describe, expect, it, vi } from 'vitest'
-import { Button, Command, Modal } from '../builders'
+import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
+import { describe, expect, expectTypeOf, it, vi } from 'vitest'
+import {
+  makeActionRow,
+  makeButton,
+  makeChannelSelect,
+  makeLabel,
+  makeModal,
+  makeSlashCommand,
+  makeStringOption,
+  makeSubCommand,
+  makeTextInput,
+} from '../builders'
 import { DiscordHono } from '../discord-hono'
+import { toJSON } from '../utils'
 import { createFactory } from './create-factory'
 
 describe('createFactory', () => {
@@ -12,21 +24,64 @@ describe('createFactory', () => {
   })
 
   it('should create a command wrapper', () => {
-    const commandMock = new Command('name', 'description')
+    const commandMock = makeSlashCommand('name', 'description')
     const handlerMock = vi.fn()
     const result = factory.command(commandMock, handlerMock)
     expect(result).toEqual({ command: commandMock, handler: handlerMock })
   })
 
+  it('should accept JsonSerializable commands while preserving Variables typing', () => {
+    const commandJson = {
+      name: 'echo',
+      description: 'echo command',
+      options: [{ type: 3, name: 'text', description: 'text option', required: true }],
+    } as const satisfies RESTPostAPIApplicationCommandsJSONBody
+
+    const result = factory.command(commandJson, c => {
+      expectTypeOf(c.var.text).toEqualTypeOf<string>()
+      return c.res('ok')
+    })
+
+    expect(result.command).toEqual(commandJson)
+  })
+
+  it('should infer Variables from command option names', () => {
+    const result = factory.command(
+      makeSlashCommand('test2', 'Another test command').options([
+        makeStringOption('text', 'A string option').required(true),
+      ]),
+      c => {
+        expectTypeOf(c.var.text).toEqualTypeOf<string>()
+        return c.res(`text: ${c.var.text}`)
+      },
+    )
+
+    expect(toJSON(result.command).name).toBe('test2')
+  })
+
+  it('should infer Variables from nested subcommand option names', () => {
+    const result = factory.command(
+      makeSlashCommand('test2', 'Another test command').options([
+        makeSubCommand('sub1', 'A subcommand').options([makeStringOption('text', 'A string option').required(true)]),
+      ]),
+      c => {
+        expectTypeOf(c.var.text).toEqualTypeOf<string>()
+        return c.res(`text: ${c.var.text}`)
+      },
+    )
+
+    expect(toJSON(result.command).name).toBe('test2')
+  })
+
   it('should create a component wrapper', () => {
-    const componentMock = new Button('str', 'label')
+    const componentMock = makeButton('str', 'label')
     const handlerMock = vi.fn()
     const result = factory.component(componentMock, handlerMock)
     expect(result).toEqual({ component: componentMock, handler: handlerMock })
   })
 
   it('should create an autocomplete wrapper', () => {
-    const commandMock = new Command('name', 'description')
+    const commandMock = makeSlashCommand('name', 'description')
     const autocompleteMock = vi.fn()
     const handlerMock = vi.fn()
     const result = factory.autocomplete(commandMock, autocompleteMock, handlerMock)
@@ -34,10 +89,26 @@ describe('createFactory', () => {
   })
 
   it('should create a modal wrapper', () => {
-    const modalMock = new Modal('unique_id', 'title')
+    const modalMock = makeModal('unique_id', 'title', [])
     const handlerMock = vi.fn()
     const result = factory.modal(modalMock, handlerMock)
     expect(result).toEqual({ modal: modalMock, handler: handlerMock })
+  })
+
+  it('should infer Variables from modal input ids', () => {
+    const result = factory.modal(
+      makeModal('testModal', 'A test modal', [
+        makeActionRow([makeTextInput('text', 'A text input').required(true)]),
+        makeLabel('label1', makeChannelSelect('channel').required(true)),
+      ]),
+      c => {
+        expectTypeOf(c.var.text).toEqualTypeOf<string>()
+        expectTypeOf(c.var.channel).toEqualTypeOf<string[]>()
+        return c.res(`text: ${c.var.text}, channel: ${c.var.channel}`)
+      },
+    )
+
+    expect(toJSON(result.modal).custom_id).toBe('testModal')
   })
 
   it('should create a cron wrapper', () => {
@@ -49,9 +120,9 @@ describe('createFactory', () => {
 
   it('should load handlers into DiscordHono instance', () => {
     const app = factory.discord()
-    const commandMock = new Command('name', 'description')
-    const componentMock = new Button('str', 'label')
-    const modalMock = new Modal('unique_id', 'title')
+    const commandMock = makeSlashCommand('name', 'description')
+    const componentMock = makeButton('str', 'label')
+    const modalMock = makeModal('unique_id', 'title', [])
     const handlerMock = vi.fn()
 
     const handlers = [
@@ -80,7 +151,7 @@ describe('createFactory', () => {
   })
 
   it('should return a list of commands', () => {
-    const commandMock = new Command('name', 'description')
+    const commandMock = makeSlashCommand('name', 'description')
     const handlers = [factory.command(commandMock, vi.fn())]
     const commands = factory.getCommands(handlers)
     expect(commands).toEqual([commandMock])

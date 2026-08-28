@@ -1,110 +1,50 @@
-import type { APIEmbed, APIEmbedField, EmbedType } from 'discord-api-types/v10'
-import { Builder } from './utils'
+// biome-ignore-all lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
 
-export class Embed extends Builder<APIEmbed> {
-  /**
-   * [Embed Structure](https://discord.com/developers/docs/resources/message#embed-object)
-   */
-  constructor() {
-    super({})
-  }
-  /**
-   * @param {string} e Length limit: 256 characters
-   * @returns {this}
-   */
-  title(e: string): this {
-    return this.a({ title: e })
-  }
-  /**
-   * @deprecated Embed types should be considered deprecated and might be removed in a future API version
-   * @param {EmbedType} e
-   * @returns {this}
-   */
-  type(e: EmbedType): this {
-    return this.a({ type: e })
-  }
-  /**
-   * @param {string} e Length limit: 4096 characters
-   * @returns {this}
-   */
-  description(e: string): this {
-    return this.a({ description: e })
-  }
-  /**
-   * @param {string} e
-   * @returns {this}
-   */
-  url(e: string): this {
-    return this.a({ url: e })
-  }
-  /**
-   * @param {string} e ISO8601 timestamp
-   * @returns {this}
-   */
-  timestamp(e: string): this {
-    return this.a({ timestamp: e })
-  }
-  /**
-   * @param {number} e
-   * @returns {this}
-   */
-  color(e: number): this {
-    return this.a({ color: e })
-  }
-  /**
-   * [Footer Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-footer-structure)
-   * @param {NonNullable<APIEmbed["footer"]>} e
-   * @returns {this}
-   */
-  footer(e: NonNullable<APIEmbed['footer']>): this {
-    return this.a({ footer: e })
-  }
-  /**
-   * [Image Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-image-structure)
-   * @param {NonNullable<APIEmbed["image"]>} e
-   * @returns {this}
-   */
-  image(e: NonNullable<APIEmbed['image']>): this {
-    return this.a({ image: e })
-  }
-  /**
-   * [Thumbnail Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-thumbnail-structure)
-   * @param {NonNullable<APIEmbed["thumbnail"]>} e
-   * @returns {this}
-   */
-  thumbnail(e: NonNullable<APIEmbed['thumbnail']>): this {
-    return this.a({ thumbnail: e })
-  }
-  /**
-   * [Video Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-video-structure)
-   * @param {NonNullable<APIEmbed["video"]>} e
-   * @returns {this}
-   */
-  video(e: NonNullable<APIEmbed['video']>): this {
-    return this.a({ video: e })
-  }
-  /**
-   * [Provider Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-provider-structure)
-   * @param {NonNullable<APIEmbed["provider"]>} e
-   * @returns {this}
-   */
-  provider(e: NonNullable<APIEmbed['provider']>): this {
-    return this.a({ provider: e })
-  }
-  /**
-   * [Author Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-author-structure)
-   * @param {NonNullable<APIEmbed["author"]>} e
-   * @returns {this}
-   */
-  author(e: NonNullable<APIEmbed['author']>): this {
-    return this.a({ author: e })
-  }
-  /**
-   * [Field Structure](https://discord.com/developers/docs/resources/message#embed-object-embed-field-structure)
-   * @param {...APIEmbedField} e Length limit: 25 field objects
-   * @returns {this}
-   */
-  fields(...e: APIEmbedField[]): this {
-    return this.a({ fields: e })
-  }
+import type {
+  APIEmbed,
+  APIEmbedAuthor,
+  APIEmbedField,
+  APIEmbedFooter,
+  APIEmbedImage,
+  APIEmbedProvider,
+  APIEmbedVideo,
+} from 'discord-api-types/v10'
+import { createJsonBuilder, type JsonBuilderOptions } from './json-builder'
+
+export const embedType = {
+  Rich: 'rich',
+  Image: 'image',
+  Video: 'video',
+  GIFV: 'gifv',
+  Article: 'article',
+  Link: 'link',
+  PollResult: 'poll_result',
+  //  AutoModerationMessage: "auto_moderation_message",
+} as const // satisfies Record<string, APIEmbed['type']>
+
+type FixedEmbed = Omit<APIEmbed, 'type'> & {
+  type?: (typeof embedType)[keyof typeof embedType]
 }
+
+export const makeEmbed = (builderOptions?: JsonBuilderOptions) => createJsonBuilder<{}, FixedEmbed>({}, builderOptions)
+
+export const makeEmbedFooter = <T extends string>(text: T, builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<{ text: T }, APIEmbedFooter>({ text }, builderOptions)
+
+export const makeEmbedImage = <U extends string>(url: U, builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<{ url: U }, APIEmbedImage>({ url }, builderOptions)
+
+export const makeEmbedVideo = (builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<{}, APIEmbedVideo>({}, builderOptions)
+
+export const makeEmbedProvider = (builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<{}, APIEmbedProvider>({}, builderOptions)
+
+export const makeEmbedAuthor = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
+  createJsonBuilder<{ name: N }, APIEmbedAuthor>({ name }, builderOptions)
+
+export const makeEmbedField = <N extends string, V extends string>(
+  name: N,
+  value: V,
+  builderOptions?: JsonBuilderOptions,
+) => createJsonBuilder<{ name: N; value: V }, APIEmbedField>({ name, value }, builderOptions)

@@ -1,31 +1,38 @@
-import type { Command } from '../builders/command'
-import type { Select } from '../builders/components'
-import type { Modal } from '../builders/modal'
+import type {
+  APIModalInteractionResponseCallbackData,
+  RESTPostAPIApplicationCommandsJSONBody,
+} from 'discord-api-types/v10'
 import { DiscordHono } from '../discord-hono'
 import type {
   AutocompleteHandler,
   CommandHandler,
   ComponentHandler,
-  ComponentType,
   CronHandler,
   Env,
   InitOptions,
+  InteractionComponent,
+  JsonSerializable,
   ModalHandler,
+  ResolvedToJSON,
+  Simplify,
 } from '../types'
-import { CUSTOM_ID_SEPARATOR, newError } from '../utils'
+import { CUSTOM_ID_SEPARATOR, newError, toJSON } from '../utils'
 
 class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
   loader(handlers: Handler<E>[]): this {
     for (const elem of handlers) {
       if ('command' in elem) {
-        if ('autocomplete' in elem) this.autocomplete(elem.command.toJSON().name, elem.autocomplete, elem.handler)
-        else this.command(elem.command.toJSON().name, elem.handler)
+        const command = toJSON(elem.command)
+        if ('autocomplete' in elem) this.autocomplete(command.name, elem.autocomplete)
+        this.command(command.name, elem.handler)
       } else if ('component' in elem) {
-        const json = elem.component.toJSON()
-        if ('custom_id' in json) this.component(json.custom_id.split(CUSTOM_ID_SEPARATOR)[0] ?? '', elem.handler)
-      } else if ('modal' in elem)
-        this.modal(elem.modal.toJSON().custom_id.split(CUSTOM_ID_SEPARATOR)[0] ?? '', elem.handler)
-      else if ('cron' in elem) this.cron(elem.cron, elem.handler)
+        const component = toJSON(elem.component)
+        if ('custom_id' in component)
+          this.component(component.custom_id.split(CUSTOM_ID_SEPARATOR)[0] ?? '', elem.handler)
+      } else if ('modal' in elem) {
+        const modal = toJSON(elem.modal)
+        this.modal(modal.custom_id.split(CUSTOM_ID_SEPARATOR)[0] ?? '', elem.handler)
+      } else if ('cron' in elem) this.cron(elem.cron, elem.handler)
       else throw newError('.loader(obj)', 'obj is Invalid')
     }
     return this
@@ -34,32 +41,87 @@ class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
 
 type Var = {}
 
-type ExtractComponentVars<T> = T extends Select<infer K, infer _T2> ? { [P in K]: string[] } : {}
+type UnionToIntersection<T> = (T extends unknown ? (value: T) => void : never) extends (value: infer I) => void
+  ? I
+  : never
+
+type ExtractOptionValue<T> = T extends { type: 3 | 6 | 7 | 8 | 9 | 11 }
+  ? string
+  : T extends { type: 4 | 10 }
+    ? number
+    : T extends { type: 5 }
+      ? boolean
+      : never
+
+type ExtractOptionVar<T> = T extends { name: infer N extends string }
+  ? ExtractOptionValue<T> extends never
+    ? {}
+    : T extends { required: true }
+      ? { [K in N]: ExtractOptionValue<T> }
+      : { [K in N]?: ExtractOptionValue<T> }
+  : {}
+
+type ExtractNestedOptionVars<T> = T extends { options?: infer O }
+  ? O extends ReadonlyArray<infer U>
+    ? Simplify<UnionToIntersection<ExtractNestedOptionVars<U> | ExtractOptionVar<U>>>
+    : {}
+  : ExtractOptionVar<T>
+
+type ExtractCommandVars<T extends RESTPostAPIApplicationCommandsJSONBody> = T extends { options?: infer O }
+  ? O extends ReadonlyArray<infer U>
+    ? Simplify<UnionToIntersection<ExtractNestedOptionVars<U>>>
+    : {}
+  : {}
+
+type ExtractModalValue<T> = T extends { type: 4 | 21 | 23 }
+  ? string
+  : T extends { type: 3 | 5 | 6 | 7 | 8 | 19 | 22 }
+    ? string[]
+    : never
+
+type ExtractModalKey<T> = T extends { custom_id: infer K extends string }
+  ? ExtractModalValue<T> extends never
+    ? {}
+    : T extends { required: true } // | { type: 3 | 5 | 6 | 7 | 8 | 19 | 22 }
+      ? { [P in K]: ExtractModalValue<T> }
+      : { [P in K]?: ExtractModalValue<T> }
+  : {}
+
+type ExtractModalVars<T> = T extends readonly (infer U)[]
+  ? Simplify<UnionToIntersection<ExtractModalVars<U>>>
+  : T extends { components: infer C }
+    ? ExtractModalVars<C>
+    : T extends { component: infer C }
+      ? ExtractModalVars<C>
+      : ExtractModalKey<T>
 
 interface Factory<E extends Env> {
   discord(init?: InitOptions<E>): DiscordHonoExtends<E>
-  command<V extends Var>(
-    command: Command<V>,
-    handler: CommandHandler<E & { Variables?: V }>,
-  ): { command: Command; handler: CommandHandler<E> }
-  component<V extends ExtractComponentVars<C>, C extends ComponentType>(
-    component: C,
-    handler: ComponentHandler<E & { Variables?: V }, C>,
-  ): { component: C; handler: ComponentHandler<E, C> }
-  autocomplete<V extends Var>(
-    command: Command<V>,
+  command<
+    T extends JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
+    V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
+  >(command: T, handler: CommandHandler<E & { Variables?: V }>): { command: T; handler: CommandHandler<E> }
+  component<T extends JsonSerializable<InteractionComponent>>(
+    component: T,
+    handler: ComponentHandler<E, ResolvedToJSON<T>>,
+  ): { component: T; handler: ComponentHandler<E, ResolvedToJSON<T>> }
+  autocomplete<
+    T extends JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
+    V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
+  >(
+    command: T,
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,
     handler: CommandHandler<E & { Variables?: V }>,
-  ): { command: Command; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E> }
-  modal<V extends Var>(
-    modal: Modal<V>,
-    handler: ModalHandler<E & { Variables?: V }>,
-  ): { modal: Modal; handler: ModalHandler<E> }
+  ): { command: T; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E> }
+  modal<
+    T extends JsonSerializable<APIModalInteractionResponseCallbackData>,
+    V extends Var = ExtractModalVars<ResolvedToJSON<T>>,
+  >(modal: T, handler: ModalHandler<E & { Variables?: V }>): { modal: T; handler: ModalHandler<E> }
   cron<V extends Var>(
     cron: string,
     handler: CronHandler<E & { Variables?: V }>,
   ): { cron: string; handler: CronHandler<E> }
-  getCommands(handlers: Handler<E>[]): Command[]
+  getCommands(handlers: Handler<E>[]): JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>[]
 }
 
 type Handler<E extends Env> =
@@ -75,15 +137,28 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
     return new DiscordHonoExtends<E>(init)
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  command(command, handler) {
+  command<
+    T extends JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
+    V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
+  >(command: T, handler: CommandHandler<E & { Variables?: V }>) {
     return { command, handler: handler as CommandHandler<E> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  component(component, handler) {
+  component<T extends JsonSerializable<InteractionComponent>>(
+    component: T,
+    handler: ComponentHandler<E, ResolvedToJSON<T>>,
+  ) {
     return { component, handler: handler as ComponentHandler<E, any> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  autocomplete(command, autocomplete, handler) {
+  autocomplete<
+    T extends JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
+    V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
+  >(
+    command: T,
+    autocomplete: AutocompleteHandler<E & { Variables?: V }>,
+    handler: CommandHandler<E & { Variables?: V }>,
+  ) {
     return {
       command,
       autocomplete: autocomplete as AutocompleteHandler<E>,
@@ -91,7 +166,10 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
     }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
-  modal(modal, handler) {
+  modal<
+    T extends JsonSerializable<APIModalInteractionResponseCallbackData>,
+    V extends Var = ExtractModalVars<ResolvedToJSON<T>>,
+  >(modal: T, handler: ModalHandler<E & { Variables?: V }>) {
     return { modal, handler: handler as ModalHandler<E> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
@@ -100,6 +178,8 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
   getCommands(handlers) {
-    return handlers.filter(e => 'command' in e).map(e => e.command)
+    return handlers
+      .filter(e => 'command' in e)
+      .map(e => e.command as JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>)
   },
 })
