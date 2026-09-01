@@ -57,7 +57,7 @@ type ResolvedReturnType<T extends ResolvedCategory> = T extends keyof APIInterac
   : T extends keyof APIMessageApplicationCommandInteractionDataResolved
     ? APIMessageApplicationCommandInteractionDataResolved[T][string]
     : never
-type ResolvedData<T> = T extends { data: { resolved: infer R } } ? R : never
+type ResolvedData<T extends APIApplicationCommandInteraction> = T extends { data: { resolved?: infer R } } ? R : never
 type RetypedResolved<T extends RESTPostAPIApplicationCommandsJSONBody = any> =
   T extends RESTPostAPIApplicationCommandsJSONBody
     ? ResolvedData<CommandIntaraction<T>>
@@ -89,11 +89,10 @@ export type ContextRef = CommandRef<any> & ComponentRef & ModalRef & CronRef
 
 // biome-ignore format: ternary operator
 type CommandIntaraction<T extends RESTPostAPIApplicationCommandsJSONBody> =
-  T extends { type: 1 } ? Extract<APIApplicationCommandInteraction, { data: { type: 1 } }> :
   T extends { type: 2 } ? Extract<APIApplicationCommandInteraction, { data: { type: 2 } }> :
   T extends { type: 3 } ? Extract<APIApplicationCommandInteraction, { data: { type: 3 } }> :
   T extends { type: 4 } ? Extract<APIApplicationCommandInteraction, { data: { type: 4 } }> :
-  APIApplicationCommandInteraction
+  Extract<APIApplicationCommandInteraction, { data: { type: 1 } }>
 
 export type InteractionComponent =
   | APIButtonComponentWithCustomId
