@@ -17,6 +17,7 @@ import type {
   APIModalSubmitInteraction,
   APIStringSelectComponent,
   ComponentType,
+  RESTPostAPIApplicationCommandsJSONBody,
   SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
 import type { Context } from './context'
@@ -56,20 +57,20 @@ type ResolvedReturnType<T extends ResolvedCategory> = T extends keyof APIInterac
   : T extends keyof APIMessageApplicationCommandInteractionDataResolved
     ? APIMessageApplicationCommandInteractionDataResolved[T][string]
     : never
-type RetypedResolved = {
-  [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined>
-}
+type RetypedResolved<T extends RESTPostAPIApplicationCommandsJSONBody = any> =
+  T extends RESTPostAPIApplicationCommandsJSONBody ? CommandIntaraction<T>['data']['resolved'] :
+  { [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined> }
 
-interface CommandRef extends RetypedResolved {
+type CommandRef<T extends RESTPostAPIApplicationCommandsJSONBody = any> = RetypedResolved<T> & {
   key: string
   target_id?: string
 }
-interface ComponentRef extends RetypedResolved {
+type ComponentRef = RetypedResolved & {
   key: string
   custom_value?: string
   values?: string[]
 }
-interface ModalRef extends RetypedResolved {
+type ModalRef = RetypedResolved & {
   key: string
   custom_value?: string
 }
@@ -77,6 +78,14 @@ interface CronRef {
   key: string
 }
 export interface ContextRef extends CommandRef, ComponentRef, ModalRef, CronRef {}
+
+// biome-ignore format: ternary operator
+type CommandIntaraction<T extends RESTPostAPIApplicationCommandsJSONBody> =
+  T extends { type: 1 } ? Extract<APIApplicationCommandInteraction, { data: { type: 1 } }> :
+  T extends { type: 2 } ? Extract<APIApplicationCommandInteraction, { data: { type: 2 } }> :
+  T extends { type: 3 } ? Extract<APIApplicationCommandInteraction, { data: { type: 3 } }> :
+  T extends { type: 4 } ? Extract<APIApplicationCommandInteraction, { data: { type: 4 } }> :
+  APIApplicationCommandInteraction
 
 export type InteractionComponent =
   | APIButtonComponentWithCustomId
@@ -99,10 +108,13 @@ type ComponentInteraction<T extends InteractionComponent> =
   T extends APIChannelSelectComponent ? Omit<APIMessageComponentSelectMenuInteraction, 'data'> & { data: APIMessageChannelSelectInteractionData } :
   APIMessageComponentInteraction
 
-export type CommandContext<E extends Env = any> = ExcludeMethods<
-  Context<E, CommandContext<E>>,
+export type CommandContext<
+  E extends Env = any,
+  T extends RESTPostAPIApplicationCommandsJSONBody = any,
+> = ExcludeMethods<
+  Context<E, CommandContext<E, T>>,
   'update' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
-> & { interaction: Readonly<APIApplicationCommandInteraction>; ref: Readonly<CommandRef> }
+> & { interaction: Readonly<CommandIntaraction<T>>; ref: Readonly<CommandRef> }
 
 export type ComponentContext<E extends Env = any, T extends InteractionComponent = any> = ExcludeMethods<
   Context<E, ComponentContext<E, T>>,
@@ -137,7 +149,9 @@ export type CronContext<E extends Env = any> = ExcludeMethods<
 
 ////////// Handler //////////
 
-export type CommandHandler<E extends Env> = (c: CommandContext<E>) => Promise<Response> | Response
+export type CommandHandler<E extends Env, T extends RESTPostAPIApplicationCommandsJSONBody> = (
+  c: CommandContext<E, T>,
+) => Promise<Response> | Response
 export type ComponentHandler<E extends Env, T extends InteractionComponent> = (
   c: ComponentContext<E, T>,
 ) => Promise<Response> | Response
