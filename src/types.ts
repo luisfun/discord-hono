@@ -57,11 +57,13 @@ type ResolvedReturnType<T extends ResolvedCategory> = T extends keyof APIInterac
   : T extends keyof APIMessageApplicationCommandInteractionDataResolved
     ? APIMessageApplicationCommandInteractionDataResolved[T][string]
     : never
+type ResolvedData<T> = T extends { data: { resolved: infer R } } ? R : never
 type RetypedResolved<T extends RESTPostAPIApplicationCommandsJSONBody = any> =
-  T extends RESTPostAPIApplicationCommandsJSONBody ? CommandIntaraction<T>['data']['resolved'] :
-  { [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined> }
+  T extends RESTPostAPIApplicationCommandsJSONBody
+    ? ResolvedData<CommandIntaraction<T>>
+    : { [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined> }
 
-type CommandRef<T extends RESTPostAPIApplicationCommandsJSONBody = any> = RetypedResolved<T> & {
+type CommandRef<T extends RESTPostAPIApplicationCommandsJSONBody> = RetypedResolved<T> & {
   key: string
   target_id?: string
 }
@@ -77,7 +79,7 @@ type ModalRef = RetypedResolved & {
 interface CronRef {
   key: string
 }
-export interface ContextRef extends CommandRef, ComponentRef, ModalRef, CronRef {}
+export type ContextRef = CommandRef<any> & ComponentRef & ModalRef & CronRef
 
 // biome-ignore format: ternary operator
 type CommandIntaraction<T extends RESTPostAPIApplicationCommandsJSONBody> =
@@ -114,17 +116,20 @@ export type CommandContext<
 > = ExcludeMethods<
   Context<E, CommandContext<E, T>>,
   'update' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
-> & { interaction: Readonly<CommandIntaraction<T>>; ref: Readonly<CommandRef> }
+> & { interaction: Readonly<CommandIntaraction<T>>; ref: Readonly<CommandRef<T>> }
 
 export type ComponentContext<E extends Env = any, T extends InteractionComponent = any> = ExcludeMethods<
   Context<E, ComponentContext<E, T>>,
   'sub' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
 > & { interaction: Readonly<ComponentInteraction<T>>; ref: Readonly<ComponentRef> }
 
-export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
-  Context<E, AutocompleteContext<E>>,
+export type AutocompleteContext<
+  E extends Env = any,
+  T extends RESTPostAPIApplicationCommandsJSONBody = any,
+> = ExcludeMethods<
+  Context<E, AutocompleteContext<E, T>>,
   'flags' | 'res' | 'resDefer' | 'resActivity' | 'followup' | 'resModal' | 'update' | 'interaction' | 'ref'
-> & { interaction: Readonly<APIApplicationCommandAutocompleteInteraction>; ref: Readonly<CommandRef> }
+> & { interaction: Readonly<APIApplicationCommandAutocompleteInteraction>; ref: Readonly<CommandRef<T>> }
 
 export type ModalContext<E extends Env = any> = ExcludeMethods<
   Context<E, ModalContext<E>>,
