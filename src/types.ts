@@ -5,7 +5,6 @@ import type {
   APIButtonComponentWithCustomId,
   APIChannelSelectComponent,
   APIInteractionDataResolved,
-  APIMessageApplicationCommandInteractionDataResolved,
   APIMessageChannelSelectInteractionData,
   APIMessageComponentButtonInteraction,
   APIMessageComponentInteraction,
@@ -51,34 +50,24 @@ export interface DiscordEnv {
 
 ////////// Context //////////
 
-type ResolvedCategory = keyof APIInteractionDataResolved | keyof APIMessageApplicationCommandInteractionDataResolved
-type ResolvedReturnType<T extends ResolvedCategory> = T extends keyof APIInteractionDataResolved
-  ? NonNullable<APIInteractionDataResolved[T]>[string]
-  : T extends keyof APIMessageApplicationCommandInteractionDataResolved
-    ? APIMessageApplicationCommandInteractionDataResolved[T][string]
-    : never
 type ResolvedData<T extends APIApplicationCommandInteraction> = T extends { data: { resolved?: infer R } } ? R : never
-type RetypedResolved<T extends RESTPostAPIApplicationCommandsJSONBody = any> =
-  T extends RESTPostAPIApplicationCommandsJSONBody
-    ? ResolvedData<CommandIntaraction<T>>
-    : { [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined> }
 
-export type TargetIdData<T> = T extends { data: { target_id: infer R } }
+type TargetIdData<T> = T extends { data: { target_id: infer R } }
   ? { target_id: R }
   : T extends { data: { target_id?: infer R } }
     ? { target_id?: R }
     : {}
 
-type CommandRef<T extends RESTPostAPIApplicationCommandsJSONBody> = RetypedResolved<T> &
+type CommandRef<T extends RESTPostAPIApplicationCommandsJSONBody> = ResolvedData<CommandIntaraction<T>> &
   TargetIdData<CommandIntaraction<T>> & {
     key: string
   }
-type ComponentRef = RetypedResolved & {
+type ComponentRef = APIInteractionDataResolved & {
   key: string
   custom_value?: string
   values?: string[]
 }
-type ModalRef = RetypedResolved & {
+type ModalRef = APIInteractionDataResolved & {
   key: string
   custom_value?: string
 }
