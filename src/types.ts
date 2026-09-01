@@ -63,10 +63,16 @@ type RetypedResolved<T extends RESTPostAPIApplicationCommandsJSONBody = any> =
     ? ResolvedData<CommandIntaraction<T>>
     : { [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined> }
 
-type CommandRef<T extends RESTPostAPIApplicationCommandsJSONBody> = RetypedResolved<T> & {
-  key: string
-  target_id?: string
-}
+export type TargetIdData<T> = T extends { data: { target_id: infer R } }
+  ? { target_id: R }
+  : T extends { data: { target_id?: infer R } }
+    ? { target_id?: R }
+    : {}
+
+type CommandRef<T extends RESTPostAPIApplicationCommandsJSONBody> = RetypedResolved<T> &
+  TargetIdData<CommandIntaraction<T>> & {
+    key: string
+  }
 type ComponentRef = RetypedResolved & {
   key: string
   custom_value?: string

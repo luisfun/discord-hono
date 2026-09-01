@@ -12,6 +12,7 @@ import {
   makeTextInput,
 } from '../builders'
 import { DiscordHono } from '../discord-hono'
+import type { TargetIdData } from '../types'
 import { toJSON } from '../utils'
 import { createFactory } from './create-factory'
 
@@ -71,6 +72,14 @@ describe('createFactory', () => {
     )
 
     expect(toJSON(result.command).name).toBe('test2')
+  })
+
+  it('should extract target_id from command interaction data while preserving optionality', () => {
+    type OptionalTargetCommand = { data: { target_id?: 'user-id' } }
+    type RequiredTargetCommand = { data: { target_id: 'user-id' } }
+
+    expectTypeOf<TargetIdData<OptionalTargetCommand>>().toEqualTypeOf<{ target_id?: 'user-id' }>()
+    expectTypeOf<TargetIdData<RequiredTargetCommand>>().toEqualTypeOf<{ target_id: 'user-id' }>()
   })
 
   it('should create a component wrapper', () => {
