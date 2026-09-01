@@ -308,7 +308,7 @@ export class Context<
    * @returns
    * @example
    * ```ts
-   * return c.resModal(makeModal('unique-id', 'Title', [
+   * return c.resModal(makeModal('custom_id', 'Title', [
    *   makeActionRow([makeTextInput('custom_id', 'Label')])
    * ]))
    * ```
