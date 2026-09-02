@@ -9,6 +9,7 @@ import {
   makeSlashCommand,
   makeStringOption,
   makeSubCommand,
+  makeSubCommandGroup,
   makeTextInput,
 } from '../builders'
 import { DiscordHono } from '../discord-hono'
@@ -159,9 +160,33 @@ describe('createFactory', () => {
     expect(app.cron).toHaveBeenCalledWith('0 0 * * *', handlerMock)
   })
 
-  it('should throw an error for unknown wrapper type', () => {
-    const app = factory.discord()
-    expect(() => app.loader([{ unknownProp: 'value' } as any])).toThrow()
+  it('should route subcommands using Object.values and invoke the fallback handler when unmatched', async () => {
+    const handlers = {
+      ping: factory.subCommand(
+        makeSubCommand('ping', 'Ping the bot'),
+        vi.fn(() => Response.json({ ok: 'ping' })),
+      ),
+      admin: factory.subCommandGroup(
+        makeSubCommandGroup('admin', 'Admin commands').options([makeSubCommand('status', 'Display admin status')]),
+        vi.fn(() => Response.json({ ok: 'admin' })),
+      ),
+    }
+
+    const defaultHandler = vi.fn(c => Response.json({ error: `Subcommand not found: ${c.sub.command}` }))
+    const loader = factory.subLoader(Object.values(handlers), defaultHandler)
+
+    const commandResponse = await loader({ sub: { command: 'ping', group: undefined } } as any)
+    expect(handlers.ping.handler).toHaveBeenCalledTimes(1)
+    expect(defaultHandler).not.toHaveBeenCalled()
+    expect(await commandResponse.json()).toEqual({ ok: 'ping' })
+
+    const groupResponse = await loader({ sub: { command: 'status', group: 'admin' } } as any)
+    expect(handlers.admin.handler).toHaveBeenCalledTimes(1)
+    expect(await groupResponse.json()).toEqual({ ok: 'admin' })
+
+    const unmatched = await loader({ sub: { command: 'missing', group: undefined } } as any)
+    expect(defaultHandler).toHaveBeenCalledTimes(1)
+    expect(await unmatched.json()).toEqual({ error: 'Subcommand not found: missing' })
   })
 
   it('should return a list of commands', () => {
