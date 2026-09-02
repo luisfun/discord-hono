@@ -100,7 +100,10 @@ interface Factory<E extends Env> {
   command<
     T extends JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
     V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
-  >(command: T, handler: CommandHandler<E & { Variables?: V }>): { command: T; handler: CommandHandler<E> }
+  >(
+    command: T,
+    handler: CommandHandler<E & { Variables?: V }, ResolvedToJSON<T>>,
+  ): { command: T; handler: CommandHandler<E, ResolvedToJSON<T>> }
   component<T extends JsonSerializable<InteractionComponent>>(
     component: T,
     handler: ComponentHandler<E, ResolvedToJSON<T>>,
@@ -111,8 +114,8 @@ interface Factory<E extends Env> {
   >(
     command: T,
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,
-    handler: CommandHandler<E & { Variables?: V }>,
-  ): { command: T; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E> }
+    handler: CommandHandler<E & { Variables?: V }, ResolvedToJSON<T>>,
+  ): { command: T; autocomplete: AutocompleteHandler<E>; handler: CommandHandler<E, ResolvedToJSON<T>> }
   modal<
     T extends JsonSerializable<APIModalInteractionResponseCallbackData>,
     V extends Var = ExtractModalVars<ResolvedToJSON<T>>,
@@ -140,15 +143,15 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
   command<
     T extends JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
     V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
-  >(command: T, handler: CommandHandler<E & { Variables?: V }>) {
-    return { command, handler: handler as CommandHandler<E> }
+  >(command: T, handler: CommandHandler<E & { Variables?: V }, ResolvedToJSON<T>>) {
+    return { command, handler: handler as CommandHandler<E, ResolvedToJSON<T>> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
   component<T extends JsonSerializable<InteractionComponent>>(
     component: T,
     handler: ComponentHandler<E, ResolvedToJSON<T>>,
   ) {
-    return { component, handler: handler as ComponentHandler<E, any> }
+    return { component, handler: handler as ComponentHandler<E, ResolvedToJSON<T>> }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted
   autocomplete<
@@ -157,12 +160,12 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
   >(
     command: T,
     autocomplete: AutocompleteHandler<E & { Variables?: V }>,
-    handler: CommandHandler<E & { Variables?: V }>,
+    handler: CommandHandler<E & { Variables?: V }, ResolvedToJSON<T>>,
   ) {
     return {
       command,
       autocomplete: autocomplete as AutocompleteHandler<E>,
-      handler: handler as CommandHandler<E>,
+      handler: handler as CommandHandler<E, ResolvedToJSON<T>>,
     }
   },
   // biome-ignore lint/nursery/useExplicitType: omitted

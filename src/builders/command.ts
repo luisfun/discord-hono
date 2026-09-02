@@ -20,6 +20,20 @@ import type {
 } from 'discord-api-types/v10'
 import { createJsonBuilder, type JsonBuilderOptions } from './json-builder'
 
+// type fix https://docs.discord.com/developers/interactions/application-commands#create-global-application-command
+
+interface SlashCommandJson extends Omit<RESTPostAPIChatInputApplicationCommandsJSONBody, 'handler'> {}
+interface ContextMenuCommandJson
+  extends Omit<
+    RESTPostAPIContextMenuApplicationCommandsJSONBody,
+    'description' | 'description_localizations' | 'options' | 'handler'
+  > {}
+interface EntryPointCommandJson
+  extends Omit<
+    RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody,
+    'description' | 'description_localizations' | 'options'
+  > {}
+
 export const commandType = {
   ChatInput: 1,
   User: 2,
@@ -47,30 +61,17 @@ export const makeSlashCommand = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) =>
-  createJsonBuilder<{ name: N; description: D }, RESTPostAPIChatInputApplicationCommandsJSONBody, 'type'>(
-    { name, description },
-    builderOptions,
-  )
+) => createJsonBuilder<{ name: N; description: D }, SlashCommandJson, 'type'>({ name, description }, builderOptions)
 //const testSlashCommand = makeSlashCommand('test', 'A test command')
 
 export const makeUserCommand = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  createJsonBuilder<{ type: 2; name: N }, RESTPostAPIContextMenuApplicationCommandsJSONBody, 'type'>(
-    { type: 2, name },
-    builderOptions,
-  )
+  createJsonBuilder<{ type: 2; name: N }, ContextMenuCommandJson, 'type'>({ type: 2, name }, builderOptions)
 
 export const makeMessageCommand = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  createJsonBuilder<{ type: 3; name: N }, RESTPostAPIContextMenuApplicationCommandsJSONBody, 'type'>(
-    { type: 3, name },
-    builderOptions,
-  )
+  createJsonBuilder<{ type: 3; name: N }, ContextMenuCommandJson, 'type'>({ type: 3, name }, builderOptions)
 
 export const makeEntryPointCommand = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
-  createJsonBuilder<{ type: 4; name: N }, RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody, 'type'>(
-    { type: 4, name },
-    builderOptions,
-  )
+  createJsonBuilder<{ type: 4; name: N }, EntryPointCommandJson, 'type'>({ type: 4, name }, builderOptions)
 
 export const makeSubCommand = <N extends string, D extends string>(
   name: N,

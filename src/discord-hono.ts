@@ -1,4 +1,8 @@
-import type { APIInteraction, APIInteractionResponsePong } from 'discord-api-types/v10'
+import type {
+  APIInteraction,
+  APIInteractionResponsePong,
+  RESTPostAPIApplicationCommandsJSONBody,
+} from 'discord-api-types/v10'
 import { Context } from './context'
 import type {
   AutocompleteHandler,
@@ -28,7 +32,7 @@ type HandlerNumber = 0 | 2 | 3 | 4 | 5
 // biome-ignore format: ternary operator
 type AnyHandler<E extends Env, N extends HandlerNumber> =
   N extends 0 ? CronHandler<E> :
-  N extends 2 ? CommandHandler<E> :
+  N extends 2 ? CommandHandler<E, any> :
   N extends 3 ? ComponentHandler<E, any> :
   N extends 4 ? AutocompleteHandler<E> :
   N extends 5 ? ModalHandler<E> :
@@ -73,7 +77,7 @@ export class DiscordHono<E extends Env = Env> {
    * @param handler
    * @returns
    */
-  command(command: string, handler: CommandHandler<E>): this {
+  command<T extends RESTPostAPIApplicationCommandsJSONBody>(command: string, handler: CommandHandler<E, T>): this {
     return this.#set(2, command, handler)
   }
   /**
@@ -90,7 +94,11 @@ export class DiscordHono<E extends Env = Env> {
    * @param handler
    * @returns
    */
-  autocomplete(command: string, autocomplete: AutocompleteHandler<E>, handler?: CommandHandler<E>): this {
+  autocomplete<T extends RESTPostAPIApplicationCommandsJSONBody>(
+    command: string,
+    autocomplete: AutocompleteHandler<E>,
+    handler?: CommandHandler<E, T>,
+  ): this {
     return (handler ? this.#set(2, command, handler) : this).#set(4, command, autocomplete)
   }
   /**
