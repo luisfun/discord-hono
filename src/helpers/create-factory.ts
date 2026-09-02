@@ -149,6 +149,9 @@ interface Factory<E extends Env> {
     handler: CronHandler<E & { Variables?: V }>,
   ): { cron: string; handler: CronHandler<E> }
   getCommands(handlers: Handler<E>[]): JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>[]
+  getSubCommands<T extends APIApplicationCommandSubcommandOption | APIApplicationCommandSubcommandGroupOption>(
+    handlers: Handler<E>[],
+  ): JsonSerializable<T>[]
   subLoader(
     handlers: Handler<E>[],
     defaultHandler?: SubCommandHandler<E>,
@@ -191,9 +194,12 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
     return { cron, handler }
   },
   getCommands(handlers) {
+    return handlers.filter(e => 'command' in e).map(e => e.command)
+  },
+  getSubCommands(handlers) {
     return handlers
-      .filter(e => 'command' in e)
-      .map(e => e.command as JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>)
+      .filter(e => 'subCommand' in e || 'subCommandGroup' in e)
+      .map(e => ('subCommand' in e ? e.subCommand : e.subCommandGroup) as any)
   },
   subLoader(handlers, defaultHandler) {
     const handlerMap = new Map<`cmd:${string}` | `grp:${string}`, SubCommandHandler<E>>()
