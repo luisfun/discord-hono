@@ -9,6 +9,7 @@ import {
   makeSlashCommand,
   makeStringOption,
   makeSubCommand,
+  makeSubCommandGroup,
   makeTextInput,
 } from '../builders'
 import { DiscordHono } from '../discord-hono'
@@ -28,6 +29,20 @@ describe('createFactory', () => {
     const handlerMock = vi.fn()
     const result = factory.command(commandMock, handlerMock)
     expect(result).toEqual({ command: commandMock, handler: handlerMock })
+  })
+
+  it('should create a subcommand wrapper with inferred Variables', () => {
+    const subCommandMock = makeSubCommand('sub', 'A subcommand').options([
+      makeStringOption('text', 'A string option').required(true),
+    ])
+
+    const result = factory.subCommand(subCommandMock, c => {
+      expectTypeOf(c.var.text).toEqualTypeOf<string>()
+      return c.res(`text: ${c.var.text}`)
+    })
+
+    expect(result.subCommand).toEqual(subCommandMock)
+    expect(result.handler).toBeInstanceOf(Function)
   })
 
   it('should accept JsonSerializable commands while preserving Variables typing', () => {
@@ -121,18 +136,24 @@ describe('createFactory', () => {
   it('should load handlers into DiscordHono instance', () => {
     const app = factory.discord()
     const commandMock = makeSlashCommand('name', 'description')
+    const autocompleteCommandMock = makeSlashCommand('autocomplete', 'description').options([
+      makeStringOption('text', 'text').required(true),
+    ])
     const componentMock = makeButton('str', 'label')
     const modalMock = makeModal('unique_id', 'title', [])
     const handlerMock = vi.fn()
+    const autocompleteMock = vi.fn()
 
     const handlers = [
       factory.command(commandMock, handlerMock),
+      factory.autocomplete(autocompleteCommandMock, autocompleteMock, handlerMock),
       factory.component(componentMock, handlerMock),
       factory.modal(modalMock, handlerMock),
       factory.cron('0 0 * * *', handlerMock),
     ]
 
     vi.spyOn(app, 'command')
+    vi.spyOn(app, 'autocomplete')
     vi.spyOn(app, 'component')
     vi.spyOn(app, 'modal')
     vi.spyOn(app, 'cron')
@@ -140,14 +161,51 @@ describe('createFactory', () => {
     app.loader(handlers)
 
     expect(app.command).toHaveBeenCalledWith('name', handlerMock)
+    expect(app.autocomplete).toHaveBeenCalledWith('autocomplete', autocompleteMock)
     expect(app.component).toHaveBeenCalledWith('str', handlerMock)
     expect(app.modal).toHaveBeenCalledWith('unique_id', handlerMock)
     expect(app.cron).toHaveBeenCalledWith('0 0 * * *', handlerMock)
   })
 
-  it('should throw an error for unknown wrapper type', () => {
-    const app = factory.discord()
-    expect(() => app.loader([{ unknownProp: 'value' } as any])).toThrow()
+  it('should route subcommands using Object.values and invoke the fallback handler when unmatched', async () => {
+    const handlers = {
+      ping: factory.subCommand(
+        makeSubCommand('ping', 'Ping the bot'),
+        vi.fn(() => Response.json({ ok: 'ping' })),
+      ),
+      admin: factory.subCommandGroup(
+        makeSubCommandGroup('admin', 'Admin commands').options([makeSubCommand('status', 'Display admin status')]),
+        vi.fn(() => Response.json({ ok: 'admin' })),
+      ),
+    }
+
+    const defaultHandler = vi.fn(c => Response.json({ error: `Subcommand not found: ${c.sub.command}` }))
+    const loader = factory.subLoader(Object.values(handlers), defaultHandler)
+
+    const commandResponse = await loader({ sub: { command: 'ping', group: undefined } } as any)
+    expect(handlers.ping.handler).toHaveBeenCalledTimes(1)
+    expect(defaultHandler).not.toHaveBeenCalled()
+    expect(await commandResponse.json()).toEqual({ ok: 'ping' })
+
+    const groupResponse = await loader({ sub: { command: 'status', group: 'admin' } } as any)
+    expect(handlers.admin.handler).toHaveBeenCalledTimes(1)
+    expect(await groupResponse.json()).toEqual({ ok: 'admin' })
+
+    const unmatched = await loader({ sub: { command: 'missing', group: undefined } } as any)
+    expect(defaultHandler).toHaveBeenCalledTimes(1)
+    expect(await unmatched.json()).toEqual({ error: 'Subcommand not found: missing' })
+  })
+
+  it('should accept subcommand arrays in subcommand groups', () => {
+    const handlers = {
+      ping: factory.subCommand(
+        makeSubCommand('ping', 'Ping the bot'),
+        vi.fn(() => Response.json({ ok: 'ping' })),
+      ),
+    }
+
+    const group = makeSubCommandGroup('group', 'group option').options(factory.getSubCommands(Object.values(handlers)))
+    expect(group.toJSON().options).toHaveLength(1)
   })
 
   it('should return a list of commands', () => {
