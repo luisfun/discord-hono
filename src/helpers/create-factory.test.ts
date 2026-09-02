@@ -136,18 +136,24 @@ describe('createFactory', () => {
   it('should load handlers into DiscordHono instance', () => {
     const app = factory.discord()
     const commandMock = makeSlashCommand('name', 'description')
+    const autocompleteCommandMock = makeSlashCommand('autocomplete', 'description').options([
+      makeStringOption('text', 'text').required(true),
+    ])
     const componentMock = makeButton('str', 'label')
     const modalMock = makeModal('unique_id', 'title', [])
     const handlerMock = vi.fn()
+    const autocompleteMock = vi.fn()
 
     const handlers = [
       factory.command(commandMock, handlerMock),
+      factory.autocomplete(autocompleteCommandMock, autocompleteMock, handlerMock),
       factory.component(componentMock, handlerMock),
       factory.modal(modalMock, handlerMock),
       factory.cron('0 0 * * *', handlerMock),
     ]
 
     vi.spyOn(app, 'command')
+    vi.spyOn(app, 'autocomplete')
     vi.spyOn(app, 'component')
     vi.spyOn(app, 'modal')
     vi.spyOn(app, 'cron')
@@ -155,6 +161,7 @@ describe('createFactory', () => {
     app.loader(handlers)
 
     expect(app.command).toHaveBeenCalledWith('name', handlerMock)
+    expect(app.autocomplete).toHaveBeenCalledWith('autocomplete', autocompleteMock)
     expect(app.component).toHaveBeenCalledWith('str', handlerMock)
     expect(app.modal).toHaveBeenCalledWith('unique_id', handlerMock)
     expect(app.cron).toHaveBeenCalledWith('0 0 * * *', handlerMock)
