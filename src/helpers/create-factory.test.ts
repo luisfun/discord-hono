@@ -189,6 +189,18 @@ describe('createFactory', () => {
     expect(await unmatched.json()).toEqual({ error: 'Subcommand not found: missing' })
   })
 
+  it('should accept subcommand arrays in subcommand groups', () => {
+    const handlers = {
+      ping: factory.subCommand(
+        makeSubCommand('ping', 'Ping the bot'),
+        vi.fn(() => Response.json({ ok: 'ping' })),
+      ),
+    }
+
+    const group = makeSubCommandGroup('group', 'group option').options(factory.getSubCommands(Object.values(handlers)))
+    expect(group.toJSON().options).toHaveLength(1)
+  })
+
   it('should return a list of commands', () => {
     const commandMock = makeSlashCommand('name', 'description')
     const handlers = [factory.command(commandMock, vi.fn())]

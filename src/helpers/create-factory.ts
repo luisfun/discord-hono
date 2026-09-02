@@ -44,6 +44,8 @@ class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
 
 type SubCommandHandler<E extends Env> = CommandHandler<E, RESTPostAPIChatInputApplicationCommandsJSONBody>
 
+type ExtractSubCommand<T> = T extends { subCommand: infer U } ? U : T extends { subCommandGroup: infer U } ? U : never
+
 type Var = {}
 
 type UnionToIntersection<T> = (T extends unknown ? (value: T) => void : never) extends (value: infer I) => void
@@ -149,9 +151,7 @@ interface Factory<E extends Env> {
     handler: CronHandler<E & { Variables?: V }>,
   ): { cron: string; handler: CronHandler<E> }
   getCommands(handlers: Handler<E>[]): JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>[]
-  getSubCommands<T extends APIApplicationCommandSubcommandOption | APIApplicationCommandSubcommandGroupOption>(
-    handlers: Handler<E>[],
-  ): JsonSerializable<T>[]
+  getSubCommands<T extends Handler<E>>(handlers: readonly T[]): ExtractSubCommand<T>[]
   subLoader(
     handlers: Handler<E>[],
     defaultHandler?: SubCommandHandler<E>,
