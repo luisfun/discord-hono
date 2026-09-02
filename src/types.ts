@@ -58,8 +58,8 @@ type TargetIdData<T> = T extends { data: { target_id: infer R } }
     ? { target_id?: R }
     : {}
 
-type CommandRef<T extends RESTPostAPIApplicationCommandsJSONBody> = ResolvedData<CommandIntaraction<T>> &
-  TargetIdData<CommandIntaraction<T>> & {
+type CommandRef<T extends RESTPostAPIApplicationCommandsJSONBody> = ResolvedData<CommandInteraction<T>> &
+  TargetIdData<CommandInteraction<T>> & {
     key: string
   }
 type ComponentRef = APIInteractionDataResolved & {
@@ -77,7 +77,7 @@ interface CronRef {
 export type ContextRef = CommandRef<any> & ComponentRef & ModalRef & CronRef
 
 // biome-ignore format: ternary operator
-type CommandIntaraction<T extends RESTPostAPIApplicationCommandsJSONBody> =
+type CommandInteraction<T extends RESTPostAPIApplicationCommandsJSONBody> =
   T extends { type: 2 } ? Extract<APIApplicationCommandInteraction, { data: { type: 2 } }> :
   T extends { type: 3 } ? Extract<APIApplicationCommandInteraction, { data: { type: 3 } }> :
   T extends { type: 4 } ? Extract<APIApplicationCommandInteraction, { data: { type: 4 } }> :
@@ -110,7 +110,7 @@ export type CommandContext<
 > = ExcludeMethods<
   Context<E, CommandContext<E, T>>,
   'update' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
-> & { interaction: Readonly<CommandIntaraction<T>>; ref: Readonly<CommandRef<T>> }
+> & { interaction: Readonly<CommandInteraction<T>>; ref: Readonly<CommandRef<T>> }
 
 export type ComponentContext<E extends Env = any, T extends InteractionComponent = any> = ExcludeMethods<
   Context<E, ComponentContext<E, T>>,
