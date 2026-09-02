@@ -213,7 +213,8 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
       }
     }
     return (c: CommandContext<E, RESTPostAPIChatInputApplicationCommandsJSONBody>) =>
-      handlerMap.get(c.sub.group ? `grp:${c.sub.group}` : `cmd:${c.sub.command}`)?.(c) ??
+      handlerMap.get(`grp:${c.sub.group}`)?.(c) ??
+      handlerMap.get(`cmd:${c.sub.command}`)?.(c) ??
       defaultHandler?.(c) ??
       Response.json({ error: 'Subcommand not found' }, { status: 400 })
   },
