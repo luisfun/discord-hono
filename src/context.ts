@@ -86,7 +86,8 @@ export class Context<
     this.#ref = { key }
     if ('data' in interaction && interaction.data) {
       const { data } = interaction
-      for (const k of ['custom_value', 'target_id', 'values'] as const) if (k in data) this.#ref[k] = (data as any)[k]
+      for (const k of ['custom_value', 'target_id', 'values'] as const)
+        if (k in data) (this.#ref as any)[k] = (data as any)[k]
       // security-ignore: `data.resolved` is raw data from the Discord API, and the risk of prototype pollution is low.
       if ('resolved' in data) this.#ref = { ...this.#ref, ...data.resolved }
     }
@@ -307,7 +308,7 @@ export class Context<
    * @returns
    * @example
    * ```ts
-   * return c.resModal(makeModal('unique-id', 'Title', [
+   * return c.resModal(makeModal('custom_id', 'Title', [
    *   makeActionRow([makeTextInput('custom_id', 'Label')])
    * ]))
    * ```

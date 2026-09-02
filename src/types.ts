@@ -5,7 +5,6 @@ import type {
   APIButtonComponentWithCustomId,
   APIChannelSelectComponent,
   APIInteractionDataResolved,
-  APIMessageApplicationCommandInteractionDataResolved,
   APIMessageChannelSelectInteractionData,
   APIMessageComponentButtonInteraction,
   APIMessageComponentInteraction,
@@ -17,6 +16,7 @@ import type {
   APIModalSubmitInteraction,
   APIStringSelectComponent,
   ComponentType,
+  RESTPostAPIApplicationCommandsJSONBody,
   SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
 import type { Context } from './context'
@@ -50,33 +50,38 @@ export interface DiscordEnv {
 
 ////////// Context //////////
 
-type ResolvedCategory = keyof APIInteractionDataResolved | keyof APIMessageApplicationCommandInteractionDataResolved
-type ResolvedReturnType<T extends ResolvedCategory> = T extends keyof APIInteractionDataResolved
-  ? NonNullable<APIInteractionDataResolved[T]>[string]
-  : T extends keyof APIMessageApplicationCommandInteractionDataResolved
-    ? APIMessageApplicationCommandInteractionDataResolved[T][string]
-    : never
-type RetypedResolved = {
-  [K in ResolvedCategory]?: Record<string, ResolvedReturnType<K> | undefined>
-}
+type ResolvedData<T extends APIApplicationCommandInteraction> = T extends { data: { resolved?: infer R } } ? R : never
 
-interface CommandRef extends RetypedResolved {
-  key: string
-  target_id?: string
-}
-interface ComponentRef extends RetypedResolved {
+type TargetIdData<T> = T extends { data: { target_id: infer R } }
+  ? { target_id: R }
+  : T extends { data: { target_id?: infer R } }
+    ? { target_id?: R }
+    : {}
+
+type CommandRef<T extends RESTPostAPIApplicationCommandsJSONBody> = ResolvedData<CommandInteraction<T>> &
+  TargetIdData<CommandInteraction<T>> & {
+    key: string
+  }
+type ComponentRef = APIInteractionDataResolved & {
   key: string
   custom_value?: string
   values?: string[]
 }
-interface ModalRef extends RetypedResolved {
+type ModalRef = APIInteractionDataResolved & {
   key: string
   custom_value?: string
 }
 interface CronRef {
   key: string
 }
-export interface ContextRef extends CommandRef, ComponentRef, ModalRef, CronRef {}
+export type ContextRef = CommandRef<any> & ComponentRef & ModalRef & CronRef
+
+// biome-ignore format: ternary operator
+type CommandInteraction<T extends RESTPostAPIApplicationCommandsJSONBody> =
+  T extends { type: 2 } ? Extract<APIApplicationCommandInteraction, { data: { type: 2 } }> :
+  T extends { type: 3 } ? Extract<APIApplicationCommandInteraction, { data: { type: 3 } }> :
+  T extends { type: 4 } ? Extract<APIApplicationCommandInteraction, { data: { type: 4 } }> :
+  Extract<APIApplicationCommandInteraction, { data: { type: 1 } }>
 
 export type InteractionComponent =
   | APIButtonComponentWithCustomId
@@ -99,20 +104,26 @@ type ComponentInteraction<T extends InteractionComponent> =
   T extends APIChannelSelectComponent ? Omit<APIMessageComponentSelectMenuInteraction, 'data'> & { data: APIMessageChannelSelectInteractionData } :
   APIMessageComponentInteraction
 
-export type CommandContext<E extends Env = any> = ExcludeMethods<
-  Context<E, CommandContext<E>>,
+export type CommandContext<
+  E extends Env = any,
+  T extends RESTPostAPIApplicationCommandsJSONBody = any,
+> = ExcludeMethods<
+  Context<E, CommandContext<E, T>>,
   'update' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
-> & { interaction: Readonly<APIApplicationCommandInteraction>; ref: Readonly<CommandRef> }
+> & { interaction: Readonly<CommandInteraction<T>>; ref: Readonly<CommandRef<T>> }
 
 export type ComponentContext<E extends Env = any, T extends InteractionComponent = any> = ExcludeMethods<
   Context<E, ComponentContext<E, T>>,
   'sub' | 'focused' | 'resAutocomplete' | 'interaction' | 'ref'
 > & { interaction: Readonly<ComponentInteraction<T>>; ref: Readonly<ComponentRef> }
 
-export type AutocompleteContext<E extends Env = any> = ExcludeMethods<
-  Context<E, AutocompleteContext<E>>,
+export type AutocompleteContext<
+  E extends Env = any,
+  T extends RESTPostAPIApplicationCommandsJSONBody = any,
+> = ExcludeMethods<
+  Context<E, AutocompleteContext<E, T>>,
   'flags' | 'res' | 'resDefer' | 'resActivity' | 'followup' | 'resModal' | 'update' | 'interaction' | 'ref'
-> & { interaction: Readonly<APIApplicationCommandAutocompleteInteraction>; ref: Readonly<CommandRef> }
+> & { interaction: Readonly<APIApplicationCommandAutocompleteInteraction>; ref: Readonly<CommandRef<T>> }
 
 export type ModalContext<E extends Env = any> = ExcludeMethods<
   Context<E, ModalContext<E>>,
@@ -137,7 +148,9 @@ export type CronContext<E extends Env = any> = ExcludeMethods<
 
 ////////// Handler //////////
 
-export type CommandHandler<E extends Env> = (c: CommandContext<E>) => Promise<Response> | Response
+export type CommandHandler<E extends Env, T extends RESTPostAPIApplicationCommandsJSONBody> = (
+  c: CommandContext<E, T>,
+) => Promise<Response> | Response
 export type ComponentHandler<E extends Env, T extends InteractionComponent> = (
   c: ComponentContext<E, T>,
 ) => Promise<Response> | Response
