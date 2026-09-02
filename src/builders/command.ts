@@ -22,6 +22,7 @@ import { createJsonBuilder, type JsonBuilderOptions } from './json-builder'
 
 // type fix https://docs.discord.com/developers/interactions/application-commands#create-global-application-command
 
+interface SlashCommandJson extends Omit<RESTPostAPIChatInputApplicationCommandsJSONBody, 'handler'> {}
 interface ContextMenuCommandJson
   extends Omit<
     RESTPostAPIContextMenuApplicationCommandsJSONBody,
@@ -60,11 +61,7 @@ export const makeSlashCommand = <N extends string, D extends string>(
   name: N,
   description: D,
   builderOptions?: JsonBuilderOptions,
-) =>
-  createJsonBuilder<{ name: N; description: D }, RESTPostAPIChatInputApplicationCommandsJSONBody, 'type'>(
-    { name, description },
-    builderOptions,
-  )
+) => createJsonBuilder<{ name: N; description: D }, SlashCommandJson, 'type'>({ name, description }, builderOptions)
 //const testSlashCommand = makeSlashCommand('test', 'A test command')
 
 export const makeUserCommand = <N extends string>(name: N, builderOptions?: JsonBuilderOptions) =>
