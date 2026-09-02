@@ -30,6 +30,20 @@ describe('createFactory', () => {
     expect(result).toEqual({ command: commandMock, handler: handlerMock })
   })
 
+  it('should create a subcommand wrapper with inferred Variables', () => {
+    const subCommandMock = makeSubCommand('sub', 'A subcommand').options([
+      makeStringOption('text', 'A string option').required(true),
+    ])
+
+    const result = factory.subCommand(subCommandMock, c => {
+      expectTypeOf(c.var.text).toEqualTypeOf<string>()
+      return c.res(`text: ${c.var.text}`)
+    })
+
+    expect(result.subCommand).toEqual(subCommandMock)
+    expect(result.handler).toBeInstanceOf(Function)
+  })
+
   it('should accept JsonSerializable commands while preserving Variables typing', () => {
     const commandJson = {
       name: 'echo',

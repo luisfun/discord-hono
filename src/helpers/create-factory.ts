@@ -1,10 +1,14 @@
 import type {
+  APIApplicationCommandSubcommandGroupOption,
+  APIApplicationCommandSubcommandOption,
   APIModalInteractionResponseCallbackData,
   RESTPostAPIApplicationCommandsJSONBody,
+  RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from 'discord-api-types/v10'
 import { DiscordHono } from '../discord-hono'
 import type {
   AutocompleteHandler,
+  CommandContext,
   CommandHandler,
   ComponentHandler,
   CronHandler,
@@ -16,7 +20,7 @@ import type {
   ResolvedToJSON,
   Simplify,
 } from '../types'
-import { CUSTOM_ID_SEPARATOR, newError, toJSON } from '../utils'
+import { CUSTOM_ID_SEPARATOR, toJSON } from '../utils'
 
 class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
   loader(handlers: Handler<E>[]): this {
@@ -33,11 +37,12 @@ class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
         const modal = toJSON(elem.modal)
         this.modal(modal.custom_id.split(CUSTOM_ID_SEPARATOR)[0] ?? '', elem.handler)
       } else if ('cron' in elem) this.cron(elem.cron, elem.handler)
-      else throw newError('.loader(obj)', 'obj is Invalid')
     }
     return this
   }
 }
+
+type SubCommandHandler<E extends Env> = CommandHandler<E, RESTPostAPIChatInputApplicationCommandsJSONBody>
 
 type Var = {}
 
@@ -67,7 +72,12 @@ type ExtractNestedOptionVars<T> = T extends { options?: infer O }
     : {}
   : ExtractOptionVar<T>
 
-type ExtractCommandVars<T extends RESTPostAPIApplicationCommandsJSONBody> = T extends { options?: infer O }
+type ExtractCommandVars<
+  T extends
+    | RESTPostAPIApplicationCommandsJSONBody
+    | APIApplicationCommandSubcommandOption
+    | APIApplicationCommandSubcommandGroupOption,
+> = T extends { options?: infer O }
   ? O extends ReadonlyArray<infer U>
     ? Simplify<UnionToIntersection<ExtractNestedOptionVars<U>>>
     : {}
@@ -104,6 +114,20 @@ interface Factory<E extends Env> {
     command: T,
     handler: CommandHandler<E & { Variables?: V }, ResolvedToJSON<T>>,
   ): { command: T; handler: CommandHandler<E, ResolvedToJSON<T>> }
+  subCommand<
+    T extends JsonSerializable<APIApplicationCommandSubcommandOption>,
+    V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
+  >(subCommand: T, handler: SubCommandHandler<E & { Variables?: V }>): { subCommand: T; handler: SubCommandHandler<E> }
+  subCommandGroup<
+    T extends JsonSerializable<APIApplicationCommandSubcommandGroupOption>,
+    V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
+  >(
+    subCommandGroup: T,
+    handler: SubCommandHandler<E & { Variables?: V }>,
+  ): {
+    subCommandGroup: T
+    handler: SubCommandHandler<E>
+  }
   component<T extends JsonSerializable<InteractionComponent>>(
     component: T,
     handler: ComponentHandler<E, ResolvedToJSON<T>>,
@@ -125,64 +149,67 @@ interface Factory<E extends Env> {
     handler: CronHandler<E & { Variables?: V }>,
   ): { cron: string; handler: CronHandler<E> }
   getCommands(handlers: Handler<E>[]): JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>[]
+  subLoader(
+    handlers: Handler<E>[],
+    defaultHandler?: SubCommandHandler<E>,
+  ): CommandHandler<E, RESTPostAPIChatInputApplicationCommandsJSONBody>
 }
 
 type Handler<E extends Env> =
   | ReturnType<Factory<E>['command']>
+  | ReturnType<Factory<E>['subCommand']>
+  | ReturnType<Factory<E>['subCommandGroup']>
   | ReturnType<Factory<E>['component']>
   | ReturnType<Factory<E>['autocomplete']>
   | ReturnType<Factory<E>['modal']>
   | ReturnType<Factory<E>['cron']>
 
 export const createFactory = <E extends Env = Env>(): Factory<E> => ({
-  // biome-ignore lint/nursery/useExplicitType: omitted
+  // biome-ignore-start lint/nursery/useExplicitType: omitted
   discord(init) {
     return new DiscordHonoExtends<E>(init)
   },
-  // biome-ignore lint/nursery/useExplicitType: omitted
-  command<
-    T extends JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
-    V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
-  >(command: T, handler: CommandHandler<E & { Variables?: V }, ResolvedToJSON<T>>) {
-    return { command, handler: handler as CommandHandler<E, ResolvedToJSON<T>> }
+  command(command, handler: any) {
+    return { command, handler }
   },
-  // biome-ignore lint/nursery/useExplicitType: omitted
-  component<T extends JsonSerializable<InteractionComponent>>(
-    component: T,
-    handler: ComponentHandler<E, ResolvedToJSON<T>>,
-  ) {
-    return { component, handler: handler as ComponentHandler<E, ResolvedToJSON<T>> }
+  subCommand(subCommand, handler: any) {
+    return { subCommand, handler }
   },
-  // biome-ignore lint/nursery/useExplicitType: omitted
-  autocomplete<
-    T extends JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>,
-    V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
-  >(
-    command: T,
-    autocomplete: AutocompleteHandler<E & { Variables?: V }>,
-    handler: CommandHandler<E & { Variables?: V }, ResolvedToJSON<T>>,
-  ) {
-    return {
-      command,
-      autocomplete: autocomplete as AutocompleteHandler<E>,
-      handler: handler as CommandHandler<E, ResolvedToJSON<T>>,
-    }
+  subCommandGroup(subCommandGroup, handler: any) {
+    return { subCommandGroup, handler }
   },
-  // biome-ignore lint/nursery/useExplicitType: omitted
-  modal<
-    T extends JsonSerializable<APIModalInteractionResponseCallbackData>,
-    V extends Var = ExtractModalVars<ResolvedToJSON<T>>,
-  >(modal: T, handler: ModalHandler<E & { Variables?: V }>) {
-    return { modal, handler: handler as ModalHandler<E> }
+  component(component, handler: any) {
+    return { component, handler }
   },
-  // biome-ignore lint/nursery/useExplicitType: omitted
-  cron(cron, handler) {
-    return { cron, handler: handler as CronHandler<E> }
+  autocomplete(command, autocomplete: any, handler: any) {
+    return { command, autocomplete, handler }
   },
-  // biome-ignore lint/nursery/useExplicitType: omitted
+  modal(modal, handler: any) {
+    return { modal, handler }
+  },
+  cron(cron, handler: any) {
+    return { cron, handler }
+  },
   getCommands(handlers) {
     return handlers
       .filter(e => 'command' in e)
       .map(e => e.command as JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>)
   },
+  subLoader(handlers, defaultHandler) {
+    const handlerMap = new Map<`cmd:${string}` | `grp:${string}`, SubCommandHandler<E>>()
+    for (const elem of handlers) {
+      if ('subCommand' in elem) {
+        const subCommand = toJSON(elem.subCommand)
+        handlerMap.set(`cmd:${subCommand.name}`, elem.handler)
+      } else if ('subCommandGroup' in elem) {
+        const subCommandGroup = toJSON(elem.subCommandGroup)
+        handlerMap.set(`grp:${subCommandGroup.name}`, elem.handler)
+      }
+    }
+    return (c: CommandContext<E, RESTPostAPIChatInputApplicationCommandsJSONBody>) =>
+      handlerMap.get(c.sub.group ? `grp:${c.sub.group}` : `cmd:${c.sub.command}`)?.(c) ??
+      defaultHandler?.(c) ??
+      Response.json({ error: 'Subcommand not found' }, { status: 400 })
+  },
+  // biome-ignore-end lint/nursery/useExplicitType: omitted
 })
