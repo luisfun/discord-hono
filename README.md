@@ -1,6 +1,6 @@
 # 🔥 Discord Hono [![npm v](https://img.shields.io/npm/v/discord-hono)](https://www.npmjs.com/package/discord-hono) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/discord-hono?label=minzip)](https://bundlephobia.com/package/discord-hono) [![Discord](https://img.shields.io/discord/1331893810501914694?label=Discord)](https://discord.gg/KFAgHFwBsr)
 
-**This library enables you to easily build Discord bots on Cloudflare Workers**
+**Easily build HTTP-based Discord bots on Cloudflare Workers — so you can focus on what matters.**
 
 [👉 Documentation](https://discord-hono.luis.fun) │ [💥 Breaking Changes](https://discord-hono.luis.fun/migration-guides/v0/)
 
