@@ -34,6 +34,7 @@ import type {
   FileData,
   JsonSerializable,
   ModalContext,
+  Simplify,
   TypedResponse,
 } from './types'
 import { formData, isArray, isProto, type MessageFlag, messageFlags, newError, prepareData, toJSON } from './utils'
@@ -217,7 +218,7 @@ export class Context<
    * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
    * @returns
    */
-  res(data: CustomCallbackData<APIInteractionResponseCallbackData>, file?: FileData): Response {
+  res(data: Simplify<CustomCallbackData<APIInteractionResponseCallbackData>>, file?: FileData): Response {
     this.#throwIfNotAllowType([2, 3, 5])
     const body: APIInteractionResponse = {
       data: { ...this.#flags, ...prepareData(data) },
@@ -251,8 +252,10 @@ export class Context<
    */
   async resAutoDefer(
     handler: (c: This) => Promise<{
-      data: CustomCallbackData<
-        DeepCommon<APIInteractionResponseCallbackData, RESTPatchAPIInteractionOriginalResponseJSONBody>
+      data: Simplify<
+        CustomCallbackData<
+          DeepCommon<APIInteractionResponseCallbackData, RESTPatchAPIInteractionOriginalResponseJSONBody>
+        >
       >
       file?: FileData
     }>,
@@ -298,7 +301,7 @@ export class Context<
    * ```
    */
   followup(
-    data?: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>,
+    data?: Simplify<CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>>,
     file?: FileData,
   ): Promise<TypedResponse<APIMessage | never>> {
     this.#throwIfNotAllowType([2, 3, 5])
