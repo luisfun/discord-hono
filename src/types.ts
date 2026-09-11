@@ -33,35 +33,7 @@ export type JsonSerializable<V> = V extends (infer U)[] ? JsonSerializable<U>[] 
 
 export type ResolvedToJSON<V> = V extends (infer U)[] ? ResolvedToJSON<U>[] : V extends { toJSON(): infer R } ? R : V
 
-type Primitive = string | number | boolean | bigint | symbol | null | undefined
-type OptionalKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? K : never
-}[keyof T]
-type CommonProperties<T extends object, U extends object> = {
-  [K in keyof T & keyof U]: DeepCommon<T[K], U[K]>
-}
-type NonNeverProperties<T> = {
-  [K in keyof T as [T[K]] extends [never] ? never : K]: T[K]
-}
-type ApplyOptional<T, K> = Omit<T, Extract<K, keyof T>> & Partial<Pick<T, Extract<K, keyof T>>>
-type DeepCommonObject<T extends object, U extends object> = ApplyOptional<
-  NonNeverProperties<CommonProperties<T, U>>,
-  OptionalKeys<T> | OptionalKeys<U>
->
-export type DeepCommon<T, U> =
-  // Primitive to Primitive comparison
-  T extends Primitive
-    ? T extends U
-      ? T
-      : never
-    : U extends Primitive
-      ? never
-      : // Object to Object comparison
-        T extends object
-        ? U extends object
-          ? DeepCommonObject<T, U>
-          : never
-        : never
+export type Common<T, U> = Pick<T, keyof T & keyof U>
 
 ////////// Env //////////
 

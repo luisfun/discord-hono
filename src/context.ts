@@ -21,12 +21,12 @@ import { $webhooks$_$_$messages$original, createRest } from './rest'
 import type {
   AutocompleteContext,
   CommandContext,
+  Common,
   ComponentContext,
   ContextRef,
   CronContext,
   CronEvent,
   CustomCallbackData,
-  DeepCommon,
   DiscordEnv,
   Env,
   ExecutionContext,
@@ -253,9 +253,7 @@ export class Context<
   async resAutoDefer(
     handler: (c: This) => Promise<{
       data: Simplify<
-        CustomCallbackData<
-          DeepCommon<APIInteractionResponseCallbackData, RESTPatchAPIInteractionOriginalResponseJSONBody>
-        >
+        CustomCallbackData<Common<APIInteractionResponseCallbackData, RESTPatchAPIInteractionOriginalResponseJSONBody>>
       >
       file?: FileData
     }>,
@@ -269,14 +267,13 @@ export class Context<
     const result = await Promise.race([handlerPromise.then(result => ({ ...result })), timeoutPromise.then(() => ({}))])
     if ('data' in result) {
       clearTimeout(timerId)
-      console.log('c.res called')
       return this.res(result.data as APIInteractionResponseCallbackData, result.file)
     }
-    const afterTask = handlerPromise.then(async result => {
-      console.log('Deferred handler resolved')
-      await this.followup(result.data as RESTPatchAPIInteractionOriginalResponseJSONBody, result.file)
-    })
-    return this.resDefer(_c => afterTask)
+    return this.resDefer(() =>
+      handlerPromise.then(result =>
+        this.followup(result.data as RESTPatchAPIInteractionOriginalResponseJSONBody, result.file),
+      ),
+    )
   }
 
   /**
