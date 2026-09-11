@@ -21,6 +21,7 @@ import { $webhooks$_$_$messages$original, createRest } from './rest'
 import type {
   AutocompleteContext,
   CommandContext,
+  Common,
   ComponentContext,
   ContextRef,
   CronContext,
@@ -33,6 +34,7 @@ import type {
   FileData,
   JsonSerializable,
   ModalContext,
+  Simplify,
   TypedResponse,
 } from './types'
 import { formData, isArray, isProto, type MessageFlag, messageFlags, newError, prepareData, toJSON } from './utils'
@@ -216,7 +218,7 @@ export class Context<
    * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
    * @returns
    */
-  res(data: CustomCallbackData<APIInteractionResponseCallbackData>, file?: FileData): Response {
+  res(data: Simplify<CustomCallbackData<APIInteractionResponseCallbackData>>, file?: FileData): Response {
     this.#throwIfNotAllowType([2, 3, 5])
     const body: APIInteractionResponse = {
       data: { ...this.#flags, ...prepareData(data) },
@@ -245,6 +247,34 @@ export class Context<
           } satisfies APIInteractionResponseDeferredChannelMessageWithSource),
     )
   }
+  /**
+   * @beta
+   */
+  async resAutoDefer(
+    handler: (c: This) => Promise<{
+      data: Simplify<
+        CustomCallbackData<Common<APIInteractionResponseCallbackData, RESTPatchAPIInteractionOriginalResponseJSONBody>>
+      >
+      file?: FileData
+    }>,
+    options?: { deferMs?: number },
+  ): Promise<Response> {
+    this.#throwIfNotAllowType([2, 3, 5])
+    const deferMs = options?.deferMs ?? 2000
+    let timerId: ReturnType<typeof setTimeout> | undefined
+    const handlerPromise = handler(this as unknown as This)
+    const timeoutPromise = new Promise<void>(resolve => (timerId = setTimeout(resolve, deferMs)))
+    const result = await Promise.race([handlerPromise.then(result => ({ ...result })), timeoutPromise.then(() => ({}))])
+    if ('data' in result) {
+      clearTimeout(timerId)
+      return this.res(result.data as APIInteractionResponseCallbackData, result.file)
+    }
+    return this.resDefer(() =>
+      handlerPromise.then(result =>
+        this.followup(result.data as RESTPatchAPIInteractionOriginalResponseJSONBody, result.file),
+      ),
+    )
+  }
 
   /**
    * Launch the Activity associated with the app. Only available for apps with Activities enabled
@@ -268,7 +298,7 @@ export class Context<
    * ```
    */
   followup(
-    data?: CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>,
+    data?: Simplify<CustomCallbackData<RESTPatchAPIInteractionOriginalResponseJSONBody>>,
     file?: FileData,
   ): Promise<TypedResponse<APIMessage | never>> {
     this.#throwIfNotAllowType([2, 3, 5])

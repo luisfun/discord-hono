@@ -388,6 +388,50 @@ describe('Context', () => {
     expect(body.type).toEqual(5) // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
   })
 
+  it('should return the handler response when resAutoDefer completes before the timeout', async () => {
+    const ctx = new Context(env, executionCtx, discordEnv, key, commandInteraction)
+    const response = await ctx.resAutoDefer(async () => ({ data: 'Processed immediately' }), { deferMs: 100 })
+    const body = await response.json()
+
+    expect(body.type).toEqual(4)
+    expect(body.data.content).toEqual('Processed immediately')
+    expect(executionCtx.waitUntil).not.toHaveBeenCalled()
+  })
+
+  it('should defer and follow up when resAutoDefer exceeds the timeout', async () => {
+    vi.useFakeTimers()
+    executionCtx.waitUntil.mockClear()
+
+    let resolveHandler: (value: { data: string }) => void = () => undefined
+    const handler = new Promise<{ data: string }>(resolve => {
+      resolveHandler = resolve
+    })
+    const ctx = new Context(env, executionCtx, discordEnv, key, commandInteraction)
+    const responsePromise = ctx.resAutoDefer(() => handler, { deferMs: 100 })
+
+    await vi.advanceTimersByTimeAsync(100)
+    const response = await responsePromise
+    const body = await response.json()
+
+    expect(body.type).toEqual(5)
+    expect(executionCtx.waitUntil).toHaveBeenCalledOnce()
+
+    resolveHandler({ data: 'Processed after defer' })
+    const waitUntilHandler = executionCtx.waitUntil.mock.calls[0]?.[0]
+    expect(waitUntilHandler).toBeDefined()
+    if (!waitUntilHandler) throw new Error('waitUntil handler was not registered')
+    await waitUntilHandler
+    expect(ctx.rest).toHaveBeenCalledWith(
+      'PATCH',
+      $webhooks$_$_$messages$original,
+      ['app-id', 'token'],
+      { content: 'Processed after defer' },
+      undefined,
+    )
+
+    vi.useRealTimers()
+  })
+
   it('should create update response for components', async () => {
     const ctx = new Context<any, ComponentContext>(env, executionCtx, discordEnv, key, componentInteraction)
     const response = ctx.update().res('Updated message')
