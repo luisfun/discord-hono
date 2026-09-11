@@ -26,6 +26,7 @@ import type {
   CronContext,
   CronEvent,
   CustomCallbackData,
+  DeepCommon,
   DiscordEnv,
   Env,
   ExecutionContext,
@@ -34,7 +35,6 @@ import type {
   JsonSerializable,
   ModalContext,
   TypedResponse,
-  DeepCommon,
 } from './types'
 import { formData, isArray, isProto, type MessageFlag, messageFlags, newError, prepareData, toJSON } from './utils'
 
@@ -249,31 +249,36 @@ export class Context<
   /**
    * @beta
    */
-  async resAutoDefer(handler: (c: This) => Promise<{ data: DeepCommon<APIInteractionResponseCallbackData, RESTPatchAPIInteractionOriginalResponseJSONBody>; file?: FileData }>, options?: { deferMs?: number }): Promise<Response> {
+  async resAutoDefer(
+    handler: (
+      c: This,
+    ) => Promise<{
+      data: DeepCommon<APIInteractionResponseCallbackData, RESTPatchAPIInteractionOriginalResponseJSONBody>
+      file?: FileData
+    }>,
+    options?: { deferMs?: number },
+  ): Promise<Response> {
     this.#throwIfNotAllowType([2, 3, 5])
-    const deferMs = options?.deferMs ?? 3000;
-    let timerId: ReturnType<typeof setTimeout> | undefined;
-    const handlerPromise = handler(this as unknown as This);
-    const timeoutPromise = new Promise<"timeout">((resolve) => {
+    const deferMs = options?.deferMs ?? 3000
+    let timerId: ReturnType<typeof setTimeout> | undefined
+    const handlerPromise = handler(this as unknown as This)
+    const timeoutPromise = new Promise<'timeout'>(resolve => {
       timerId = setTimeout(() => {
-        resolve("timeout");
-      }, deferMs);
-    });
-    const result = await Promise.race([
-      handlerPromise.then((result) => ({ ...result })),
-      timeoutPromise.then(() => ({})),
-    ]);
+        resolve('timeout')
+      }, deferMs)
+    })
+    const result = await Promise.race([handlerPromise.then(result => ({ ...result })), timeoutPromise.then(() => ({}))])
     if ('data' in result) {
-      clearTimeout(timerId);
+      clearTimeout(timerId)
       return this.res(result.data as APIInteractionResponseCallbackData, result.file)
     }
     const afterTask = handlerPromise
-      .then((result) => {
+      .then(result => {
         this.followup(result.data as RESTPatchAPIInteractionOriginalResponseJSONBody, result.file)
       })
-      .catch((error) => {
-        console.error("Deferred handler failed:", error);
-      });
+      .catch(error => {
+        console.error('Deferred handler failed:', error)
+      })
     return this.resDefer(_c => afterTask)
   }
 
