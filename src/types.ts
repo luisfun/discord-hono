@@ -33,6 +33,25 @@ export type JsonSerializable<V> = V extends (infer U)[] ? JsonSerializable<U>[] 
 
 export type ResolvedToJSON<V> = V extends (infer U)[] ? ResolvedToJSON<U>[] : V extends { toJSON(): infer R } ? R : V
 
+type Primitive = string | number | boolean | bigint | symbol | null | undefined
+
+export type DeepCommon<T, U> =
+  // Primitive to Primitive comparison
+  T extends Primitive
+    ? T extends U
+      ? T
+      : never
+    : U extends Primitive
+      ? never
+      : // Object to Object comparison
+        T extends object
+        ? U extends object
+          ? {
+              [K in keyof T & keyof U as [DeepCommon<T[K], U[K]>] extends [never] ? never : K]: DeepCommon<T[K], U[K]>
+            }
+          : never
+        : never
+
 ////////// Env //////////
 
 export interface Env {
