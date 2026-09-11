@@ -250,35 +250,29 @@ export class Context<
    * @beta
    */
   async resAutoDefer(
-    handler: (
-      c: This,
-    ) => Promise<{
-      data: DeepCommon<APIInteractionResponseCallbackData, RESTPatchAPIInteractionOriginalResponseJSONBody>
+    handler: (c: This) => Promise<{
+      data: CustomCallbackData<
+        DeepCommon<APIInteractionResponseCallbackData, RESTPatchAPIInteractionOriginalResponseJSONBody>
+      >
       file?: FileData
     }>,
     options?: { deferMs?: number },
   ): Promise<Response> {
     this.#throwIfNotAllowType([2, 3, 5])
-    const deferMs = options?.deferMs ?? 3000
+    const deferMs = options?.deferMs ?? 2000
     let timerId: ReturnType<typeof setTimeout> | undefined
     const handlerPromise = handler(this as unknown as This)
-    const timeoutPromise = new Promise<'timeout'>(resolve => {
-      timerId = setTimeout(() => {
-        resolve('timeout')
-      }, deferMs)
-    })
+    const timeoutPromise = new Promise<void>(resolve => (timerId = setTimeout(resolve, deferMs)))
     const result = await Promise.race([handlerPromise.then(result => ({ ...result })), timeoutPromise.then(() => ({}))])
     if ('data' in result) {
       clearTimeout(timerId)
+      console.log('c.res called')
       return this.res(result.data as APIInteractionResponseCallbackData, result.file)
     }
-    const afterTask = handlerPromise
-      .then(result => {
-        this.followup(result.data as RESTPatchAPIInteractionOriginalResponseJSONBody, result.file)
-      })
-      .catch(error => {
-        console.error('Deferred handler failed:', error)
-      })
+    const afterTask = handlerPromise.then(async result => {
+      console.log('Deferred handler resolved')
+      await this.followup(result.data as RESTPatchAPIInteractionOriginalResponseJSONBody, result.file)
+    })
     return this.resDefer(_c => afterTask)
   }
 
