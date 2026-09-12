@@ -19,6 +19,7 @@ export const createRest =
    * @param file
    * @returns
    */
+  // biome-ignore lint/complexity/useMaxParams: It is necessary due to the structure of the path and variables
   <M extends RestMethod, P extends RestPath<M>>(
     method: M,
     path: P,

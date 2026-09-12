@@ -23,8 +23,7 @@ describe('Rest', () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
-    // @ts-expect-error
-    global.fetch = mockFetch
+    globalThis.fetch = mockFetch
     rest = createRest(mockToken)
   })
 
