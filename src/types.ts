@@ -33,8 +33,6 @@ export type JsonSerializable<V> = V extends (infer U)[] ? JsonSerializable<U>[] 
 
 export type ResolvedToJSON<V> = V extends (infer U)[] ? ResolvedToJSON<U>[] : V extends { toJSON(): infer R } ? R : V
 
-export type Common<T, U> = Pick<T, keyof T & keyof U>
-
 ////////// Env //////////
 
 export interface Env {
@@ -124,16 +122,7 @@ export type AutocompleteContext<
   T extends RESTPostAPIApplicationCommandsJSONBody = any,
 > = ExcludeMethods<
   Context<E, AutocompleteContext<E, T>>,
-  | 'flags'
-  | 'res'
-  | 'resDefer'
-  | 'resAutoDefer'
-  | 'resActivity'
-  | 'followup'
-  | 'resModal'
-  | 'update'
-  | 'interaction'
-  | 'ref'
+  'flags' | 'res' | 'resDefer' | 'resActivity' | 'followup' | 'resModal' | 'update' | 'interaction' | 'ref'
 > & { interaction: Readonly<APIApplicationCommandAutocompleteInteraction>; ref: Readonly<CommandRef<T>> }
 
 export type ModalContext<E extends Env = any> = ExcludeMethods<
@@ -146,7 +135,6 @@ export type CronContext<E extends Env = any> = ExcludeMethods<
   | 'flags'
   | 'res'
   | 'resDefer'
-  | 'resAutoDefer'
   | 'resActivity'
   | 'followup'
   | 'sub'
