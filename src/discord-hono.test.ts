@@ -33,6 +33,7 @@ describe('DiscordHono', () => {
     it('should return text for GET requests', async () => {
       const req = new Request('https://example.com', { method: 'GET' })
       const res = await app.fetch(req)
+      // biome-ignore lint/security/noSecrets: not a real secret, just a mock token
       expect(await res.text()).toBe('Operational🔥')
     })
 

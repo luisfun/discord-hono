@@ -15,6 +15,7 @@ import { isString } from './utils'
 // Mock createRest to avoid actual API calls
 vi.mock('./rest', () => ({
   createRest: vi.fn().mockReturnValue(
+    // biome-ignore lint/complexity/useMaxParams: Allow multiple parameters
     vi.fn().mockImplementation((method, _endpoint, _pathVars, _data, _file) => {
       if (method === 'PATCH') return Promise.resolve({})
       if (method === 'DELETE') return Promise.resolve({})

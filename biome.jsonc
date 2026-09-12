@@ -23,6 +23,12 @@
       },
       "complexity": {
         "noBannedTypes": "off",
+        "noExcessiveCognitiveComplexity": {
+          "level": "on",
+          "options": {
+            "maxAllowedComplexity": 20
+          }
+        },
         "noExcessiveLinesPerFunction": "off" // Allow test functions with many lines
       },
       "nursery": {
@@ -40,8 +46,10 @@
         "useBlockStatements": "off", // Allow single-line statements without block braces
         "useConsistentMethodSignatures": "off", // Temporary
         "useDefaultSwitchClause": "off",
+        "useDestructuring": "off", // For lightweight coding
         "useExportsLast": "off", // Allow exports to appear anywhere
-        "useNamingConvention": "off"
+        "useNamingConvention": "off",
+        "useReadonlyClassProperties": "off" // Temporary
       },
       "suspicious": {
         "noBitwiseOperators": "off", // Use bitwise operations for high-speed processing

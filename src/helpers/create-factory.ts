@@ -23,7 +23,6 @@ import type {
 import { CUSTOM_ID_SEPARATOR, toJSON } from '../utils'
 
 class DiscordHonoExtends<E extends Env> extends DiscordHono<E> {
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: maybe not complex
   loader(handlers: Handler<E>[]): this {
     for (const elem of handlers) {
       if ('command' in elem) {
