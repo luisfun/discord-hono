@@ -53,7 +53,7 @@ export const newError = (locate: string, text: string): Error => new Error(`disc
 export const queryStringify = (query: Record<string, unknown> | undefined): '' | `?${string}` => {
   if (!query) return ''
   const queryMap: Record<string, string> = {}
-  // Simplified handling of null and undefined values
+  // biome-ignore lint/suspicious/noEqualsToNull: Simplified handling of null and undefined values
   for (const [key, value] of Object.entries(query)) if (value != null) queryMap[key] = String(value)
   return `?${new URLSearchParams(queryMap).toString()}`
 }

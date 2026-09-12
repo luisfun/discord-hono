@@ -32,6 +32,7 @@
     "node": ">=18.4.0"
   },
   "scripts": {
+    "check": "biome check .",
     "fix": "biome check --write .",
     "fix:unsafe": "biome check --write --unsafe .",
     "test": "biome check . && tsc && vitest run --coverage",

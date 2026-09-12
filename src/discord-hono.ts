@@ -130,6 +130,7 @@ export class DiscordHono<E extends Env = Env> {
   fetch = async (request: Request, env?: E['Bindings'], executionCtx?: ExecutionContext): Promise<Response> => {
     switch (request.method) {
       case 'GET':
+        // biome-ignore lint/security/noSecrets: Health check endpoint does not expose secrets
         return new Response('Operational🔥')
       case 'POST': {
         const discord = this.#discord(env)
@@ -153,11 +154,11 @@ export class DiscordHono<E extends Env = Env> {
             case 3:
             case 5: {
               const id = interaction.data.custom_id
-              const key = id.split(CUSTOM_ID_SEPARATOR)[0] ?? ''
-              interaction.data.custom_id = key
+              const custom_id = id.split(CUSTOM_ID_SEPARATOR)[0] ?? ''
+              interaction.data.custom_id = custom_id
               // @ts-expect-error: Add library-specific value
-              interaction.data.custom_value = id.slice(key.length + 1)
-              return key
+              interaction.data.custom_value = id.slice(custom_id.length + 1)
+              return custom_id
             }
           }
           return ''

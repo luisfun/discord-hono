@@ -8,7 +8,7 @@
 export const retry429 = (
   fetchFunc: () => ReturnType<typeof fetch>,
   retryCount: number,
-  addDelay: number = 0,
+  addDelay = 0,
 ): ReturnType<typeof fetch> => {
   const retryFetch = async (count: number): ReturnType<typeof fetch> => {
     const res = await fetchFunc()

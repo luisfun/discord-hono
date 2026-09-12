@@ -11,7 +11,7 @@ const hex2bin: (hex: string) => Uint8Array<ArrayBuffer> =
   ((hex: string): Uint8Array<ArrayBuffer> => {
     const len = hex.length
     const bin = new Uint8Array(len >> 1)
-    for (let i = 0; i < len; i += 2) bin[i >> 1] = parseInt(hex.slice(i, i + 2), 16)
+    for (let i = 0; i < len; i += 2) bin[i >> 1] = Number.parseInt(hex.slice(i, i + 2), 16)
     return bin
   })
 
@@ -21,6 +21,7 @@ export const verify = async (
   timestamp: string | null,
   publicKey: string,
 ): Promise<boolean> => {
+  // biome-ignore lint/complexity/useSimplifiedLogicExpression: not complexity logic
   if (!body || !signature || !timestamp) return false
   const subtle: SubtleCrypto | undefined = globalThis.crypto?.subtle
   if (!subtle) throw newError('verify', 'crypto')

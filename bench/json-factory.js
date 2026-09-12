@@ -1,8 +1,12 @@
 // @ts-check
 
 // biome-ignore-all lint/complexity/useLiteralKeys: Not sure if custom_id exists
-
 // biome-ignore-all lint/correctness/noUnresolvedImports: Ignore for local processing
+// biome-ignore-all lint/suspicious/noVar: temporary
+// biome-ignore-all lint/suspicious/noShadow: temporary
+// biome-ignore-all lint/complexity/noForEach: temporary
+// biome-ignore-all lint/style/noIncrementDecrement: temporary
+
 import { CUSTOM_ID_SEPARATOR } from 'discord-hono'
 import { bench, boxplot, run, summary } from 'mitata'
 
@@ -117,7 +121,7 @@ const forCount = [10, 10]
 
 const benchmarks = () => {
   for (const { ver, func } of benchItems) {
-    bench(ver, async () => {
+    bench(ver, () => {
       for (let i = 0; i < forCount[0]; i++) {
         const result = func({ type: i, custom_id: `test${i}` }, keys)
         for (let j = 0; j < forCount[1]; j++) {
