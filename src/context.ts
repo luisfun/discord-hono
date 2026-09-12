@@ -21,7 +21,6 @@ import { $webhooks$_$_$messages$original, createRest } from './rest'
 import type {
   AutocompleteContext,
   CommandContext,
-  Common,
   ComponentContext,
   ContextRef,
   CronContext,
@@ -245,34 +244,6 @@ export class Context<
             type: 5,
             data: this.#flags,
           } satisfies APIInteractionResponseDeferredChannelMessageWithSource),
-    )
-  }
-  /**
-   * @beta
-   */
-  async resAutoDefer(
-    handler: (c: This) => Promise<{
-      data: Simplify<
-        CustomCallbackData<Common<APIInteractionResponseCallbackData, RESTPatchAPIInteractionOriginalResponseJSONBody>>
-      >
-      file?: FileData
-    }>,
-    options?: { deferMs?: number },
-  ): Promise<Response> {
-    this.#throwIfNotAllowType([2, 3, 5])
-    const deferMs = options?.deferMs ?? 2000
-    let timerId: ReturnType<typeof setTimeout> | undefined
-    const handlerPromise = handler(this as unknown as This)
-    const timeoutPromise = new Promise<void>(resolve => (timerId = setTimeout(resolve, deferMs)))
-    const result = await Promise.race([handlerPromise.then(result => ({ ...result })), timeoutPromise.then(() => ({}))])
-    if ('data' in result) {
-      clearTimeout(timerId)
-      return this.res(result.data as APIInteractionResponseCallbackData, result.file)
-    }
-    return this.resDefer(() =>
-      handlerPromise.then(result =>
-        this.followup(result.data as RESTPatchAPIInteractionOriginalResponseJSONBody, result.file),
-      ),
     )
   }
 
