@@ -94,8 +94,8 @@ describe('json-builder', () => {
 
     // @ts-expect-error Testing invalid key access
     // biome-ignore lint/suspicious/noProto: Testing invalid key access
-    expect(() => builder.__proto__).toThrow("Invalid key: __proto__")
-    expect(() => builder.constructor).toThrow("Invalid key: constructor")
+    expect(() => builder.__proto__).toThrow('Invalid key: __proto__')
+    expect(() => builder.constructor).toThrow('Invalid key: constructor')
   })
 
   it('should allow Object.prototype members through the default branch', () => {

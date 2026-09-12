@@ -25,11 +25,11 @@ export const fire = (app: FetchModule, options?: FireOptions): void => {
   // @ts-expect-error
   addEventListener('fetch', (event: FetchEventLike) => {
     const env = typeof options?.env === 'function' ? options.env(event) : options?.env
-    const ctx = !options?.executionCtx
-      ? event
-      : typeof options?.executionCtx === 'function'
+    const ctx = options?.executionCtx
+      ? typeof options?.executionCtx === 'function'
         ? options.executionCtx(event)
         : options?.executionCtx
+      : event
     event.respondWith(app.fetch(event.request, env, ctx))
   })
 }

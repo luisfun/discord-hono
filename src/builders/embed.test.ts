@@ -43,8 +43,8 @@ describe('a-embed builders', () => {
   })
 
   it('should set color', () => {
-    const embed = makeEmbed().color(0xff0000)
-    expect(embed.toJSON()).toEqual({ color: 0xff0000 })
+    const embed = makeEmbed().color(0xff_00_00)
+    expect(embed.toJSON()).toEqual({ color: 0xff_00_00 })
   })
 
   it('should set footer', () => {
@@ -90,7 +90,7 @@ describe('a-embed builders', () => {
     const embed = makeEmbed()
       .title('Test Title')
       .description('Test Description')
-      .color(0xff0000)
+      .color(0xff_00_00)
       .footer(makeEmbedFooter('Footer Text'))
       .image(makeEmbedImage('https://example.com/image.png'))
       .author(makeEmbedAuthor('Author Name'))
@@ -99,7 +99,7 @@ describe('a-embed builders', () => {
     expect(embed.toJSON()).toEqual({
       title: 'Test Title',
       description: 'Test Description',
-      color: 0xff0000,
+      color: 0xff_00_00,
       footer: { text: 'Footer Text' },
       image: { url: 'https://example.com/image.png' },
       author: { name: 'Author Name' },

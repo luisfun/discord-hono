@@ -328,7 +328,7 @@ export class Context<
    * return c.update().res('Edit the original message')
    * ```
    */
-  update(bool: boolean = true): This {
+  update(bool = true): This {
     this.#throwIfNotAllowType([3, 5])
     this.#update = bool
     return this as unknown as This

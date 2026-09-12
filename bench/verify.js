@@ -10,7 +10,7 @@ import pkg from '../package.json' with { type: 'json' }
 const hex2bin = hex => {
   const len = hex.length
   const bin = new Uint8Array(len >> 1)
-  for (let i = 0; i < len; i += 2) bin[i >> 1] = parseInt(hex.slice(i, i + 2), 16)
+  for (let i = 0; i < len; i += 2) bin[i >> 1] = Number.parseInt(hex.slice(i, i + 2), 16)
   return bin
 }
 
@@ -18,7 +18,7 @@ const hex2bin = hex => {
  * @param {string} hex
  * @returns {Uint8Array}
  */
-const hex2binNext = hex => new Uint8Array((hex.match(/.{1,2}/g) ?? []).map(byte => parseInt(byte, 16)))
+const hex2binNext = hex => new Uint8Array((hex.match(/.{1,2}/g) ?? []).map(byte => Number.parseInt(byte, 16)))
 // const hex2bin = Uint8Array.fromHex // ES2025
 
 const benchItems = [
