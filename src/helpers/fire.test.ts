@@ -27,7 +27,7 @@ describe('fire', () => {
     expect(typeof capturedHandler).toBe('function')
   })
 
-  it('calls app.fetch and uses event.respondWith', async () => {
+  it('calls app.fetch and uses event.respondWith', () => {
     let handler: any
     globalThis.addEventListener = (_type: string, h: unknown): void => {
       handler = h
@@ -50,7 +50,7 @@ describe('fire', () => {
     expect(respondWith).toHaveBeenCalledWith(fetchPromise)
   })
 
-  it('DiscordHono Type Check', async () => {
+  it('DiscordHono Type Check', () => {
     const app = new DiscordHono()
     let handler: any
     globalThis.addEventListener = (_type: string, h: unknown): void => {
@@ -68,7 +68,7 @@ describe('fire', () => {
     expect(respondWith).toHaveBeenCalled()
   })
 
-  it('passes env option object to app.fetch', async () => {
+  it('passes env option object to app.fetch', () => {
     let handler: any
     globalThis.addEventListener = (_type: string, h: unknown): void => {
       handler = h
@@ -91,7 +91,7 @@ describe('fire', () => {
     expect(respondWith).toHaveBeenCalledWith(fetchPromise)
   })
 
-  it('calls env function with event and passes result', async () => {
+  it('calls env function with event and passes result', () => {
     let handler: any
     globalThis.addEventListener = (_type: string, h: unknown): void => {
       handler = h
@@ -114,7 +114,7 @@ describe('fire', () => {
     expect(respondWith).toHaveBeenCalledWith(fetchPromise)
   })
 
-  it('passes executionCtx object to app.fetch as ctx', async () => {
+  it('passes executionCtx object to app.fetch as ctx', () => {
     let handler: any
     globalThis.addEventListener = (_type: string, h: unknown): void => {
       handler = h

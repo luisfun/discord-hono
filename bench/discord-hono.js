@@ -1,6 +1,8 @@
 // @ts-check
 
 // biome-ignore-all lint/correctness/noUnresolvedImports: Ignore for local processing
+// biome-ignore-all lint/suspicious/noShadow: temporary
+
 import { DiscordHono as DiscordHonoOld } from 'discord-hono'
 import { bench, boxplot, compact, run, summary } from 'mitata'
 import {

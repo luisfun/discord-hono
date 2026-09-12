@@ -28,7 +28,7 @@ const benchItems = [
 
 const benchmarks = () => {
   for (const { ver, func } of benchItems) {
-    bench(`hex2bin: ${ver}`, async () => {
+    bench(`hex2bin: ${ver}`, () => {
       func('1234123412341234123412341234123412341234123412341234123412341234') // 64 hex chars
     }).gc(false) // Feels more stable than the default (once) when set to false
   }

@@ -21,6 +21,7 @@ export const verify = async (
   timestamp: string | null,
   publicKey: string,
 ): Promise<boolean> => {
+  // biome-ignore lint/complexity/useSimplifiedLogicExpression: not complexity logic
   if (!body || !signature || !timestamp) return false
   const subtle: SubtleCrypto | undefined = globalThis.crypto?.subtle
   if (!subtle) throw newError('verify', 'crypto')

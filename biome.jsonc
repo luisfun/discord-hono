@@ -14,16 +14,16 @@
   },
   "linter": {
     "domains": {
-      "project": "all",
-      "test": "all",
-      "types": "all"
+      "qwik": "none"
     },
     "rules": {
+      "preset": "all",
       "correctness": {
         "useImportExtensions": "off" // For simple coding purposes
       },
       "complexity": {
-        "noBannedTypes": "off" // Allow banned types
+        "noBannedTypes": "off",
+        "noExcessiveLinesPerFunction": "off" // Allow test functions with many lines
       },
       "nursery": {
         "useExplicitType": "warn" // Encourage explicit type annotation
@@ -32,7 +32,19 @@
         "noBarrelFile": "off", // For simple coding purposes
         "noReExportAll": "off" // For consistency in file separation
       },
+      "style": {
+        "noExcessiveLinesPerFile": "off", // For test files
+        "noMagicNumbers": "off", // For lightweight coding
+        "noNestedTernary": "off",
+        "noTernary": "off",
+        "useBlockStatements": "off", // Allow single-line statements without block braces
+        "useConsistentMethodSignatures": "off", // Temporary
+        "useDefaultSwitchClause": "off",
+        "useExportsLast": "off", // Allow exports to appear anywhere
+        "useNamingConvention": "off"
+      },
       "suspicious": {
+        "noBitwiseOperators": "off", // Use bitwise operations for high-speed processing
         "noConsole": {
           "level": "on",
           "options": {

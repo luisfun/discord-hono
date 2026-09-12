@@ -87,6 +87,7 @@ export const createJsonBuilder = <const T extends object, M extends object, E ex
   const proxy = new Proxy(
     {},
     {
+      // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Allow complex cognitive logic in the proxy get handler
       get(target: {}, prop: string | symbol): unknown {
         switch (prop) {
           case 'toJSON': {
