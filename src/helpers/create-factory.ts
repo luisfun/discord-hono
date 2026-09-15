@@ -151,6 +151,7 @@ interface Factory<E extends Env> {
     handler: CronHandler<E & { Variables?: V }>,
   ): { cron: string; handler: CronHandler<E> }
   getCommands(handlers: Handler<E>[]): JsonSerializable<RESTPostAPIApplicationCommandsJSONBody>[]
+  // wip: commandを排除しないとエラーに気づきにくい可能性がある
   getSubCommands<T extends Handler<E>>(handlers: readonly T[]): ExtractSubCommand<T>[]
   subLoader(
     handlers: Handler<E>[],
