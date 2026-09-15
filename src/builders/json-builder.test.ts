@@ -48,6 +48,28 @@ describe('json-builder', () => {
     })
   })
 
+  it('should allow custom_id values up to 100 characters', () => {
+    const customId = 'a'.repeat(100)
+    const builder = createJsonBuilder<
+      { custom_id: string },
+      { custom_id: string; custom_value?: string; label: string }
+    >({ custom_id: customId })
+
+    expect(builder.label('Click Me').toJSON()).toEqual({
+      custom_id: customId,
+      label: 'Click Me',
+    })
+  })
+
+  it('should throw when custom_id exceeds 100 characters due to custom_value', () => {
+    const builder = createJsonBuilder<
+      { custom_id: string },
+      { custom_id: string; custom_value?: string; label: string }
+    >({ custom_id: 'a'.repeat(99) })
+
+    expect(() => builder.custom_value('b').label('Click Me').toJSON()).toThrow('custom_id exceeded 100')
+  })
+
   it('should delete a property from the builder state', () => {
     const builder = createJsonBuilder<{ id: string; active: boolean }, { id: string; active?: boolean }>({
       id: '123',

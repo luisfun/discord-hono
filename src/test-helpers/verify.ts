@@ -1,11 +1,8 @@
-import { verify } from '../verify'
+import type { verify } from '../verify'
 
 /**
  * verify that always returns `true`.
  * @param rest
  * @returns
  */
-export const testVerifyTrue = async (...rest: Parameters<typeof verify>): Promise<true> => {
-  await verify(...rest)
-  return true
-}
+export const testVerifyTrue = async (..._rest: Parameters<typeof verify>): Promise<true> => true
