@@ -61,4 +61,14 @@ describe('responseDebug', () => {
       message: '50035: Invalid Form Body\nembeds.0.title: Required',
     })
   })
+
+  it('returns a parse error when the response body is not JSON', async () => {
+    const response = new Response('not json', { status: 500 })
+
+    await expect(responseDebug(response)).resolves.toEqual({
+      json: undefined,
+      text: 'JSON parse error',
+      message: 'JSON parse error',
+    })
+  })
 })
