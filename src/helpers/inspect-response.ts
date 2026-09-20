@@ -59,7 +59,7 @@ const summarize = (value: unknown, depth: number): unknown => {
 
 /**
  * @beta
- * @param response The Response object to debug.
+ * @param response The Response object to inspect.
  * @param options `{ depth?: number, errorDepth?: number, codeBlock?: boolean }`
  * @returns `Promise<{ json: any | undefined, text: string, message: string }>`
  */
