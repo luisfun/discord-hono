@@ -26,7 +26,7 @@ const collectResponseErrors = (errors: Record<string, unknown>, path: string): s
     return []
   })
 
-export const formatResponseError = (value: unknown): string => {
+const formatResponseError = (value: unknown): string => {
   if (typeof value !== 'object' || value === null) return String(value)
 
   const error = value as {
@@ -52,6 +52,12 @@ const summarize = (value: unknown, depth: number): unknown => {
   )
 }
 
+/**
+ * @beta
+ * @param response The Response object to debug.
+ * @param options `{ depth?: number, errorDepth?: number, codeBlock?: boolean }`
+ * @returns `{ json: any | undefined, text: string, message: string }`
+ */
 export const responseDebug = async <R extends Response>(
   response: R,
   options?: DebugOptions,
