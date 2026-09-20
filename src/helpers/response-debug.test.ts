@@ -70,6 +70,14 @@ describe('responseDebug', () => {
     })
   })
 
+  it('preserves empty arrays', async () => {
+    const response = Response.json({ items: [] })
+
+    await expect(responseDebug(response)).resolves.toMatchObject({
+      text: '{\n  "items": []\n}',
+    })
+  })
+
   it('summarizes objects when the depth limit is reached', async () => {
     const response = Response.json({ details: { first: 1, second: 2 } })
 
