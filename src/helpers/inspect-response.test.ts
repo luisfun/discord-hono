@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { inspectResponse } from './response-debug'
+import { inspectResponse } from './inspect-response'
 
 describe('inspectResponse', () => {
   const createErrorResponse = (body: object): Response =>
