@@ -16,6 +16,8 @@ describe('register function', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, 'info').mockImplementation(() => undefined)
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
   })
 
   afterEach(() => {
@@ -51,6 +53,15 @@ describe('register function', () => {
 
     expect(mockRest).toHaveBeenCalledWith('PUT', $applications$_$commands, [mockApplicationId], expect.any(Array))
     expect(result).toContain('✅ Success')
+  })
+
+  it('should not call Discord API directly', async () => {
+    const mockFetch = vi.spyOn(globalThis, 'fetch')
+    mockRest.mockResolvedValue({ ok: true, status: 200, statusText: 'OK' })
+
+    await register(mockCommands, mockApplicationId, mockToken)
+
+    expect(mockFetch).not.toHaveBeenCalled()
   })
 
   it('should handle error responses', async () => {
