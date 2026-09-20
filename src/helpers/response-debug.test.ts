@@ -62,6 +62,16 @@ describe('responseDebug', () => {
     })
   })
 
+  it('formats primitive error responses as a message', async () => {
+    const response = new Response(JSON.stringify('Bad Request'), { status: 400 })
+
+    await expect(responseDebug(response)).resolves.toEqual({
+      json: 'Bad Request',
+      text: '"Bad Request"',
+      message: 'Bad Request',
+    })
+  })
+
   it('summarizes arrays when the depth limit is reached', async () => {
     const response = Response.json({ items: ['first', 'second'] })
 
