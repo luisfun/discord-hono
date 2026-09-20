@@ -62,6 +62,22 @@ describe('responseDebug', () => {
     })
   })
 
+  it('summarizes arrays when the depth limit is reached', async () => {
+    const response = Response.json({ items: ['first', 'second'] })
+
+    await expect(responseDebug(response)).resolves.toMatchObject({
+      text: '{\n  "items": "[...+2]"\n}',
+    })
+  })
+
+  it('summarizes objects when the depth limit is reached', async () => {
+    const response = Response.json({ details: { first: 1, second: 2 } })
+
+    await expect(responseDebug(response)).resolves.toMatchObject({
+      text: '{\n  "details": "{...+2}"\n}',
+    })
+  })
+
   it('returns a parse error when the response body is not JSON', async () => {
     const response = new Response('not json', { status: 500 })
 
