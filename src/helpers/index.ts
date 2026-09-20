@@ -1,5 +1,6 @@
 export * from './create-factory'
 export * from './fire'
+export * from './inspect-response'
 export * from './register'
 export * from './retry429'
 export * from './webhook'
