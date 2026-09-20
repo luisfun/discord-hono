@@ -1,11 +1,13 @@
+import type { Simplify, TypedResponse } from '../types'
+
 interface DebugOptions {
   depth?: number
   errorDepth?: number
   codeBlock?: boolean
 }
 
-interface DebugResult<R extends Response> {
-  json: ReturnType<R['json']> | undefined
+interface DebugResult<R extends Response | TypedResponse<any>> {
+  json: (ReturnType<R['json']> extends Promise<infer U> ? U : ReturnType<R['json']>) | undefined
   text: string
   message: string
 }
@@ -41,8 +43,11 @@ const formatResponseError = (value: unknown): string => {
 }
 
 const summarize = (value: unknown, depth: number): unknown => {
-  if (typeof value !== 'object' || value === null) return value
-  if (depth <= 0) return Array.isArray(value) ? '[...]' : '{...}'
+  if (typeof value !== 'object' || value === null || Object.keys(value).length === 0) return value
+  if (depth <= 0) {
+    const len = Object.keys(value).length
+    return Array.isArray(value) ? `[...+${len}]` : `{...+${len}}`
+  }
   if (Array.isArray(value)) return value.map(item => summarize(item, depth - 1))
   return Object.fromEntries(
     Object.entries(value).map(([key, child]) => [
@@ -56,12 +61,12 @@ const summarize = (value: unknown, depth: number): unknown => {
  * @beta
  * @param response The Response object to debug.
  * @param options `{ depth?: number, errorDepth?: number, codeBlock?: boolean }`
- * @returns `{ json: any | undefined, text: string, message: string }`
+ * @returns `Promise<{ json: any | undefined, text: string, message: string }>`
  */
-export const responseDebug = async <R extends Response>(
+export const responseDebug = async <R extends Response | TypedResponse<any>>(
   response: R,
   options?: DebugOptions,
-): Promise<DebugResult<R>> => {
+): Promise<Simplify<DebugResult<R>>> => {
   const res = response.clone()
   try {
     const json = await res.json()
