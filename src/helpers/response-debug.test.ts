@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { responseDebug } from './response-debug'
+import { inspectResponse } from './response-debug'
 
-describe('responseDebug', () => {
+describe('inspectResponse', () => {
   const createErrorResponse = (body: object): Response =>
     new Response(JSON.stringify(body), {
       status: 400,
@@ -24,7 +24,7 @@ describe('responseDebug', () => {
       },
     })
 
-    await expect(responseDebug(response)).resolves.toMatchObject({
+    await expect(inspectResponse(response)).resolves.toMatchObject({
       json: {
         message: 'Invalid Form Body',
         code: 50_035,
@@ -51,7 +51,7 @@ describe('responseDebug', () => {
       errors: { embeds: { '0': { title: { _errors: [{ message: 'Required' }] } } } },
     })
 
-    await expect(responseDebug(response)).resolves.toMatchObject({
+    await expect(inspectResponse(response)).resolves.toMatchObject({
       json: {
         code: 50_035,
         message: 'Invalid Form Body',
@@ -65,7 +65,7 @@ describe('responseDebug', () => {
   it('formats primitive error responses as a message', async () => {
     const response = new Response(JSON.stringify('Bad Request'), { status: 400 })
 
-    await expect(responseDebug(response)).resolves.toEqual({
+    await expect(inspectResponse(response)).resolves.toEqual({
       json: 'Bad Request',
       text: '"Bad Request"',
       message: 'Bad Request',
@@ -75,7 +75,7 @@ describe('responseDebug', () => {
   it('summarizes arrays when the depth limit is reached', async () => {
     const response = Response.json({ items: ['first', 'second'] })
 
-    await expect(responseDebug(response)).resolves.toMatchObject({
+    await expect(inspectResponse(response)).resolves.toMatchObject({
       text: '{\n  "items": "[...+2]"\n}',
     })
   })
@@ -83,7 +83,7 @@ describe('responseDebug', () => {
   it('summarizes objects when the depth limit is reached', async () => {
     const response = Response.json({ details: { first: 1, second: 2 } })
 
-    await expect(responseDebug(response)).resolves.toMatchObject({
+    await expect(inspectResponse(response)).resolves.toMatchObject({
       text: '{\n  "details": "{...+2}"\n}',
     })
   })
@@ -91,7 +91,7 @@ describe('responseDebug', () => {
   it('returns a parse error when the response body is not JSON', async () => {
     const response = new Response('not json', { status: 500 })
 
-    await expect(responseDebug(response)).resolves.toEqual({
+    await expect(inspectResponse(response)).resolves.toEqual({
       json: undefined,
       text: 'JSON parse error',
       message: 'JSON parse error',

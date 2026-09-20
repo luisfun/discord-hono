@@ -1,12 +1,12 @@
 import type { Simplify, TypedResponse } from '../types'
 
-interface DebugOptions {
+interface InspectOptions {
   depth?: number
   errorDepth?: number
   codeBlock?: boolean
 }
 
-interface DebugResult<R extends Response | TypedResponse<any>> {
+interface InspectResult<R extends Response | TypedResponse<any>> {
   json: (ReturnType<R['json']> extends Promise<infer U> ? U : ReturnType<R['json']>) | undefined
   text: string
   message: string
@@ -63,10 +63,10 @@ const summarize = (value: unknown, depth: number): unknown => {
  * @param options `{ depth?: number, errorDepth?: number, codeBlock?: boolean }`
  * @returns `Promise<{ json: any | undefined, text: string, message: string }>`
  */
-export const responseDebug = async <R extends Response | TypedResponse<any>>(
+export const inspectResponse = async <R extends Response | TypedResponse<any>>(
   response: R,
-  options?: DebugOptions,
-): Promise<Simplify<DebugResult<R>>> => {
+  options?: InspectOptions,
+): Promise<Simplify<InspectResult<R>>> => {
   const res = response.clone()
   try {
     const json = await res.json()
