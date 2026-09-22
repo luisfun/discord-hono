@@ -17,8 +17,8 @@ Thank you for [Yusuke Wada](https://github.com/yusukebe) and Hono contributors!
 
 ```shell
 npm i discord-hono
-npm i -D discord-api-types # When using TypeScript
-# npm i -D @types/node # As needed
+npm i -D discord-api-types
+npm i -D tsx @types/node # Node/TS environment
 ```
 
 ## Example Code

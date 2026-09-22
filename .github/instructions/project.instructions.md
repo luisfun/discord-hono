@@ -2,7 +2,7 @@
 applyTo: '**'
 ---
 ## Project Overview
-A library for building Discord bots on Cloudflare Workers.
+Discord bot framework built for the Edge.
 ### Features
 - **Intuitive API:** Influenced by Hono, offering a familiar and easy-to-use interface
 - **Lightweight:** Zero runtime dependencies, optimized for performance
