@@ -89,9 +89,4 @@ export default defineConfig({
       reporter: ['html', 'json'],
     },
   },
-  pack: {
-    format: ['esm'],
-    dts: true,
-    clean: true,
-  },
 })
