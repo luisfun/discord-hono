@@ -37,7 +37,7 @@ import type {
   Simplify,
   TypedResponse,
 } from './types'
-import { formData, isArray, isProto, type MessageFlag, messageFlags, newError, prepareData, toJSON } from './utils'
+import { type MessageFlag, formData, isArray, isProto, messageFlags, newError, prepareData, toJSON } from './utils'
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 

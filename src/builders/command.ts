@@ -18,7 +18,7 @@ import type {
   RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody,
 } from 'discord-api-types/v10'
 
-import { createJsonBuilder, type JsonBuilderOptions } from './json-builder'
+import { type JsonBuilderOptions, createJsonBuilder } from './json-builder'
 
 // type fix https://docs.discord.com/developers/interactions/application-commands#create-global-application-command
 

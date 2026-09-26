@@ -32,8 +32,8 @@ import type {
 } from 'discord-api-types/v10'
 
 import type { JsonSerializable, NoSemicolon } from '../types'
-import { isArray, isString, type ToJSON, toJSON } from '../utils'
-import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions } from './json-builder'
+import { type ToJSON, isArray, isString, toJSON } from '../utils'
+import { type AddCustomValue, type JsonBuilderOptions, createJsonBuilder } from './json-builder'
 
 type WebUrl = `${'http' | 'https'}://${string}`
 type AttachmentUrl = `attachment://${string}`

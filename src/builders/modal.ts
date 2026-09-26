@@ -5,7 +5,7 @@ import type {
 
 import type { JsonSerializable, NoSemicolon } from '../types'
 import { type ToJSON, toJSON } from '../utils'
-import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions } from './json-builder'
+import { type AddCustomValue, type JsonBuilderOptions, createJsonBuilder } from './json-builder'
 
 export const makeModal = <
   I extends string,

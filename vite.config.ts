@@ -40,7 +40,8 @@ export default defineConfig({
       'no-magic-numbers': 'off',
       'no-nested-ternary': 'off',
       'no-ternary': 'off',
-      'sort-keys': 'off', // 広すぎる
+      'sort-imports': 'off', // Delegated to fmt
+      'sort-keys': 'off', // Too broad
       'typescript/consistent-indexed-object-style': 'off',
       'typescript/method-signature-style': ['warn', 'method'],
       'typescript/no-empty-interface': 'off',
@@ -48,8 +49,6 @@ export default defineConfig({
       'unicorn/no-nested-ternary': 'off',
       'unicorn/no-null': 'off',
       'unicorn/switch-case-braces': ['warn', 'avoid'],
-      //
-      'sort-imports': 'off', // 一旦
     },
     overrides: [
       {

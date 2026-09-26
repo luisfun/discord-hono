@@ -5,6 +5,7 @@ import type {
   APIMessageComponentInteraction,
   APIModalSubmitInteraction,
 } from 'discord-api-types/v10'
+// oxlint-disable-next-line no-duplicate-imports : escape typetypetype
 import { Locale } from 'discord-api-types/v10'
 import { describe, expect, it, vi } from 'vitest'
 
