@@ -17,7 +17,7 @@ export default defineConfig({
       pedantic: 'warn',
       perf: 'error',
       style: 'warn',
-      restriction: 'off',
+      restriction: 'warn',
       nursery: 'off',
     },
     rules: {
@@ -49,12 +49,27 @@ export default defineConfig({
       'unicorn/no-nested-ternary': 'off',
       'unicorn/no-null': 'off',
       'unicorn/switch-case-braces': ['warn', 'avoid'],
+      // restriction
+      'default-case': 'off', // 短いコーディングのため
+      'no-bitwise': 'off',
+      'no-console': 'off', //['warn', { allow: ["assert", "error", "info", "warn"] }],
+      'no-plusplus': 'off',
+      'no-undefined': 'off',
+      'oxc/no-async-await': 'off', // ???
+      'oxc/no-optional-chaining': 'off',
+      'oxc/no-rest-spread-properties': 'off',
+      'typescript/explicit-function-return-type': 'off', // temporary
+      'typescript/explicit-member-accessibility': 'off',
+      'typescript/explicit-module-boundary-types': 'off', // temporary
+      'typescript/no-empty-object-type': 'off',
+      'typescript/no-explicit-any': 'off', // temporary
     },
     overrides: [
       {
         files: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
         rules: {
           'init-declarations': 'off',
+          'no-proto': 'off',
           'typescript/ban-ts-comment': 'off',
           'unicorn/max-nested-calls': 'off',
         },

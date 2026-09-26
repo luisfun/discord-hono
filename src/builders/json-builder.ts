@@ -101,6 +101,7 @@ export const createJsonBuilder = <const T extends object, M extends object, E ex
           }
           case 'delete':
             return (key: PropertyKey) => {
+              // oxlint-disable-next-line typescript/no-dynamic-delete
               delete data[key]
               return proxy
             }

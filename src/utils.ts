@@ -2,6 +2,13 @@ import type { CustomCallbackData, FileData } from './types'
 
 export const CUSTOM_ID_SEPARATOR = ';'
 
+export const isString = (value: unknown): value is string => typeof value === 'string' // || value instanceof String
+export const isArray = (value: unknown): value is unknown[] => Array.isArray(value)
+// export const toArray = <T>(value: T | T[]) => (isArray(value) ? value : [value])
+
+export const isProto = (value: unknown): boolean =>
+  value === '__proto__' || value === 'constructor' || value === 'prototype'
+
 const flagData = {
   SUPPRESS_EMBEDS: 2,
   EPHEMERAL: 6,
@@ -39,6 +46,7 @@ export const formData = (data?: object, file?: FileData): FormData => {
   const body = new FormData()
   if (data && Object.keys(data).length > 0) body.append('payload_json', JSON.stringify(data))
   if (file)
+    // oxlint-disable-next-line unicorn/no-array-for-each
     (isArray(file) ? file : [file]).forEach((f, i) => {
       body.append(`files[${i}]`, f.blob, f.name)
     })
@@ -53,14 +61,7 @@ export const newError = (locate: string, text: string): Error => new Error(`disc
 export const queryStringify = (query: Record<string, unknown> | undefined): '' | `?${string}` => {
   if (!query) return ''
   const queryMap: Record<string, string> = {}
-  // oxlint-disable-next-line eqeqeq
+  // oxlint-disable-next-line eqeqeq, no-eq-null
   for (const [key, value] of Object.entries(query)) if (value != null) queryMap[key] = String(value)
   return `?${new URLSearchParams(queryMap).toString()}`
 }
-
-export const isString = (value: unknown): value is string => typeof value === 'string' // || value instanceof String
-export const isArray = (value: unknown): value is unknown[] => Array.isArray(value)
-// export const toArray = <T>(value: T | T[]) => (isArray(value) ? value : [value])
-
-export const isProto = (value: unknown): boolean =>
-  value === '__proto__' || value === 'constructor' || value === 'prototype'
