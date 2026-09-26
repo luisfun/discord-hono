@@ -36,7 +36,7 @@ export default defineConfig({
     },
   },
   pack: {
-    format: ['esm', 'cjs'],
+    format: ['esm'],
     dts: true,
     clean: true,
   },

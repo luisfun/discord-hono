@@ -46,6 +46,7 @@ jobs:
 
       - name: Test
         run: |
+          npm run check
           npm run test
           npm run build
 

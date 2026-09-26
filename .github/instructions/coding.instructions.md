@@ -15,5 +15,7 @@ applyTo: 'src/**, bench/**'
 
 ## Styling Guides
 
-- Formatter/Linter: Biome
-- npm scripts: `npm run fix`
+- Formatter/Linter: Vite+(Oxfmt/Oxlint)
+- npm scripts
+  - check: `npm run check`
+  - fix: `npm run fix`

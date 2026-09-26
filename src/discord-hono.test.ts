@@ -5,11 +5,12 @@ import { Context } from './context'
 import { DiscordHono } from './discord-hono'
 import { testVerifyTrue } from './test-helpers'
 
+const postRequest = (json: object): Request =>
+  new Request('https://example.com', { method: 'POST', body: JSON.stringify(json) })
+
 describe('DiscordHono', () => {
   const app = new DiscordHono()
   const env = { DISCORD_PUBLIC_KEY: 'test_public_key' }
-  const postRequest = (json: object): Request =>
-    new Request('https://example.com', { method: 'POST', body: JSON.stringify(json) })
 
   it('should register handlers', () => {
     const commandHandler = vi.fn()
