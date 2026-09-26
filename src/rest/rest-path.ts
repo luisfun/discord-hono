@@ -1,3 +1,5 @@
+// oxlint-disable no-underscore-dangle
+
 ////////// Duplication //////////
 
 export const $webhooks$_$_ = '/webhooks/{}/{}' as

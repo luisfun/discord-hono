@@ -7,7 +7,6 @@ export default defineConfig({
     singleQuote: true,
     arrowParens: 'avoid',
     sortImports: true,
-    ignorePatterns: ['src/rest/rest-types.ts'],
   },
   lint: {
     categories: {
@@ -72,12 +71,6 @@ export default defineConfig({
           'no-proto': 'off',
           'typescript/ban-ts-comment': 'off',
           'unicorn/max-nested-calls': 'off',
-        },
-      },
-      {
-        files: ['src/rest/rest-path.ts'],
-        rules: {
-          'no-underscore-dangle': 'off',
         },
       },
     ],
