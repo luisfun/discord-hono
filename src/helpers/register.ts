@@ -26,15 +26,14 @@ export const register = async (
 
   const rest = createRest(token)
   const json = commands.map(toJSON)
-  let res: Response
-  if (guild_id)
-    res = await rest(
-      'PUT',
-      $applications$_$guilds$_$commands,
-      [application_id, guild_id],
-      json as RESTPutAPIApplicationGuildCommandsJSONBody,
-    )
-  else res = await rest('PUT', $applications$_$commands, [application_id], json)
+  const res = guild_id
+    ? await rest(
+        'PUT',
+        $applications$_$guilds$_$commands,
+        [application_id, guild_id],
+        json as RESTPutAPIApplicationGuildCommandsJSONBody,
+      )
+    : await rest('PUT', $applications$_$commands, [application_id], json)
 
   let logText = ''
   if (res.ok) {
@@ -47,8 +46,8 @@ export const register = async (
       if (error) {
         logText += `\n\n${error}`
       }
-    } catch (e) {
-      logText += `\n\nError reading body from request:\n${e}`
+    } catch (error) {
+      logText += `\n\nError reading body from request:\n${error}`
     }
     logText += '\n===== ⚠️ Error ====='
     console.error(logText)

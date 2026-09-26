@@ -16,32 +16,53 @@ export default defineConfig({
       suspicious: 'error',
       pedantic: 'warn',
       perf: 'error',
-      style: 'off',
+      style: 'warn',
       restriction: 'off',
       nursery: 'off',
     },
     rules: {
+      // pedantic
       'max-depth': ['warn', { max: 5 }],
-      'max-lines': ['warn', { max: 1000 }],
-      'max-lines-per-function': ['warn', { max: 100 }],
+      'max-lines': 'off',
+      'max-lines-per-function': 'off',
       'no-inline-comments': 'off',
       'no-useless-undefined': 'off',
-      'require-unicode-regexp': 'off', // 要検討
+      'one-var': 'off',
+      'require-unicode-regexp': 'off', // temporary
       'typescript/ban-types': 'off',
       'unicorn/no-array-callback-reference': 'off',
+      // style
+      'capitalized-comments': 'off',
+      curly: ['off', 'multi-line', 'consistent'],
+      'id-length': 'off',
+      'max-params': ['warn', { max: 5 }],
+      'max-statements': 'off',
+      'no-magic-numbers': 'off',
+      'no-nested-ternary': 'off',
+      'no-ternary': 'off',
+      'sort-keys': 'off', // 広すぎる
+      'typescript/consistent-indexed-object-style': 'off',
+      'typescript/method-signature-style': ['warn', 'method'],
+      'typescript/no-empty-interface': 'off',
+      'typescript/unified-signatures': 'off',
+      'unicorn/no-nested-ternary': 'off',
+      'unicorn/no-null': 'off',
+      'unicorn/switch-case-braces': ['warn', 'avoid'],
+      //
+      'sort-imports': 'off', // 一旦
     },
     overrides: [
       {
         files: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
         rules: {
-          'max-lines-per-function': 'off',
+          'init-declarations': 'off',
           'typescript/ban-ts-comment': 'off',
+          'unicorn/max-nested-calls': 'off',
         },
       },
       {
-        files: ['src/rest/**/*.ts'],
+        files: ['src/**/rest-path.ts'],
         rules: {
-          'max-lines': 'off',
           'no-underscore-dangle': 'off',
         },
       },

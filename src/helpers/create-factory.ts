@@ -47,7 +47,7 @@ type SubCommandHandler<E extends Env> = CommandHandler<E, RESTPostAPIChatInputAp
 
 type ExtractSubCommand<T> = T extends { subCommand: infer U } ? U : T extends { subCommandGroup: infer U } ? U : never
 
-type Var = {}
+interface Var {}
 
 type UnionToIntersection<T> = (T extends unknown ? (value: T) => void : never) extends (value: infer I) => void
   ? I
@@ -70,7 +70,7 @@ type ExtractOptionVar<T> = T extends { name: infer N extends string }
   : {}
 
 type ExtractNestedOptionVars<T> = T extends { options?: infer O }
-  ? O extends ReadonlyArray<infer U>
+  ? O extends readonly (infer U)[]
     ? Simplify<UnionToIntersection<ExtractNestedOptionVars<U> | ExtractOptionVar<U>>>
     : {}
   : ExtractOptionVar<T>
@@ -81,7 +81,7 @@ type ExtractCommandVars<
     | APIApplicationCommandSubcommandOption
     | APIApplicationCommandSubcommandGroupOption,
 > = T extends { options?: infer O }
-  ? O extends ReadonlyArray<infer U>
+  ? O extends readonly (infer U)[]
     ? Simplify<UnionToIntersection<ExtractNestedOptionVars<U>>>
     : {}
   : {}

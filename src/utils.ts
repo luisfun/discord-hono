@@ -2,7 +2,6 @@ import type { CustomCallbackData, FileData } from './types'
 
 export const CUSTOM_ID_SEPARATOR = ';'
 
-// oxfmt-ignore
 const flagData = {
   SUPPRESS_EMBEDS: 2,
   EPHEMERAL: 6,

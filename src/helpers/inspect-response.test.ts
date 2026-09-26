@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { inspectResponse } from './inspect-response'
 
 const createErrorResponse = (body: object): Response =>
-  new Response(JSON.stringify(body), {
+  Response.json(body, {
     status: 400,
     headers: { 'content-type': 'application/json' },
   })
@@ -64,7 +64,7 @@ describe('inspectResponse', () => {
   })
 
   it('formats primitive error responses as a message', async () => {
-    const response = new Response(JSON.stringify('Bad Request'), { status: 400 })
+    const response = Response.json('Bad Request', { status: 400 })
 
     await expect(inspectResponse(response)).resolves.toEqual({
       json: 'Bad Request',

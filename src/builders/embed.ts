@@ -10,7 +10,6 @@ import type {
 
 import { createJsonBuilder, type JsonBuilderOptions } from './json-builder'
 
-// oxfmt-ignore
 export const embedType = {
   Rich: 'rich',
   Image: 'image',

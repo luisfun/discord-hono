@@ -41,7 +41,7 @@ import { formData, isArray, isProto, type MessageFlag, messageFlags, newError, p
 
 type ExecutionCtx = FetchEventLike | ExecutionContext | undefined
 
-type ContextVariableMap = {}
+interface ContextVariableMap {}
 type IsAny<T> = boolean extends (T extends never ? true : false) ? true : false
 
 type AutocompleteOption =
@@ -96,17 +96,21 @@ export class Context<
     switch (interaction.type) {
       case 2:
       case 4: {
+        // oxlint-disable-next-line init-declarations
         let options: APIApplicationCommandInteractionDataOption[] | undefined
         if ('options' in interaction.data) {
+          // oxlint-disable-next-line prefer-destructuring
           options = interaction.data.options
           if (options?.[0]?.type === 2) {
             this.#sub.group = options[0].name
             this.#sub.string = `${options[0].name} `
+            // oxlint-disable-next-line prefer-destructuring
             options = options[0].options
           }
           if (options?.[0]?.type === 1) {
             this.#sub.command = options[0].name
             this.#sub.string += options[0].name
+            // oxlint-disable-next-line prefer-destructuring
             options = options[0].options
           }
         }
@@ -125,7 +129,7 @@ export class Context<
           for (const row of modalRows) {
             if ('components' in row) for (const modal of row.components) this.set<any>(modal.custom_id, modal.value)
             if ('component' in row) {
-              const component = row.component
+              const { component } = row
               this.set<any>(component.custom_id, 'value' in component ? component.value : component.values)
             }
           }
