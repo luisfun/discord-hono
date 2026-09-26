@@ -8,7 +8,7 @@ export default defineConfig({
     arrowParens: 'avoid',
     sortImports: true,
     sortPackageJson: true,
-    ignorePatterns: ['src/**/rest-types.ts'],
+    ignorePatterns: ['src/rest/rest-types.ts'],
   },
   lint: {
     categories: {
@@ -76,7 +76,7 @@ export default defineConfig({
         },
       },
       {
-        files: ['src/**/rest-path.ts'],
+        files: ['src/rest/rest-path.ts'],
         rules: {
           'no-underscore-dangle': 'off',
         },
