@@ -8,7 +8,6 @@ import {
   makeSlashCommand,
   makeStringOption,
   testCommandRequestInit,
-  testVerifyTrue,
 } from '../dist/index.mjs'
 import pkg from '../package.json' with { type: 'json' }
 
@@ -25,7 +24,7 @@ const benchItems = [
 const benchmarks = () => {
   for (const { ver, DiscordHono } of benchItems) {
     bench(`DiscordHono: ${ver}`, async () => {
-      await new DiscordHono({ verify: testVerifyTrue })
+      await new DiscordHono({ verify: () => true })
         .command('test', c => c.res('ok'))
         .fetch(new Request('http://localhost', init), env)
     }).gc(false) // Feels more stable than the default (once) when set to false
