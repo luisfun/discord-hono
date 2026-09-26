@@ -7,7 +7,6 @@ export default defineConfig({
     singleQuote: true,
     arrowParens: 'avoid',
     sortImports: true,
-    sortPackageJson: true,
     ignorePatterns: ['src/rest/rest-types.ts'],
   },
   lint: {
