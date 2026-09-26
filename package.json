@@ -47,7 +47,6 @@
     "discord-hono": "0.22.1",
     "hono": "^4.13.9",
     "mitata": "^1.0.34",
-    "tsdown": "^0.23.0",
     "typescript": "^7.0.2",
     "vite-plus": "^1.0.0-rc.0"
   },
