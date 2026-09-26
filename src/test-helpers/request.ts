@@ -12,15 +12,14 @@ export const testCommandRequestBodyJson = <V extends {}>(
 ): APIApplicationCommandInteraction => {
   const cmd = toJSON(command)
   const supportOptionType = new Set([3, 4, 5, 10]) // STRING, INTEGER, BOOLEAN, NUMBER
-  const interaction: APIApplicationCommandInteraction = {
+  const interaction = {
     type: 2, // Command Number
-    // @ts-expect-error
     data: {
       name: cmd.name,
       id: '0'.repeat(32),
       type: cmd.type || 1,
     },
-  }
+  } as APIApplicationCommandInteraction
   // CHAT_INPUT with options
   if (interaction.data.type === 1 && cmd.options) {
     if (cmd.options.every(opt => supportOptionType.has(opt.type))) {
@@ -29,7 +28,7 @@ export const testCommandRequestBodyJson = <V extends {}>(
         for (const [name, value] of Object.entries(options)) {
           const type = cmd.options.find(opt => opt.name === name)?.type
           if (!type) throw newError('testCommandRequestBody', `option: "${name}" is not found`)
-          // @ts-expect-error
+          // @ts-expect-error: ts(2322): value is unknown
           interaction.data.options.push({ name, value, type })
         }
       }

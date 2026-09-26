@@ -176,7 +176,6 @@ type Handler<E extends Env> =
   | ReturnType<Factory<E>['cron']>
 
 export const createFactory = <E extends Env = Env>(): Factory<E> => ({
-  // biome-ignore-start lint/nursery/useExplicitType: omitted
   discord(init) {
     return new DiscordHonoExtends<E>(init)
   },
@@ -226,5 +225,4 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
       defaultHandler?.(c) ??
       Response.json({ error: 'Subcommand not found' }, { status: 400 })
   },
-  // biome-ignore-end lint/nursery/useExplicitType: omitted
 })

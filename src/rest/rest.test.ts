@@ -40,7 +40,6 @@ describe('Rest', () => {
       r => r.json(),
     )
 
-    // biome-ignore lint/security/noSecrets: not a real secret, just a mock token
     expect(mockFetch).toHaveBeenCalledWith('https://discord.com/api/v10/users/123/emoji/45678?query=param', {
       method: 'GET',
       headers: {

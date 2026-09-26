@@ -19,7 +19,6 @@ export const createRest =
    * @param file
    * @returns
    */
-  // biome-ignore lint/complexity/useMaxParams: It is necessary due to the structure of the path and variables
   <M extends RestMethod, P extends RestPath<M>>(
     method: M,
     path: P,
@@ -35,7 +34,7 @@ export const createRest =
     if (method.toUpperCase() !== 'GET')
       requestInit.body = file ? formData(prepareData<any>(data), file) : JSON.stringify(prepareData(data))
     return fetch(
-      `https://discord.com/api/${API_VER + path.replace(/\{[^}]*\}/g, () => vars.shift() ?? '') + queryStringify(variables.find(v => !isString(v)) as Record<string, unknown> | undefined)}`,
+      `https://discord.com/api/${API_VER + path.replaceAll(/\{[^}]*\}/g, () => vars.shift() ?? '') + queryStringify(variables.find(v => !isString(v)) as Record<string, unknown> | undefined)}`,
       requestInit,
     )
   }

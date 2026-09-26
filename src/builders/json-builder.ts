@@ -87,18 +87,15 @@ export const createJsonBuilder = <const T extends object, M extends object, E ex
   const proxy = new Proxy(
     {},
     {
-      // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Allow complex cognitive logic in the proxy handler
       get(target: {}, prop: string | symbol): unknown {
         switch (prop) {
           case 'toJSON': {
             const { custom_id, custom_value, ...rest } = data
             if (custom_id || custom_value) {
-              // biome-ignore-start lint/complexity/useLiteralKeys: Not sure if custom_id exists
               rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
-              // @ts-expect-error
-              if (rest.custom_id.length > 100)
+              // @ts-expect-error: ts(2571): rest.custom_id is unknown
+              if (rest['custom_id'].length > 100)
                 throw newError('jsonBuilder', `custom_id exceeded 100:\n${rest['custom_id']}`)
-              // biome-ignore-end lint/complexity/useLiteralKeys: Not sure if custom_id exists
             }
             return () => (options?.clone ? clone(rest) : rest)
           }

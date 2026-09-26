@@ -16,6 +16,7 @@ export const retry429 = (
     const retryAfter = res.headers.get('Retry-After')
     if (!retryAfter) return res
     const delay = Number(retryAfter) * 1e3 + addDelay
+    // oxlint-disable-next-line no-promise-executor-return : temporary
     await new Promise(resolve => setTimeout(resolve, Math.max(delay, 0)))
     return retryFetch(count - 1)
   }

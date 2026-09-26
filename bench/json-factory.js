@@ -1,12 +1,5 @@
 // @ts-check
 
-// biome-ignore-all lint/complexity/useLiteralKeys: Not sure if custom_id exists
-// biome-ignore-all lint/correctness/noUnresolvedImports: Ignore for local processing
-// biome-ignore-all lint/suspicious/noVar: temporary
-// biome-ignore-all lint/suspicious/noShadow: temporary
-// biome-ignore-all lint/complexity/noForEach: temporary
-// biome-ignore-all lint/style/noIncrementDecrement: temporary
-
 import { CUSTOM_ID_SEPARATOR } from 'discord-hono'
 import { bench, boxplot, run, summary } from 'mitata'
 

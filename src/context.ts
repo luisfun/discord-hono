@@ -74,8 +74,6 @@ export class Context<
   #throwIfNotAllowType(allowType: (APIInteraction | CronEvent)['type'][]): void {
     if (!allowType.includes(this.#interaction.type)) throw newError('c.***', 'Invalid method')
   }
-  // biome-ignore lint/complexity/useMaxParams: Allow multiple parameters
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Allow complex
   constructor(
     env: E['Bindings'],
     executionCtx: ExecutionCtx,

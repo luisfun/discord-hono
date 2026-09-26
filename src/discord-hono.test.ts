@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { Context } from './context'
 import { DiscordHono } from './discord-hono'
-import { testVerifyTrue } from './test-helpers'
 
 const postRequest = (json: object): Request =>
   new Request('https://example.com', { method: 'POST', body: JSON.stringify(json) })
@@ -35,7 +34,6 @@ describe('DiscordHono', () => {
     it('should return text for GET requests', async () => {
       const req = new Request('https://example.com', { method: 'GET' })
       const res = await app.fetch(req)
-      // biome-ignore lint/security/noSecrets: not a real secret, just a mock token
       expect(await res.text()).toBe('Operational🔥')
     })
 
@@ -111,7 +109,7 @@ describe('HandlerMap', () => {
 
 describe('hono integration', () => {
   it('should work with hono', async () => {
-    const discord = new DiscordHono({ discordEnv: () => ({ PUBLIC_KEY: 'test' }), verify: testVerifyTrue })
+    const discord = new DiscordHono({ discordEnv: () => ({ PUBLIC_KEY: 'test' }), verify: () => true })
     discord.command('ping', c => c.res('Pong!'))
     const hono = new Hono()
     hono.get('/', c => c.text('I like apples'))

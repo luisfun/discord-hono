@@ -5,8 +5,8 @@
 import { newError } from './utils'
 
 const hex2bin: (hex: string) => Uint8Array<ArrayBuffer> =
-  // biome-ignore lint/suspicious/noTsIgnore: To prevent errors in GitHub Actions (supporting the latest Node.js).
-  // @ts-ignore: ES2025
+  // oxlint-disable-next-line typescript/prefer-ts-expect-error, typescript/ban-ts-comment
+  // @ts-ignore: ts(2550): ES2025. To prevent errors in GitHub Actions (supporting the latest Node.js).
   Uint8Array.fromHex ??
   ((hex: string): Uint8Array<ArrayBuffer> => {
     const len = hex.length
@@ -21,7 +21,6 @@ export const verify = async (
   timestamp: string | null,
   publicKey: string,
 ): Promise<boolean> => {
-  // biome-ignore lint/complexity/useSimplifiedLogicExpression: not complexity logic
   if (!body || !signature || !timestamp) return false
   const subtle: SubtleCrypto | undefined = globalThis.crypto?.subtle
   if (!subtle) throw newError('verify', 'crypto')

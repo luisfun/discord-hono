@@ -1,5 +1,3 @@
-// biome-ignore-all lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
-
 import type {
   APIActionRowComponent,
   APIBaseAutoPopulatedSelectMenuComponent,

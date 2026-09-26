@@ -131,7 +131,6 @@ export class DiscordHono<E extends Env = Env> {
   fetch = async (request: Request, env?: E['Bindings'], executionCtx?: ExecutionContext): Promise<Response> => {
     switch (request.method) {
       case 'GET':
-        // biome-ignore lint/security/noSecrets: Health check endpoint does not expose secrets
         return new Response('Operational🔥')
       case 'POST': {
         const discord = this.#discord(env)
