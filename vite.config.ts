@@ -73,12 +73,6 @@ export default defineConfig({
           'unicorn/max-nested-calls': 'off',
         },
       },
-      {
-        files: ['src/rest/rest-path.ts'],
-        rules: {
-          'no-underscore-dangle': 'off',
-        },
-      },
     ],
   },
   test: {
