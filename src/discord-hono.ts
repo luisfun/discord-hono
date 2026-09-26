@@ -3,6 +3,7 @@ import type {
   APIInteractionResponsePong,
   RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10'
+
 import { Context } from './context'
 import type {
   AutocompleteHandler,

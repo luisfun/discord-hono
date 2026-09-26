@@ -8,7 +8,7 @@ export default defineConfig({
     arrowParens: 'avoid',
     sortImports: true,
     sortPackageJson: true,
-    ignorePatterns: ['src/**/rest-path.ts'],
+    ignorePatterns: ['src/**/rest-types.ts'],
   },
   lint: {
     categories: {
