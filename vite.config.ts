@@ -26,6 +26,12 @@ export default defineConfig({
       },
     ],
   },
+  test: {
+    coverage: {
+      include: ['src/**'],
+      reporter: ['html', 'json'],
+    },
+  },
   pack: {
     format: ['esm', 'cjs'],
     dts: true,
