@@ -1,11 +1,11 @@
 name: Test
 on:
   push:
-    branches: [ '**', '!main' ]
+    branches: ['**', '!main']
     paths:
       - 'src/**'
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read

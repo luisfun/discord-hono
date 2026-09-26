@@ -29,7 +29,7 @@ interface DiscordEnvBindings {
 }
 
 type HandlerNumber = 0 | 2 | 3 | 4 | 5
-// biome-ignore format: ternary operator
+// oxfmt-ignore
 type AnyHandler<E extends Env, N extends HandlerNumber> =
   N extends 0 ? CronHandler<E> :
   N extends 2 ? CommandHandler<E, any> :

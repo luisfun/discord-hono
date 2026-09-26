@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { inspectResponse } from './inspect-response'
 
 describe('inspectResponse', () => {

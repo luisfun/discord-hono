@@ -9,6 +9,7 @@ import type {
   APIEmbedProvider,
   APIEmbedVideo,
 } from 'discord-api-types/v10'
+
 import { createJsonBuilder, type JsonBuilderOptions } from './json-builder'
 
 // oxfmt-ignore

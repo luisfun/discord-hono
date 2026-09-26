@@ -1,4 +1,5 @@
 import type { APIApplicationCommandInteraction, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
+
 import type { JsonSerializable } from '../types'
 import { newError, toJSON } from '../utils'
 
@@ -10,7 +11,7 @@ export const testCommandRequestBodyJson = <V extends {}>(
   options?: V,
 ): APIApplicationCommandInteraction => {
   const cmd = toJSON(command)
-  const supportOptionType = [3, 4, 5, 10] // STRING, INTEGER, BOOLEAN, NUMBER
+  const supportOptionType = new Set([3, 4, 5, 10]) // STRING, INTEGER, BOOLEAN, NUMBER
   const interaction: APIApplicationCommandInteraction = {
     type: 2, // Command Number
     // @ts-expect-error
@@ -22,7 +23,7 @@ export const testCommandRequestBodyJson = <V extends {}>(
   }
   // CHAT_INPUT with options
   if (interaction.data.type === 1 && cmd.options) {
-    if (cmd.options.every(opt => supportOptionType.includes(opt.type))) {
+    if (cmd.options.every(opt => supportOptionType.has(opt.type))) {
       if (options) {
         interaction.data.options = []
         for (const [name, value] of Object.entries(options)) {

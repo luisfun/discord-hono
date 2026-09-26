@@ -8,13 +8,13 @@ on:
         required: true
         type: choice
         options:
-        - patch
-        - minor
-        - major
-        - prerelease
-        - prepatch
-        - preminor
-        - premajor
+          - patch
+          - minor
+          - major
+          - prerelease
+          - prepatch
+          - preminor
+          - premajor
 
 permissions: read-all
 

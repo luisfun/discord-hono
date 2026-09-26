@@ -5,6 +5,7 @@
 
 import { DiscordHono as DiscordHonoOld } from 'discord-hono'
 import { bench, boxplot, compact, run, summary } from 'mitata'
+
 import {
   DiscordHono as DiscordHonoNew,
   makeSlashCommand,

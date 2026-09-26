@@ -2,30 +2,30 @@ import { defineConfig } from 'vite-plus'
 
 export default defineConfig({
   fmt: {
-    "printWidth": 120,
-    "semi": false,
-    "singleQuote": true,
-    "arrowParens": 'avoid',
-    "sortImports": true,
-    "sortPackageJson": true,
-    ignorePatterns: ['coverage/', 'dist/']
+    printWidth: 120,
+    semi: false,
+    singleQuote: true,
+    arrowParens: 'avoid',
+    sortImports: true,
+    sortPackageJson: true,
+    ignorePatterns: ['src/**/rest-path.ts'],
   },
   lint: {
-    "categories": {
-      "correctness": "error",
-      "suspicious": "error",
-      "pedantic": "off",
-      "perf": "error",
-      "style": "off",
-      "restriction": "off",
-      "nursery": "off",
+    categories: {
+      correctness: 'error',
+      suspicious: 'error',
+      pedantic: 'off',
+      perf: 'error',
+      style: 'off',
+      restriction: 'off',
+      nursery: 'off',
     },
     overrides: [
       {
         files: ['src/**/rest-path.ts'],
         rules: {
-          "no-underscore-dangle": "off",
-        }
+          'no-underscore-dangle': 'off',
+        },
       },
     ],
   },

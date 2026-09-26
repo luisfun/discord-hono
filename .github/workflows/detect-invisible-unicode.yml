@@ -159,4 +159,3 @@ jobs:
 
           print("OK: no suspicious invisible/bidi control characters found in changed files.")
           PY
-          

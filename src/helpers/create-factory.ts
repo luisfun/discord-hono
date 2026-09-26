@@ -5,6 +5,7 @@ import type {
   RESTPostAPIApplicationCommandsJSONBody,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from 'discord-api-types/v10'
+
 import { DiscordHono } from '../discord-hono'
 import type {
   AutocompleteHandler,
@@ -119,7 +120,10 @@ interface Factory<E extends Env> {
   subCommand<
     T extends JsonSerializable<APIApplicationCommandSubcommandOption>,
     V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
-  >(subCommand: T, handler: SubCommandHandler<E & { Variables?: V }>): { subCommand: T; handler: SubCommandHandler<E> }
+  >(
+    subCommand: T,
+    handler: SubCommandHandler<E & { Variables?: V }>,
+  ): { subCommand: T; handler: SubCommandHandler<E> }
   subCommandGroup<
     T extends JsonSerializable<APIApplicationCommandSubcommandGroupOption>,
     V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
@@ -145,7 +149,10 @@ interface Factory<E extends Env> {
   modal<
     T extends JsonSerializable<APIModalInteractionResponseCallbackData>,
     V extends Var = ExtractModalVars<ResolvedToJSON<T>>,
-  >(modal: T, handler: ModalHandler<E & { Variables?: V }>): { modal: T; handler: ModalHandler<E> }
+  >(
+    modal: T,
+    handler: ModalHandler<E & { Variables?: V }>,
+  ): { modal: T; handler: ModalHandler<E> }
   cron<V extends Var>(
     cron: string,
     handler: CronHandler<E & { Variables?: V }>,

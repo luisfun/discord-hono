@@ -2,6 +2,7 @@ import type {
   RESTPostAPIApplicationCommandsJSONBody,
   RESTPutAPIApplicationGuildCommandsJSONBody,
 } from 'discord-api-types/v10'
+
 import { createRest } from '../rest/rest'
 import { $applications$_$commands, $applications$_$guilds$_$commands } from '../rest/rest-path'
 import type { JsonSerializable } from '../types'

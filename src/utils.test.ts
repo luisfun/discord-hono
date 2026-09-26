@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, test, vi } from 'vitest'
+
 import { makeEmbed } from './builders'
 import { formData, isProto, messageFlags, newError, prepareData, queryStringify, toJSON } from './utils'
 

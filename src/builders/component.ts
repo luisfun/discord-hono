@@ -32,6 +32,7 @@ import type {
   SelectMenuDefaultValueType,
   TextInputStyle,
 } from 'discord-api-types/v10'
+
 import type { JsonSerializable, NoSemicolon } from '../types'
 import { isArray, isString, type ToJSON, toJSON } from '../utils'
 import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions } from './json-builder'

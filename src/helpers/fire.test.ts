@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+
 import { DiscordHono } from '../discord-hono'
 import type { FetchEventLike } from '../types'
 import { fire } from './fire'

@@ -19,21 +19,20 @@ import type {
   RESTPostAPIContextMenuApplicationCommandsJSONBody,
   RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody,
 } from 'discord-api-types/v10'
+
 import { createJsonBuilder, type JsonBuilderOptions } from './json-builder'
 
 // type fix https://docs.discord.com/developers/interactions/application-commands#create-global-application-command
 
 interface SlashCommandJson extends Omit<RESTPostAPIChatInputApplicationCommandsJSONBody, 'handler'> {}
-interface ContextMenuCommandJson
-  extends Omit<
-    RESTPostAPIContextMenuApplicationCommandsJSONBody,
-    'description' | 'description_localizations' | 'options' | 'handler'
-  > {}
-interface EntryPointCommandJson
-  extends Omit<
-    RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody,
-    'description' | 'description_localizations' | 'options'
-  > {}
+interface ContextMenuCommandJson extends Omit<
+  RESTPostAPIContextMenuApplicationCommandsJSONBody,
+  'description' | 'description_localizations' | 'options' | 'handler'
+> {}
+interface EntryPointCommandJson extends Omit<
+  RESTPostAPIPrimaryEntryPointApplicationCommandJSONBody,
+  'description' | 'description_localizations' | 'options'
+> {}
 
 // oxfmt-ignore
 export const commandType = {

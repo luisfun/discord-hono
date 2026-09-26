@@ -2,23 +2,23 @@
   "name": "discord-hono",
   "version": "0.22.1",
   "description": "Discord bot framework built for the Edge",
+  "keywords": [
+    "cloudflare-workers",
+    "discord-bot",
+    "discord-hono"
+  ],
+  "homepage": "https://github.com/luisfun/discord-hono",
+  "license": "MIT",
   "author": "Luis (https://github.com/luisfun)",
   "repository": {
     "type": "git",
     "url": "https://github.com/luisfun/discord-hono"
   },
-  "homepage": "https://github.com/luisfun/discord-hono",
-  "license": "MIT",
-  "keywords": [
-    "discord-hono",
-    "discord-bot",
-    "cloudflare-workers"
-  ],
-  "type": "module",
-  "sideEffects": false,
   "files": [
     "dist"
   ],
+  "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
@@ -27,9 +27,6 @@
       "types": "./dist/index.d.mts",
       "default": "./dist/index.mjs"
     }
-  },
-  "engines": {
-    "node": ">=18.4.0"
   },
   "scripts": {
     "check": "vp check",
@@ -61,5 +58,8 @@
     "discord-api-types": {
       "optional": true
     }
+  },
+  "engines": {
+    "node": ">=18.4.0"
   }
 }

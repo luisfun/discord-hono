@@ -23,5 +23,6 @@ By Creating a pull request, you agree to license your contribution under the pro
 ## Other Ways to Contribute
 
 You can also contribute to the project by:
+
 - Sharing: Create posts on social media, blogs, or technical articles
 - Using: Develop projects using discord-hono
