@@ -32,11 +32,10 @@
     "node": ">=18.4.0"
   },
   "scripts": {
-    "check": "biome check .",
-    "fix": "biome check --write .",
-    "fix:unsafe": "biome check --write --unsafe .",
-    "test": "biome check . && tsc && vitest run --coverage",
-    "build": "tsdown src/index.ts --format esm --dts --clean && attw -P . --ignore-rules cjs-resolves-to-esm",
+    "check": "vp check",
+    "fix": "vp check --fix",
+    "test": "vp test run --coverage",
+    "build": "vp pack && attw -P . --ignore-rules cjs-resolves-to-esm",
     "bench:only": "node --expose-gc bench/discord-hono.js",
     "bench:verify": "node --expose-gc bench/verify.js",
     "bench:json-factory": "node --expose-gc bench/json-factory.js",
@@ -44,17 +43,16 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
-    "@biomejs/biome": "^2.4.16",
     "@discordjs/builders": "^1.14.1",
     "@tsconfig/strictest": "^2.0.8",
-    "@vitest/coverage-v8": "^4.1.11",
-    "discord-api-types": "^0.38.53",
-    "discord-hono": "0.21.2",
-    "hono": "^4.13.3",
+    "@vitest/coverage-v8": "^5.0.1",
+    "discord-api-types": "^0.38.55",
+    "discord-hono": "0.22.1",
+    "hono": "^4.13.9",
     "mitata": "^1.0.34",
-    "tsdown": "^0.22.14",
+    "tsdown": "^0.23.0",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.11"
+    "vite-plus": "^1.0.0-rc.0"
   },
   "peerDependencies": {
     "discord-api-types": ">=0.38.0"
