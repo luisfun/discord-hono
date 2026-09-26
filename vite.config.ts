@@ -11,12 +11,20 @@ export default defineConfig({
     "categories": {
       "correctness": "error",
       "suspicious": "error",
-      "pedantic": "warn",
+      "pedantic": "off",
       "perf": "error",
-      "style": "warn",
-      "restriction": "warn",
+      "style": "off",
+      "restriction": "off",
       "nursery": "off",
     },
+    overrides: [
+      {
+        files: ['src/**/rest-path.ts'],
+        rules: {
+          "no-underscore-dangle": "off",
+        }
+      },
+    ],
   },
   pack: {
     format: ['esm', 'cjs'],

@@ -19,7 +19,7 @@ var newError = (funcName, message) => new Error(`[${funcName}] ${message}`)
 var attachToJSON = initial => ({
   ...initial,
   toJSON() {
-    const { custom_id, custom_value, toJSON: toJSON3, ...rest } = this
+    const { custom_id, custom_value, toJSON: _toJSON, ...rest } = this
     if (custom_id || custom_value)
       rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
     return rest
