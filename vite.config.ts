@@ -7,7 +7,8 @@ export default defineConfig({
     "singleQuote": true,
     "arrowParens": 'avoid',
     "sortImports": true,
-    "sortPackageJson": true
+    "sortPackageJson": true,
+    ignorePatterns: ['coverage/', 'dist/']
   },
   lint: {
     "categories": {

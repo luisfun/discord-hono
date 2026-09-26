@@ -73,6 +73,7 @@ type TemplatedContainerComponent = Omit<APIContainerComponent, 'components'> & {
 
 type InteractionButtonStyle = ButtonStyle.Primary | ButtonStyle.Secondary | ButtonStyle.Success | ButtonStyle.Danger
 
+// oxfmt-ignore
 export const componentType = {
   ActionRow: 1,
   Button: 2,

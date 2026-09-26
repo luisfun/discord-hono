@@ -35,6 +35,7 @@ interface EntryPointCommandJson
     'description' | 'description_localizations' | 'options'
   > {}
 
+// oxfmt-ignore
 export const commandType = {
   ChatInput: 1,
   User: 2,
@@ -42,6 +43,7 @@ export const commandType = {
   PrimaryEntryPoint: 4,
 } as const satisfies Record<string, ApplicationCommandType>
 
+// oxfmt-ignore
 export const commandOptionType = {
   Subcommand: 1,
   SubcommandGroup: 2,
@@ -59,6 +61,7 @@ export const commandOptionType = {
 /**
  * @see https://docs.discord.com/developers/resources/channel#channel-object-channel-types
  */
+// oxfmt-ignore
 export const channelType = {
   GUILD_TEXT: 0,
   DM: 1,
