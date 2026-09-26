@@ -39,7 +39,7 @@ const formatResponseError = (value: unknown): string => {
   const lines = [error.code !== undefined && error.message ? `${error.code}: ${error.message}` : error.message].filter(
     (line): line is string => Boolean(line),
   )
-  return lines.concat(error.errors ? collectResponseErrors(error.errors, '') : []).join('\n')
+  return [...lines, ...(error.errors ? collectResponseErrors(error.errors, '') : [])].join('\n')
 }
 
 const summarize = (value: unknown, depth: number): unknown => {

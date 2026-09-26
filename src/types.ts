@@ -19,6 +19,7 @@ import type {
   RESTPostAPIApplicationCommandsJSONBody,
   SelectMenuDefaultValueType,
 } from 'discord-api-types/v10'
+
 import type { Context } from './context'
 
 ////////// Utils //////////
@@ -76,7 +77,7 @@ interface CronRef {
 }
 export type ContextRef = CommandRef<any> & ComponentRef & ModalRef & CronRef
 
-// biome-ignore format: ternary operator
+// oxfmt-ignore
 type CommandInteraction<T extends RESTPostAPIApplicationCommandsJSONBody> =
   T extends { type: 2 } ? Extract<APIApplicationCommandInteraction, { data: { type: 2 } }> :
   T extends { type: 3 } ? Extract<APIApplicationCommandInteraction, { data: { type: 3 } }> :
@@ -94,7 +95,7 @@ export type InteractionComponent =
     >
   | APIChannelSelectComponent
 
-// biome-ignore format: ternary operator
+// oxfmt-ignore
 type ComponentInteraction<T extends InteractionComponent> =
   T extends APIButtonComponentWithCustomId ? APIMessageComponentButtonInteraction :
   T extends APIStringSelectComponent ? Omit<APIMessageComponentSelectMenuInteraction, 'data'> & { data: APIMessageStringSelectInteractionData } :

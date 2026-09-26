@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, test, vi } from 'vitest'
+
 import { makeEmbed } from './builders'
 import { formData, isProto, messageFlags, newError, prepareData, queryStringify, toJSON } from './utils'
 
@@ -126,7 +127,6 @@ test('newError function', () => {
   expect(e.message).toBe('discord-hono(locate): text')
 })
 
-// biome-ignore-start lint/security/noSecrets: not a real secret
 describe('queryStringify', () => {
   it('should return empty string when query is undefined', () => {
     expect(queryStringify(undefined)).toBe('')
@@ -161,7 +161,6 @@ describe('queryStringify', () => {
     expect(queryStringify({})).toBe('?')
   })
 })
-// biome-ignore-end lint/security/noSecrets: not a real secret
 
 describe('messageFlags', () => {
   it('should return 0 when no flags are provided', () => {

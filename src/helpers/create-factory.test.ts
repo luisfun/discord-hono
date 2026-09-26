@@ -1,5 +1,6 @@
 import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
 import { describe, expect, expectTypeOf, it, vi } from 'vitest'
+
 import {
   makeActionRow,
   makeButton,

@@ -5,6 +5,7 @@ import type {
   RESTPostAPIApplicationCommandsJSONBody,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from 'discord-api-types/v10'
+
 import { DiscordHono } from '../discord-hono'
 import type {
   AutocompleteHandler,
@@ -46,7 +47,7 @@ type SubCommandHandler<E extends Env> = CommandHandler<E, RESTPostAPIChatInputAp
 
 type ExtractSubCommand<T> = T extends { subCommand: infer U } ? U : T extends { subCommandGroup: infer U } ? U : never
 
-type Var = {}
+interface Var {}
 
 type UnionToIntersection<T> = (T extends unknown ? (value: T) => void : never) extends (value: infer I) => void
   ? I
@@ -69,7 +70,7 @@ type ExtractOptionVar<T> = T extends { name: infer N extends string }
   : {}
 
 type ExtractNestedOptionVars<T> = T extends { options?: infer O }
-  ? O extends ReadonlyArray<infer U>
+  ? O extends readonly (infer U)[]
     ? Simplify<UnionToIntersection<ExtractNestedOptionVars<U> | ExtractOptionVar<U>>>
     : {}
   : ExtractOptionVar<T>
@@ -80,7 +81,7 @@ type ExtractCommandVars<
     | APIApplicationCommandSubcommandOption
     | APIApplicationCommandSubcommandGroupOption,
 > = T extends { options?: infer O }
-  ? O extends ReadonlyArray<infer U>
+  ? O extends readonly (infer U)[]
     ? Simplify<UnionToIntersection<ExtractNestedOptionVars<U>>>
     : {}
   : {}
@@ -119,7 +120,10 @@ interface Factory<E extends Env> {
   subCommand<
     T extends JsonSerializable<APIApplicationCommandSubcommandOption>,
     V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
-  >(subCommand: T, handler: SubCommandHandler<E & { Variables?: V }>): { subCommand: T; handler: SubCommandHandler<E> }
+  >(
+    subCommand: T,
+    handler: SubCommandHandler<E & { Variables?: V }>,
+  ): { subCommand: T; handler: SubCommandHandler<E> }
   subCommandGroup<
     T extends JsonSerializable<APIApplicationCommandSubcommandGroupOption>,
     V extends Var = ExtractCommandVars<ResolvedToJSON<T>>,
@@ -145,7 +149,10 @@ interface Factory<E extends Env> {
   modal<
     T extends JsonSerializable<APIModalInteractionResponseCallbackData>,
     V extends Var = ExtractModalVars<ResolvedToJSON<T>>,
-  >(modal: T, handler: ModalHandler<E & { Variables?: V }>): { modal: T; handler: ModalHandler<E> }
+  >(
+    modal: T,
+    handler: ModalHandler<E & { Variables?: V }>,
+  ): { modal: T; handler: ModalHandler<E> }
   cron<V extends Var>(
     cron: string,
     handler: CronHandler<E & { Variables?: V }>,
@@ -169,7 +176,6 @@ type Handler<E extends Env> =
   | ReturnType<Factory<E>['cron']>
 
 export const createFactory = <E extends Env = Env>(): Factory<E> => ({
-  // biome-ignore-start lint/nursery/useExplicitType: omitted
   discord(init) {
     return new DiscordHonoExtends<E>(init)
   },
@@ -219,5 +225,4 @@ export const createFactory = <E extends Env = Env>(): Factory<E> => ({
       defaultHandler?.(c) ??
       Response.json({ error: 'Subcommand not found' }, { status: 400 })
   },
-  // biome-ignore-end lint/nursery/useExplicitType: omitted
 })

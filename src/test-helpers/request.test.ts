@@ -1,5 +1,6 @@
 import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
 import { describe, expect, it } from 'vitest'
+
 import { makeSlashCommand } from '../builders'
 import { testCommandRequestBodyJson, testCommandRequestInit } from './request'
 

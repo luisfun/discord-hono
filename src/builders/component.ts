@@ -1,5 +1,3 @@
-// biome-ignore-all lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
-
 import type {
   APIActionRowComponent,
   APIBaseAutoPopulatedSelectMenuComponent,
@@ -32,9 +30,10 @@ import type {
   SelectMenuDefaultValueType,
   TextInputStyle,
 } from 'discord-api-types/v10'
+
 import type { JsonSerializable, NoSemicolon } from '../types'
-import { isArray, isString, type ToJSON, toJSON } from '../utils'
-import { type AddCustomValue, createJsonBuilder, type JsonBuilderOptions } from './json-builder'
+import { type ToJSON, isArray, isString, toJSON } from '../utils'
+import { type AddCustomValue, type JsonBuilderOptions, createJsonBuilder } from './json-builder'
 
 type WebUrl = `${'http' | 'https'}://${string}`
 type AttachmentUrl = `attachment://${string}`

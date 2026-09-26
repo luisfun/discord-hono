@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { CUSTOM_ID_SEPARATOR } from '../utils'
 import { createJsonBuilder } from './json-builder'
 
@@ -115,7 +116,6 @@ describe('json-builder', () => {
     const builder = createJsonBuilder<{ value: number }, { value: number }>({ value: 1 })
 
     // @ts-expect-error Testing invalid key access
-    // biome-ignore lint/suspicious/noProto: Testing invalid key access
     expect(() => builder.__proto__).toThrow('Invalid key: __proto__')
     expect(() => builder.constructor).toThrow('Invalid key: constructor')
   })

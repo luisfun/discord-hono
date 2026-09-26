@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { formData } from '../utils'
 import { webhook } from './webhook'
 
 // モックの設定
 vi.mock('../utils', async importOriginal => {
+  // oxlint-disable-next-line typescript/consistent-type-imports : temporary
   const actual = await importOriginal<typeof import('../utils')>()
   return {
     ...actual,

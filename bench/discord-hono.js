@@ -1,16 +1,13 @@
 // @ts-check
 
-// biome-ignore-all lint/correctness/noUnresolvedImports: Ignore for local processing
-// biome-ignore-all lint/suspicious/noShadow: temporary
-
 import { DiscordHono as DiscordHonoOld } from 'discord-hono'
 import { bench, boxplot, compact, run, summary } from 'mitata'
+
 import {
-  DiscordHono,
+  DiscordHono as DiscordHonoNew,
   makeSlashCommand,
   makeStringOption,
   testCommandRequestInit,
-  testVerifyTrue,
 } from '../dist/index.mjs'
 import pkg from '../package.json' with { type: 'json' }
 
@@ -21,13 +18,13 @@ const env = { DISCORD_PUBLIC_KEY: 'f'.repeat(64) }
 
 const benchItems = [
   { ver: pkg.devDependencies['discord-hono'], DiscordHono: DiscordHonoOld },
-  { ver: 'next', DiscordHono },
+  { ver: 'next', DiscordHono: DiscordHonoNew },
 ]
 
 const benchmarks = () => {
   for (const { ver, DiscordHono } of benchItems) {
     bench(`DiscordHono: ${ver}`, async () => {
-      await new DiscordHono({ verify: testVerifyTrue })
+      await new DiscordHono({ verify: () => true })
         .command('test', c => c.res('ok'))
         .fetch(new Request('http://localhost', init), env)
     }).gc(false) // Feels more stable than the default (once) when set to false

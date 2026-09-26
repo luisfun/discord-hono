@@ -1,11 +1,11 @@
 name: Test
 on:
   push:
-    branches: [ '**', '!main' ]
+    branches: ['**', '!main']
     paths:
       - 'src/**'
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read
@@ -20,6 +20,9 @@ jobs:
           node-version: 'lts/*'
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
+
+      - name: Check
+        run: npm run check
 
       - name: Test
         run: npm run test

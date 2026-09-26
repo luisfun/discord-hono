@@ -1,4 +1,3 @@
-// biome-ignore-start lint/suspicious/noDeprecatedImports: Keep it available until it’s deleted
 import type {
   APIInteractionResponse,
   RESTDeleteAPIApplicationEmojiResult,
@@ -293,7 +292,6 @@ import type {
   //RESTPostAPIGuildStickerFormDataBody,
   //RESTPostAPIGuildStickerResult,
 } from 'discord-api-types/v10'
-// biome-ignore-end lint/suspicious/noDeprecatedImports: Keep it available until it’s deleted
 import type { CustomCallbackData, FileData, TypedResponse } from '../types'
 import type {
   $applications$_$activityinstances$_,
@@ -438,7 +436,6 @@ export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 //////                            //////
 ////////////////////////////////////////
 
-// biome-ignore format: ternary operator
 type RestPathNV<M extends RestMethod> =
   M extends 'GET' ?
     // Application
@@ -455,7 +452,6 @@ type RestPathNV<M extends RestMethod> =
     | typeof $voice$regions
   : never
 
-// biome-ignore format: ternary operator
 type RestPathVars<M extends RestMethod> =
   M extends 'GET' ?
     // Receiving and Responding
@@ -634,14 +630,12 @@ type RestPathVars<M extends RestMethod> =
     | typeof $webhooks$_$_$messages$_
   : never
 
-// biome-ignore format: ternary operator
 type RestPathVarsQueryRequired<M extends RestMethod> =
   M extends 'GET' ?
     // Guild
     | typeof $guilds$_$members$search
   : never
 
-// biome-ignore format: ternary operator
 type RestPathVarsData<M extends RestMethod> =
   M extends 'PUT' ?
     // Application Commands
@@ -746,7 +740,6 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof $webhooks$_$_
   : never
 
-// biome-ignore format: ternary operator
 type RestPathVarsDataFile<M extends RestMethod> =
   M extends 'POST' ?
     // Receiving and Responding
@@ -779,7 +772,6 @@ export type RestPath<M extends RestMethod> =
 //////                            //////
 ////////////////////////////////////////
 
-// biome-ignore format: ternary operator
 export type RestVariables<P extends RestPath<any>> =
   P extends
     | typeof $applications$me
@@ -913,7 +905,6 @@ export type RestVariables<P extends RestPath<any>> =
 //////                            //////
 ////////////////////////////////////////
 
-// biome-ignore format: ternary operator
 export type RestQuery<M extends RestMethod, P extends RestPath<M>> =
   M extends 'GET' ?
     // Receiving and Responding
@@ -972,7 +963,6 @@ export type RestQuery<M extends RestMethod, P extends RestPath<M>> =
 //////                            //////
 ////////////////////////////////////////
 
-// biome-ignore format: ternary operator
 export type RestData<M extends RestMethod, P extends RestPath<M>> =
   M extends 'PUT' ?
     // Application Commands
@@ -1097,7 +1087,6 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
 //////                            //////
 ////////////////////////////////////////
 
-// biome-ignore format: ternary operator
 export type RestFile<M extends RestMethod, P extends RestPath<M>> =
   M extends 'POST' ?
     P extends
@@ -1125,7 +1114,6 @@ export type RestFile<M extends RestMethod, P extends RestPath<M>> =
 //////                            //////
 ////////////////////////////////////////
 
-// biome-ignore format: ternary operator
 export type RestResult<M extends RestMethod, P extends RestPath<M>> =
   M extends 'GET' ?
     // Receiving and Responding

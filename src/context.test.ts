@@ -5,8 +5,10 @@ import type {
   APIMessageComponentInteraction,
   APIModalSubmitInteraction,
 } from 'discord-api-types/v10'
+// oxlint-disable-next-line no-duplicate-imports : escape typetypetype
 import { Locale } from 'discord-api-types/v10'
 import { describe, expect, it, vi } from 'vitest'
+
 import { Context } from './context'
 import { $webhooks$_$_$messages$original, createRest } from './rest'
 import type { CommandContext, ComponentContext } from './types'
@@ -15,7 +17,6 @@ import { isString } from './utils'
 // Mock createRest to avoid actual API calls
 vi.mock('./rest', () => ({
   createRest: vi.fn().mockReturnValue(
-    // biome-ignore lint/complexity/useMaxParams: Allow multiple parameters
     vi.fn().mockImplementation((method, _endpoint, _pathVars, _data, _file) => {
       if (method === 'PATCH') return Promise.resolve({})
       if (method === 'DELETE') return Promise.resolve({})

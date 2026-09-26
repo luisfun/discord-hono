@@ -1,25 +1,18 @@
 // @ts-check
 
-// biome-ignore-all lint/complexity/useLiteralKeys: Not sure if custom_id exists
-// biome-ignore-all lint/correctness/noUnresolvedImports: Ignore for local processing
-// biome-ignore-all lint/suspicious/noVar: temporary
-// biome-ignore-all lint/suspicious/noShadow: temporary
-// biome-ignore-all lint/complexity/noForEach: temporary
-// biome-ignore-all lint/style/noIncrementDecrement: temporary
-
 import { CUSTOM_ID_SEPARATOR } from 'discord-hono'
 import { bench, boxplot, run, summary } from 'mitata'
 
 // @ts-expect-error
-var isProto = prop => prop === '__proto__' || prop === 'constructor' || prop === 'prototype'
+const isProto = prop => prop === '__proto__' || prop === 'constructor' || prop === 'prototype'
 // @ts-expect-error
-var newError = (funcName, message) => new Error(`[${funcName}] ${message}`)
+const newError = (funcName, message) => new Error(`[${funcName}] ${message}`)
 
 // @ts-expect-error
-var attachToJSON = initial => ({
+const attachToJSON = initial => ({
   ...initial,
   toJSON() {
-    const { custom_id, custom_value, toJSON: toJSON3, ...rest } = this
+    const { custom_id, custom_value, toJSON: _toJSON, ...rest } = this
     if (custom_id || custom_value)
       rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
     return rest
@@ -27,7 +20,7 @@ var attachToJSON = initial => ({
 })
 
 // @ts-expect-error
-var jsonFactory = initial => {
+const jsonFactory = initial => {
   const data = { ...initial }
   const proxy = new Proxy(
     {},
@@ -52,7 +45,7 @@ var jsonFactory = initial => {
 }
 
 // @ts-expect-error
-var jsonFactoryOnProto = (initial, keys) => {
+const jsonFactoryOnProto = (initial, keys) => {
   const data = { ...initial }
   const builder = {
     toJSON() {
@@ -62,15 +55,15 @@ var jsonFactoryOnProto = (initial, keys) => {
       return rest
     },
   }
-  // @ts-expect-error
-  keys.forEach(k => {
-    if (isProto(k)) return
-    // @ts-expect-error
-    builder[k] = v => {
-      data[k] = v
-      return builder
+  for (const k of keys) {
+    if (!isProto(k)) {
+      // @ts-expect-error
+      builder[k] = v => {
+        data[k] = v
+        return builder
+      }
     }
-  })
+  }
   return builder
 }
 

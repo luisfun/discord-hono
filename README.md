@@ -28,8 +28,7 @@ index.ts
 ```ts
 import { DiscordHono } from 'discord-hono'
 
-const app = new DiscordHono()
-  .command('hello', c => c.res('Hello, World!'))
+const app = new DiscordHono().command('hello', c => c.res('Hello, World!'))
 
 export default app
 ```
@@ -39,9 +38,7 @@ register.ts
 ```ts
 import { makeSlashCommand, register } from 'discord-hono'
 
-const commands = [
-  makeSlashCommand('hello', 'Hello, World!'),
-]
+const commands = [makeSlashCommand('hello', 'Hello, World!')]
 
 register(
   commands,

@@ -3,6 +3,7 @@ import type {
   APIInteractionResponsePong,
   RESTPostAPIApplicationCommandsJSONBody,
 } from 'discord-api-types/v10'
+
 import { Context } from './context'
 import type {
   AutocompleteHandler,
@@ -29,7 +30,7 @@ interface DiscordEnvBindings {
 }
 
 type HandlerNumber = 0 | 2 | 3 | 4 | 5
-// biome-ignore format: ternary operator
+// oxfmt-ignore
 type AnyHandler<E extends Env, N extends HandlerNumber> =
   N extends 0 ? CronHandler<E> :
   N extends 2 ? CommandHandler<E, any> :
@@ -130,7 +131,6 @@ export class DiscordHono<E extends Env = Env> {
   fetch = async (request: Request, env?: E['Bindings'], executionCtx?: ExecutionContext): Promise<Response> => {
     switch (request.method) {
       case 'GET':
-        // biome-ignore lint/security/noSecrets: Health check endpoint does not expose secrets
         return new Response('Operational🔥')
       case 'POST': {
         const discord = this.#discord(env)

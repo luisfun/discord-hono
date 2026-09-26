@@ -1,5 +1,3 @@
-// biome-ignore-all lint/nursery/useExplicitType: Because each builder returns a JsonBuilder, explicit type annotations are redundant.
-
 import type {
   APIEmbed,
   APIEmbedAuthor,
@@ -9,7 +7,8 @@ import type {
   APIEmbedProvider,
   APIEmbedVideo,
 } from 'discord-api-types/v10'
-import { createJsonBuilder, type JsonBuilderOptions } from './json-builder'
+
+import { type JsonBuilderOptions, createJsonBuilder } from './json-builder'
 
 export const embedType = {
   Rich: 'rich',

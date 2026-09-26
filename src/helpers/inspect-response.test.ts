@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest'
+
 import { inspectResponse } from './inspect-response'
 
-describe('inspectResponse', () => {
-  const createErrorResponse = (body: object): Response =>
-    new Response(JSON.stringify(body), {
-      status: 400,
-      headers: { 'content-type': 'application/json' },
-    })
+const createErrorResponse = (body: object): Response =>
+  Response.json(body, {
+    status: 400,
+    headers: { 'content-type': 'application/json' },
+  })
 
+describe('inspectResponse', () => {
   it('formats Discord validation errors as a message', async () => {
     const response = createErrorResponse({
       message: 'Invalid Form Body',
@@ -63,7 +64,7 @@ describe('inspectResponse', () => {
   })
 
   it('formats primitive error responses as a message', async () => {
-    const response = new Response(JSON.stringify('Bad Request'), { status: 400 })
+    const response = Response.json('Bad Request', { status: 400 })
 
     await expect(inspectResponse(response)).resolves.toEqual({
       json: 'Bad Request',

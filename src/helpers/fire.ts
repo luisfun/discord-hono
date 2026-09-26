@@ -22,7 +22,7 @@ interface FireOptions {
  * ```
  */
 export const fire = (app: FetchModule, options?: FireOptions): void => {
-  // @ts-expect-error
+  // @ts-expect-error: ts(2769)
   addEventListener('fetch', (event: FetchEventLike) => {
     const env = typeof options?.env === 'function' ? options.env(event) : options?.env
     const ctx = options?.executionCtx

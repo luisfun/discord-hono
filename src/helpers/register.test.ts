@@ -1,4 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
+import { type Mock, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { $applications$_$commands, $applications$_$guilds$_$commands } from '../rest/rest-path'
 import { register } from './register'
 
