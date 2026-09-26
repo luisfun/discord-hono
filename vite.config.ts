@@ -48,11 +48,12 @@ export default defineConfig({
       'typescript/unified-signatures': 'off',
       'unicorn/no-nested-ternary': 'off',
       'unicorn/no-null': 'off',
+      'unicorn/number-literal-case': 'off', // May conflict with fmt
       'unicorn/switch-case-braces': ['warn', 'avoid'],
       // restriction
-      'default-case': 'off', // 短いコーディングのため
+      'default-case': 'off', // For concise coding
       'no-bitwise': 'off',
-      'no-console': 'off', //['warn', { allow: ["assert", "error", "info", "warn"] }],
+      'no-console': ['warn', { allow: ['assert', 'error', 'info', 'warn'] }],
       'no-plusplus': 'off',
       'no-undefined': 'off',
       'oxc/no-async-await': 'off', // ???
