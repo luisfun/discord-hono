@@ -292,6 +292,7 @@ import type {
   //RESTPostAPIGuildStickerFormDataBody,
   //RESTPostAPIGuildStickerResult,
 } from 'discord-api-types/v10'
+
 import type { CustomCallbackData, FileData, TypedResponse } from '../types'
 import type {
   $applications$_$activityinstances$_,
@@ -436,6 +437,7 @@ export type RestMethod = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE'
 //////                            //////
 ////////////////////////////////////////
 
+// oxfmt-ignore
 type RestPathNV<M extends RestMethod> =
   M extends 'GET' ?
     // Application
@@ -452,6 +454,7 @@ type RestPathNV<M extends RestMethod> =
     | typeof $voice$regions
   : never
 
+// oxfmt-ignore
 type RestPathVars<M extends RestMethod> =
   M extends 'GET' ?
     // Receiving and Responding
@@ -630,12 +633,14 @@ type RestPathVars<M extends RestMethod> =
     | typeof $webhooks$_$_$messages$_
   : never
 
+// oxfmt-ignore
 type RestPathVarsQueryRequired<M extends RestMethod> =
   M extends 'GET' ?
     // Guild
     | typeof $guilds$_$members$search
   : never
 
+// oxfmt-ignore
 type RestPathVarsData<M extends RestMethod> =
   M extends 'PUT' ?
     // Application Commands
@@ -740,6 +745,7 @@ type RestPathVarsData<M extends RestMethod> =
     | typeof $webhooks$_$_
   : never
 
+// oxfmt-ignore
 type RestPathVarsDataFile<M extends RestMethod> =
   M extends 'POST' ?
     // Receiving and Responding
@@ -772,6 +778,7 @@ export type RestPath<M extends RestMethod> =
 //////                            //////
 ////////////////////////////////////////
 
+// oxfmt-ignore
 export type RestVariables<P extends RestPath<any>> =
   P extends
     | typeof $applications$me
@@ -905,6 +912,7 @@ export type RestVariables<P extends RestPath<any>> =
 //////                            //////
 ////////////////////////////////////////
 
+// oxfmt-ignore
 export type RestQuery<M extends RestMethod, P extends RestPath<M>> =
   M extends 'GET' ?
     // Receiving and Responding
@@ -963,6 +971,7 @@ export type RestQuery<M extends RestMethod, P extends RestPath<M>> =
 //////                            //////
 ////////////////////////////////////////
 
+// oxfmt-ignore
 export type RestData<M extends RestMethod, P extends RestPath<M>> =
   M extends 'PUT' ?
     // Application Commands
@@ -1087,6 +1096,7 @@ export type RestData<M extends RestMethod, P extends RestPath<M>> =
 //////                            //////
 ////////////////////////////////////////
 
+// oxfmt-ignore
 export type RestFile<M extends RestMethod, P extends RestPath<M>> =
   M extends 'POST' ?
     P extends
@@ -1114,6 +1124,7 @@ export type RestFile<M extends RestMethod, P extends RestPath<M>> =
 //////                            //////
 ////////////////////////////////////////
 
+// oxfmt-ignore
 export type RestResult<M extends RestMethod, P extends RestPath<M>> =
   M extends 'GET' ?
     // Receiving and Responding

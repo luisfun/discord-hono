@@ -7,7 +7,6 @@ export default defineConfig({
     singleQuote: true,
     arrowParens: 'avoid',
     sortImports: true,
-    ignorePatterns: ['src/rest/rest-types.ts'],
   },
   lint: {
     categories: {
