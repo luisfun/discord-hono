@@ -93,7 +93,7 @@ export const createJsonBuilder = <const T extends object, M extends object, E ex
             const { custom_id, custom_value, ...rest } = data
             if (custom_id || custom_value) {
               if (isString(custom_id) && custom_id.includes(CUSTOM_ID_SEPARATOR))
-                consoleWarn('jsonBuilder', `custom_id cannot include the separator: ${CUSTOM_ID_SEPARATOR}`)
+                consoleWarn('jsonBuilder', `custom_id include "${CUSTOM_ID_SEPARATOR}"`)
               rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
             }
             return () => (options?.clone ? clone(rest) : rest)
