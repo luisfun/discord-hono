@@ -79,7 +79,7 @@ const permissionFlagData = {
 type PermissionFlag = keyof typeof permissionFlagData
 
 export const permissionFlags = (...flag: PermissionFlag[]): number =>
-  flag.reduce((result, f) => result | (1 << permissionFlagData[f]), 0)
+  Number(flag.reduce((result, f) => result | (1n << BigInt(permissionFlagData[f])), 0n))
 
 export type ToJSON<T> = T extends { toJSON(): infer R } ? R : T
 
