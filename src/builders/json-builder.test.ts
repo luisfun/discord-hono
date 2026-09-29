@@ -61,9 +61,7 @@ describe('json-builder', () => {
 
     builder.toJSON()
 
-    expect(warn).toHaveBeenCalledWith(
-      `discord-hono(jsonBuilder): custom_id include "${CUSTOM_ID_SEPARATOR}"`,
-    )
+    expect(warn).toHaveBeenCalledWith(`discord-hono(jsonBuilder): custom_id include "${CUSTOM_ID_SEPARATOR}"`)
   })
 
   it('should allow custom_id values up to 100 characters', () => {
