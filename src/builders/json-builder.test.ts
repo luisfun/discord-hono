@@ -62,7 +62,7 @@ describe('json-builder', () => {
     builder.toJSON()
 
     expect(warn).toHaveBeenCalledWith(
-      `discord-hono(jsonBuilder): custom_id cannot include the separator: ${CUSTOM_ID_SEPARATOR}`,
+      `discord-hono(jsonBuilder): custom_id include "${CUSTOM_ID_SEPARATOR}"`,
     )
   })
 
