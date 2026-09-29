@@ -4,7 +4,7 @@
  */
 
 import type { JsonSerializable, ResolvedToJSON, Simplify } from '../types'
-import { CUSTOM_ID_SEPARATOR, isArray, isProto, newError, toJSON } from '../utils'
+import { CUSTOM_ID_SEPARATOR, isArray, isProto, newError, toJSON, isString, consoleWarn } from '../utils'
 
 export type AddCustomValue<T> = T extends any
   ? 'custom_id' extends keyof T
@@ -92,10 +92,9 @@ export const createJsonBuilder = <const T extends object, M extends object, E ex
           case 'toJSON': {
             const { custom_id, custom_value, ...rest } = data
             if (custom_id || custom_value) {
+              if (isString(custom_id) && custom_id.includes(CUSTOM_ID_SEPARATOR))
+                consoleWarn('jsonBuilder', `custom_id include "${CUSTOM_ID_SEPARATOR}"`)
               rest['custom_id'] = (custom_id ?? '') + (custom_value ? CUSTOM_ID_SEPARATOR + custom_value : '')
-              // @ts-expect-error: ts(2571): rest.custom_id is unknown
-              if (rest['custom_id'].length > 100)
-                throw newError('jsonBuilder', `custom_id exceeded 100:\n${rest['custom_id']}`)
             }
             return () => (options?.clone ? clone(rest) : rest)
           }

@@ -1,7 +1,16 @@
 import { beforeEach, describe, expect, it, test, vi } from 'vitest'
 
 import { makeEmbed } from './builders'
-import { formData, isProto, messageFlags, newError, prepareData, queryStringify, toJSON } from './utils'
+import {
+  formData,
+  isProto,
+  messageFlags,
+  newError,
+  permissionFlags,
+  prepareData,
+  queryStringify,
+  toJSON,
+} from './utils'
 
 describe('toJSON function', () => {
   it('should return the result of toJSON method if it exists', () => {
@@ -179,6 +188,20 @@ describe('messageFlags', () => {
     expect(messageFlags('SUPPRESS_EMBEDS', 'SUPPRESS_NOTIFICATIONS', 'IS_COMPONENTS_V2')).toBe(
       (1 << 2) | (1 << 12) | (1 << 15),
     )
+  })
+})
+
+describe('permissionFlags', () => {
+  it('should return 0 when no flags are provided', () => {
+    expect(permissionFlags()).toBe(0)
+  })
+
+  it('should return correct value for a high-bit flag', () => {
+    expect(permissionFlags('USE_EXTERNAL_APPS')).toBe(1_125_899_906_842_624)
+  })
+
+  it('should combine high and low flags', () => {
+    expect(permissionFlags('USE_EXTERNAL_APPS', 'KICK_MEMBERS')).toBe(1_125_899_906_842_626)
   })
 })
 

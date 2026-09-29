@@ -1,7 +1,7 @@
 import type { APIApplicationCommandInteraction, RESTPostAPIApplicationCommandsJSONBody } from 'discord-api-types/v10'
 
 import type { JsonSerializable } from '../types'
-import { newError, toJSON } from '../utils'
+import { newError, toJSON, consoleWarn } from '../utils'
 
 /**
  * @alpha
@@ -33,7 +33,7 @@ export const testCommandRequestBodyJson = <V extends {}>(
         }
       }
     } else {
-      console.warn('discord-hono(testCommandRequestBody): options are not supported yet')
+      consoleWarn('testCommandRequestBody', 'options are not supported yet')
     }
   }
   return interaction

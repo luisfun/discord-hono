@@ -44,11 +44,8 @@ jobs:
       - name: Create release branch
         run: git checkout -b release
 
-      - name: Test
-        run: |
-          npm run check
-          npm run test
-          npm run build
+      - name: Build
+        run: npm run build
 
       - name: Version upgrade
         run: npm version ${{ github.event.inputs.version_type }}

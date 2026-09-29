@@ -9,17 +9,77 @@ export const isArray = (value: unknown): value is unknown[] => Array.isArray(val
 export const isProto = (value: unknown): boolean =>
   value === '__proto__' || value === 'constructor' || value === 'prototype'
 
-const flagData = {
+const messageFlagData = {
   SUPPRESS_EMBEDS: 2,
   EPHEMERAL: 6,
   SUPPRESS_NOTIFICATIONS: 12,
   IS_COMPONENTS_V2: 15,
 } as const
 
-export type MessageFlag = keyof typeof flagData
+export type MessageFlag = keyof typeof messageFlagData
 
 export const messageFlags = (...flag: MessageFlag[]): number =>
-  flag.reduce((result, f) => result | (1 << flagData[f]), 0)
+  flag.reduce((result, f) => result | (1 << messageFlagData[f]), 0)
+
+const permissionFlagData = {
+  CREATE_INSTANT_INVITE: 0,
+  KICK_MEMBERS: 1,
+  BAN_MEMBERS: 2,
+  ADMINISTRATOR: 3,
+  MANAGE_CHANNELS: 4,
+  MANAGE_GUILD: 5,
+  ADD_REACTIONS: 6,
+  VIEW_AUDIT_LOG: 7,
+  PRIORITY_SPEAKER: 8,
+  STREAM: 9,
+  VIEW_CHANNEL: 10,
+  SEND_MESSAGES: 11,
+  SEND_TTS_MESSAGES: 12,
+  MANAGE_MESSAGES: 13,
+  EMBED_LINKS: 14,
+  ATTACH_FILES: 15,
+  READ_MESSAGE_HISTORY: 16,
+  MENTION_EVERYONE: 17,
+  USE_EXTERNAL_EMOJIS: 18,
+  VIEW_GUILD_INSIGHTS: 19,
+  CONNECT: 20,
+  SPEAK: 21,
+  MUTE_MEMBERS: 22,
+  DEAFEN_MEMBERS: 23,
+  MOVE_MEMBERS: 24,
+  USE_VAD: 25,
+  CHANGE_NICKNAME: 26,
+  MANAGE_NICKNAMES: 27,
+  MANAGE_ROLES: 28,
+  MANAGE_WEBHOOKS: 29,
+  MANAGE_GUILD_EXPRESSIONS: 30,
+  USE_APPLICATION_COMMANDS: 31,
+  REQUEST_TO_SPEAK: 32,
+  MANAGE_EVENTS: 33,
+  MANAGE_THREADS: 34,
+  CREATE_PUBLIC_THREADS: 35,
+  CREATE_PRIVATE_THREADS: 36,
+  USE_EXTERNAL_STICKERS: 37,
+  SEND_MESSAGES_IN_THREADS: 38,
+  USE_EMBEDDED_ACTIVITIES: 39,
+  MODERATE_MEMBERS: 40,
+  VIEW_CREATOR_MONETIZATION_ANALYTICS: 41,
+  USE_SOUNDBOARD: 42,
+  CREATE_GUILD_EXPRESSIONS: 43,
+  CREATE_EVENTS: 44,
+  USE_EXTERNAL_SOUNDS: 45,
+  SEND_VOICE_MESSAGES: 46,
+  SET_VOICE_CHANNEL_STATUS: 48,
+  SEND_POLLS: 49,
+  USE_EXTERNAL_APPS: 50,
+  PIN_MESSAGES: 51,
+  BYPASS_SLOWMODE: 52,
+} as const
+
+type PermissionFlag = keyof typeof permissionFlagData
+
+export const permissionFlags = (...flag: PermissionFlag[]): number =>
+  Number(flag.reduce((result, f) => result | (1n << BigInt(permissionFlagData[f])), 0n))
 
 export type ToJSON<T> = T extends { toJSON(): infer R } ? R : T
 
@@ -57,6 +117,11 @@ export const formData = (data?: object, file?: FileData): FormData => {
  * new Error(\`discord-hono(${locate}): ${text}\`)
  */
 export const newError = (locate: string, text: string): Error => new Error(`discord-hono(${locate}): ${text}`)
+
+/**
+ * console.warn(\`discord-hono(${locate}): ${text}\`)
+ */
+export const consoleWarn = (locate: string, text: string): void => console.warn(`discord-hono(${locate}): ${text}`)
 
 export const queryStringify = (query: Record<string, unknown> | undefined): '' | `?${string}` => {
   if (!query) return ''
