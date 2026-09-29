@@ -58,6 +58,11 @@ export const formData = (data?: object, file?: FileData): FormData => {
  */
 export const newError = (locate: string, text: string): Error => new Error(`discord-hono(${locate}): ${text}`)
 
+/**
+ * console.warn(\`discord-hono(${locate}): ${text}\`)
+ */
+export const consoleWarn = (locate: string, text: string): void => console.warn(`discord-hono(${locate}): ${text}`)
+
 export const queryStringify = (query: Record<string, unknown> | undefined): '' | `?${string}` => {
   if (!query) return ''
   const queryMap: Record<string, string> = {}
