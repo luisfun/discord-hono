@@ -66,13 +66,7 @@ describe('register function', () => {
   })
 
   it('should handle error responses', async () => {
-    const mockErrorResponse = {
-      ok: false,
-      status: 400,
-      statusText: 'Bad Request',
-      url: 'https://discord.com/api/v10/applications/123456789/commands',
-      text: vi.fn().mockResolvedValue('Invalid command structure'),
-    }
+    const mockErrorResponse = Response.json({ message: 'Invalid command structure' }, { status: 400 })
     mockRest.mockResolvedValue(mockErrorResponse)
 
     const result = await register(mockCommands, mockApplicationId, mockToken)
@@ -84,11 +78,9 @@ describe('register function', () => {
 
   it('should handle error when reading response body fails', async () => {
     const mockErrorResponse = {
-      ok: false,
-      status: 500,
-      statusText: 'Internal Server Error',
-      url: 'https://discord.com/api/v10/applications/123456789/commands',
-      text: vi.fn().mockRejectedValue(new Error('Failed to read body')),
+      clone: vi.fn(() => ({
+        json: vi.fn().mockRejectedValue(new Error('Failed to read body')),
+      })),
     }
     mockRest.mockResolvedValue(mockErrorResponse)
 
@@ -96,6 +88,6 @@ describe('register function', () => {
 
     expect(result).toContain('⚠️ Error')
     expect(result).toContain('Error registering commands')
-    expect(result).toContain('Error reading body from request')
+    expect(result).toContain('JSON parse error')
   })
 })

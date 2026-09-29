@@ -7,6 +7,7 @@ import { createRest } from '../rest/rest'
 import { $applications$_$commands, $applications$_$guilds$_$commands } from '../rest/rest-path'
 import type { JsonSerializable } from '../types'
 import { newError, toJSON } from '../utils'
+import { inspectResponse } from './inspect-response'
 
 /**
  * [Docs](https://discord-hono.luis.fun/rest-api/register/)
@@ -41,14 +42,8 @@ export const register = async (
     console.info(logText)
   } else {
     logText = `Error registering commands\n${res.url}: ${res.status} ${res.statusText}`
-    try {
-      const error = await res.text()
-      if (error) {
-        logText += `\n\n${error}`
-      }
-    } catch (error) {
-      logText += `\n\nError reading body from request:\n${error}`
-    }
+    const debug = await inspectResponse(res)
+    logText += `\n\n${debug.text}`
     logText += '\n===== ⚠️ Error ====='
     console.error(logText)
   }
