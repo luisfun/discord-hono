@@ -32,11 +32,11 @@
     "check": "vp check",
     "fix": "vp check --fix",
     "test": "vp test run --coverage",
-    "build": "vp pack && attw -P . --ignore-rules cjs-resolves-to-esm",
+    "build": "npm run check && npm run test && vp pack && attw -P . --ignore-rules cjs-resolves-to-esm",
     "bench:only": "node --expose-gc bench/discord-hono.js",
     "bench:verify": "node --expose-gc bench/verify.js",
     "bench:json-factory": "node --expose-gc bench/json-factory.js",
-    "bench": "npm run build && npm run bench:only"
+    "bench": "vp pack && npm run bench:only"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
