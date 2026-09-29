@@ -1,9 +1,13 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { CUSTOM_ID_SEPARATOR } from '../utils'
 import { createJsonBuilder } from './json-builder'
 
 describe('json-builder', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('should set values and serialize them', () => {
     const builder = createJsonBuilder<{ name: string }, { name: string; count: number }>({ name: 'test' })
 
@@ -47,6 +51,19 @@ describe('json-builder', () => {
       custom_id: 'id',
       label: 'Click Me',
     })
+  })
+
+  it('should warn when the base custom_id contains the separator', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const builder = createJsonBuilder<{ custom_id: string }, { custom_id: string }>({
+      custom_id: `button${CUSTOM_ID_SEPARATOR}id`,
+    })
+
+    builder.toJSON()
+
+    expect(warn).toHaveBeenCalledWith(
+      `discord-hono(jsonBuilder): custom_id cannot include the separator: ${CUSTOM_ID_SEPARATOR}`,
+    )
   })
 
   it('should allow custom_id values up to 100 characters', () => {
