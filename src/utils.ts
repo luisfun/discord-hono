@@ -16,10 +16,10 @@ const messageFlagData = {
   IS_COMPONENTS_V2: 15,
 } as const
 
-export type MessageFlag = keyof typeof messageflagData
+export type MessageFlag = keyof typeof messageFlagData
 
 export const messageFlags = (...flag: MessageFlag[]): number =>
-  flag.reduce((result, f) => result | (1 << messageflagData[f]), 0)
+  flag.reduce((result, f) => result | (1 << messageFlagData[f]), 0)
 
 const permissionFlagData = {
   CREATE_INSTANT_INVITE: 0,
