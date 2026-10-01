@@ -78,6 +78,9 @@ const permissionFlagData = {
 
 type PermissionFlag = keyof typeof permissionFlagData
 
+/**
+ * @see https://docs.discord.com/developers/topics/permissions#permissions-bitwise-permission-flags
+ */
 export const permissionFlags = (...flag: PermissionFlag[]): number =>
   Number(flag.reduce((result, f) => result | (1n << BigInt(permissionFlagData[f])), 0n))
 
