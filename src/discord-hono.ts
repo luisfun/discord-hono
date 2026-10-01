@@ -20,7 +20,7 @@ import type {
   ModalHandler,
   Verify,
 } from './types'
-import { CUSTOM_ID_SEPARATOR, newError } from './utils'
+import { CUSTOM_ID_SEPARATOR, newError, consoleWarn } from './utils'
 import { verify } from './verify'
 
 interface DiscordEnvBindings {
@@ -44,7 +44,9 @@ export class DiscordHono<E extends Env = Env> {
   #discord: (env: DiscordEnvBindings | undefined) => DiscordEnv
   #map = new Map<string, AnyHandler<E, HandlerNumber>>()
   #set<N extends HandlerNumber>(num: N, key: string, value: AnyHandler<E, N>): this {
-    this.#map.set(`${num}:${key}`, value)
+    const mapKey = `${num}:${key}`
+    if (this.#map.has(mapKey)) consoleWarn('DiscordHono', `Multiple handlers: ${mapKey}`)
+    this.#map.set(mapKey, value)
     return this
   }
   #get<N extends HandlerNumber>(num: N, key: string): AnyHandler<E, N> {
