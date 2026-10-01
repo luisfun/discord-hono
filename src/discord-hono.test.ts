@@ -12,9 +12,10 @@ describe('DiscordHono', () => {
   const env = { DISCORD_PUBLIC_KEY: 'test_public_key' }
 
   it('should warn when registering multiple handlers with the same key', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    app.command('test', vi.fn())
-    app.command('test', vi.fn())
+    const warn = vi.spyOn(console, 'warn').mockReturnValue(undefined)
+    const multiHandlersApp = new DiscordHono()
+    multiHandlersApp.command('test', vi.fn())
+    multiHandlersApp.command('test', vi.fn())
     expect(warn).toHaveBeenCalledWith('discord-hono(DiscordHono): Multiple handlers: 2:test')
     warn.mockRestore()
   })

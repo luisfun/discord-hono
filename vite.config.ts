@@ -68,7 +68,6 @@ export default defineConfig({
         files: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
         rules: {
           'init-declarations': 'off',
-          'no-empty-function': 'off',
           'no-proto': 'off',
           'typescript/ban-ts-comment': 'off',
           'unicorn/max-nested-calls': 'off',
