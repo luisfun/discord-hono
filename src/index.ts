@@ -15,5 +15,6 @@ export type {
   InitOptions,
   ModalContext,
   ModalHandler,
+  TypedResponse,
 } from './types'
 export { CUSTOM_ID_SEPARATOR, messageFlags, permissionFlags } from './utils'
