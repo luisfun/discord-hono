@@ -10,6 +10,12 @@ type MountOptions =
       replaceRequest?: MountReplaceRequest | false
     }
 
+/**
+ * @example
+ * const discord = new DiscordHono<Env>()
+ * const app = new Hono<Env>()
+ * hono.mount('/interactions', discord.fetch, honoMountOptions)
+ */
 export const honoMountOptions = {
   optionHandler: c => {
     let executionContext: ExecutionContext | undefined = undefined
