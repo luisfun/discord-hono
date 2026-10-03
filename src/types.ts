@@ -197,6 +197,12 @@ export abstract class FetchEventLike {
   abstract waitUntil(promise: Promise<void>): void
 }
 
+////////// FetchOption //////////
+
+export interface FetchOption {
+  var?: Record<string, unknown>
+}
+
 ////////// InteractionData //////////
 
 export type CustomCallbackData<T extends Record<string, unknown>> =

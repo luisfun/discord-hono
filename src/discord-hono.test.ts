@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { Context } from './context'
 import { DiscordHono } from './discord-hono'
+import { honoMountOptions } from './helpers/hono-mount-option'
 
 const postRequest = (json: object): Request =>
   new Request('https://example.com', { method: 'POST', body: JSON.stringify(json) })
@@ -122,12 +123,13 @@ describe('hono integration', () => {
     discord.command('ping', c => c.res('Pong!'))
     const hono = new Hono()
     hono.get('/', c => c.text('I like apples'))
-    hono.mount('/interactions', discord.fetch)
+    hono.mount('/interactions', discord.fetch, honoMountOptions)
     const req = new Request('http://localhost/interactions', {
       method: 'POST',
       body: JSON.stringify({ type: 2, data: { name: 'ping' } }),
     })
     const res = await hono.request(req)
     expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ type: 4, data: { content: 'Pong!' } })
   })
 })

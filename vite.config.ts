@@ -33,7 +33,7 @@ export default defineConfig({
       'capitalized-comments': 'off',
       curly: ['off', 'multi-line', 'consistent'],
       'id-length': 'off',
-      'max-params': ['warn', { max: 5 }],
+      'max-params': ['warn', { max: 6 }],
       'max-statements': 'off',
       'no-magic-numbers': 'off',
       'no-nested-ternary': 'off',

@@ -19,6 +19,7 @@ import type {
   InteractionComponent,
   ModalHandler,
   Verify,
+  FetchOption,
 } from './types'
 import { CUSTOM_ID_SEPARATOR, newError, consoleWarn } from './utils'
 import { verify } from './verify'
@@ -130,7 +131,12 @@ export class DiscordHono<E extends Env = Env> {
    * @param executionCtx
    * @returns
    */
-  fetch = async (request: Request, env?: E['Bindings'], executionCtx?: ExecutionContext): Promise<Response> => {
+  fetch = async (
+    request: Request,
+    env?: E['Bindings'],
+    executionCtx?: ExecutionContext,
+    option?: FetchOption,
+  ): Promise<Response> => {
     switch (request.method) {
       case 'GET':
         return new Response('Operational🔥')
@@ -176,7 +182,7 @@ export class DiscordHono<E extends Env = Env> {
               interaction.type,
               key,
               // @ts-expect-error ts(2345) -- ignore due to complex type inference
-            )(new Context(env, executionCtx, discord, key, interaction))
+            )(new Context(env, executionCtx, discord, key, interaction, option))
         }
         return Response.json({ error: 'Unknown Type' }, { status: 400 })
       }
