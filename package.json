@@ -42,7 +42,7 @@
     "@arethetypeswrong/cli": "^0.18.5",
     "@discordjs/builders": "^1.14.1",
     "@tsconfig/strictest": "^2.0.8",
-    "@vitest/coverage-v8": "^5.0.3",
+    "@vitest/coverage-v8": "5.0.1",
     "discord-api-types": "^0.38.56",
     "discord-hono": "0.22.2",
     "hono": "^4.13.12",

@@ -119,10 +119,19 @@ describe('HandlerMap', () => {
 
 describe('hono integration', () => {
   it('should work with hono', async () => {
-    const discord = new DiscordHono({ discordEnv: () => ({ PUBLIC_KEY: 'test' }), verify: () => true })
-    discord.command('ping', c => c.res('Pong!'))
-    const hono = new Hono()
+    interface Env {
+      Variables: {
+        message: string
+      }
+    }
+    const discord = new DiscordHono<Env>({ discordEnv: () => ({ PUBLIC_KEY: 'test' }), verify: () => true })
+    discord.command('ping', c => c.res(c.get('message')))
+    const hono = new Hono<Env>()
     hono.get('/', c => c.text('I like apples'))
+    hono.use('/interactions', async (c, next) => {
+      c.set('message', 'test')
+      await next()
+    })
     hono.mount('/interactions', discord.fetch, honoMountOptions)
     const req = new Request('http://localhost/interactions', {
       method: 'POST',
@@ -130,6 +139,6 @@ describe('hono integration', () => {
     })
     const res = await hono.request(req)
     expect(res.status).toBe(200)
-    expect(await res.json()).toEqual({ type: 4, data: { content: 'Pong!' } })
+    expect(await res.json()).toEqual({ type: 4, data: { content: 'test' } })
   })
 })
