@@ -1,5 +1,6 @@
 export * from './create-factory'
 export * from './fire'
+export * from './hono-mount-options'
 export * from './inspect-response'
 export * from './register'
 export * from './retry429'

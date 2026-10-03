@@ -31,6 +31,7 @@ import type {
   Env,
   ExecutionContext,
   FetchEventLike,
+  FetchOption,
   FileData,
   JsonSerializable,
   ModalContext,
@@ -62,7 +63,7 @@ export class Context<
   #env: E['Bindings']
   #executionCtx: ExecutionCtx
   #discord: DiscordEnv
-  #var = new Map()
+  #var: Map<unknown, unknown>
   #ref: ContextRef
   #rest: ReturnType<typeof createRest> | undefined = undefined
   // interaction
@@ -81,10 +82,12 @@ export class Context<
     discord: DiscordEnv,
     key: string,
     interaction: APIInteraction | CronEvent,
+    option?: FetchOption,
   ) {
     this.#env = env
     this.#executionCtx = executionCtx
     this.#discord = discord
+    this.#var = option?.var ? new Map(Object.entries(option.var)) : new Map()
     this.#interaction = interaction
     this.#ref = { key }
     if ('data' in interaction && interaction.data) {

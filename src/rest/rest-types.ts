@@ -1,3 +1,4 @@
+// oxlint-disable sort-imports
 import type {
   APIInteractionResponse,
   RESTDeleteAPIApplicationEmojiResult,

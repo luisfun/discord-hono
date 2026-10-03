@@ -4,7 +4,7 @@
  */
 
 import type { JsonSerializable, ResolvedToJSON, Simplify } from '../types'
-import { CUSTOM_ID_SEPARATOR, isArray, isProto, newError, toJSON, isString, consoleWarn } from '../utils'
+import { CUSTOM_ID_SEPARATOR, consoleWarn, isArray, isProto, isString, newError, toJSON } from '../utils'
 
 export type AddCustomValue<T> = T extends any
   ? 'custom_id' extends keyof T
