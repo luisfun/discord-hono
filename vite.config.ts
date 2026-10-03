@@ -81,4 +81,9 @@ export default defineConfig({
       reporter: ['html', 'json'],
     },
   },
+  pack: {
+    deps: {
+      neverBundle: true,
+    },
+  },
 })
