@@ -107,7 +107,10 @@ export default defineConfig({
           }
 
           if (externalImports.size > 0) {
-            this.error(`External runtime dependencies are not allowed: ${[...externalImports].join(', ')}`)
+            this.error({
+              message: `External runtime dependencies are not allowed: ${[...externalImports].join(', ')}`,
+              stack: '',
+            })
           }
         },
       },
