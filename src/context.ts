@@ -31,12 +31,12 @@ import type {
   Env,
   ExecutionContext,
   FetchEventLike,
+  FetchOption,
   FileData,
   JsonSerializable,
   ModalContext,
   Simplify,
   TypedResponse,
-  FetchOption,
 } from './types'
 import { type MessageFlag, formData, isArray, isProto, messageFlags, newError, prepareData, toJSON } from './utils'
 

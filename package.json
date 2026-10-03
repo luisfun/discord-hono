@@ -51,10 +51,14 @@
     "vite-plus": "^1.0.0-rc.0"
   },
   "peerDependencies": {
-    "discord-api-types": ">=0.38.0"
+    "discord-api-types": ">=0.38.0",
+    "hono": ">=4.x"
   },
   "peerDependenciesMeta": {
     "discord-api-types": {
+      "optional": true
+    },
+    "hono": {
       "optional": true
     }
   },

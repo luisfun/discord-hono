@@ -6,9 +6,7 @@ export default defineConfig({
     semi: false,
     singleQuote: true,
     arrowParens: 'avoid',
-    sortImports: {
-      type: 'asc',
-    },
+    sortImports: true,
   },
   lint: {
     categories: {
@@ -40,7 +38,7 @@ export default defineConfig({
       'no-magic-numbers': 'off',
       'no-nested-ternary': 'off',
       'no-ternary': 'off',
-      'sort-imports': 'off', // Delegated to fmt
+      'sort-imports': ['warn', { ignoreDeclarationSort: true }],
       'sort-keys': 'off', // Too broad
       'typescript/consistent-indexed-object-style': 'off',
       'typescript/method-signature-style': ['warn', 'method'],

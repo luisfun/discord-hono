@@ -15,13 +15,13 @@ import type {
   DiscordEnv,
   Env,
   ExecutionContext,
+  FetchOption,
   InitOptions,
   InteractionComponent,
   ModalHandler,
   Verify,
-  FetchOption,
 } from './types'
-import { CUSTOM_ID_SEPARATOR, newError, consoleWarn } from './utils'
+import { CUSTOM_ID_SEPARATOR, consoleWarn, newError } from './utils'
 import { verify } from './verify'
 
 interface DiscordEnvBindings {
