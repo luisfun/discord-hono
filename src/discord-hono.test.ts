@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { Context } from './context'
 import { DiscordHono } from './discord-hono'
-import { honoMountOptions } from './helpers/hono-mount-option'
+import { honoMountOptions } from './helpers/hono-mount-options'
 
 const postRequest = (json: object): Request =>
   new Request('https://example.com', { method: 'POST', body: JSON.stringify(json) })

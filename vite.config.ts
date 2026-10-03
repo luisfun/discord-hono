@@ -6,7 +6,9 @@ export default defineConfig({
     semi: false,
     singleQuote: true,
     arrowParens: 'avoid',
-    sortImports: true,
+    sortImports: {
+      type: 'asc',
+    },
   },
   lint: {
     categories: {
