@@ -81,39 +81,28 @@ export default defineConfig({
       reporter: ['html', 'json'],
     },
   },
-  pack: {
-    deps: {
-      neverBundle: true,
-    },
-    plugins: [
-      {
-        name: 'error-on-external-runtime-dependencies',
-        generateBundle(_, bundle) {
-          const emittedChunks = new Set(
-            Object.values(bundle)
-              .filter(output => output.type === 'chunk' && !/\.d\.(?:ts|mts|cts)$/.test(output.fileName))
-              .map(output => output.fileName),
-          )
-          const externalImports = new Set<string>()
-
-          for (const output of Object.values(bundle)) {
-            if (output.type === 'chunk' && !/\.d\.(?:ts|mts|cts)$/.test(output.fileName)) {
-              for (const id of [...output.imports, ...output.dynamicImports]) {
-                if (!emittedChunks.has(id) && !emittedChunks.has(id.replace(/^\.\//, ''))) {
-                  externalImports.add(id)
-                }
-              }
-            }
-          }
-
-          if (externalImports.size > 0) {
-            this.error({
-              message: `External runtime dependencies are not allowed: ${[...externalImports].join(', ')}`,
-              stack: '',
-            })
-          }
-        },
+  pack: [
+    // Check no runtime deps
+    {
+      write: false,
+      dts: false,
+      deps: {
+        onlyBundle: [],
       },
-    ],
-  },
+    },
+    // Check types deps
+    {
+      write: false,
+      dts: { emitDtsOnly: true },
+      deps: {
+        onlyBundle: ['discord-api-types', 'hono'],
+      },
+    },
+    // Packing
+    {
+      deps: {
+        neverBundle: true,
+      },
+    },
+  ],
 })
