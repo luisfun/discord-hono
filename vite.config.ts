@@ -82,27 +82,15 @@ export default defineConfig({
     },
   },
   pack: [
-    // Check no runtime deps
     {
-      write: false,
       dts: false,
-      deps: {
-        onlyBundle: [],
-      },
+      deps: { onlyBundle: [], onlyImport: [] }, // Check zero runtime JS deps
+      clean: true,
     },
-    // Check types deps
     {
-      write: false,
       dts: { emitDtsOnly: true },
-      deps: {
-        onlyBundle: ['discord-api-types', 'hono'],
-      },
-    },
-    // Packing
-    {
-      deps: {
-        neverBundle: true,
-      },
+      deps: { onlyBundle: [] }, // Check types deps
+      clean: false,
     },
   ],
 })
