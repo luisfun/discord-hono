@@ -54,6 +54,7 @@ export default defineConfig({
       'no-console': ['warn', { allow: ['assert', 'error', 'info', 'warn'] }],
       'no-plusplus': 'off',
       'no-undefined': 'off',
+      'oxc/bad-bitwise-operator': 'off',
       'oxc/no-async-await': 'off', // ???
       'oxc/no-optional-chaining': 'off',
       'oxc/no-rest-spread-properties': 'off',

@@ -10,70 +10,73 @@ export const isProto = (value: unknown): boolean =>
   value === '__proto__' || value === 'constructor' || value === 'prototype'
 
 const messageFlagData = {
-  SUPPRESS_EMBEDS: 2,
-  EPHEMERAL: 6,
-  SUPPRESS_NOTIFICATIONS: 12,
-  IS_COMPONENTS_V2: 15,
+  SUPPRESS_EMBEDS: 1 << 2,
+  EPHEMERAL: 1 << 6,
+  SUPPRESS_NOTIFICATIONS: 1 << 12,
+  IS_COMPONENTS_V2: 1 << 15,
 } as const
 
 export type MessageFlag = keyof typeof messageFlagData
 
-export const messageFlags = (...flag: MessageFlag[]): number =>
-  flag.reduce((result, f) => result | (1 << messageFlagData[f]), 0)
+export const messageFlags = (...flags: MessageFlag[]): number => {
+  let result = 0
+  for (const f of flags) result |= messageFlagData[f]
+  return result
+}
 
 const permissionFlagData = {
-  CREATE_INSTANT_INVITE: 0,
-  KICK_MEMBERS: 1,
-  BAN_MEMBERS: 2,
-  ADMINISTRATOR: 3,
-  MANAGE_CHANNELS: 4,
-  MANAGE_GUILD: 5,
-  ADD_REACTIONS: 6,
-  VIEW_AUDIT_LOG: 7,
-  PRIORITY_SPEAKER: 8,
-  STREAM: 9,
-  VIEW_CHANNEL: 10,
-  SEND_MESSAGES: 11,
-  SEND_TTS_MESSAGES: 12,
-  MANAGE_MESSAGES: 13,
-  EMBED_LINKS: 14,
-  ATTACH_FILES: 15,
-  READ_MESSAGE_HISTORY: 16,
-  MENTION_EVERYONE: 17,
-  USE_EXTERNAL_EMOJIS: 18,
-  VIEW_GUILD_INSIGHTS: 19,
-  CONNECT: 20,
-  SPEAK: 21,
-  MUTE_MEMBERS: 22,
-  DEAFEN_MEMBERS: 23,
-  MOVE_MEMBERS: 24,
-  USE_VAD: 25,
-  CHANGE_NICKNAME: 26,
-  MANAGE_NICKNAMES: 27,
-  MANAGE_ROLES: 28,
-  MANAGE_WEBHOOKS: 29,
-  MANAGE_GUILD_EXPRESSIONS: 30,
-  USE_APPLICATION_COMMANDS: 31,
-  REQUEST_TO_SPEAK: 32,
-  MANAGE_EVENTS: 33,
-  MANAGE_THREADS: 34,
-  CREATE_PUBLIC_THREADS: 35,
-  CREATE_PRIVATE_THREADS: 36,
-  USE_EXTERNAL_STICKERS: 37,
-  SEND_MESSAGES_IN_THREADS: 38,
-  USE_EMBEDDED_ACTIVITIES: 39,
-  MODERATE_MEMBERS: 40,
-  VIEW_CREATOR_MONETIZATION_ANALYTICS: 41,
-  USE_SOUNDBOARD: 42,
-  CREATE_GUILD_EXPRESSIONS: 43,
-  CREATE_EVENTS: 44,
-  USE_EXTERNAL_SOUNDS: 45,
-  SEND_VOICE_MESSAGES: 46,
-  SET_VOICE_CHANNEL_STATUS: 48,
-  SEND_POLLS: 49,
-  USE_EXTERNAL_APPS: 50,
-  PIN_MESSAGES: 51,
-  BYPASS_SLOWMODE: 52,
+  CREATE_INSTANT_INVITE: 1n << 0n,
+  KICK_MEMBERS: 1n << 1n,
+  BAN_MEMBERS: 1n << 2n,
+  ADMINISTRATOR: 1n << 3n,
+  MANAGE_CHANNELS: 1n << 4n,
+  MANAGE_GUILD: 1n << 5n,
+  ADD_REACTIONS: 1n << 6n,
+  VIEW_AUDIT_LOG: 1n << 7n,
+  PRIORITY_SPEAKER: 1n << 8n,
+  STREAM: 1n << 9n,
+  VIEW_CHANNEL: 1n << 10n,
+  SEND_MESSAGES: 1n << 11n,
+  SEND_TTS_MESSAGES: 1n << 12n,
+  MANAGE_MESSAGES: 1n << 13n,
+  EMBED_LINKS: 1n << 14n,
+  ATTACH_FILES: 1n << 15n,
+  READ_MESSAGE_HISTORY: 1n << 16n,
+  MENTION_EVERYONE: 1n << 17n,
+  USE_EXTERNAL_EMOJIS: 1n << 18n,
+  VIEW_GUILD_INSIGHTS: 1n << 19n,
+  CONNECT: 1n << 20n,
+  SPEAK: 1n << 21n,
+  MUTE_MEMBERS: 1n << 22n,
+  DEAFEN_MEMBERS: 1n << 23n,
+  MOVE_MEMBERS: 1n << 24n,
+  USE_VAD: 1n << 25n,
+  CHANGE_NICKNAME: 1n << 26n,
+  MANAGE_NICKNAMES: 1n << 27n,
+  MANAGE_ROLES: 1n << 28n,
+  MANAGE_WEBHOOKS: 1n << 29n,
+  MANAGE_GUILD_EXPRESSIONS: 1n << 30n,
+  USE_APPLICATION_COMMANDS: 1n << 31n,
+  REQUEST_TO_SPEAK: 1n << 32n,
+  MANAGE_EVENTS: 1n << 33n,
+  MANAGE_THREADS: 1n << 34n,
+  CREATE_PUBLIC_THREADS: 1n << 35n,
+  CREATE_PRIVATE_THREADS: 1n << 36n,
+  USE_EXTERNAL_STICKERS: 1n << 37n,
+  SEND_MESSAGES_IN_THREADS: 1n << 38n,
+  USE_EMBEDDED_ACTIVITIES: 1n << 39n,
+  MODERATE_MEMBERS: 1n << 40n,
+  VIEW_CREATOR_MONETIZATION_ANALYTICS: 1n << 41n,
+  USE_SOUNDBOARD: 1n << 42n,
+  CREATE_GUILD_EXPRESSIONS: 1n << 43n,
+  CREATE_EVENTS: 1n << 44n,
+  USE_EXTERNAL_SOUNDS: 1n << 45n,
+  SEND_VOICE_MESSAGES: 1n << 46n,
+  SET_VOICE_CHANNEL_STATUS: 1n << 48n,
+  SEND_POLLS: 1n << 49n,
+  USE_EXTERNAL_APPS: 1n << 50n,
+  PIN_MESSAGES: 1n << 51n,
+  BYPASS_SLOWMODE: 1n << 52n,
 } as const
 
 type PermissionFlag = keyof typeof permissionFlagData
@@ -81,8 +84,11 @@ type PermissionFlag = keyof typeof permissionFlagData
 /**
  * @see https://docs.discord.com/developers/topics/permissions#permissions-bitwise-permission-flags
  */
-export const permissionFlags = (...flag: PermissionFlag[]): number =>
-  Number(flag.reduce((result, f) => result | (1n << BigInt(permissionFlagData[f])), 0n))
+export const permissionFlags = (...flags: PermissionFlag[]): number => {
+  let result = 0n
+  for (const f of flags) result |= permissionFlagData[f]
+  return Number(result)
+}
 
 export type ToJSON<T> = T extends { toJSON(): infer R } ? R : T
 
