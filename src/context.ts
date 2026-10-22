@@ -18,7 +18,7 @@ import type {
   RESTPatchAPIInteractionOriginalResponseJSONBody,
 } from 'discord-api-types/v10'
 
-import { $webhooks$_$_$messages$original, createRest } from './rest'
+import { $interactions$_$_$callback, $webhooks$_$_$messages$original, createRest } from './rest'
 import type {
   AutocompleteContext,
   CommandContext,
@@ -323,9 +323,22 @@ export class Context<
    * ]))
    * ```
    */
-  resModal(data: JsonSerializable<APIModalInteractionResponseCallbackData>): Response {
+  resModal(
+    data: JsonSerializable<APIModalInteractionResponseCallbackData>,
+    callbackHandler?: (res: TypedResponse<undefined>) => unknown,
+  ): Response {
     this.#throwIfNotAllowType([2, 3])
-    return Response.json({ type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse)
+    const json = { type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse
+    if (!callbackHandler) return Response.json(json)
+    this.executionCtx.waitUntil(
+      this.rest(
+        'POST',
+        $interactions$_$_$callback,
+        [(this.#interaction as APIInteraction).id, (this.#interaction as APIInteraction).token],
+        json,
+      ).then(callbackHandler),
+    )
+    return new Response(null, { status: 202 })
   }
 
   /**
