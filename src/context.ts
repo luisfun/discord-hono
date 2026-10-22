@@ -18,7 +18,7 @@ import type {
   RESTPatchAPIInteractionOriginalResponseJSONBody,
 } from 'discord-api-types/v10'
 
-import { $interactions$_$_$callback, $webhooks$_$_$messages$original, createRest } from './rest'
+import { $interactions$_$_$callback, $webhooks$_$_$messages$original, type RestResult, createRest } from './rest'
 import type {
   AutocompleteContext,
   CommandContext,
@@ -74,6 +74,22 @@ export class Context<
   #focused: AutocompleteOption | undefined // 4
   #throwIfNotAllowType(allowType: (APIInteraction | CronEvent)['type'][]): void {
     if (!allowType.includes(this.#interaction.type)) throw newError('c.***', 'Invalid method')
+  }
+  #interactionCallback(
+    data: APIInteractionResponse,
+    file: FileData | undefined,
+    callbackHandler: (res: TypedResponse<RestResult<'POST', typeof $interactions$_$_$callback>>) => unknown,
+  ): Response {
+    this.executionCtx.waitUntil(
+      this.rest(
+        'POST',
+        $interactions$_$_$callback,
+        [(this.#interaction as APIInteraction).id, (this.#interaction as APIInteraction).token],
+        data,
+        file,
+      ).then(callbackHandler),
+    )
+    return new Response(null, { status: 202 })
   }
   // oxlint-disable-next-line complexity
   constructor(
@@ -330,16 +346,8 @@ export class Context<
   ): Response {
     this.#throwIfNotAllowType([2, 3])
     const json = { type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse
-    if (!callbackHandler) return Response.json(json)
-    this.executionCtx.waitUntil(
-      this.rest(
-        'POST',
-        $interactions$_$_$callback,
-        [(this.#interaction as APIInteraction).id, (this.#interaction as APIInteraction).token],
-        json,
-      ).then(callbackHandler),
-    )
-    return new Response(null, { status: 202 })
+    if (callbackHandler) return this.#interactionCallback(json, undefined, callbackHandler)
+    return Response.json(json)
   }
 
   /**
