@@ -18,7 +18,7 @@ import type {
   RESTPatchAPIInteractionOriginalResponseJSONBody,
 } from 'discord-api-types/v10'
 
-import { $webhooks$_$_$messages$original, createRest } from './rest'
+import { $interactions$_$_$callback, $webhooks$_$_$messages$original, type RestResult, createRest } from './rest'
 import type {
   AutocompleteContext,
   CommandContext,
@@ -56,6 +56,8 @@ interface SubKey {
   string: string
 }
 
+type CallbackResult = RestResult<'POST', typeof $interactions$_$_$callback>
+
 export class Context<
   E extends Env,
   This extends CommandContext | ComponentContext | AutocompleteContext | ModalContext | CronContext,
@@ -74,6 +76,22 @@ export class Context<
   #focused: AutocompleteOption | undefined // 4
   #throwIfNotAllowType(allowType: (APIInteraction | CronEvent)['type'][]): void {
     if (!allowType.includes(this.#interaction.type)) throw newError('c.***', 'Invalid method')
+  }
+  #interactionCallback(
+    data: APIInteractionResponse,
+    file: FileData | undefined,
+    callbackHandler: (res: TypedResponse<CallbackResult>) => unknown,
+  ): Response {
+    this.executionCtx.waitUntil(
+      this.rest(
+        'POST',
+        $interactions$_$_$callback,
+        [(this.#interaction as APIInteraction).id, (this.#interaction as APIInteraction).token],
+        data,
+        file,
+      ).then(callbackHandler),
+    )
+    return new Response(null, { status: 202 })
   }
   // oxlint-disable-next-line complexity
   constructor(
@@ -315,6 +333,7 @@ export class Context<
   /**
    * Response for modal window display
    * @param data
+   * @param callbackHandler In [callback mode](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-callback), sends the interaction callback and passes the response to this handler.
    * @returns
    * @example
    * ```ts
@@ -323,9 +342,14 @@ export class Context<
    * ]))
    * ```
    */
-  resModal(data: JsonSerializable<APIModalInteractionResponseCallbackData>): Response {
+  resModal(
+    data: JsonSerializable<APIModalInteractionResponseCallbackData>,
+    callbackHandler?: (res: TypedResponse<CallbackResult>) => unknown,
+  ): Response {
     this.#throwIfNotAllowType([2, 3])
-    return Response.json({ type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse)
+    const json = { type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse
+    if (callbackHandler) return this.#interactionCallback(json, undefined, callbackHandler)
+    return Response.json(json)
   }
 
   /**

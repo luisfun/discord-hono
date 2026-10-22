@@ -12,7 +12,9 @@ export const $webhooks$_$_$messages$_ = '/webhooks/{}/{}/messages/{}' as
 ////////// Receiving and Responding //////////
 // https://discord.com/developers/docs/interactions/receiving-and-responding
 // ✅ 25/02/07
-export const $interactions$_$_$callback = '/interactions/{interaction.id}/{interaction.token}/callback' as const
+// Compressed because it's used in Context
+export const $interactions$_$_$callback =
+  '/interactions/{}/{}/callback' as '/interactions/{interaction.id}/{interaction.token}/callback'
 // Compressed because it's used in Context
 export const $webhooks$_$_$messages$original =
   '/webhooks/{}/{}/messages/@original' as '/webhooks/{application.id}/{interaction.token}/messages/@original'
