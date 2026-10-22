@@ -56,6 +56,8 @@ interface SubKey {
   string: string
 }
 
+type CallbackResult = RestResult<'POST', typeof $interactions$_$_$callback>
+
 export class Context<
   E extends Env,
   This extends CommandContext | ComponentContext | AutocompleteContext | ModalContext | CronContext,
@@ -78,7 +80,7 @@ export class Context<
   #interactionCallback(
     data: APIInteractionResponse,
     file: FileData | undefined,
-    callbackHandler: (res: TypedResponse<RestResult<'POST', typeof $interactions$_$_$callback>>) => unknown,
+    callbackHandler: (res: TypedResponse<CallbackResult>) => unknown,
   ): Response {
     this.executionCtx.waitUntil(
       this.rest(
@@ -342,7 +344,7 @@ export class Context<
    */
   resModal(
     data: JsonSerializable<APIModalInteractionResponseCallbackData>,
-    callbackHandler?: (res: TypedResponse<undefined>) => unknown,
+    callbackHandler?: (res: TypedResponse<CallbackResult>) => unknown,
   ): Response {
     this.#throwIfNotAllowType([2, 3])
     const json = { type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse
