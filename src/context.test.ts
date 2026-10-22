@@ -439,10 +439,16 @@ describe('Context', () => {
 
     expect(response.status).toEqual(202)
     expect(await response.text()).toEqual('')
-    expect(ctx.rest).toHaveBeenCalledWith('POST', $interactions$_$_$callback, ['interaction-id', 'token'], {
-      type: 9,
-      data: modal,
-    }, undefined)
+    expect(ctx.rest).toHaveBeenCalledWith(
+      'POST',
+      $interactions$_$_$callback,
+      ['interaction-id', 'token'],
+      {
+        type: 9,
+        data: modal,
+      },
+      undefined,
+    )
     expect(callbackExecutionCtx.waitUntil).toHaveBeenCalledTimes(1)
     await vi.waitFor(() => expect(callbackHandler).toHaveBeenCalledWith({}))
   })
