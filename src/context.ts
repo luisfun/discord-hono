@@ -315,6 +315,7 @@ export class Context<
   /**
    * Response for modal window display
    * @param data
+   * @param callbackHandler In [callback mode](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-callback), sends the interaction callback and passes the response to this handler.
    * @returns
    * @example
    * ```ts
