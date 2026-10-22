@@ -10,7 +10,7 @@ import { Locale } from 'discord-api-types/v10'
 import { describe, expect, it, vi } from 'vitest'
 
 import { Context } from './context'
-import { $webhooks$_$_$messages$original, createRest } from './rest'
+import { $interactions$_$_$callback, $webhooks$_$_$messages$original, createRest } from './rest'
 import type { CommandContext, ComponentContext } from './types'
 import { isString } from './utils'
 
@@ -23,6 +23,7 @@ vi.mock('./rest', () => ({
       return Promise.resolve({})
     }),
   ),
+  $interactions$_$_$callback: '/interactions/{}/{}/callback',
   $webhooks$_$_$messages$original: '/webhooks/{}/{}/messages/@original',
 }))
 
@@ -423,6 +424,27 @@ describe('Context', () => {
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.type).toEqual(9) // MODAL
     expect(body.data.title).toEqual('Test Modal')
+  })
+
+  it('should send modal response through REST and invoke the callback handler', async () => {
+    const callbackExecutionCtx = {
+      waitUntil: vi.fn(),
+      passThroughOnException: vi.fn(),
+    }
+    const ctx = new Context(env, callbackExecutionCtx, discordEnv, key, commandInteraction)
+    const callbackHandler = vi.fn()
+    const modal = { title: 'Test Modal', custom_id: 'modal-test', components: [] }
+
+    const response = ctx.resModal(modal, callbackHandler)
+
+    expect(response.status).toEqual(202)
+    expect(await response.text()).toEqual('')
+    expect(ctx.rest).toHaveBeenCalledWith('POST', $interactions$_$_$callback, ['interaction-id', 'token'], {
+      type: 9,
+      data: modal,
+    })
+    expect(callbackExecutionCtx.waitUntil).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() => expect(callbackHandler).toHaveBeenCalledWith({}))
   })
 
   it('should create autocomplete response', async () => {
