@@ -43,7 +43,7 @@ describe('register function', () => {
       expect.any(Array),
     )
     expect(result).toBe(mockResponse)
-    expect(console.info).toHaveBeenCalledWith('===== ✅ Success Command Registration =====')
+    expect(console.info).toHaveBeenCalledWith('✅ Success Guild Command Registration')
   })
 
   it('should register global commands when guild_id is not provided', async () => {
@@ -54,7 +54,7 @@ describe('register function', () => {
 
     expect(mockRest).toHaveBeenCalledWith('PUT', $applications$_$commands, [mockApplicationId], expect.any(Array))
     expect(result).toBe(mockResponse)
-    expect(console.info).toHaveBeenCalledWith('===== ✅ Success Command Registration =====')
+    expect(console.info).toHaveBeenCalledWith('✅ Success Global Command Registration')
   })
 
   it('should suppress logging when silent is provided for global commands', async () => {
@@ -104,8 +104,11 @@ describe('register function', () => {
     const result = await register(mockCommands, mockApplicationId, mockToken)
 
     expect(result).toBe(mockErrorResponse)
-    expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Error registering commands'))
-    expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Invalid command structure'))
+    expect(console.error).toHaveBeenCalledWith(
+      expect.stringContaining(
+        '⚠️ 400: \n{\n  "message": "Invalid command structure"\n}\n⚠️ Error Global Command Registration',
+      ),
+    )
   })
 
   it('should handle error when reading response body fails', async () => {
@@ -115,7 +118,8 @@ describe('register function', () => {
     const result = await register(mockCommands, mockApplicationId, mockToken)
 
     expect(result).toBe(mockErrorResponse)
-    expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Error registering commands'))
-    expect(console.error).toHaveBeenCalledWith(expect.stringContaining('JSON parse error'))
+    expect(console.error).toHaveBeenCalledWith(
+      expect.stringContaining('⚠️ 500: \nJSON parse error\n⚠️ Error Global Command Registration'),
+    )
   })
 })
