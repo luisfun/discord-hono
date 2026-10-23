@@ -384,6 +384,33 @@ describe('Context', () => {
     expect(body.data.content).toEqual('Test message')
   })
 
+  it('should send a response through REST and invoke the callback handler', async () => {
+    const callbackExecutionCtx = {
+      waitUntil: vi.fn(),
+      passThroughOnException: vi.fn(),
+    }
+    const ctx = new Context<any, CommandContext>(env, callbackExecutionCtx, discordEnv, key, commandInteraction)
+    const callbackHandler = vi.fn()
+    const file = { blob: new Blob(['test']), name: 'test.txt' }
+
+    const response = ctx.flags('EPHEMERAL').res('Test message', file, callbackHandler)
+
+    expect(response.status).toEqual(202)
+    expect(await response.text()).toEqual('')
+    expect(ctx.rest).toHaveBeenCalledWith(
+      'POST',
+      $interactions$_$_$callback,
+      ['interaction-id', 'token'],
+      {
+        type: 4,
+        data: { content: 'Test message', flags: 64 },
+      },
+      file,
+    )
+    expect(callbackExecutionCtx.waitUntil).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() => expect(callbackHandler).toHaveBeenCalledWith({}))
+  })
+
   it('should create defer response', async () => {
     const ctx = new Context(env, executionCtx, discordEnv, key, commandInteraction)
     const response = ctx.resDefer()
@@ -397,6 +424,32 @@ describe('Context', () => {
     const body = await response.json() //JSON.parse(response.body as string)
     expect(body.type).toEqual(7) // UPDATE_MESSAGE
     expect(body.data.content).toEqual('Updated message')
+  })
+
+  it('should send an update response through REST in callback mode', async () => {
+    const callbackExecutionCtx = {
+      waitUntil: vi.fn(),
+      passThroughOnException: vi.fn(),
+    }
+    const ctx = new Context<any, ComponentContext>(env, callbackExecutionCtx, discordEnv, key, componentInteraction)
+    const callbackHandler = vi.fn()
+
+    const response = ctx.update().res('Updated message', undefined, callbackHandler)
+
+    expect(response.status).toEqual(202)
+    expect(await response.text()).toEqual('')
+    expect(ctx.rest).toHaveBeenCalledWith(
+      'POST',
+      $interactions$_$_$callback,
+      ['interaction-id', 'token'],
+      {
+        type: 7,
+        data: { content: 'Updated message' },
+      },
+      undefined,
+    )
+    expect(callbackExecutionCtx.waitUntil).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() => expect(callbackHandler).toHaveBeenCalledWith({}))
   })
 
   it('should throw error for invalid method calls', () => {
