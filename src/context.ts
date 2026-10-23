@@ -379,17 +379,21 @@ export class Context<
 
   /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
+   * @param callbackHandler In [callback mode](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-callback), sends the interaction callback and passes the response to this handler.
    * @returns
    */
   resAutocomplete(
     data:
       | JsonSerializable<APICommandAutocompleteInteractionResponseCallbackData>
       | Required<APICommandAutocompleteInteractionResponseCallbackData>['choices'],
+    callbackHandler?: (res: TypedResponse<CallbackResult>) => unknown,
   ): Response {
     this.#throwIfNotAllowType([4])
-    const responseData: APICommandAutocompleteInteractionResponseCallbackData = isArray(data)
-      ? { choices: data }
-      : toJSON(data)
-    return Response.json({ type: 8, data: responseData } satisfies APIApplicationCommandAutocompleteResponse)
+    const json = {
+      type: 8,
+      data: isArray(data) ? { choices: data } : toJSON(data),
+    } satisfies APIApplicationCommandAutocompleteResponse
+    if (callbackHandler) return this.#interactionCallback(json, undefined, callbackHandler)
+    return Response.json(json)
   }
 }
