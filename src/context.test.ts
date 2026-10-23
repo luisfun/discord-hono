@@ -400,7 +400,7 @@ describe('Context', () => {
     expect(ctx.rest).toHaveBeenCalledWith(
       'POST',
       $interactions$_$_$callback,
-      ['interaction-id', 'token'],
+      ['interaction-id', 'token', { with_response: true }],
       {
         type: 4,
         data: { content: 'Test message', flags: 64 },
@@ -441,7 +441,7 @@ describe('Context', () => {
     expect(ctx.rest).toHaveBeenCalledWith(
       'POST',
       $interactions$_$_$callback,
-      ['interaction-id', 'token'],
+      ['interaction-id', 'token', { with_response: true }],
       {
         type: 7,
         data: { content: 'Updated message' },
@@ -495,7 +495,7 @@ describe('Context', () => {
     expect(ctx.rest).toHaveBeenCalledWith(
       'POST',
       $interactions$_$_$callback,
-      ['interaction-id', 'token'],
+      ['interaction-id', 'token', { with_response: true }],
       {
         type: 9,
         data: modal,
@@ -530,7 +530,7 @@ describe('Context', () => {
     expect(ctx.rest).toHaveBeenCalledWith(
       'POST',
       $interactions$_$_$callback,
-      ['interaction-id', 'token'],
+      ['interaction-id', 'token', { with_response: true }],
       {
         type: 8,
         data: { choices },
