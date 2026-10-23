@@ -461,6 +461,33 @@ describe('Context', () => {
     expect(body.data.choices).toEqual([{ name: 'Option 1', value: 'option1' }])
   })
 
+  it('should send autocomplete response through REST and invoke the callback handler', async () => {
+    const callbackExecutionCtx = {
+      waitUntil: vi.fn(),
+      passThroughOnException: vi.fn(),
+    }
+    const ctx = new Context(env, callbackExecutionCtx, discordEnv, key, autocompleteInteraction)
+    const callbackHandler = vi.fn()
+    const choices = [{ name: 'Option 1', value: 'option1' }]
+
+    const response = ctx.resAutocomplete(choices, callbackHandler)
+
+    expect(response.status).toEqual(202)
+    expect(await response.text()).toEqual('')
+    expect(ctx.rest).toHaveBeenCalledWith(
+      'POST',
+      $interactions$_$_$callback,
+      ['interaction-id', 'token'],
+      {
+        type: 8,
+        data: { choices },
+      },
+      undefined,
+    )
+    expect(callbackExecutionCtx.waitUntil).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() => expect(callbackHandler).toHaveBeenCalledWith({}))
+  })
+
   it('should create activity response', async () => {
     const ctx = new Context(env, executionCtx, discordEnv, key, commandInteraction)
     const response = ctx.resActivity()
