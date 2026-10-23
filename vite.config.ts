@@ -77,6 +77,7 @@ export default defineConfig({
     ],
   },
   test: {
+    reporters: ['minimal'],
     coverage: {
       include: ['src/**'],
       reporter: ['html', 'json'],
