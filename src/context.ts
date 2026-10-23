@@ -242,15 +242,21 @@ export class Context<
   /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
+   * @param callbackHandler In [callback mode](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-callback), sends the interaction callback and passes the response to this handler.
    * @returns
    */
-  res(data: Simplify<CustomCallbackData<APIInteractionResponseCallbackData>>, file?: FileData): Response {
+  res(
+    data: Simplify<CustomCallbackData<APIInteractionResponseCallbackData>>,
+    file?: FileData,
+    callbackHandler?: (res: TypedResponse<CallbackResult>) => unknown,
+  ): Response {
     this.#throwIfNotAllowType([2, 3, 5])
-    const body: APIInteractionResponse = {
+    const json = {
       data: { ...this.#flags, ...prepareData(data) },
       type: this.#update ? 7 : 4,
-    }
-    return file ? new Response(formData(body, file)) : Response.json(body)
+    } as const satisfies APIInteractionResponse
+    if (callbackHandler) return this.#interactionCallback(json, file, callbackHandler)
+    return file ? new Response(formData(json, file)) : Response.json(json)
   }
   /**
    * ACK an interaction and edit a response later, the user sees a loading state
@@ -347,7 +353,7 @@ export class Context<
     callbackHandler?: (res: TypedResponse<CallbackResult>) => unknown,
   ): Response {
     this.#throwIfNotAllowType([2, 3])
-    const json = { type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse
+    const json = { type: 9, data: toJSON(data) } as const satisfies APIModalInteractionResponse
     if (callbackHandler) return this.#interactionCallback(json, undefined, callbackHandler)
     return Response.json(json)
   }
@@ -392,7 +398,7 @@ export class Context<
     const json = {
       type: 8,
       data: isArray(data) ? { choices: data } : toJSON(data),
-    } satisfies APIApplicationCommandAutocompleteResponse
+    } as const satisfies APIApplicationCommandAutocompleteResponse
     if (callbackHandler) return this.#interactionCallback(json, undefined, callbackHandler)
     return Response.json(json)
   }
