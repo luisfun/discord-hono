@@ -16,9 +16,10 @@ import type {
   APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
   RESTPatchAPIInteractionOriginalResponseJSONBody,
+  RESTPostAPIInteractionCallbackWithResponseResult,
 } from 'discord-api-types/v10'
 
-import { $interactions$_$_$callback, $webhooks$_$_$messages$original, type RestResult, createRest } from './rest'
+import { $interactions$_$_$callback, $webhooks$_$_$messages$original, createRest } from './rest'
 import type {
   AutocompleteContext,
   CommandContext,
@@ -56,7 +57,7 @@ interface SubKey {
   string: string
 }
 
-type CallbackResult = RestResult<'POST', typeof $interactions$_$_$callback>
+type CallbackResult = RESTPostAPIInteractionCallbackWithResponseResult
 
 export class Context<
   E extends Env,
@@ -83,12 +84,18 @@ export class Context<
     callbackHandler: (res: TypedResponse<CallbackResult>) => unknown,
   ): Response {
     this.executionCtx.waitUntil(
-      this.rest(
-        'POST',
-        $interactions$_$_$callback,
-        [(this.#interaction as APIInteraction).id, (this.#interaction as APIInteraction).token],
-        data,
-        file,
+      (
+        this.rest(
+          'POST',
+          $interactions$_$_$callback,
+          [
+            (this.#interaction as APIInteraction).id,
+            (this.#interaction as APIInteraction).token,
+            { with_response: true },
+          ],
+          data,
+          file,
+        ) as Promise<TypedResponse<RESTPostAPIInteractionCallbackWithResponseResult>>
       ).then(callbackHandler),
     )
     return new Response(null, { status: 202 })
@@ -242,15 +249,21 @@ export class Context<
   /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-callback-data-structure)
    * @param file File: { blob: Blob, name: string } | { blob: Blob, name: string }[]
+   * @param callbackHandler In [callback mode](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-callback), sends the interaction callback and passes the response to this handler.
    * @returns
    */
-  res(data: Simplify<CustomCallbackData<APIInteractionResponseCallbackData>>, file?: FileData): Response {
+  res(
+    data: Simplify<CustomCallbackData<APIInteractionResponseCallbackData>>,
+    file?: FileData,
+    callbackHandler?: (res: TypedResponse<CallbackResult>) => unknown,
+  ): Response {
     this.#throwIfNotAllowType([2, 3, 5])
-    const body: APIInteractionResponse = {
+    const json = {
       data: { ...this.#flags, ...prepareData(data) },
       type: this.#update ? 7 : 4,
-    }
-    return file ? new Response(formData(body, file)) : Response.json(body)
+    } as const satisfies APIInteractionResponse
+    if (callbackHandler) return this.#interactionCallback(json, file, callbackHandler)
+    return file ? new Response(formData(json, file)) : Response.json(json)
   }
   /**
    * ACK an interaction and edit a response later, the user sees a loading state
@@ -347,7 +360,7 @@ export class Context<
     callbackHandler?: (res: TypedResponse<CallbackResult>) => unknown,
   ): Response {
     this.#throwIfNotAllowType([2, 3])
-    const json = { type: 9, data: toJSON(data) } satisfies APIModalInteractionResponse
+    const json = { type: 9, data: toJSON(data) } as const satisfies APIModalInteractionResponse
     if (callbackHandler) return this.#interactionCallback(json, undefined, callbackHandler)
     return Response.json(json)
   }
@@ -379,17 +392,21 @@ export class Context<
 
   /**
    * @param data [Data Structure](https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete)
+   * @param callbackHandler In [callback mode](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-callback), sends the interaction callback and passes the response to this handler.
    * @returns
    */
   resAutocomplete(
     data:
       | JsonSerializable<APICommandAutocompleteInteractionResponseCallbackData>
       | Required<APICommandAutocompleteInteractionResponseCallbackData>['choices'],
+    callbackHandler?: (res: TypedResponse<CallbackResult>) => unknown,
   ): Response {
     this.#throwIfNotAllowType([4])
-    const responseData: APICommandAutocompleteInteractionResponseCallbackData = isArray(data)
-      ? { choices: data }
-      : toJSON(data)
-    return Response.json({ type: 8, data: responseData } satisfies APIApplicationCommandAutocompleteResponse)
+    const json = {
+      type: 8,
+      data: isArray(data) ? { choices: data } : toJSON(data),
+    } as const satisfies APIApplicationCommandAutocompleteResponse
+    if (callbackHandler) return this.#interactionCallback(json, undefined, callbackHandler)
+    return Response.json(json)
   }
 }

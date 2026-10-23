@@ -67,6 +67,7 @@ describe('inspectResponse', () => {
     const response = Response.json('Bad Request', { status: 400 })
 
     await expect(inspectResponse(response)).resolves.toEqual({
+      parsed: true,
       json: 'Bad Request',
       text: '"Bad Request"',
       message: 'Bad Request',
@@ -93,6 +94,7 @@ describe('inspectResponse', () => {
     const response = new Response('not json', { status: 500 })
 
     await expect(inspectResponse(response)).resolves.toEqual({
+      parsed: false,
       json: undefined,
       text: 'JSON parse error',
       message: 'JSON parse error',
