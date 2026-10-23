@@ -9,7 +9,6 @@ const postRequest = (json: object): Request =>
   new Request('https://example.com', { method: 'POST', body: JSON.stringify(json) })
 
 describe('DiscordHono', () => {
-  const app = new DiscordHono()
   const env = { DISCORD_PUBLIC_KEY: 'test_public_key' }
 
   it('should warn when registering multiple handlers with the same key', () => {
@@ -22,6 +21,7 @@ describe('DiscordHono', () => {
   })
 
   it('should register handlers', () => {
+    const app = new DiscordHono()
     const commandHandler = vi.fn()
     const componentHandler = vi.fn()
     const autocompleteHandler = vi.fn()
@@ -30,7 +30,7 @@ describe('DiscordHono', () => {
     app.command('test', commandHandler)
     app.component('test', componentHandler)
     app.autocomplete('test', autocompleteHandler)
-    app.autocomplete('test', autocompleteHandler, commandHandler)
+    app.autocomplete('autocomplete-with-command', autocompleteHandler, commandHandler)
     app.modal('test', modalHandler)
     app.cron('0 0 * * *', cronHandler)
     expect(commandHandler).not.toHaveBeenCalled()
@@ -41,6 +41,7 @@ describe('DiscordHono', () => {
   })
 
   describe('fetch', () => {
+    const app = new DiscordHono()
     it('should return text for GET requests', async () => {
       const req = new Request('https://example.com', { method: 'GET' })
       const res = await app.fetch(req)
@@ -92,9 +93,9 @@ describe('DiscordHono', () => {
   describe('scheduled', () => {
     it('should call the registered cron handler', async () => {
       const handler = vi.fn()
-      app.cron('0 0 * * *', handler)
+      const scheduledApp = new DiscordHono().cron('0 0 * * *', handler)
       const event = { cron: '0 0 * * *', type: '', scheduledTime: 0 }
-      await app.scheduled(event, {})
+      await scheduledApp.scheduled(event, {})
       expect(handler).toHaveBeenCalledWith(expect.any(Context))
     })
   })

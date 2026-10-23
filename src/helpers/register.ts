@@ -63,13 +63,12 @@ export const register: Register = async (
 
   if (opts?.silent) return res
 
+  const logText = `${guild_id ? 'Guild' : 'Global'} Command Registration`
   if (res.ok) {
-    console.info('===== ✅ Success Command Registration =====')
+    console.info(`✅ Success ${logText}`)
   } else {
     const debug = await inspectResponse(res)
-    console.error(
-      `Error registering commands\n${res.url}\n${res.status}: ${res.statusText}\n\n${debug.text}\n===== ⚠️ Error Command Registration =====`,
-    )
+    console.error(`⚠️ ${res.status}: ${res.url}\n${debug.text}\n⚠️ Error ${logText}`)
   }
   return res
 }
