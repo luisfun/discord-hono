@@ -3,14 +3,21 @@ import type { Simplify, TypedResponse } from '../types'
 interface InspectOptions {
   depth?: number
   errorDepth?: number
-  codeBlock?: boolean
 }
 
-interface InspectResult<R extends Response | TypedResponse<any>> {
-  json: (ReturnType<R['json']> extends Promise<infer U> ? U : ReturnType<R['json']>) | undefined
-  text: string
-  message: string
-}
+type InspectResult<R extends Response | TypedResponse<any>> =
+  | {
+      parsed: true
+      json: ReturnType<R['json']> extends Promise<infer U> ? U : ReturnType<R['json']>
+      text: string
+      message: string
+    }
+  | {
+      parsed: false
+      json: undefined
+      text: 'JSON parse error'
+      message: 'Success' | 'JSON parse error'
+    }
 
 const collectResponseErrors = (errors: Record<string, unknown>, path: string): string[] =>
   Object.entries(errors).flatMap(([key, child]) => {
@@ -60,20 +67,27 @@ const summarize = (value: unknown, depth: number): unknown => {
 /**
  * @beta
  * @param response The Response object to inspect.
- * @param options `{ depth?: number, errorDepth?: number, codeBlock?: boolean }`
- * @returns `Promise<{ json: any | undefined, text: string, message: string }>`
+ * @param options `{ depth?: number, errorDepth?: number }`
+ * @returns `Promise<{ parsed: boolean, json: any | undefined, text: string, message: string }>`
  */
 export const inspectResponse = async <R extends Response | TypedResponse<any>>(
   response: R,
   options?: InspectOptions,
 ): Promise<Simplify<InspectResult<R>>> => {
-  const res = response.clone()
   try {
-    const json = await res.json()
-    const text = JSON.stringify(summarize(json, res.ok ? (options?.depth ?? 1) : (options?.errorDepth ?? 10)), null, 2)
-    const message = res.ok ? 'Success' : formatResponseError(json)
-    return { json, text: options?.codeBlock ? `\`\`\`json\n${text}\n\`\`\`` : text, message }
+    const json = await response.clone().json()
+    return {
+      parsed: true,
+      json,
+      text: JSON.stringify(summarize(json, response.ok ? (options?.depth ?? 1) : (options?.errorDepth ?? 10)), null, 2),
+      message: response.ok ? 'Success' : formatResponseError(json),
+    }
   } catch {
-    return { json: undefined, text: 'JSON parse error', message: 'JSON parse error' }
+    return {
+      parsed: false,
+      json: undefined,
+      text: 'JSON parse error',
+      message: response.ok ? 'Success' : 'JSON parse error',
+    }
   }
 }
