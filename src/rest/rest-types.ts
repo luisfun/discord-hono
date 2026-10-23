@@ -244,6 +244,7 @@ import type {
   RESTPostAPIGuildTemplatesResult,
   RESTPostAPIInteractionCallbackQuery,
   RESTPostAPIInteractionCallbackResult,
+  RESTPostAPIInteractionCallbackWithResponseResult,
   RESTPostAPIInteractionFollowupJSONBody,
   RESTPostAPIInteractionFollowupResult,
   RESTPostAPIPollExpireResult,
@@ -1265,7 +1266,7 @@ export type RestResult<M extends RestMethod, P extends RestPath<M>> =
     never
   : M extends 'POST' ?
     // Receiving and Responding
-    P extends typeof $interactions$_$_$callback ? RESTPostAPIInteractionCallbackResult :
+    P extends typeof $interactions$_$_$callback ? RESTPostAPIInteractionCallbackResult | RESTPostAPIInteractionCallbackWithResponseResult :
     P extends typeof $webhooks$_$_ ? RESTPostAPIInteractionFollowupResult :
     // Application Commands
     P extends typeof $applications$_$commands ? RESTPostAPIApplicationCommandsResult :

@@ -16,9 +16,10 @@ import type {
   APIModalInteractionResponse,
   APIModalInteractionResponseCallbackData,
   RESTPatchAPIInteractionOriginalResponseJSONBody,
+  RESTPostAPIInteractionCallbackWithResponseResult,
 } from 'discord-api-types/v10'
 
-import { $interactions$_$_$callback, $webhooks$_$_$messages$original, type RestResult, createRest } from './rest'
+import { $interactions$_$_$callback, $webhooks$_$_$messages$original, createRest } from './rest'
 import type {
   AutocompleteContext,
   CommandContext,
@@ -56,7 +57,7 @@ interface SubKey {
   string: string
 }
 
-type CallbackResult = RestResult<'POST', typeof $interactions$_$_$callback>
+type CallbackResult = RESTPostAPIInteractionCallbackWithResponseResult
 
 export class Context<
   E extends Env,
@@ -83,12 +84,18 @@ export class Context<
     callbackHandler: (res: TypedResponse<CallbackResult>) => unknown,
   ): Response {
     this.executionCtx.waitUntil(
-      this.rest(
-        'POST',
-        $interactions$_$_$callback,
-        [(this.#interaction as APIInteraction).id, (this.#interaction as APIInteraction).token],
-        data,
-        file,
+      (
+        this.rest(
+          'POST',
+          $interactions$_$_$callback,
+          [
+            (this.#interaction as APIInteraction).id,
+            (this.#interaction as APIInteraction).token,
+            { with_response: true },
+          ],
+          data,
+          file,
+        ) as Promise<TypedResponse<RESTPostAPIInteractionCallbackWithResponseResult>>
       ).then(callbackHandler),
     )
     return new Response(null, { status: 202 })
