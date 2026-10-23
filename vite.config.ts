@@ -88,11 +88,13 @@ export default defineConfig({
       dts: false,
       deps: { onlyBundle: [], onlyImport: [] }, // Check zero runtime JS deps
       clean: true,
+      logLevel: 'info',
     },
     {
       dts: { emitDtsOnly: true },
       deps: { onlyBundle: [] }, // Check types deps
       clean: false,
+      logLevel: 'warn',
     },
   ],
 })
