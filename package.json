@@ -29,7 +29,7 @@
     }
   },
   "scripts": {
-    "check": "vp check",
+    "check": "tsc --noEmit && vp check",
     "fix": "vp check --fix",
     "test": "vp test run --coverage",
     "pack": "vp pack",

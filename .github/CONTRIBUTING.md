@@ -14,7 +14,7 @@ For quick questions or immediate assistance, consider using our Discord chat.
 
 - Run `npm ci` to install
 - Run `npm run fix` before commit
-- Run `npm run test` before pull request
+- Run `npm run build` before pull request
 
 ### License Agreement
 
