@@ -223,6 +223,12 @@ export type FileData = FileUnit | FileUnit[]
 
 ///////// TypedResponse //////////
 
-export interface TypedResponse<T> extends Omit<Response, 'json'> {
-  json(): Promise<T>
-}
+export type TypedResponse<T> =
+  | (Omit<Response, 'ok' | 'json'> & {
+      readonly ok: true
+      json(): Promise<T>
+    })
+  | (Omit<Response, 'ok' | 'json'> & {
+      readonly ok: false
+      json(): Promise<unknown>
+    })
