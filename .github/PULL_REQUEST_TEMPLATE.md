@@ -10,6 +10,6 @@
 ### Checklist
 
 - [ ] npm run fix
-- [ ] npm run test
+- [ ] npm run build
 - [ ] Add tests (as needed)
 - [ ] Add JsDoc (as needed)

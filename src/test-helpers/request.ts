@@ -21,7 +21,7 @@ export const testCommandRequestBodyJson = <V extends {}>(
     },
   } as APIApplicationCommandInteraction
   // CHAT_INPUT with options
-  if (interaction.data.type === 1 && cmd.options) {
+  if (interaction.data.type === 1 && 'options' in cmd && cmd.options) {
     if (cmd.options.every(opt => supportOptionType.has(opt.type))) {
       if (options) {
         interaction.data.options = []
