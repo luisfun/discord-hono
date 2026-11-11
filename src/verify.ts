@@ -9,9 +9,8 @@ const hex2bin: (hex: string) => Uint8Array<ArrayBuffer> =
   // @ts-ignore: ts(2550): ES2025. To prevent errors in GitHub Actions (supporting the latest Node.js).
   Uint8Array.fromHex ??
   ((hex: string): Uint8Array<ArrayBuffer> => {
-    const len = hex.length
-    const bin = new Uint8Array(len >> 1)
-    for (let i = 0; i < len; i += 2) bin[i >> 1] = Number.parseInt(hex.slice(i, i + 2), 16)
+    const bin = new Uint8Array(hex.length / 2)
+    for (let i = 0; i < hex.length; i += 2) bin[i / 2] = Number.parseInt(hex.slice(i, i + 2), 16)
     return bin
   })
 
