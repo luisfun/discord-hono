@@ -10,8 +10,8 @@ import pkg from '../package.json' with { type: 'json' }
  */
 const hex2bin = hex => {
   const len = hex.length
-  const bin = new Uint8Array(len >> 1)
-  for (let i = 0; i < len; i += 2) bin[i >> 1] = Number.parseInt(hex.slice(i, i + 2), 16)
+  const bin = new Uint8Array(len / 2)
+  for (let i = 0; i < len; i += 2) bin[i / 2] = Number.parseInt(hex.slice(i, i + 2), 16)
   return bin
 }
 

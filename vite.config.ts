@@ -50,7 +50,6 @@ export default defineConfig({
       'unicorn/switch-case-braces': ['warn', 'avoid'],
       // restriction
       'default-case': 'off', // For concise coding
-      'no-bitwise': 'off',
       'no-console': ['warn', { allow: ['assert', 'error', 'info', 'warn'] }],
       'no-plusplus': 'off',
       'no-undefined': 'off',
@@ -69,6 +68,7 @@ export default defineConfig({
         files: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
         rules: {
           'init-declarations': 'off',
+          'no-bitwise': 'off',
           'no-proto': 'off',
           'typescript/ban-ts-comment': 'off',
           'unicorn/max-nested-calls': 'off',

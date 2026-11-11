@@ -1,3 +1,5 @@
+// eslint-disable no-bitwise
+
 import type { CustomCallbackData, FileData } from './types'
 
 export const CUSTOM_ID_SEPARATOR = ';'
