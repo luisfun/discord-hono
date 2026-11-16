@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
+    "@cloudflare/workers-types": "^5.20261114.1",
     "@discordjs/builders": "^1.14.1",
     "@tsconfig/strictest": "^2.0.8",
     "@vitest/coverage-v8": "5.0.5",

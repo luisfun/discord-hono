@@ -8,5 +8,6 @@
     "forceConsistentCasingInFileNames": true,
     "erasableSyntaxOnly": true
   },
-  "include": [".github/**/*", "src/**/*", "*"]
+  "include": [".github/**/*", "src/**/*", "*"],
+  "exclude": ["src/gateway/*/**"]
 }
