@@ -24,12 +24,16 @@
   "types": "./dist/index.d.mts",
   "exports": {
     ".": {
+      "workerd": {
+        "types": "./dist/index.cloudflare.d.mts",
+        "default": "./dist/index.cloudflare.mjs"
+      },
       "types": "./dist/index.d.mts",
       "default": "./dist/index.mjs"
     }
   },
   "scripts": {
-    "check": "tsc --noEmit && vp check",
+    "check": "tsc --noEmit && tsc --noEmit -p src/gateway/cloudflare/tsconfig.json && vp check",
     "fix": "vp check --fix",
     "test": "vp test run --coverage",
     "pack": "vp pack",
