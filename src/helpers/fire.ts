@@ -22,6 +22,7 @@ interface FireOptions {
  * ```
  */
 export const fire = (app: FetchModule, options?: FireOptions): void => {
+  // oxlint-disable-next-line typescript/prefer-ts-expect-error, typescript/ban-ts-comment
   // @ts-ignore: ts(2769)
   addEventListener('fetch', (event: FetchEventLike) => {
     const env = typeof options?.env === 'function' ? options.env(event) : options?.env

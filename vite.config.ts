@@ -68,6 +68,7 @@ export default defineConfig({
         files: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
         rules: {
           'init-declarations': 'off',
+          'max-classes-per-file': 'off',
           'no-bitwise': 'off',
           'no-proto': 'off',
           'typescript/ban-ts-comment': 'off',
