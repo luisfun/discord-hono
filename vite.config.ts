@@ -90,7 +90,7 @@ export default defineConfig({
         index: 'src/index.ts',
         cloudflare: 'src/cloudflare/index.ts',
       },
-      //tsconfig: 'src/cloudflare/tsconfig.json',
+      tsconfig: 'tsconfig.build.json',
       dts: false,
       deps: { onlyBundle: [], onlyImport: ['cloudflare:workers'], neverBundle: ['cloudflare:workers'] },
       clean: true,
@@ -101,7 +101,7 @@ export default defineConfig({
         index: 'src/index.ts',
         cloudflare: 'src/cloudflare/index.ts',
       },
-      //tsconfig: 'src/cloudflare/tsconfig.json',
+      tsconfig: 'tsconfig.build.json',
       dts: { emitDtsOnly: true },
       deps: { onlyBundle: [] }, // Check types deps
       clean: false,
