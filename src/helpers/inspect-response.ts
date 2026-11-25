@@ -75,7 +75,8 @@ export const inspectResponse = async <R extends Response | TypedResponse<any>>(
   options?: InspectOptions,
 ): Promise<Simplify<InspectResult<R>>> => {
   try {
-    const json = await response.clone().json()
+    // The type must be cast in environments with "types": ["@cloudflare/workers-types"].
+    const json = await (response.clone() as R).json()
     return {
       parsed: true,
       json,

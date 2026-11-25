@@ -68,6 +68,7 @@ export default defineConfig({
         files: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
         rules: {
           'init-declarations': 'off',
+          'max-classes-per-file': 'off',
           'no-bitwise': 'off',
           'no-proto': 'off',
           'typescript/ban-ts-comment': 'off',
@@ -85,12 +86,22 @@ export default defineConfig({
   },
   pack: [
     {
+      entry: {
+        index: 'src/index.ts',
+        cloudflare: 'src/cloudflare/index.ts',
+      },
+      tsconfig: 'tsconfig.build.json',
       dts: false,
-      deps: { onlyBundle: [], onlyImport: [] }, // Check zero runtime JS deps
+      deps: { onlyBundle: [], onlyImport: ['cloudflare:workers'], neverBundle: ['cloudflare:workers'] },
       clean: true,
       logLevel: 'info',
     },
     {
+      entry: {
+        index: 'src/index.ts',
+        cloudflare: 'src/cloudflare/index.ts',
+      },
+      tsconfig: 'tsconfig.build.json',
       dts: { emitDtsOnly: true },
       deps: { onlyBundle: [] }, // Check types deps
       clean: false,

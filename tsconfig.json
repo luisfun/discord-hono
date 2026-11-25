@@ -9,5 +9,5 @@
     "erasableSyntaxOnly": true
   },
   "include": [".github/**/*", "src/**/*", "*"],
-  "exclude": ["src/gateway/*/**"]
+  "exclude": ["src/cloudflare/**"]
 }
