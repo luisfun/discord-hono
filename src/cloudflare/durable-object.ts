@@ -160,7 +160,8 @@ export abstract class GatewayDO<E extends GatewayEnv = GatewayEnv> extends Durab
       const due = Math.max(this.#stored.reconnectAt, this.#stored.session ? 0 : this.#stored.identifyAfter)
       if (Date.now() < due) return
       const connectionGeneration = this.#generation
-      await this.ctx.storage.setAlarm(Date.now() + 60_000)
+      // Recover quickly if the object is evicted mid-connect (discovery + upgrade take at most 30s)
+      await this.ctx.storage.setAlarm(Date.now() + 35_000)
       if (connectionGeneration !== this.#generation) return
       await this.#connectGateway(token, intents, connectionGeneration)
     } finally {
