@@ -85,16 +85,16 @@ export default defineConfig({
   },
   pack: [
     {
-      entry: ['src/index.ts', 'src/index.cloudflare.ts'],
-      tsconfig: 'tsconfig.cloudflare.json',
+      entry: ['src/index.ts', 'src/cloudflare/index.ts'],
+      tsconfig: 'src/cloudflare/tsconfig.json',
       dts: false,
       deps: { onlyBundle: [], onlyImport: ['cloudflare:workers'], neverBundle: ['cloudflare:workers'] },
       clean: true,
       logLevel: 'info',
     },
     {
-      entry: ['src/index.ts', 'src/index.cloudflare.ts'],
-      tsconfig: 'tsconfig.cloudflare.json',
+      entry: ['src/index.ts', 'src/cloudflare/index.ts'],
+      tsconfig: 'src/cloudflare/tsconfig.json',
       dts: { emitDtsOnly: true },
       deps: { onlyBundle: [] }, // Check types deps
       clean: false,

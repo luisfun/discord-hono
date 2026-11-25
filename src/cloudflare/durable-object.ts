@@ -1,7 +1,7 @@
 import { DurableObject } from 'cloudflare:workers'
 import type { GatewayDispatchPayload } from 'discord-api-types/v10'
 
-import { createRest } from '../../rest/rest'
+import { createRest } from '../rest/rest'
 
 /** Bindings required by the single-shard Gateway. */
 export interface GatewayEnv {

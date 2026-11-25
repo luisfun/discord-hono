@@ -1,2 +1,2 @@
-export * from './index'
-export * from './gateway/cloudflare/durable-object'
+export * from '../index'
+export * from './durable-object'
